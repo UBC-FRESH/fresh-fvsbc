@@ -59,7 +59,7 @@ Status: active
 Goal: settle the repository's public footing, then state the question, the users, the scope, and the out-of-scope items, and record the first decisions as ADRs.
 
 - [x] P1.1 Add the MIT licence and align the package metadata
-- [ ] P1.2 Write the problem statement and scope in `notes/`
+- [x] P1.2 Write the problem statement and scope in `notes/`
 - [ ] P1.3 Record the first design decisions as ADRs in `notes/adr/`
 
 Acceptance criteria:
