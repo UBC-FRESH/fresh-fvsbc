@@ -8,7 +8,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 
 | Phase | Parent issue | Branch | Status |
 | --- | --- | --- | --- |
-| P0 Bootstrap | TBD | `feature/p0-bootstrap` | planned |
+| P0 Bootstrap | #1 | `feature/p0-bootstrap` | active |
 | P1 Scope and design | TBD | `feature/p1-scope-design` | planned |
 | P2 Contracts and prototype | TBD | `feature/p2-contracts-prototype` | planned |
 | P3 Build | TBD | `feature/p3-build` | planned |
@@ -35,18 +35,20 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 
 ## Phase 0: Bootstrap
 
-Parent issue: TBD
+Parent issue: #1
 Branch: `feature/p0-bootstrap`
-Status: planned
+Status: active
 
 Goal: adapt the contract to this project, and make the first pull request reviewable.
 
-- [ ] P0.1 Adapt `AGENTS.md` and `README.md` to this project
-- [ ] P0.2 Confirm the validator and the docs build pass
+- [x] P0.1 Adapt `AGENTS.md` and `README.md` to this project
+- [x] P0.2 Confirm the validator and the docs build pass
 
 Acceptance criteria:
 
-- <State the criterion that shows this phase met its goal.>
+- `AGENTS.md` states the fvsbc-specific rules, and links the shared workflow rules instead of copying them.
+- `README.md` describes `fvsbc`, its place in the pipeline, and its status, and claims nothing the roadmap has not recorded.
+- `python scripts/dashboard.py` exits zero on the head commit of the phase branch.
 
 ## Phase 1: Scope and design
 

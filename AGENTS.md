@@ -119,4 +119,15 @@ Record the result in the changelog entry for the milestone.
 
 ## Project-specific rules
 
-Add domain guardrails here, each with its reason. Keep shared workflow rules out of this section.
+- **Wrap the BC variant, and only the BC variant.** `fvsbc` exists to run `FVSbc`. The other variants
+  are PyFVS's concern, not ours.
+- **Never edit the FVS Fortran in this repository.** The Fortran lives in the pinned PyFVS fork and its
+  FVS source submodule (ADR 0001). A needed change is made there, and the new pin is recorded here.
+- **Record the provenance of every run.** A run names the PyFVS fork commit, the FVS source submodule
+  commit, and the built variant list, so a result can be reproduced. This is scientific software.
+- **Do not import `nemora`.** `fvsbc` owns the bridge from synthetic stem populations (ADR 0003). Tests
+  use fixture records shaped like `nemora` output, so the suite needs no `nemora` install.
+- **Keep the BC tree list in one writer.** The FVS-BC tree list is a fixed-width record. Build it in one
+  tested place, never by ad hoc string formatting at a call site.
+- **Treat BC inventory data as restricted until proven open.** This repository is public. Confirm the
+  licence of any data before it is committed, and prefer synthetic fixtures.
