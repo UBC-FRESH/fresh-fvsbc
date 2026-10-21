@@ -32,11 +32,11 @@ The run uses PyFVS's own step API, the same pattern as its `tests/test_variants.
 ```python
 from pyfvs import fvs
 
-f = fvs.FVS('bc')
-f.init_projection('bc_bareground.key')
+f = fvs.FVS("bc")
+f.init_projection("bc_bareground.key")
 for c in range(f.globals.ncyc):
     f.grow()
-rc = f.end_projection()          # rc == 0
+rc = f.end_projection()  # rc == 0
 ```
 
 The keyword file is `pn`'s bare-ground fixture, adapted. Two changes: the species code becomes `FD`, which
