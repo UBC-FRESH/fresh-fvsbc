@@ -12,20 +12,24 @@ FVS source: submodule `forest-modeling/ForestVegetationSimulator` at `ef5fa84`, 
 ## The question
 
 ADR 0001 recorded one central uncertainty: whether adding `bc` to the PyFVS variant matrix is sufficient,
-or whether the FVS source submodule needs a patch. Every later phase depended on the answer.
+or whether the FVS source submodule needs a patch.
 
 ## The answer
 
-**Adding `bc` to the variant matrix is not sufficient.** The variant compiles, links, and produces a
-Python extension module, but the module cannot be imported. Four separate defects stand in the way, and
-three are fixed.
+**Adding `bc` to the variant matrix is not sufficient.** The BC source list is materially incomplete
+against what PyFVS's API and database layers require. Six defects were found; three are fixed, and the
+sixth is a reconstruction task rather than a patch.
 
-| # | Defect | Fixed |
+| # | Defect | Status |
 | --- | --- | --- |
-| 1 | `meson_options.txt` rejects `bc` before anything is compiled | yes |
-| 2 | The BC source list carries 12 Windows-only C++ sources | yes |
-| 3 | `numpy.f2py` cannot parse `canada/bc/BCPLOT.F77` | yes |
-| 4 | PyFVS's API calls `cubrds`, which no BC source defines | **no** |
+| 1 | `meson_options.txt` rejects `bc` before anything compiles | fixed |
+| 2 | `fire/cfim` does not compile on Linux | fixed, by a compiler flag |
+| 3 | `numpy.f2py` cannot parse `canada/bc/BCPLOT.F77` | fixed |
+| 4 | PyFVS's API calls `cubrds`, which no BC source defines | fixed |
+| 5 | The source list omits `vdbsqlite/dbsreference.f` and three `dbsqlite/dbs_fiavbc_*.f` | partly fixed |
+| 6 | The source list omits the entire `volume/` subsystem, which `dbs_fiavbc_*` depend on | **open** |
+
+The build now reaches `[433/569]`. It does not complete.
 
 ## How to reproduce
 
@@ -38,11 +42,6 @@ git -C tmp/pyfvs submodule update --init --recursive --depth 1
 python3 -m venv tmp/build-venv
 tmp/build-venv/bin/python -m pip install meson ninja meson-python setuptools-scm numpy patchelf
 export PATH="$PWD/tmp/build-venv/bin:$PATH"
-```
-
-Then, with the three patches below applied:
-
-```bash
 cd tmp/pyfvs
 meson setup build-bc -Dfvsvariants=bc
 meson compile -C build-bc
@@ -57,152 +56,166 @@ meson.build:4:0: ERROR: Value "bc" for option "fvsvariants" is not in allowed ch
 "pn, wc, so, op, oc, ec, ca, nc, bm, ie, ci, ak, ws"
 ```
 
-Fix: add `'bc'` to the `choices` list in `meson_options.txt`. The `value` list, which is the default set,
-was left alone.
+Fix: add `'bc'` to the `choices` list in `meson_options.txt`. The `value` list, the default set, is
+unchanged.
 
-## Defect 2: the source list carries Windows-only sources
+## Defect 2: `fire/cfim` does not compile on Linux
 
-With defect 1 fixed, the compile fails in the C++ phase, on all 12 `fire/cfim` sources:
+The compile fails on all 12 `fire/cfim` sources:
 
 ```text
 FAILED: libfvsbc.a.p/fvs_fire_cfim_nrutilcpp.cpp.o
 ../fvs/fire/cfim/stdafx.h:17:10: fatal error: tchar.h: No such file or directory
 ```
 
-`tchar.h` is an MSVC header. `fire/cfim/stdafx.h` includes it, so the whole component is Windows-only.
+**The first fix attempted was wrong.** Deleting the 12 `../fire/cfim/` lines from the BC source list does
+clear the error, but it removes `cfim_driver`, which `canada/fire/bc/fmcfim.f` line 166 calls. The compile
+error became a link error. Deleting the lines is a remedy for a defect that does not exist.
 
-The BC source list carries these; the US variants do not:
+The real cause is a missing compiler definition. `fire/cfim/stdafx.h` guards the Windows header:
 
-| Source list | `fire/cfim` entries |
-| --- | --- |
-| `FVSbc_sourceList.txt` | 12 |
-| `FVSon_sourceList.txt` | 12 |
-| `FVSpn_sourceList.txt` | 0 |
-| `FVSwc_sourceList.txt` | 0 |
-| `FVSak_sourceList.txt` | 0 |
+```c
+#include <stdio.h>
+#ifndef unix
+#include <tchar.h>
+#endif
+```
 
-Both Canadian variants carry them, and no US variant does. Fix: delete the 12 lines. The BC source list
-goes from 655 lines to 643, and the C++ phase then passes.
+and `fire/cfim/cfim.cpp` has three branches:
+
+```cpp
+#ifdef CMPgcc
+  #ifdef unix
+    extern "C" int cfim_driver_ (              // GCC compiler, Unix OS
+  #else
+    extern "C" { __stdcall __declspec(dllexport) int cfim_driver_ (   // GCC compiler, Windows OS
+#else
+  extern "C" __declspec(dllexport) int CFIM_DRIVER (                  // VS2010 compiler, Windows OS
+```
+
+A Linux-clean branch already exists. Nothing defined `CMPgcc`, so the MinGW branch was taken.
+
+Fix: `add_project_arguments('-DCMPgcc', '-Dunix', language: 'cpp')` in `meson.build`.
+
+Note the scope: both Canadian source lists carry the `fire/cfim` sources, and no US variant does. No US
+variant compiles `cfim`, so PyFVS had never built it on Linux. The fix is likely of interest upstream.
 
 ## Defect 3: f2py cannot parse `BCPLOT.F77`
 
-With defects 1 and 2 fixed, the only failure is the signature step:
+The signature step fails:
 
 ```text
 FAILED: fvsbc_pre.pyf
 Exception: crackline: groupcounter(=0) is nonpositive. Check the blocks.
 ```
 
-Bisecting the f2py input list isolated it to two files, and then to one cause.
+`canada/bc/BCPLOT.F77` is not a Fortran program unit. Its first line is `CODE SEGMENT BCPLOT`, and it holds
+Fortran 90 derived types that f2py's fixed-form parser cannot handle.
 
-`canada/bc/BCPLOT.F77` is not a Fortran program unit. Its first line is `CODE SEGMENT BCPLOT`, and it
-holds Fortran 90 derived types:
+`canada/bc/blkdat.f` fails for the same reason by a route that is easy to miss. Its line 22 is
+`INCLUDE 'BCPLOT.F77'`, and f2py resolves an `INCLUDE` relative to the including file's directory, where
+that file sits. Its other `INCLUDE` lines name files in `common/`, which f2py cannot resolve and ignores.
+`blkdat.f` does not reference anything from `BCPLOT.F77`; the include is vestigial.
 
-```fortran
-      TYPE BEC_DESCRIPTION
-        SEQUENCE
-        CHARACTER (LEN=3)  :: Region
-        ...
-      END TYPE
-```
-
-`numpy.f2py` parses fixed-form Fortran and cannot handle that construct.
-
-`canada/bc/blkdat.f` fails for the same reason, by a route that is easy to miss. Its line 22 is:
-
-```fortran
-      INCLUDE 'BCPLOT.F77'
-```
-
-f2py resolves an `INCLUDE` relative to the including file's directory, and `BCPLOT.F77` sits beside
-`blkdat.f`. So f2py reads it and dies. Its other `INCLUDE` lines name files in `common/`, which it cannot
-resolve, and it ignores those.
-
-Two things follow:
-
-- `blkdat.f` does not reference anything from `BCPLOT.F77`. The include is vestigial, and removing it does
-  not change what the file compiles to.
-- `BCPLOT.F77` is also passed to f2py directly, as line 1 of the source list, so it must be excluded from
-  the signature input as well as from the include.
-
-Fix, in two parts:
-
-1. Remove the `INCLUDE 'BCPLOT.F77'` line from `canada/bc/blkdat.f`.
-2. Filter `BCPLOT.F77` out of the f2py input in `meson.build`. The file is still compiled; it is only
-   dropped from the signature generation.
+Fix, in two parts: remove the `INCLUDE 'BCPLOT.F77'` line from `canada/bc/blkdat.f`, and filter
+`BCPLOT.F77` out of the f2py input in `meson.build`. The file is still compiled.
 
 Verified: with both applied, the whole f2py step passes.
 
-## Defect 4: a symbol the BC variant does not provide
+## Defect 4: `cubrds`
 
-With defects 1 to 3 fixed, the build **succeeds**:
-
-```text
-[531/531] Linking target fvsbc.cpython-312-x86_64-linux-gnu.so
-```
-
-PyFVS also registers the variant correctly. Its generated `variants.py` reads:
-
-```python
-variant_libs = {
-    "BC": "fvsbc",
-}
-variants = [v.upper() for v in variant_libs.keys()]
-```
-
-The module still cannot be imported:
-
-```text
-ImportError: .../fvsbc.cpython-312-x86_64-linux-gnu.so: undefined symbol: cubrds_
-```
-
-`cubrds` is defined in 23 variants — `acd ak bm ca ci cr cs ec em ie kt ls nc ne sn so tt ut wc ws` — and
-in no BC source. The reference comes from PyFVS's own API, `src/api/fvs_step.f90`:
+The link fails with `undefined symbol: cubrds_`. `cubrds` is defined in 20 variants and in no BC source.
+PyFVS's `src/api/fvs_step.f90` references it from a subroutine that is never called:
 
 ```fortran
     subroutine donotcall()
-        ! external fmcblk !NOTE: This did not work as-is
         call blkdat()
         call esblkd()
         call cubrds()
-        call keywds()
-        call svblkd()
-        call dbsblkd()
-        call fmcblk()
+        ...
 ```
 
-So PyFVS's API layer hardcodes a call that the BC variant cannot satisfy. This is an integration gap
-between PyFVS and the BC variant, not a defect in the BC variant's own sources.
+Nothing calls `donotcall`; it exists to force the linker to keep the Fortran initializers. The symbol
+reference is doing real work, so the answer is to satisfy it, not to delete it.
 
-Not resolved. The options are to supply a BC `cubrds`, to guard the call, or to check whether `cfvol`
-covers what `cubrds` provides. Deciding that is `P3` work.
+`cubrds` is 57 lines of zero-initialization for the `VOLSTD` common. Its `DATA` sizes follow `MAXSP`:
+`wc` has `MAXSP=39` and writes `273*0.0` (`7*39`), `ca` has `MAXSP=50` and writes `350*0.0`, and **BC has
+`MAXSP=15`, so it needs `105*0.0` and `15*0`**.
 
-## A second gap, not yet a blocker
+Fix: add `canada/bc/cubrds.f`, copied from `wc` with the sizes corrected for `MAXSP=15`, and add it to the
+source list.
 
-The BC source list has **1** `volume/` entry. `pn`, `wc`, and `ak` each have **155**, including the whole
-of `volume/NVEL`, the volume library. The BC variant does have `canada/bc/cfvol.f` and
-`canada/bc/vols.f`, so this may be deliberate. It is not established either way, and it is recorded as a
-question rather than a finding.
+An earlier concern, that BC reads uninitialized volume arrays, is unfounded. `canada/bc/initre.f` writes
+`CFVEQS` at lines 3522, 3537, and 3552. BC supplies its own coefficients, so a zero-initializing `cubrds`
+is a link stub whose values BC overwrites.
 
-## The patch set
+## Defect 5: three database sources are missing
+
+After `cubrds`, the link reports four more undefined symbols. Three are database routines the BC source
+list omits and `pn`'s carries:
+
+| Symbol | Defined in | In `pn`'s list |
+| --- | --- | --- |
+| `dbsreference_` | `vdbsqlite/dbsreference.f` | line 309 |
+| `dbs_fiavbc_atrtls_` | `dbsqlite/dbs_fiavbc_atrtls.f` | line 311 |
+| `dbs_fiavbc_cutlst_` | `dbsqlite/dbs_fiavbc_cutlst.f` | line 312 |
+| `dbs_fiavbc_trls_` | `dbsqlite/dbs_fiavbc_trls.f` | line 313 |
+
+All four were added to the BC source list. `dbsreference.f` is fine. The three `dbs_fiavbc_*` files are
+not, and they lead to defect 6.
+
+Not established: what references these four symbols. No source file calls them by name. The reference
+must come from the database layer's own dispatch or from the f2py wrapper, and it was not traced.
+
+## Defect 6: the `volume/` subsystem is absent, and `dbs_fiavbc_*` depend on it
+
+Adding `dbs_fiavbc_cutlst.f` fails to compile:
+
+```text
+../fvs/dbsqlite/dbs_fiavbc_cutlst.f:36:0:
+   36 |       INCLUDE 'wdbkwtdata.inc'
+Fatal Error: Cannot open included file 'wdbkwtdata.inc'
+```
+
+`wdbkwtdata.inc` lives in `volume/NVEL/`. The scale of the gap:
+
+| Source list | `volume/` entries | `.inc` entries |
+| --- | --- | --- |
+| `FVSpn_sourceList.txt` | 155 | 25 in `volume/NVEL` |
+| `FVSwc_sourceList.txt` | 155 | — |
+| `FVSak_sourceList.txt` | 155 | — |
+| `FVSbc_sourceList.txt` | **1** | **0** |
+
+The BC variant has its own volume equations, `canada/bc/cfvol.f` and `canada/bc/vols.f`, and it writes its
+own `CFVEQS`. So the absent subsystem may be deliberate for the model, while `dbs_fiavbc_*` needs it for
+the FIA volume and weight tables.
+
+That is the open question, and it is not a patch. Either the BC list gains the volume subsystem, or the
+`dbs_fiavbc_*` dependency is traced and removed. The second is more likely correct, because the first
+would add a US volume library to a variant that does not use it.
+
+## The patch set so far
 
 Fork, `UBC-FRESH/PyFVS` at `e95172b`:
 
 - `meson_options.txt`: add `'bc'` to `choices`.
-- `meson.build`: filter `bcplot.f77` out of the f2py signature input.
+- `meson.build`: `add_project_arguments('-DCMPgcc', '-Dunix', language: 'cpp')`, and filter
+  `bcplot.f77` out of the f2py signature input.
 
 Submodule, `ef5fa84`:
 
-- `bin/FVSbc_sourceList.txt`: delete the 12 `../fire/cfim/` lines.
 - `canada/bc/blkdat.f`: delete the `INCLUDE 'BCPLOT.F77'` line.
+- `canada/bc/cubrds.f`: new, from `wc` with `MAXSP=15` sizes.
+- `bin/FVSbc_sourceList.txt`: add `canada/bc/cubrds.f`, `vdbsqlite/dbsreference.f`, and the three
+  `dbsqlite/dbs_fiavbc_*.f`.
 
 ## What this does not settle
 
-- The `cubrds` gap, which blocks the import.
+- Defect 6, which blocks the build.
 - Whether `FVSbc` produces correct results once it loads. Nothing has been run.
-- The tree-record format hazard in `docs/reference/tree-list.rst`. The three-format conflict could not be
-  tested, because the module does not import.
-- The four output questions in `docs/reference/outputs.rst`, for the same reason.
-- The two units questions in `docs/reference/nemora-ingest.rst`.
+- The tree-record format hazard in `docs/reference/tree-list.rst`, the four output questions in
+  `docs/reference/outputs.rst`, and the two units questions in `docs/reference/nemora-ingest.rst`. All
+  need a module that imports.
 
-The spike answers the build question. It does not answer whether the result is usable.
+The spike answers the build question: the variant matrix is not enough, and the work is a source-list
+reconstruction rather than a small patch.
