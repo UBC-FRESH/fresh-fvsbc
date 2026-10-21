@@ -60,7 +60,7 @@ Goal: settle the repository's public footing, then state the question, the users
 
 - [x] P1.1 Add the MIT licence and align the package metadata
 - [x] P1.2 Write the problem statement and scope in `notes/`
-- [ ] P1.3 Record the first design decisions as ADRs in `notes/adr/`
+- [x] P1.3 Record the first design decisions as ADRs in `notes/adr/`
 
 Acceptance criteria:
 
