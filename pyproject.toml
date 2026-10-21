@@ -1,6 +1,19 @@
-# Tool configuration for the UBC-FRESH dev workflow. This repository is a seed and
-# documentation kit, not a Python package, so there is no [project] table. Each gate
-# configured here is also a check in the green dashboard (scripts/dashboard.py).
+# Tool configuration for fvsbc. Each gate configured here is also a check in the
+# green dashboard (scripts/dashboard.py).
+
+[project]
+name = "fvsbc"
+version = "0.0.0"
+description = "A Python wrapper for the BC variant of the Forest Vegetation Simulator."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "UBC FRESH Lab" }]
+keywords = ["forest-modelling", "fvs", "british-columbia", "growth-and-yield"]
+
+[project.urls]
+Repository = "https://github.com/UBC-FRESH/fvsbc"
+Documentation = "https://ubc-fresh.github.io/fvsbc/"
 
 [tool.ruff]
 line-length = 100

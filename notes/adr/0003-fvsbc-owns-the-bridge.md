@@ -1,8 +1,8 @@
 # ADR 0003: fvsbc owns the bridge from synthetic stem populations
 
-Status: proposed
+Status: accepted
 Date: 2026-10-21
-Issues: TBD
+Issues: #8
 
 ## Context
 

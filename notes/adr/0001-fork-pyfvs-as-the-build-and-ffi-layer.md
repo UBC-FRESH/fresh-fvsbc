@@ -1,8 +1,8 @@
 # ADR 0001: Fork PyFVS as the FVS build and FFI layer
 
-Status: proposed
+Status: accepted
 Date: 2026-10-21
-Issues: TBD
+Issues: #8
 
 ## Context
 
@@ -63,8 +63,9 @@ We fork `forest-modeling/PyFVS` to `UBC-FRESH/PyFVS` and consume it as a pinned 
   release work.
 - Not yet verified: no `FVSbc` has been built; whether adding `bc` to the variant matrix is sufficient is
   unknown; the `bc_sourcelist` work is unreviewed and its author's intent is not established.
-- Two decisions follow and need their own ADRs: that `fvsbc` is a standalone package rather than a
-  module of an existing package, and the policy for contributing patches upstream.
+- ADR 0002 records that `fvsbc` is a standalone package, and ADR 0003 records who owns the bridge from
+  synthetic stem populations. The policy for contributing patches upstream is still open, and needs its
+  own ADR when the first patch is proposed.
 
 ## Alternatives considered
 
