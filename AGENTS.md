@@ -130,4 +130,4 @@ Record the result in the changelog entry for the milestone.
 - **Keep the BC tree list in one writer.** The FVS-BC tree list is a fixed-width record. Build it in one
   tested place, never by ad hoc string formatting at a call site.
 - **Treat BC inventory data as restricted until proven open.** This repository is public. Confirm the
-  licence of any data before it is committed, and prefer synthetic fixtures.
+  license of any data before it is committed, and prefer synthetic fixtures.

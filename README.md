@@ -75,5 +75,14 @@ gate, the workflow validator, and the docs build with warnings as errors.
 
 ## License
 
-`fvsbc` has no licence file yet, and a public repository without one grants no rights to use it. Choose
-and add a licence before the first public release.
+MIT. See [`LICENSE`](LICENSE).
+
+`fvsbc` builds on two dependencies with their own terms:
+
+- **FVS** is produced by the USDA Forest Service and is in the U.S. public domain. It is released
+  without conditions on its use.
+- **PyFVS** is MIT, copyright 2021 Forest Modeling. `fvsbc` depends on the `UBC-FRESH/PyFVS` fork and
+  does not vendor it. Where a built artifact carries PyFVS code, its notice is retained.
+
+See [`notes/reference/license-analysis.md`](notes/reference/license-analysis.md) for the check and its
+provenance.

@@ -16,3 +16,4 @@ Newest entries last. Each milestone gets a dated entry that matches the roadmap 
 - P0 merged. Squash-merged pull request #4 as `9c576f3`, deleted `feature/p0-bootstrap`, and closed parent issue #1 with child issues #2 and #3.
 - Enabled GitHub Pages with `build_type: workflow`. The `Docs` workflow now passes on `main` (run 39559881805), and the site is live at https://ubc-fresh.github.io/fvsbc/.
 - Launched P1 (Scope and design): parent issue #5, child issues #6, #7, and #8, branch `feature/p1-scope-design`.
+- P1.1: added the MIT licence, aligned `pyproject.toml` and `README.md`, and recorded the dependency licenses in `notes/reference/license-analysis.md`. Checked the FVS tree for copyleft and found none; FVS is U.S. public domain and PyFVS is MIT.
