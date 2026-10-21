@@ -13,3 +13,6 @@ Newest entries last. Each milestone gets a dated entry that matches the roadmap 
 - Activated P0: parent issue #1, child issues #2 and #3, branch `feature/p0-bootstrap`.
 - P0.1: adapted `AGENTS.md` and `README.md` to this project.
 - P0.2: installed the dev dependencies and ran `python scripts/dashboard.py`. All six gates green: lint, format, types, tests, validator, docs. Exit status 0. The dashboard is green on `d21d571`.
+- P0 merged. Squash-merged pull request #4 as `9c576f3`, deleted `feature/p0-bootstrap`, and closed parent issue #1 with child issues #2 and #3.
+- Enabled GitHub Pages with `build_type: workflow`. The `Docs` workflow now passes on `main` (run 39559881805), and the site is live at https://ubc-fresh.github.io/fvsbc/.
+- Launched P1 (Scope and design): parent issue #5, child issues #6, #7, and #8, branch `feature/p1-scope-design`.
