@@ -8,7 +8,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 
 | Phase | Parent issue | Branch | Status |
 | --- | --- | --- | --- |
-| P0 Bootstrap | TBD | `feature/p0-bootstrap` | planned |
+| P0 Bootstrap | #1 | `feature/p0-bootstrap` | active |
 | P1 Scope and design | TBD | `feature/p1-scope-design` | planned |
 | P2 Contracts and prototype | TBD | `feature/p2-contracts-prototype` | planned |
 | P3 Build | TBD | `feature/p3-build` | planned |
@@ -35,9 +35,9 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 
 ## Phase 0: Bootstrap
 
-Parent issue: TBD
+Parent issue: #1
 Branch: `feature/p0-bootstrap`
-Status: planned
+Status: active
 
 Goal: adapt the contract to this project, and make the first pull request reviewable.
 
