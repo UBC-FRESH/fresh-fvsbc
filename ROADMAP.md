@@ -9,7 +9,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | Phase | Parent issue | Branch | Status |
 | --- | --- | --- | --- |
 | P0 Bootstrap | #1 | `feature/p0-bootstrap` | complete |
-| P1 Scope and design | #5 | `feature/p1-scope-design` | active |
+| P1 Scope and design | #5 | `feature/p1-scope-design` | pr-open |
 | P2 Contracts and prototype | TBD | `feature/p2-contracts-prototype` | planned |
 | P3 Build | TBD | `feature/p3-build` | planned |
 | P4 Verify | TBD | `feature/p4-verify` | planned |
@@ -41,8 +41,8 @@ Status: complete
 
 Goal: adapt the contract to this project, and make the first pull request reviewable.
 
-- [x] P0.1 Adapt `AGENTS.md` and `README.md` to this project
-- [x] P0.2 Confirm the validator and the docs build pass
+- [x] P0.1 Adapt `AGENTS.md` and `README.md` to this project (#2)
+- [x] P0.2 Confirm the validator and the docs build pass (#3)
 
 Acceptance criteria:
 
@@ -54,13 +54,13 @@ Acceptance criteria:
 
 Parent issue: #5
 Branch: `feature/p1-scope-design`
-Status: active
+Status: pr-open
 
 Goal: settle the repository's public footing, then state the question, the users, the scope, and the out-of-scope items, and record the first decisions as ADRs.
 
-- [x] P1.1 Add the MIT licence and align the package metadata
-- [x] P1.2 Write the problem statement and scope in `notes/`
-- [x] P1.3 Record the first design decisions as ADRs in `notes/adr/`
+- [x] P1.1 Add the MIT licence and align the package metadata (#6)
+- [x] P1.2 Write the problem statement and scope in `notes/` (#7)
+- [x] P1.3 Record the first design decisions as ADRs in `notes/adr/` (#8)
 
 Acceptance criteria:
 
@@ -143,5 +143,6 @@ Acceptance criteria:
 
 ## Detailed Next Steps Notes
 
-1. Create the GitHub repository and the Phase 0 parent issue. This needs maintainer approval.
-2. Activate Phase 0 by setting its parent issue number and its status to `active`, here and in the tracker map.
+1. P1 is queued. Pull request #9 waits for the maintainer's approval of `notes/reports/p1-closeout.md`.
+2. P2 (Contracts and prototype) is recommended next. Its first act should be the build spike: whether adding `bc` to the PyFVS variant matrix is sufficient to build `FVSbc`, or the FVS source submodule needs a patch. See ADR 0001 and section 6 of the P1 close-out report.
+3. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` and the seed repository's own roadmap include them. Reported to `UBC-FRESH/ubc-fresh-dev-workflow`; until it is fixed, add the numbers by hand when a task's issue exists.
