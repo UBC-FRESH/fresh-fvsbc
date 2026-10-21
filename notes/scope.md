@@ -20,8 +20,8 @@ Three separate obstacles stand in the way, and each was confirmed before this no
    work, but its variant list is `pn, wc, so, op, oc, ec, ca, nc, bm, ie, ci, ak, ws`. The code `ca` is
    Central America, not Canada. BC is absent.
 3. **No BC data layer exists.** FVS-BC consumes a fixed-width tree list and a keyword file, and it emits
-   fixed-width output. It carries BC-specific concepts: BEC zones, site index, and a species mapping that is
-   keyed on the variant name. Nothing in the lab's stack speaks that vocabulary. See
+   fixed-width output. It carries BC-specific concepts: BEC zones, site index, and its own list of 15 species
+   codes. Nothing in the lab's stack speaks that vocabulary. See
    `notes/reference/bc-treelist-and-species.md`.
 
 The cost of the gap is paid by anyone who wants a BC growth projection: compile Fortran from a fork,
@@ -41,8 +41,8 @@ fixed-width output by eye.
 ## In scope
 
 - **A reproducible `FVSbc` build** from the pinned fork, with the build recipe recorded.
-- **The BC layer**: BC keywords, the variant-keyed species mapping in `canada/bc/bcspp.f`, and BEC zone and
-  site index handling.
+- **The BC layer**: BC keywords, the 15-species code list and the tree-record format in
+  `canada/bc/blkdat.f`, and BEC zone and site index handling.
 - **Tree list ingestion**, including synthetic stem populations shaped like `nemora` output. The bridge
   lives here, per ADR 0003.
 - **Tidy output**: FVS-BC result files parsed into dataframes, not fixed-width text.

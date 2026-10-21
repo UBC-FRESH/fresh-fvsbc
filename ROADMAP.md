@@ -146,6 +146,6 @@ Acceptance criteria:
 
 ## Detailed Next Steps Notes
 
-1. P2 is active. Start with `P2.1`, the contracts. The tree list is the FVS `TREEFMT` format, which PyFVS encodes in `src/pyfvs/config_default.yaml`, and the species mapping is in `canada/bc/bcspp.f`. Both are readable in the pinned fork without a build. See `notes/reference/bc-treelist-and-species.md`.
+1. P2 is active. Start with `P2.1`, the contracts. The tree-record format and the 15 species codes are in `canada/bc/blkdat.f`, and `bcspp.f` is dead code that the BC build does not compile. PyFVS injects its own `TREEFMT` when a keyword set lacks one, and that format differs from the BC variant default. See `notes/reference/bc-treelist-and-species.md`.
 2. `P2.2` runs the build spike first: whether adding `bc` to the PyFVS variant matrix is sufficient, or the FVS source submodule needs a patch. Every later phase depends on the answer, and ADR 0001 records it as unverified.
 3. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` requires them. Reported as `UBC-FRESH/ubc-fresh-dev-workflow` issue #44. Until it is fixed, add the numbers by hand when a task's issue exists.
