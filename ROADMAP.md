@@ -41,12 +41,14 @@ Status: active
 
 Goal: adapt the contract to this project, and make the first pull request reviewable.
 
-- [ ] P0.1 Adapt `AGENTS.md` and `README.md` to this project
-- [ ] P0.2 Confirm the validator and the docs build pass
+- [x] P0.1 Adapt `AGENTS.md` and `README.md` to this project
+- [x] P0.2 Confirm the validator and the docs build pass
 
 Acceptance criteria:
 
-- <State the criterion that shows this phase met its goal.>
+- `AGENTS.md` states the fvsbc-specific rules, and links the shared workflow rules instead of copying them.
+- `README.md` describes `fvsbc`, its place in the pipeline, and its status, and claims nothing the roadmap has not recorded.
+- `python scripts/dashboard.py` exits zero on the head commit of the phase branch.
 
 ## Phase 1: Scope and design
 

@@ -12,3 +12,4 @@ Newest entries last. Each milestone gets a dated entry that matches the roadmap 
 - Created the `phase` and `task` labels that the seed's issue templates require.
 - Activated P0: parent issue #1, child issues #2 and #3, branch `feature/p0-bootstrap`.
 - P0.1: adapted `AGENTS.md` and `README.md` to this project.
+- P0.2: installed the dev dependencies and ran `python scripts/dashboard.py`. All six gates green: lint, format, types, tests, validator, docs. Exit status 0. The dashboard is green on `d21d571`.
