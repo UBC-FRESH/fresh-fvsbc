@@ -146,6 +146,7 @@ Acceptance criteria:
 
 ## Detailed Next Steps Notes
 
-1. P2 is active. Start with `P2.1`, the contracts. The tree-record format and the 15 species codes are in `canada/bc/blkdat.f`, and `bcspp.f` is dead code that the BC build does not compile. PyFVS injects its own `TREEFMT` when a keyword set lacks one, and that format differs from the BC variant default. See `notes/reference/bc-treelist-and-species.md`.
-2. `P2.2` runs the build spike first: whether adding `bc` to the PyFVS variant matrix is sufficient, or the FVS source submodule needs a patch. Every later phase depends on the answer, and ADR 0001 records it as unverified.
-3. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` requires them. Reported as `UBC-FRESH/ubc-fresh-dev-workflow` issue #44. Until it is fixed, add the numbers by hand when a task's issue exists.
+1. `P2.2`'s build spike is done. **`FVSbc` builds** with three patches to the fork, and PyFVS registers the variant. It cannot be imported: `src/api/fvs_step.f90` calls `cubrds`, which no BC source defines. See `notes/reference/fvsbc-build-spike.md` and ADR 0004.
+2. The prototype half of `P2.2` is blocked on the `cubrds` gap. Fixing it is a scope decision: either `P2.2` takes it on, or the prototype moves to `P3`. The spike's note lists three options, with a preference for the least invasive.
+3. The patch set lives in the fork and is not pushed. Pushing it to `UBC-FRESH/PyFVS` needs an approval, and it is named in ADR 0004.
+4. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` requires them. Reported as `UBC-FRESH/ubc-fresh-dev-workflow` issue #44. Until it is fixed, add the numbers by hand when a task's issue exists.
