@@ -146,7 +146,8 @@ Acceptance criteria:
 
 ## Detailed Next Steps Notes
 
-1. `P2.2`'s build spike is done. **`FVSbc` builds** with three patches to the fork, and PyFVS registers the variant. It cannot be imported: `src/api/fvs_step.f90` calls `cubrds`, which no BC source defines. See `notes/reference/fvsbc-build-spike.md` and ADR 0004.
-2. The prototype half of `P2.2` is blocked on the `cubrds` gap. Fixing it is a scope decision: either `P2.2` takes it on, or the prototype moves to `P3`. The spike's note lists three options, with a preference for the least invasive.
-3. The patch set lives in the fork and is not pushed. Pushing it to `UBC-FRESH/PyFVS` needs an approval, and it is named in ADR 0004.
-4. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` requires them. Reported as `UBC-FRESH/ubc-fresh-dev-workflow` issue #44. Until it is fixed, add the numbers by hand when a task's issue exists.
+1. `P2.2`'s build spike is done, and **`FVSbc` builds and imports** with a nine-line patch set across four files plus one new file. `fvs_step` exposes `fvs_init`, `fvs_grow`, and `fvs_end`. See `notes/reference/fvsbc-build-spike.md` and ADR 0004.
+2. Nothing has been run. The module imports, which is not evidence that it computes correctly. The next move is a smoke run on a synthetic stand, which would also close the open questions in the tree-list, output, and `nemora` contracts.
+3. The prototype half of `P2.2` is unblocked. Whether it lands in `P2.2` or moves to `P3` is a scope decision.
+4. The patch set lives in the fork and is not pushed. Pushing it to `UBC-FRESH/PyFVS` needs an approval, and it is named in ADR 0004.
+5. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` requires them. Reported as `UBC-FRESH/ubc-fresh-dev-workflow` issue #44. Until it is fixed, add the numbers by hand when a task's issue exists.

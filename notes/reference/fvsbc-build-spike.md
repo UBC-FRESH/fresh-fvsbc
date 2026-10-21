@@ -26,10 +26,26 @@ sixth is a reconstruction task rather than a patch.
 | 2 | `fire/cfim` does not compile on Linux | fixed, by a compiler flag |
 | 3 | `numpy.f2py` cannot parse `canada/bc/BCPLOT.F77` | fixed |
 | 4 | PyFVS's API calls `cubrds`, which no BC source defines | fixed |
-| 5 | The source list omits `vdbsqlite/dbsreference.f` and three `dbsqlite/dbs_fiavbc_*.f` | partly fixed |
-| 6 | The source list omits the entire `volume/` subsystem, which `dbs_fiavbc_*` depend on | **open** |
+| 5 | The source list omits `vdbsqlite/dbsreference.f` and three `dbsqlite/dbs_fiavbc_*.f` | fixed |
+| 6 | `dbs_fiavbc_cutlst.f` needs `wdbkwtdata.inc`, which the BC list does not reach | fixed |
 
-The build now reaches `[433/569]`. It does not complete.
+**The build completes and the module imports.**
+
+```text
+[569/569] Linking target fvsbc.cpython-312-x86_64-linux-gnu.so
+compile exit=0
+```
+
+```text
+IMPORTED: .../fvsbc.cpython-312-x86_64-linux-gnu.so
+public symbols: 24
+fvs_step: fvs_init, fvs_grow, fvs_end, gcb_pre_grow, gcb_post_grow,
+          gcb_post_dg_htg, gcb_post_mort, gcb_incr, sim_status, donotcall
+fvs_api:  23 symbols, including calc_dbh, calc_height, calc_forest_type, dim_sizes
+```
+
+`fvs_init`, `fvs_grow`, and `fvs_end` are the step API the project needs. No undefined Fortran symbols
+remain: `ldd -r` reports none after filtering the Python C-API, which the interpreter resolves at load.
 
 ## How to reproduce
 
@@ -167,7 +183,7 @@ not, and they lead to defect 6.
 Not established: what references these four symbols. No source file calls them by name. The reference
 must come from the database layer's own dispatch or from the f2py wrapper, and it was not traced.
 
-## Defect 6: the `volume/` subsystem is absent, and `dbs_fiavbc_*` depend on it
+## Defect 6: `wdbkwtdata.inc`, and a false alarm
 
 Adding `dbs_fiavbc_cutlst.f` fails to compile:
 
@@ -177,7 +193,7 @@ Adding `dbs_fiavbc_cutlst.f` fails to compile:
 Fatal Error: Cannot open included file 'wdbkwtdata.inc'
 ```
 
-`wdbkwtdata.inc` lives in `volume/NVEL/`. The scale of the gap:
+The BC source list had no `volume/` includes at all, so this looked like a large gap:
 
 | Source list | `volume/` entries | `.inc` entries |
 | --- | --- | --- |
@@ -186,15 +202,37 @@ Fatal Error: Cannot open included file 'wdbkwtdata.inc'
 | `FVSak_sourceList.txt` | 155 | — |
 | `FVSbc_sourceList.txt` | **1** | **0** |
 
-The BC variant has its own volume equations, `canada/bc/cfvol.f` and `canada/bc/vols.f`, and it writes its
-own `CFVEQS`. So the absent subsystem may be deliberate for the model, while `dbs_fiavbc_*` needs it for
-the FIA volume and weight tables.
+It is not. Tracing the three symbols showed that the routines **self-guard**:
 
-That is the open question, and it is not a patch. Either the BC list gains the volume subsystem, or the
-`dbs_fiavbc_*` dependency is traced and removed. The second is more likely correct, because the first
-would add a US volume library to a variant that does not use it.
+```fortran
+C     IF VBC AFTER TREATMENT LIST IS NOT TURNED ON OR FIAVBC NOT ACTIVE
+      IF(IVBCATRLST.EQ.0) RETURN
+      IF(.NOT.LFIANVB) THEN
+```
 
-## The patch set so far
+They are compiled unconditionally but inert unless the FIAVBC feature is on. Of the nine `INCLUDE` lines
+across the three files, exactly **one** is outside the usual directories: `wdbkwtdata.inc`, needed only by
+`dbs_fiavbc_cutlst.f`. It is a 2,726-line data table, not code.
+
+meson treats a listed `.inc` as a directive to add its directory to the include path. So one source-list
+line is the whole fix:
+
+```text
+../volume/NVEL/wdbkwtdata.inc
+```
+
+The BC variant does not need the NVEL volume library. It needs one data file's directory on the include
+path.
+
+The trace, and the reason the earlier searches failed: the calls are in shared code and uppercase. Fortran
+is case-insensitive, and the first searches were not.
+
+- `vbase/cuts.f:1739,1741` — `CALL DBS_FIAVBC_CUTLST`, `CALL DBS_FIAVBC_ATRTLS`
+- `base/fvs.f:340,424` — `CALL DBS_FIAVBC_TRLS`
+
+Both files are in both source lists, so the calls are not BC-specific and cannot simply be dropped.
+
+## The patch set
 
 Fork, `UBC-FRESH/PyFVS` at `e95172b`:
 
@@ -206,16 +244,20 @@ Submodule, `ef5fa84`:
 
 - `canada/bc/blkdat.f`: delete the `INCLUDE 'BCPLOT.F77'` line.
 - `canada/bc/cubrds.f`: new, from `wc` with `MAXSP=15` sizes.
-- `bin/FVSbc_sourceList.txt`: add `canada/bc/cubrds.f`, `vdbsqlite/dbsreference.f`, and the three
-  `dbsqlite/dbs_fiavbc_*.f`.
+- `bin/FVSbc_sourceList.txt`: six additions — `canada/bc/cubrds.f`, `vdbsqlite/dbsreference.f`, the three
+  `dbsqlite/dbs_fiavbc_*.f`, and `volume/NVEL/wdbkwtdata.inc` — plus one deletion, the `BCPLOT.F77` line
+  in `blkdat.f`.
+
+Nine lines changed in total, across four files, plus one new 57-line file.
 
 ## What this does not settle
 
-- Defect 6, which blocks the build.
-- Whether `FVSbc` produces correct results once it loads. Nothing has been run.
-- The tree-record format hazard in `docs/reference/tree-list.rst`, the four output questions in
-  `docs/reference/outputs.rst`, and the two units questions in `docs/reference/nemora-ingest.rst`. All
-  need a module that imports.
+- Whether `FVSbc` produces correct results. It imports; nothing has been run. A stand has not been grown,
+  a keyword file has not been read, and no output has been parsed.
+- The tree-record format hazard in `docs/reference/tree-list.rst`. The three-format conflict can now be
+  tested, and has not been.
+- The four output questions in `docs/reference/outputs.rst`, and the two units questions in
+  `docs/reference/nemora-ingest.rst`.
 
-The spike answers the build question: the variant matrix is not enough, and the work is a source-list
-reconstruction rather than a small patch.
+The spike answers the build question. It does not answer whether the result is usable, and it does not
+claim to.
