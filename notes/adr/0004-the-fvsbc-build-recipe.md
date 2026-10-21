@@ -34,6 +34,9 @@ file.
 4. **`bin/FVSbc_sourceList.txt`.** Add six entries: `canada/bc/cubrds.f`, `vdbsqlite/dbsreference.f`, the
    three `dbsqlite/dbs_fiavbc_*.f`, and `volume/NVEL/wdbkwtdata.inc`.
 5. **`canada/bc/cubrds.f`.** New. 57 lines, from `wc`, with the `DATA` sizes corrected for `MAXSP=15`.
+6. **`canada/bc/vols.f`.** Add `MCFV(I)=WK1(I)` at the two points where the merchantable total is
+   accumulated. Without it, `OMCCUR` is built from an array BC never sets, so merchantable volume reports as
+   zero. See `notes/reference/fvsbc-smoke-run.md`.
 
 Two things this ADR explicitly does **not** do:
 

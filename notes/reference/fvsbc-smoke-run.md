@@ -84,20 +84,76 @@ settles at 201.
 
 **This is a working FVS-BC run, not a stub returning zero.**
 
-## The defect this exposes
+## The `mcuft` defect — root-caused and fixed
 
-**`mcuft` is 0 for all 200 years.** Merchantable cubic volume never accumulates, while total cubic volume
-does. Every other column behaves.
+**`mcuft` was 0 for all 200 years.** It is now populated. The cause was a two-line omission in the BC
+variant, and finding it took four disproofs.
 
-That is not a rounding artifact and not a plotting choice. A 200-year-old stand with 297 square feet of
-basal area and 142 feet of top height has merchantable volume.
+### The chain
 
-The most likely cause is that the merchantable volume equations are unset. The smoke keyword file drops
-`VOLEQNUM`, which names a volume equation, and BC's volume coefficients are written by
-`canada/bc/initre.f` into `CFVEQS`, which `cubrds` zeroes. Whether BC needs its own `VOLEQNUM`-equivalent
-keyword, or a coefficient table, was not established.
+`IOSUM(5)` is merchantable cubic, and PyFVS's label for it is correct — `metric/vbase/disply.f` line 427
+sets `IOSUM(05)=INT(OMCCUR(7)/GROSPC+0.5)`. So `OMCCUR` was genuinely zero.
 
-Not verified: the cause. The observation is solid; the explanation is a hypothesis.
+`base/gradd.f` builds it:
+
+```fortran
+CALL PCTILE(ITRN,IND,CFV, WK3,OCVCUR(7))    <- total cubic, from CFV
+CALL PCTILE(ITRN,IND,MCFV,WK3,OMCCUR(7))    <- merch cubic, from MCFV
+```
+
+`common/ARRAYS.F77` line 57 states the contract for the second array:
+
+```text
+C      MCFV -- MERCHANTABLE CUBIC FOOT VOLUME PER TREE CALCULTED IN **VOLS**
+```
+
+**BC's `vols.f` never sets `MCFV`.** It computes merchantable volume into `WK1` and sets only
+`CFV(I)=VN` at line 188. So `MCFV` stayed 0, `OMCCUR` stayed 0, and `IOSUM(5)` stayed 0.
+
+The US variants migrated. `ie/vols.f` says so in place:
+
+```fortran
+C  LOAD WK1 WITH MERCH CUBIC VOLUME PER TREE.
+C  WK1 array has been replaced with MCFV
+!      WK1(I)=VM          <- commented out
+       MCFV(I)=MCF        <- the replacement
+```
+
+BC was left behind on the old array.
+
+### The fix
+
+Two lines in `canada/bc/vols.f`, mirroring `MCFV(I)` from the final `WK1(I)` at both points where the
+merch total is accumulated — the `METHC == 4` branch, and after the defect correction:
+
+```fortran
+        MCFV(I)=WK1(I)      <- before the METHC==4 accumulation
+        ...
+      MCFV(I)=WK1(I)        <- before the IF(IPASS.EQ.1) accumulation
+```
+
+Result: `mcuft` is nonzero in 17 of 21 rows, reaching 12,751 at year 200 against a total cubic of 13,108.
+It matches the accumulated `SPCMC(ISPC,1)` exactly, which closes the chain.
+
+### Four hypotheses disproved along the way
+
+Recording these because each cost a build, and three of them were mine:
+
+1. **That PyFVS's summary labels were wrong for BC.** They are correct. The IOSUM row order is shared
+   between the imperial and metric builds; only the *display* order and units differ.
+2. **That `METHC = 4` was the cause.** Setting it via a `VOLUME` keyword changed nothing. `SPCMC`
+   accumulates fine under the default `METHC = 6`.
+3. **That the tree geometry was implausible.** `min.f`'s debug output labels its values `DBH (cm)` and
+   `Height (m)`, but it prints the *input* arguments, which are inches and feet. Checked against two known
+   constants: the printed stump height `0.9843` is 30 cm in feet, and the top diameter `3.9370` is 10 cm in
+   inches. Both match, so the stand is a plausible 21.5 in DBH and 145 ft.
+4. **That `SPCMC` was not accumulating.** Instrumenting `vols.f` showed `IPASS = 1` on all 2,850 calls and
+   `SPCMC(ISPC,1)` reaching 12,751. The data was fine; only its consumer was starved.
+
+### Board feet
+
+`mbdft` remains 0, and that is by design, not a second defect: `vols.f` carries the comment
+"Board feet not computed in this variant".
 
 ## What this does and does not settle
 
