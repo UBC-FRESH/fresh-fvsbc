@@ -3,7 +3,7 @@
 Phase: P1 Scope and design
 Parent issue: #5
 Pull request: #9, `feature/p1-scope-design` into `main`
-Evidence head: `9bff84e`, the head that the gates and the CI runs below cover
+Evidence head: `5953a40`, the head that the gates and the CI runs below cover
 Report commit: the commit that adds this report. Its CI run is posted on the pull request.
 Date: 2026-10-21
 Status: queued for approval. Not merged.
@@ -12,10 +12,11 @@ Status: queued for approval. Not merged.
 
 Approve these actions. The agent carries them out in this order, and reads back each result.
 
-1. Squash-merge pull request #9, and delete the branch `feature/p1-scope-design`.
-2. Close parent issue #5 with a closeout comment that cites the merge commit, and close child issues #6, #7, and #8.
+1. Squash-merge pull request #9, and delete the branch `feature/p1-scope-design`. Then confirm that the squash commit's tree equals the approved head, as `phase-closeout.rst` requires.
+2. Close parent issue #5 with a closeout comment that cites the merge commit. Child issues #6, #7, and #8 are already closed, each with a closeout comment.
 3. Launch P2 (Contracts and prototype): create its branch, set the phase statuses in `ROADMAP.md`, create its child issues as sub-issues, and start `P2.1`.
 4. After the merge, re-run `gh api repos/UBC-FRESH/fvsbc/license -q .license.spdx_id` and record that it returns `MIT`. The check reads the default branch, so it cannot pass before the merge.
+5. Open an issue on `UBC-FRESH/ubc-fresh-dev-workflow` for the seed defect in deviation 6: `templates/project/ROADMAP.md.tmpl` omits the task issue numbers that `docs/reference/workflow-model.rst` requires. The RTFM protocol requires the gap to be reported.
 
 Settings changes, each with its exact command. Each one runs only after its own approval.
 
@@ -39,7 +40,7 @@ Settings changes, each with its exact command. Each one runs only after its own 
 - Commit messages that start with task IDs: 3 of 4. `P1.1`, `P1.2`, and `P1.3` do. `P1 activate the scope and design phase` starts with the phase ID. See deviation 1.
 - Gates for each commit: section 3.
 - Roadmap and changelog in step: `e7cc81d` activated P1 and marked P0 complete; each task commit checked its own roadmap box and appended its own changelog entry. Met.
-- Child issues closed with closeout evidence: #6, #7, and #8 each received a progress comment. They close with this phase.
+- Child issues closed with closeout evidence: #6, #7, and #8 are closed, each with a closeout comment that names its commit, its verification, and the pages it changed. See deviation 8.
 - Approval gates: the Pages settings change was approved and executed during P0's close-out. Branch protection was approved and executed during this phase. No other settings were touched.
 
 ## 3. Gate evidence
@@ -57,6 +58,8 @@ The three warnings are `CODE_OF_CONDUCT.md` and `CITATION.cff`, which the seed r
 
 | Run ID | Head commit | Conclusion | Notes |
 | --- | --- | --- | --- |
+| 39562155577 | `5953a40` | success | `CI` on the pull request, on the corrections in deviations 5 to 12 |
+| 39561405782 | `15f3ee2` | success | `CI` on the pull request, on the first version of this report |
 | 39561248776 | `9bff84e` | success | `CI` on the pull request: Quality gates, Green dashboard summary, and Pre-commit parity all pass |
 | 39561170450 | `e35b288` | success | `CI` on the pull request |
 | 39560465154 | `a027f85` | success | `CI` on the pull request |
@@ -71,6 +74,17 @@ The pull request reports `mergeable_state: clean`, with all three required check
 | 2. ADR 0001 was edited rather than superseded | Its "Consequences" named the follow-on decisions as unwritten, but ADR 0002 and ADR 0003 existed. An accepted ADR is never rewritten, so the fix had to land before acceptance | Corrected in `9bff84e`, in the same commit that accepted it |
 | 3. The licence acceptance criterion cannot be checked before the merge | `gh api repos/UBC-FRESH/fvsbc/license` reads the default branch, so it returns 404 while `LICENSE` lives on the phase branch | Requested in the Recommendation, step 4. The file is confirmed present on the branch, sha `d3c9d40` |
 | 4. `pyproject.toml` gained a `[project]` table without a `[build-system]`, and the version is `0.0.0` | The task is licence and metadata alignment. A build backend and a real version are packaging work | Recorded here and in the pull request. Deferred to the packaging phase |
+| 5. Pull request titles and bodies did not follow `git-conventions.rst` | The page was not read before the pull requests were opened. Its title form is `P<n> <phase name> (#<parent>)`, and its body starts with `Part of #<parent>` | Corrected on #4 and #9 in `5953a40`'s change set. The REST API was used, because `gh pr edit` fails with a Projects-classic GraphQL deprecation error |
+| 6. Roadmap task lines omitted the issue numbers, and P1's status was `active` rather than `pr-open` | `workflow-model.rst` requires `P<n>.<m> <task name> (#<issue>)`, and defines `pr-open` as "every task is done, the pull request is open, and the report is queued". The seed template `templates/project/ROADMAP.md.tmpl` omits the numbers, and the template was followed instead of the reference page | Corrected in `5953a40`. The template defect is reported to `UBC-FRESH/ubc-fresh-dev-workflow`, per the RTFM protocol |
+| 7. Issue body files were not run through `check_workflow.py --files` before posting | `issue-standard.rst` requires it. The flag exists and works | Applied to every body posted after the correction, with the command and its exit status recorded |
+| 8. Child issues #6, #7, and #8 were left open when the phase was queued | `guides/first-project.rst` closes each child when its task completes, and `github-mapping.rst` says a child closes after its closeout comment is posted. The parent closes after the merge | Closed with closeout comments naming each commit, its verification, and the pages it changed |
+| 9. The local branch `feature/p0-bootstrap` survived P0's merge | `phase-closeout.rst` deletes the branch locally and on its remote. The remote deletion succeeded; the local one was missed | Deleted locally with `git branch -d`, which succeeded because the branch still tracked its remote |
+| 10. The repository was created `--public` immediately | `guides/first-project.rst` creates it `--private`, and switches to `--public` after the maintainer has reviewed it. The command was proposed before the spec was read. The maintainer approved the command as proposed | Not reversible without a settings change. `fvsbc` stays public. Disclosed here |
+| 11. Branch protection included `required_linear_history` | The command in `quality-gates.rst` does not name it. It was added as a sensible default for a squash-merge workflow | Disclosed. It is stricter than the spec, not looser |
+| 12. The P0 report's red `Docs` gate was never refreshed to name the commit that fixed it | `phase-closeout.rst` says a red gate is a deviation until the report names the commit that fixed it. The gate was fixed after the P0 merge, and the P0 report had already been approved | P0 is merged and its report is closed evidence. Recorded here instead |
+
+Deviations 5 to 9 share one cause: the spec pages that govern them were not read before the work. A full
+read of `docs/` followed, and these are its findings.
 
 ## 6. Next phase
 
