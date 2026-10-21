@@ -9,8 +9,8 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | Phase | Parent issue | Branch | Status |
 | --- | --- | --- | --- |
 | P0 Bootstrap | #1 | `feature/p0-bootstrap` | complete |
-| P1 Scope and design | #5 | `feature/p1-scope-design` | pr-open |
-| P2 Contracts and prototype | TBD | `feature/p2-contracts-prototype` | planned |
+| P1 Scope and design | #5 | `feature/p1-scope-design` | complete |
+| P2 Contracts and prototype | #10 | `feature/p2-contracts-prototype` | active |
 | P3 Build | TBD | `feature/p3-build` | planned |
 | P4 Verify | TBD | `feature/p4-verify` | planned |
 | P5 Release and deploy | TBD | `feature/p5-release` | planned |
@@ -54,7 +54,7 @@ Acceptance criteria:
 
 Parent issue: #5
 Branch: `feature/p1-scope-design`
-Status: pr-open
+Status: complete
 
 Goal: settle the repository's public footing, then state the question, the users, the scope, and the out-of-scope items, and record the first decisions as ADRs.
 
@@ -71,18 +71,21 @@ Acceptance criteria:
 
 ## Phase 2: Contracts and prototype
 
-Parent issue: TBD
+Parent issue: #10
 Branch: `feature/p2-contracts-prototype`
-Status: planned
+Status: active
 
-Goal: define the interfaces and data contracts, then build the smallest prototype that exercises them.
+Goal: define the interfaces and the data contracts, then build the smallest prototype that exercises them.
 
-- [ ] P2.1 Define the interface and data contracts in `docs/`
-- [ ] P2.2 Build a prototype that exercises the contracts on synthetic data
+- [ ] P2.1 Define the interface and data contracts in `docs/` (#11)
+- [ ] P2.2 Build a prototype that exercises the contracts on synthetic data (#12)
 
 Acceptance criteria:
 
-- <State the criterion that shows this phase met its goal.>
+- `docs/` states the interfaces and the data contracts: the tree-list input, the keyword set, the parsed outputs, and the provenance record.
+- A prototype runs on synthetic data and exercises each contract, with checks that can fail.
+- The build question in ADR 0001 is answered with evidence: either `bc` builds from the variant matrix, or the patch the FVS source submodule needs is recorded.
+- `python scripts/dashboard.py` exits zero on the head commit of the phase branch.
 
 ## Phase 3: Build
 
@@ -143,6 +146,6 @@ Acceptance criteria:
 
 ## Detailed Next Steps Notes
 
-1. P1 is queued. Pull request #9 waits for the maintainer's approval of `notes/reports/p1-closeout.md`.
-2. P2 (Contracts and prototype) is recommended next. Its first act should be the build spike: whether adding `bc` to the PyFVS variant matrix is sufficient to build `FVSbc`, or the FVS source submodule needs a patch. See ADR 0001 and section 6 of the P1 close-out report.
-3. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` and the seed repository's own roadmap include them. Reported to `UBC-FRESH/ubc-fresh-dev-workflow`; until it is fixed, add the numbers by hand when a task's issue exists.
+1. P2 is active. Start with `P2.1`, the contracts. They are specific enough to write before any build, because `BC.trf` and the species table are readable in the pinned fork.
+2. `P2.2` runs the build spike first: whether adding `bc` to the PyFVS variant matrix is sufficient, or the FVS source submodule needs a patch. Every later phase depends on the answer, and ADR 0001 records it as unverified.
+3. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` requires them. Reported as `UBC-FRESH/ubc-fresh-dev-workflow` issue #44. Until it is fixed, add the numbers by hand when a task's issue exists.
