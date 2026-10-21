@@ -77,7 +77,7 @@ Status: active
 
 Goal: define the interfaces and the data contracts, then build the smallest prototype that exercises them.
 
-- [ ] P2.1 Define the interface and data contracts in `docs/` (#11)
+- [x] P2.1 Define the interface and data contracts in `docs/` (#11)
 - [ ] P2.2 Build a prototype that exercises the contracts on synthetic data (#12)
 
 Acceptance criteria:
