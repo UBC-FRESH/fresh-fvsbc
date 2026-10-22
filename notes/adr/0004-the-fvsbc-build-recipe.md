@@ -21,8 +21,17 @@ The `P2.2` build spike answered it. The evidence, with the exact commands and th
 
 ## Decision
 
-The `FVSbc` build is a patched fork. The patch set is four files and nine changed lines, plus one new
-file.
+The `FVSbc` build is a patched fork. The patch set is eight modified files and one new file, nineteen
+insertions against eight deletions, relative to `ef5fa84`. It is exported at
+`notes/reference/fvsbc-patchset.diff.gz`, which was checked to apply cleanly to that commit and to
+reproduce the working tree byte for byte. It is gzipped rather than stored as bare text because the fork's
+sources use CRLF, so a faithful diff contains carriage returns, which this repository's validator rejects
+in tracked files. To rebuild:
+
+```bash
+gunzip -c notes/reference/fvsbc-patchset.diff.gz > /tmp/fvsbc.patch
+git -C <fvs-checkout> apply /tmp/fvsbc.patch
+```
 
 1. **`meson_options.txt`.** Add `'bc'` to the `fvsvariants` `choices`. The `value` default is unchanged, so
    the fork still builds the US variants by default.
@@ -35,8 +44,28 @@ file.
    three `dbsqlite/dbs_fiavbc_*.f`, and `volume/NVEL/wdbkwtdata.inc`.
 5. **`canada/bc/cubrds.f`.** New. 57 lines, from `wc`, with the `DATA` sizes corrected for `MAXSP=15`.
 6. **`canada/bc/vols.f`.** Add `MCFV(I)=WK1(I)` at the two points where the merchantable total is
-   accumulated. Without it, `OMCCUR` is built from an array BC never sets, so merchantable volume reports as
-   zero. See `notes/reference/fvsbc-smoke-run.md`.
+   accumulated, and clear `MCFV` where the tree loop converges. Without it, `OMCCUR` is built from an array
+   BC never sets, so merchantable volume reports as zero. See `notes/reference/fvsbc-smoke-run.md`, and
+   `notes/reference/fvsbc-validation.md` for the confirmation against the oracle.
+7. **`bin/FVSbc_sourceList.txt` (again).** Point `dbsqlite/dbstreesin.f`, `rd/rdin.f`, and `rd/rdsout.f` at
+   their `metric/` twins. BC's metric `INTREE` calls `DBSTREESIN` with 30 arguments where the base routine
+   expects 33, so the callee wrote through three argument slots that did not exist and `TreeSQL` segfaulted
+   on the first tree. Ontario, the closest working metric variant, makes the same `rd/` choices.
+8. **`metric/dbsqlite/dbstreesin.f`.** Normalize `# IF` / `# ELSE` / `# ENDIF` to `#if` / `#else` /
+   `#endif`. Every sibling metric file uses cpp style; this one alone used FVS's own preprocessor style, so
+   it had never compiled under the `-cpp` build.
+9. **`metric/base/evldx.f`.** Widen the parameter-reference range from `INSTR.LT.7000` to `INSTR.LT.9000`.
+   `common/OPCOM.F77` sets `MAXPRM=7999`, so the narrower range rejected every reference at index 6000 and
+   above as an undecipherable op-code. That disabled `COMPUTE` and every `IF` block in the variant.
+10. **`metric/vbase/disply.f`.** Pass 22, not 20, as the leading dimension of `IOSUM` to `SUMOUT`.
+    `common/OUTCOM.F77` declares `IOSUM(22,MAXCY1)` and `SUMOUT` takes the leading dimension as an
+    argument, so the stride-20 call mis-read every column of every row after the first.
+11. **`metric/strp/estab.f` and `metric/strp/esuckr.f`.** Reset `MCFV` for a newly established tree, as the
+    surrounding code already resets `CFV`. Without it a new tree inherits the previous occupant's
+    merchantable volume, which reports as merchantable volume exceeding total volume.
+
+Items 6, 8, 9, 10, and 11 are all the same class of defect: a newer per-tree or per-cycle array was
+introduced, and one of the places that initialises or indexes it was never updated.
 
 Two things this ADR explicitly does **not** do:
 
@@ -45,20 +74,24 @@ Two things this ADR explicitly does **not** do:
 - It does not delete the `fire/cfim` sources. That was tried, and it is wrong: it trades a compile error
   for a link error, because `canada/fire/bc/fmcfim.f` calls `cfim_driver`.
 
-The fork is pinned by commit, as ADR 0001 requires. The patches live in the fork, not in `fvsbc`.
+The fork is pinned by commit, as ADR 0001 requires. The patches live in the fork; a copy is exported into
+`fvsbc` at `notes/reference/fvsbc-patchset.diff.gz` so that the recipe survives the working tree, which is
+a scratch clone.
 
 ## Consequences
 
 - `fvsbc` builds the variant and the module imports, exposing `fvs_init`, `fvs_grow`, and `fvs_end` from
   `fvs_step`. The build is reproducible from a documented recipe.
-- The fork now diverges from its upstream in four files. A rebase onto a newer `pyfvs-features` must carry
+- The fork now diverges from its upstream in nine files. A rebase onto a newer `pyfvs-features` must carry
   the patch set forward.
 - The `fire/cfim` patch is arguably an upstream defect: both Canadian source lists carry sources that no US
   variant compiles, so PyFVS has never built them on Linux. The patch is a two-symbol compiler definition
   that the source already anticipated. The upstream policy is still open, and ADR 0001 records it as such.
 - The build takes several minutes and needs gfortran, meson, ninja, and patchelf. `fvsbc`'s own CI does not
   build it yet, and wiring that is `P3` work.
-- Nothing has been run. A successful import is not evidence that the variant computes correctly.
+- The variant is no longer unvalidated. The FVS project's own `StandStructure` comparison passes with zero
+  differing lines across all four stands, and `YSM-SkyRanch` matches on 328 of 375 rows. See
+  `notes/reference/fvsbc-validation.md`.
 
 ## Alternatives considered
 
