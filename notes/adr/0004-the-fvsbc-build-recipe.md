@@ -21,7 +21,7 @@ The `P2.2` build spike answered it. The evidence, with the exact commands and th
 
 ## Decision
 
-The `FVSbc` build is a patched fork. The patch set is eight modified files and one new file, nineteen
+The `FVSbc` build is a patched fork. The patch set is nine modified files and one new file, twenty
 insertions against eight deletions, relative to `ef5fa84`. It is exported at
 `notes/reference/fvsbc-patchset.diff.gz`, which was checked to apply cleanly to that commit and to
 reproduce the working tree byte for byte. It is gzipped rather than stored as bare text because the fork's
@@ -63,6 +63,11 @@ git -C <fvs-checkout> apply /tmp/fvsbc.patch
 11. **`metric/strp/estab.f` and `metric/strp/esuckr.f`.** Reset `MCFV` for a newly established tree, as the
     surrounding code already resets `CFV`. Without it a new tree inherits the previous occupant's
     merchantable volume, which reports as merchantable volume exceeding total volume.
+12. **`metric/dbsqlite/dbsmis.f`.** Add the missing `fsql3_exec(IoutDBref,"Begin;"//CHAR(0))` to
+    `DBSMIS2`. It is the only one of the four `DBSMIS*` routines that issues a `Commit;` without a
+    preceding `Begin;`, so its commit fails with "cannot commit - no transaction is active". The routine
+    treats that as fatal, clears `IDM2`, and never writes the table again, which is why
+    `FVS_DM_Stnd_Sum_Metric` held one row per stand instead of one per stand per report period.
 
 Items 6, 8, 9, 10, and 11 are all the same class of defect: a newer per-tree or per-cycle array was
 introduced, and one of the places that initialises or indexes it was never updated.

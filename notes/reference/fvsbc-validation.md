@@ -174,7 +174,7 @@ reproduces, value for value, all nine of the oracle's nonzero merchantable-volum
 variant — makes the same choice, and it makes the base choice for `isstag.f`, so a speculative swap of
 `isstag.f` to the metric version was reverted.
 
-## What the comparison shows
+## The `FVS_Compute` table
 
 **`FVS_Compute` matches the oracle exactly.** That table asserts, per stand and year, three named volumes:
 `SMVOL`, `MDVOL`, and `LGVOL`. For stand 101 all **40 of 40 rows are identical** to
@@ -276,19 +276,27 @@ That is the signature of a slightly different tree population rather than of a f
 and it appears late: in `SkyRanch-Control` the rows agree through 2049 and diverge from 2054. Not yet
 root-caused.
 
+**All five asserted tables now have the oracle's shape.** The dump compares them row by row, and the
+`DBSMIS2` fix brought `FVS_DM_Stnd_Sum_Metric` from fifteen rows to the oracle's 375:
+
+| table | rows | row content identical |
+| --- | --- | --- |
+| `FVS_Cases` | 15 | 15 of 15 |
+| `FVS_DM_Spp_Sum_Metric` | 400 | 336 |
+| `FVS_DM_Stnd_Sum_Metric` | 375 | 311 |
+| `FVS_DM_Sz_Sum_Metric` | 1875 | 1431 |
+| `FVS_Summary_Metric` | 375 | 322 |
+
+The `DM_Spp`, `DM_Stnd`, and `Summary` residuals sit entirely in the three SkyRanch stands described above.
+The `DM_Sz` residual touches all fifteen stands and is a separate defect.
+
 ## What it does not show
 
 - **`YSM-SkyRanch` is not exact**, as above — 47 rows across 3 of its 15 blocks.
-- **`FVS_DM_Stnd_Sum_Metric` is under-written.** The oracle's dump has 375 rows, one per stand per report
-  period; this build writes 15, one per stand, all dated to the initial year. The cause is localised.
-  `metric/dbsqlite/dbsmis.f`'s `DBSMIS2` returns early when `IDM2` is zero, and clears `IDM2` on three
-  failure paths. Instrumenting those paths shows the third firing: the
-  `fsql3_exec(IoutDBref,"Commit;"//CHAR(0))` at the end of the routine returns 1 on the first call for
-  every one of the fifteen stands, after which the routine disables itself and never writes again. The
-  insert itself is well formed — seventeen placeholders against seventeen binds and nineteen columns — and
-  the same `Commit` succeeds in `DBSMIS1` and `DBSMIS3` in the same call sequence. The next step is to read
-  the SQLite error message at that call. This is output-only, so it cannot explain the growth differences
-  above.
+- **One DM table is still short in content, and it affects every stand.**
+  `FVS_DM_Sz_Sum_Metric` now has the oracle's 1875 rows, but rows differ for all fifteen stands — 25 of
+  each stand's 125. This is separate from the growth differences below, which touch only three stands, and
+  it is not yet root-caused.
 - **Soft down woody debris differs.** `FVS_Down_Wood_Vol_Metric` agrees on the hard component and reports
   0.0 for the soft one where the oracle has 11.02 from 2024 onward.
 - **The database dumps are only partly compared.** The dump also asserts `FVS_Summary_Metric` by row count
