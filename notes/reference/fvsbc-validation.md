@@ -279,6 +279,16 @@ root-caused.
 ## What it does not show
 
 - **`YSM-SkyRanch` is not exact**, as above — 47 rows across 3 of its 15 blocks.
+- **`FVS_DM_Stnd_Sum_Metric` is under-written.** The oracle's dump has 375 rows, one per stand per report
+  period; this build writes 15, one per stand, all dated to the initial year. The cause is localised.
+  `metric/dbsqlite/dbsmis.f`'s `DBSMIS2` returns early when `IDM2` is zero, and clears `IDM2` on three
+  failure paths. Instrumenting those paths shows the third firing: the
+  `fsql3_exec(IoutDBref,"Commit;"//CHAR(0))` at the end of the routine returns 1 on the first call for
+  every one of the fifteen stands, after which the routine disables itself and never writes again. The
+  insert itself is well formed — seventeen placeholders against seventeen binds and nineteen columns — and
+  the same `Commit` succeeds in `DBSMIS1` and `DBSMIS3` in the same call sequence. The next step is to read
+  the SQLite error message at that call. This is output-only, so it cannot explain the growth differences
+  above.
 - **Soft down woody debris differs.** `FVS_Down_Wood_Vol_Metric` agrees on the hard component and reports
   0.0 for the soft one where the oracle has 11.02 from 2024 onward.
 - **The database dumps are only partly compared.** The dump also asserts `FVS_Summary_Metric` by row count
