@@ -284,21 +284,26 @@ root-caused.
 | `FVS_Cases` | 15 | 15 of 15 |
 | `FVS_DM_Spp_Sum_Metric` | 400 | 336 |
 | `FVS_DM_Stnd_Sum_Metric` | 375 | 311 |
-| `FVS_DM_Sz_Sum_Metric` | 1875 | 1431 |
+| `FVS_DM_Sz_Sum_Metric` | 1875 | 1789 |
 | `FVS_Summary_Metric` | 375 | 322 |
 
-The `DM_Spp`, `DM_Stnd`, and `Summary` residuals sit entirely in the three SkyRanch stands described above.
-The `DM_Sz` residual touches all fifteen stands and is a separate defect.
+**Every remaining difference in the second case is in the same three stands** — `SkyRanch-Control`,
+`SkyRanch-1.0m`, and `SkyRanch-2.0m` — across all four tables. `SkyRanch-0.3m` and all eleven `YSM029-*`
+stands match the oracle exactly in every table. So the growth divergence above is the only outstanding defect
+in `YSM-SkyRanch`, and the table-level view does not reveal a second one.
 
 ## What it does not show
 
 - **`YSM-SkyRanch` is not exact**, as above — 47 rows across 3 of its 15 blocks.
-- **One DM table is still short in content, and it affects every stand.**
-  `FVS_DM_Sz_Sum_Metric` now has the oracle's 1875 rows, but rows differ for all fifteen stands — 25 of
-  each stand's 125. This is separate from the growth differences below, which touch only three stands, and
-  it is not yet root-caused.
+- **One DM table's `gt45` column is the only non-`Summary` difference, and it is not separate.** Every real
+  difference in `FVS_DM_Sz_Sum_Metric` is in the `gt45` column — the >45 cm class — and all of them are in
+  the same three SkyRanch stands, so they are a consequence of the growth divergence rather than an
+  independent defect. An earlier note in this file claimed that table differed for all fifteen stands; that
+  was a comparison bug, where the literal `INF` in the `Type` column parsed as a floating-point infinity and
+  made every `INF` row compare unequal.
 - **Soft down woody debris differs.** `FVS_Down_Wood_Vol_Metric` agrees on the hard component and reports
   0.0 for the soft one where the oracle has 11.02 from 2024 onward.
-- **The database dumps are only partly compared.** The dump also asserts `FVS_Summary_Metric` by row count
-  and covers tables this run does not populate; the comparison above is the `.sum` files plus the
-  row-level `FVS_Compute` and `FVS_Down_Wood_Vol_Metric` sections.
+- **The database dumps are compared for the tables this run populates.** The `StandStructure` dump's
+  `FVS_Compute` and `FVS_Down_Wood_Vol_Metric` sections are compared row by row, and the `YSM-SkyRanch`
+  dump's five tables are tabulated above. Tables this run does not populate — the fuels and potential-fire
+  tables, for instance — are not compared.
