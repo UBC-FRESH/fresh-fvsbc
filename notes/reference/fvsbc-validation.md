@@ -294,7 +294,18 @@ in `YSM-SkyRanch`, and the table-level view does not reveal a second one.
 
 ## What it does not show
 
-- **`YSM-SkyRanch` is not exact**, as above — 47 rows across 3 of its 15 blocks.
+- **`YSM-SkyRanch` is not exact**, as above — 47 rows across 3 of its 15 blocks. The remaining divergence is
+  confined to the three densest stands and correlates with the number of tree **records**, not with stand
+  density: `YSM029-246` carries 3699 trees per hectare from only 56 records and matches the oracle exactly,
+  while `SkyRanch-1.0m` carries 4067 from 610 records and does not. Every stand with 371 records or fewer
+  matches in every table; the three that differ have 610, 653, and 978. A scan of every compiled source for
+  a literal array dimension between 300 and 900 found only `fire/vbase/fmpocr.f`'s `CRFILL(400)`,
+  `ADCRN(400)`, and `WPROP(400)`, and those are indexed by vertical fuel section rather than by tree, so a
+  tree-record capacity limit is not the explanation.
+- **The build is sensitive to optimisation level.** Configured at `-O0`, the variant processes no stand at
+  all: `fvs` returns 2 after its first call, no summary is written, and the output database is empty. At
+  `-O2` it runs all fifteen stands. That is the signature of undefined behaviour rather than of a numerical
+  difference, which makes a bounds-checked or sanitised build the right next instrument.
 - **One DM table's `gt45` column is the only non-`Summary` difference, and it is not separate.** Every real
   difference in `FVS_DM_Sz_Sum_Metric` is in the `gt45` column — the >45 cm class — and all of them are in
   the same three SkyRanch stands, so they are a consequence of the growth divergence rather than an
