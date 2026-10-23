@@ -11,8 +11,12 @@ permissions:
 
 jobs:
   quality:
-    name: Quality gates
+    name: Quality gates, Python ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
 
     steps:
       - name: Check out repository
@@ -21,7 +25,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           cache: pip
 
       - name: Install dev requirements
@@ -46,6 +50,57 @@ jobs:
 
       - name: Build docs with warnings as errors
         run: sphinx-build -b html docs _build/html -W
+
+  build-variant:
+    name: Build the BC variant
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install the build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            gfortran meson ninja-build patchelf
+
+      - name: Install the build requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install meson-python ninja numpy setuptools_scm
+
+      - name: Check out the pinned fork and its FVS source
+        run: |
+          git clone --filter=blob:none https://github.com/UBC-FRESH/PyFVS.git "$RUNNER_TEMP/PyFVS"
+          git -C "$RUNNER_TEMP/PyFVS" checkout e95172b
+          git -C "$RUNNER_TEMP/PyFVS" submodule update --init --recursive
+          echo "FVS source at $(git -C "$RUNNER_TEMP/PyFVS/fvs" rev-parse --short HEAD)"
+
+      - name: Apply the banked patch set
+        run: |
+          gunzip -c notes/reference/fvsbc-patchset.diff.gz > "$RUNNER_TEMP/fvsbc.patch"
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/fvsbc.patch"
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/fvsbc.patch"
+
+      - name: Build the BC variant
+        working-directory: ${{ runner.temp }}/PyFVS
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION: "0.3.11"
+        run: |
+          python -m pip install --no-build-isolation . \
+            --config-settings=setup-args="-Dfvsvariants=bc"
+
+      - name: Import the built variant
+        run: |
+          python -c "import pyfvs.fvsbc as m; print('imported', m.__name__)"
+          python -c "import pyfvs; print(pyfvs.list_variants())"
 
   dashboard:
     name: Green dashboard summary
