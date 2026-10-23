@@ -41,11 +41,12 @@ this record that was found.
    * - 2
      - ``T1``
      - —
-     - A tab to column 6
+     - A tab to column 1, which returns the cursor to the start of the record
    * - 3
      - ``I7``
      - ``tree_num``
-     - Integer, width 7
+     - Integer, width 7, **read from columns 1 to 7** because ``T1`` preceded it. Its first four
+       columns are shared with ``plot_id``, so only columns 5 to 7 are a writer's
    * - 4
      - ``F6.0``
      - ``tree_count``
@@ -108,8 +109,27 @@ same order, with matching types**; only the widths differ, at positions 2 (`I8` 
 against `F6.0`), 5 (`A4` against `A3`), 7 (`F3.1` against `F4.1`), 8 and 9 (`F3.0` against `F5.1`), 10
 (`F2.1` against `F5.1`), and 11 (`I2` against `I1`). The declared width totals **71 columns against 73**.
 So the field *order* question is settled: the two formats decode to the same field sequence, and the
-difference is numeric width, not field identity. Still not verified: whether BC's reader accepts every
-value that PyFVS's wider and narrower fields can produce, which the run in `P2.2` settles.
+difference is numeric width, not field identity.
+
+The columns, as opposed to the widths
+-------------------------------------
+
+The declared widths sum to 73 for BC and 71 for PyFVS, but that is not the length of the record FVS
+reads. ``T1`` is FORTRAN's *absolute column* directive and it targets **column 1**, so ``tree_num`` is
+read from columns 1 to 7 and every later field begins four columns earlier than the widths suggest. A
+BC record is **69 columns**, and ``plot_id`` and ``tree_num`` share their first four.
+
+Two independent checks, both reproducible. ``gfortran`` reads ``(I4,T1,I7)`` from the character string
+``' 123  456  789  012 345'`` as ``123`` and ``1234``, where ``(I4,1X,I7)`` reads ``4567``; and FVS's
+own reader is an internal read of a whole line (``base/intree.f``), so ``T1`` positions within that line
+rather than starting a new record. Then ``FVSso/sot03.tre`` — the one tree list in the official corpus
+that relies on the default format instead of declaring one — decodes into ``species`` ``WF``, ``diam``
+21.4, and ``live_ht`` 105 under this reading, and into the non-species text ``10WF`` under the other.
+
+The consequence is that the tree number FVS reads is the digits of the plot id followed by the digits of
+the tree number. It stays unique within a plot, which is what FVS requires, but it is a composite, and
+the writer refuses a tree number that needs more than columns 5 to 7. Still not verified: that BC's own
+reader accepts a record this writer produces, which the run in `P2.2` settles.
 
 The species codes
 -----------------
@@ -136,7 +156,9 @@ Contract rules
    fixed-width, so formatting it at a call site is a defect.
 2. The writer emits `A3` for the species field, matching `TREFMT`.
 3. The writer accepts any of the three code lists for species input, and it resolves them to a `JSP`
-   code before writing. A code that resolves to nothing is an error, not a default.
+   code before writing. A code that resolves to nothing is an error, not a default. So is a code that
+   resolves to more than one species, which `202` does: `FIAJSP` gives it to both `FD` and `OC`, and
+   the writer reports the candidates rather than choosing one.
 4. The contract names its fields by the PyFVS template names above, and it keeps the FVS edit descriptors
    beside them so a reviewer can check the widths.
 
@@ -145,7 +167,8 @@ The open hazard
 
 PyFVS writes its own ``TREEFMT`` keyword when the caller's keyword set does not contain one. Its default
 format is **not** the BC variant's. See :doc:`keywords`. The two differ at eight of the 25 widths, and
-they total 71 columns against 73.
+their declared widths total 71 against 73 — which is a sum of widths, not a record length; see the
+columns section above.
 
 Resolved in `P2.2`, from the injection's source and from the two format strings:
 
