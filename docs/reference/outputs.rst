@@ -1,7 +1,7 @@
 Output contract
 ===============
 
-What `fvsbc` reads back from a run, and what shape it hands to a caller.
+What `fresh-fvsbc` reads back from a run, and what shape it hands to a caller.
 
 Read at: `forest-modeling/ForestVegetationSimulator`, branch `pyfvs-features`, commit `ef5fa84`.
 
@@ -52,12 +52,12 @@ be traced back to what produced it, which is what :doc:`provenance` requires.
 Contract rules
 --------------
 
-1. `fvsbc` asks for the database output by default. A run that cannot produce one is a reported failure,
+1. `fresh-fvsbc` asks for the database output by default. A run that cannot produce one is a reported failure,
    not a silent fall back to text.
-2. A parsed table is returned as a dataframe whose column names are the database's column names. `fvsbc`
+2. A parsed table is returned as a dataframe whose column names are the database's column names. `fresh-fvsbc`
    does not rename a column to something friendlier, because a rename breaks the trace back to the FVS
    schema.
-3. `fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
+3. `fresh-fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
    the database holds it.
 4. Every parsed table carries its `CaseID`, so a table can be joined back to `FVS_Cases`.
 5. `FVS_Error` is read on every run. A run whose `FVS_Error` is non-empty is reported as failed, whatever

@@ -1,11 +1,11 @@
-# FVS-BC
+# fresh-fvsbc
 
-> Agent-facing index for FVS-BC. Read the linked pages before you change the project.
+> Agent-facing index for fresh-fvsbc. Read the linked pages before you change the project.
 
 ## Start here
 
 - [Home](index.html): the documentation home for the project.
-- [Reference contracts](reference/index.html): what `fvsbc` requires, page by page.
+- [Reference contracts](reference/index.html): what `fresh-fvsbc` requires, page by page.
 
 ## Reference
 

@@ -1,7 +1,7 @@
 Tree-list input contract
 ========================
 
-What `fvsbc` must write for FVS-BC to read a stand, and what it must therefore accept from a caller.
+What `fresh-fvsbc` must write for FVS-BC to read a stand, and what it must therefore accept from a caller.
 
 Read at: `forest-modeling/ForestVegetationSimulator`, branch `pyfvs-features`, commit `ef5fa84`.
 
@@ -132,7 +132,7 @@ holds 45 names of the form ``PW1``, ``PW2``, ``PW3`` through ``OH1``, ``OH2``, `
 Contract rules
 --------------
 
-1. `fvsbc` writes the record in one tested writer. `AGENTS.md` states the reason: the format is
+1. `fresh-fvsbc` writes the record in one tested writer. `AGENTS.md` states the reason: the format is
    fixed-width, so formatting it at a call site is a defect.
 2. The writer emits `A3` for the species field, matching `TREFMT`.
 3. The writer accepts any of the three code lists for species input, and it resolves them to a `JSP`
@@ -158,4 +158,4 @@ Resolved in `P2.2`, from the injection's source and from the two format strings:
   PyFVS's own output. The exposure is to a list PyFVS did **not** write: a caller who supplies a 73-column
   BC list and also passes trees would have it read with the injected 71-column format.
 - The remedy needs no change to PyFVS. ``FVS(variant, treelist_format=...)`` takes an override for both the
-  Python template and the FVS format, so `fvsbc` can pass BC's.
+  Python template and the FVS format, so `fresh-fvsbc` can pass BC's.

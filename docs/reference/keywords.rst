@@ -1,7 +1,7 @@
 Keyword-set contract
 ====================
 
-How `fvsbc` represents, validates, and hands a keyword set to FVS-BC.
+How `fresh-fvsbc` represents, validates, and hands a keyword set to FVS-BC.
 
 Read at: `forest-modeling/ForestVegetationSimulator`, branch `pyfvs-features`, commit `ef5fa84`.
 
@@ -73,13 +73,13 @@ Not verified: how a caller supplies a BEC value today, and whether ``BECINFO`` i
 Contract rules
 --------------
 
-1. `fvsbc` represents a keyword set as an ordered sequence of keywords, each with its parameters. Order
+1. `fresh-fvsbc` represents a keyword set as an ordered sequence of keywords, each with its parameters. Order
    is significant, because FVS processes the file in order.
-2. `fvsbc` validates each keyword against the table above, and it rejects an unknown keyword by name
+2. `fresh-fvsbc` validates each keyword against the table above, and it rejects an unknown keyword by name
    rather than passing it through. A pass-through would let a typo reach Fortran, which reports it
    poorly.
 3. The validator warns on ``xSALVAGE``, since a caller almost certainly meant ``SALVAGE``.
-4. `fvsbc` does not silently add a keyword the caller did not write, with one exception: the tree-record
+4. `fresh-fvsbc` does not silently add a keyword the caller did not write, with one exception: the tree-record
    format, which it must control. See :doc:`tree-list` and the hazard below.
 5. A keyword set carries a hash, and the hash is part of the run's provenance. See :doc:`provenance`.
 
@@ -87,10 +87,10 @@ The open hazard
 ---------------
 
 PyFVS injects a ``TREEFMT`` keyword when the caller's set lacks one, using its own default format rather
-than the BC variant's. `fvsbc` must not inherit that behaviour silently. Either it writes the BC
+than the BC variant's. `fresh-fvsbc` must not inherit that behaviour silently. Either it writes the BC
 ``TREEFMT`` itself, or it writes the format the build actually expects and records why.
 
 Resolved in `P2.2`. The injection is conditional, and avoiding it needs no change to PyFVS, so contract
-rule 4 stands: `fvsbc` passes BC's format through ``FVS(treelist_format=...)`` whenever it supplies trees
+rule 4 stands: `fresh-fvsbc` passes BC's format through ``FVS(treelist_format=...)`` whenever it supplies trees
 as data. The injection's condition, and how the two formats differ, are in :doc:`tree-list` and are not
 repeated here.

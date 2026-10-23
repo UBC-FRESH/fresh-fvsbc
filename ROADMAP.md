@@ -46,8 +46,8 @@ Goal: adapt the contract to this project, and make the first pull request review
 
 Acceptance criteria:
 
-- `AGENTS.md` states the fvsbc-specific rules, and links the shared workflow rules instead of copying them.
-- `README.md` describes `fvsbc`, its place in the pipeline, and its status, and claims nothing the roadmap has not recorded.
+- `AGENTS.md` states the project-specific rules, and links the shared workflow rules instead of copying them.
+- `README.md` describes `fresh-fvsbc`, its place in the pipeline, and its status, and claims nothing the roadmap has not recorded.
 - `python scripts/dashboard.py` exits zero on the head commit of the phase branch.
 
 ## Phase 1: Scope and design
@@ -159,3 +159,4 @@ Acceptance criteria:
 9. **Proposed adjacent work, not started: promote the comparison into the repository as a test that can fail.** Every comparison so far was an ad hoc script outside the repository, and three of them were buggy in ways that produced false findings. A test that runs the first official case and asserts zero differing lines would have caught them. It needs a task of its own.
 10. **Disclosure: thirteen commits labelled `P2.2` delivered `P2.3`'s work**, and a fourteenth corrected the record they produced. `P2.2`'s deliverable is the synthetic-data prototype, so the label is wrong on those commits. They are not rewritten, on the rule in `docs/reference/phase-closeout.rst`. The correct task is recorded retroactively here and on #13.
 11. `P2.4` (#14) is proposed, and `ADR 0005` is proposed with it. Three things carry a name that reads as `fvsbc`: this project's package, PyFVS's BC extension submodule, and the FVS variant that the FVS tree calls `FVSbc`. There is no import collision between the first two, which is worth stating because an earlier claim said there was; the problem is that three names and one spelling cannot be told apart in prose. The rename is 161 occurrences across 28 tracked files, of which ten are history and stay as written. **The repository rename is a public change and needs its own approval**, and the published Pages URL changes with it, so any outward link must move in the same change set.
+12. **The reference note filenames keep the old name, deliberately.** `notes/reference/fvsbc-build-spike.md`, `-smoke-run.md`, `-validation.md`, and `fvsbc-patchset.diff.gz` are cited by accepted ADR 0004, by the contract pages, and by these notes. `ADR 0005` says renaming them is its own step rather than a search and replace, and the step resolved to keeping them: renaming a file whose name an accepted ADR cites would strand that citation in a document that is not rewritten. Only the prose inside changed.

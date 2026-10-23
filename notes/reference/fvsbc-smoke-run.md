@@ -171,7 +171,7 @@ Not settled:
   is recorded in `notes/reference/fvsbc-validation.md`: the projection now matches the official oracle, but
   the summary table's period rows do not yet.
 - The tree-record format hazard in `docs/reference/tree-list.rst`. The smoke run uses PyFVS's own tree
-  handling, so it does not exercise a treelist that `fvsbc` wrote.
+  handling, so it does not exercise a treelist that `fresh-fvsbc` wrote.
 - The output contract in `docs/reference/outputs.rst`. The run used the in-memory summary, not the SQLite
   database, so the 32 tables remain unverified.
 - The two units questions in `docs/reference/nemora-ingest.rst`. The summary reports feet and square feet

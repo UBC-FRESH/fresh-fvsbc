@@ -1,10 +1,10 @@
 `nemora` ingestion contract
 ===========================
 
-How `fvsbc` accepts a synthetic stem population and turns it into an FVS-BC tree list.
+How `fresh-fvsbc` accepts a synthetic stem population and turns it into an FVS-BC tree list.
 
-ADR 0003 assigns this bridge to `fvsbc`, so that `nemora` takes no dependency on FVS or on any simulator.
-The adapter is a public interface of `fvsbc`, and its tests use fixture records shaped like `nemora`
+ADR 0003 assigns this bridge to `fresh-fvsbc`, so that `nemora` takes no dependency on FVS or on any simulator.
+The adapter is a public interface of `fresh-fvsbc`, and its tests use fixture records shaped like `nemora`
 output, so the test suite never imports `nemora`.
 
 The input shape

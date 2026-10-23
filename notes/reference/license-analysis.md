@@ -1,17 +1,17 @@
-# License analysis for fvsbc
+# License analysis for fresh-fvsbc
 
-Decision: `fvsbc` is MIT. This note records the check behind that decision, its sources, and what
+Decision: `fresh-fvsbc` is MIT. This note records the check behind that decision, its sources, and what
 remains uncertain.
 
 Date: 2026-10-21
 Related: ADR 0001, ADR 0002, ADR 0003
 
-## What fvsbc depends on
+## What fresh-fvsbc depends on
 
-`fvsbc` does not reimplement the FVS build or its bindings. It pins a fork of PyFVS, which builds FVS
+`fresh-fvsbc` does not reimplement the FVS build or its bindings. It pins a fork of PyFVS, which builds FVS
 from a fork of the USDA source. Three licenses therefore matter.
 
-| Component | License | Source | Obligation on `fvsbc` |
+| Component | License | Source | Obligation on `fresh-fvsbc` |
 | --- | --- | --- | --- |
 | FVS, USDA Forest Service | U.S. public domain | `license.txt` at the repository root | None |
 | FVS fork, `forest-modeling/ForestVegetationSimulator` | Same public-domain notice | `license.txt` at the repository root | None |

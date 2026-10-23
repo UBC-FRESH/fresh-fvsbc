@@ -1,9 +1,9 @@
 Provenance contract
 ===================
 
-What `fvsbc` records for every run, so that a number in a paper can be traced to what produced it.
+What `fresh-fvsbc` records for every run, so that a number in a paper can be traced to what produced it.
 
-This contract is `fvsbc`'s own design. It is not read from FVS. The three external facts it depends on
+This contract is `fresh-fvsbc`'s own design. It is not read from FVS. The three external facts it depends on
 are verified: FVS writes the variant and version into `FVS_Cases` (see :doc:`outputs`); the keyword file
 name is recorded there too; and the build's inputs are pinned (see ADR 0001).
 
@@ -25,8 +25,8 @@ A record has these fields.
 
    * - Field
      - What it is
-   * - ``fvsbc_version``
-     - The `fvsbc` version that ran
+   * - ``fresh_fvsbc_version``
+     - The `fresh-fvsbc` version that ran
    * - ``pyfvs_commit``
      - The commit of the pinned `UBC-FRESH/PyFVS` fork
    * - ``fvs_source_commit``
@@ -72,6 +72,6 @@ Contract rules
 Not verified
 ------------
 
-- Whether PyFVS exposes the built variant list at run time, or whether `fvsbc` must read it from the
+- Whether PyFVS exposes the built variant list at run time, or whether `fresh-fvsbc` must read it from the
   build.
 - Whether `RANNSEED` is the only source of nondeterminism, or whether FVS has others.
