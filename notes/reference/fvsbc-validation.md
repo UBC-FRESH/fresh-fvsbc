@@ -311,8 +311,12 @@ in `YSM-SkyRanch`, and the table-level view does not reveal a second one.
   is executed, not an independent cause.
 - **That attribution is not a proof.** Constructing one would mean building the source as of 2022-06-28, and
   that is not reachable by this path: the BC variant is not in `meson_options.txt` at that revision, and
-  `src/api/fvs_step.f90`, which is how PyFVS drives the library, did not exist yet. The variant is also
-  marked `notReady` upstream, which fits reference data that has not been regenerated since 2022.
+  `src/api/fvs_step.f90`, which is how PyFVS drives the library, did not exist yet. What is documented is
+  that the fixtures are old and that the project's own result checker currently skips this variant: the
+  checker carries `#FVSbc -- Omit currently 20260226`. That omission predates `66a5e14e`, so the change
+  above is a candidate rather than a demonstrated cause, and there may be more than one. An earlier version
+  of this note read `canada/bin/FVSbcc_notReady.txt` as a marker that the variant is unready; it is not one.
+  The 2018 change notes describe it as an old source list for the BC variant.
 - **The residual is not floating-point ordering.** Building at `-O2 -ffp-contract=off -fno-tree-vectorize`
   produces output bit-identical to plain `-O2` — zero differing lines between the two builds themselves.
   A scan of every compiled source for a literal array dimension between 300 and 900 found only
@@ -329,8 +333,11 @@ in `YSM-SkyRanch`, and the table-level view does not reveal a second one.
   independent defect. An earlier note in this file claimed that table differed for all fifteen stands; that
   was a comparison bug, where the literal `INF` in the `Type` column parsed as a floating-point infinity and
   made every `INF` row compare unequal.
-- **Soft down woody debris differs.** `FVS_Down_Wood_Vol_Metric` agrees on the hard component and reports
-  0.0 for the soft one where the oracle has 11.02 from 2024 onward.
+- **Down woody debris is essentially exact.** `FVS_Down_Wood_Vol_Metric` matches the oracle on 159 of its
+  160 asserted rows. The single difference is one cell, `3.5` against `3.49` in the hard component at one
+  year — a rounding boundary, not a defect. An earlier version of this note claimed the soft component read
+  0.0 where the oracle had 11.02. That was a comparison bug: it compared all nineteen columns of the table
+  against the four the makefile actually selects.
 - **The database dumps are compared for the tables this run populates.** The `StandStructure` dump's
   `FVS_Compute` and `FVS_Down_Wood_Vol_Metric` sections are compared row by row, and the `YSM-SkyRanch`
   dump's five tables are tabulated above. Tables this run does not populate — the fuels and potential-fire
