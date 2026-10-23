@@ -77,10 +77,53 @@ Status: active
 
 Goal: define the interfaces and the data contracts, then build the smallest prototype that exercises them.
 
+The detail for this phase is the focused plan `notes/p2-contracts-and-prototype.md`, which carries each
+task's sections, the phase criteria and their evidence, the deviations, and the open proposals.
+
 - [x] P2.1 Define the interface and data contracts in `docs/` (#11)
+  - [x] Read `canada/bc/BC.trf`, and establish that it is an SVS asset rather than a tree-list format.
+  - [x] Read `canada/bc/bcspp.f`, and establish that the BC build does not compile it and never calls it.
+  - [x] Read `canada/bc/blkdat.f`, and record its `TREFMT` tree-record format and its `JSP` species list.
+  - [x] Read `base/keywds.f` and `canada/bc/initre.f`, and record the keyword vocabulary and the BC site input.
+  - [x] Read `dbsqlite/` and `canada/bc/BCPLOT.F77`, and record the output tables and the BEC structure.
+  - [x] Record the format conflict between the BC variant default and PyFVS's injected `TREEFMT`, and hand the resolution to `P2.2`.
+  - [x] Write the tree-list input contract.
+  - [x] Write the keyword-set contract.
+  - [x] Write the output contract and the provenance record.
+  - [x] Write the `nemora` ingestion contract.
+  - [x] Add `CODE_OF_CONDUCT.md` and `CITATION.cff`.
 - [ ] P2.2 Build a prototype that exercises the contracts on synthetic data (#12)
+  - [x] Run the build spike, and record the command, its output, and its exit status.
+  - [x] Record the build outcome, and write the build-recipe ADR if the spike is conclusive.
+  - [x] Write a synthetic stem population shaped like `nemora` output, as a fixture built at runtime in `tests/`.
+  - [x] Write the tree-list writer, with a test that asserts the exact column positions and tests that reject an unresolvable species code.
+  - [x] Write the keyword-set validator: reject an unknown keyword by name, warn on `xSALVAGE`, and carry a hash.
+  - [x] Answer the `TREEFMT` hazard: whether PyFVS injects its own format for a BC run, and whether it misaligns a list.
+  - [x] Run the synthetic stand through the `DATABASE` path.
+  - [x] Write the output reader for `FVS_Cases` and `FVS_Error`, and fail a run that holds a row of severity `ERROR`.
+  - [ ] Read `FVS_Compute` and `FVS_Summary_Metric`. Not reachable through PyFVS, which occupies the `DATABASE` output block; see the plan's proposals.
+  - [x] Write the `nemora` adapter: require `species` and `tree_age`, and reject a crown ratio the one-digit field cannot represent.
+  - [x] Record provenance for the run, including the case id and run datetime from `FVS_Cases`.
+  - [x] Create the package skeleton and extend the gates to cover it.
 - [x] P2.3 Record the FVS source patch set and its oracle comparison (#13)
+  - [x] Bank the patch set and record the recipe in ADR 0004.
+  - [x] Compare the build against the official BC test data and record the results with their limits.
+  - [x] Disclose the mislabelled commits in the changelog and on this issue.
 - [x] P2.4 Rename the project to `fresh-fvsbc` (#14)
+  - [x] Rename the GitHub repository. Public; approved and run on 2026-10-23.
+  - [x] Update the published URLs in `pyproject.toml` and `CITATION.cff`.
+  - [x] Rename the package directory, the distribution name, and the gate configuration.
+  - [x] Rename the living documents, and add the variant-versus-package wording rule.
+  - [x] Add the `Renamed by ADR 0005` line to ADRs 0001 to 0004.
+  - [x] Rename the local directory.
+- [ ] P2.5 Repair the plan of record after the workflow audit (#15)
+  - [ ] Add the indented subtask level to this roadmap for `P2.1` to `P2.4`, and link the plan from each task line.
+  - [ ] Reconcile parent issue `#10`: its child checklist and its scope, with a scope-change comment.
+  - [ ] Correct `README.md`'s status paragraph, which claims that no variant has been built.
+  - [ ] Correct the closed task issues' `Status:` and `Completion metadata:`.
+  - [ ] Move the multi-paragraph roadmap notes into the focused plan.
+  - [ ] Pin the workflow revision in `AGENTS.md`, and file the missing agent pages upstream.
+  - [ ] Record the `P2.3` incident, thirteen commits with no child issue, in the close-out report.
 
 Acceptance criteria:
 
@@ -148,21 +191,25 @@ Acceptance criteria:
 
 ## Detailed Next Steps Notes
 
-1. `P2.3` records what `P2.2`'s build spike produced. **`FVSbc` builds, imports, and runs a 200-year projection.** The patch is now twelve items across nine modified files plus one new file, banked at `notes/reference/fvsbc-patchset.diff.gz` and listed in ADR 0004. Applying it to `ef5fa84` was checked to reproduce the working tree byte for byte. See `notes/reference/fvsbc-build-spike.md`.
-2. **The merchantable cubic volume defect is fixed and confirmed against an official reference.** `canada/bc/vols.f` never set `MCFV`, which `base/gradd.f` uses to build `OMCCUR`. The fix reproduces all nine of the reference's nonzero merchantable-volume rows value for value. Four further hypotheses were disproved on the way, and they are recorded. See `notes/reference/fvsbc-smoke-run.md`.
-3. **The numbers are now compared against the FVS project's own BC test data.** The first official case matches with the project's exact command and reports zero differing lines across all four stands; the second runs all fifteen stands and twelve of them match in every table. See `notes/reference/fvsbc-validation.md`, and item 8 for what the comparison does not establish.
-4. `P2.2`'s prototype is planned on #12 and it stays in `P2.2`. It is bounded by the five `P2.1` contract pages, each of which ends with the items it assigns to `P2.2`: the field order BC reads and the `TREEFMT` injection hazard in `docs/reference/tree-list.rst`; `BECINFO` and the keyword validator in `keywords.rst`; the table list in `outputs.rst`; the variant list in `provenance.rst`; and the height units and the crown-ratio scale in `nemora-ingest.rst`. Four of those are settled by one successful run of a synthetic stand.
-5. The patch set is banked in this repository at `notes/reference/fvsbc-patchset.diff.gz`. It is not pushed to `UBC-FRESH/PyFVS`; that is a fork-side change, it needs an approval, and ADR 0004 names it.
-6. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` requires them. Reported as `UBC-FRESH/ubc-fresh-dev-workflow` issue #44. Until it is fixed, add the numbers by hand when a task's issue exists.
-7. **`P2.3` satisfies Phase 2's third acceptance criterion**, which asks that "the patch the FVS source submodule needs is recorded". The patch is recorded; the fork itself is unmodified and unpushed, as #10's out-of-scope section requires. `P2.2`, the synthetic-data prototype with checks that can fail, is still open, and so is the phase.
-8. **The oracle is a 2022 fixture and the project's own checker skips this variant**, so the comparison bounds rather than proves correctness. The `.sum.save` files carry `06-28-2022` in their `-999` headers, the source built here is `ef5fa84` of 2026-09-10, and the checker carries `#FVSbc -- Omit currently 20260226`. The residual is confined to three dense stands of the second case, and it is attributed, not proven, to upstream changes made after the fixture was written.
-9. **Proposed adjacent work, not started: promote the comparison into the repository as a test that can fail.** Every comparison so far was an ad hoc script outside the repository, and three of them were buggy in ways that produced false findings. A test that runs the first official case and asserts zero differing lines would have caught them. It needs a task of its own.
-10. **Disclosure: thirteen commits labelled `P2.2` delivered `P2.3`'s work**, and a fourteenth corrected the record they produced. `P2.2`'s deliverable is the synthetic-data prototype, so the label is wrong on those commits. They are not rewritten, on the rule in `docs/reference/phase-closeout.rst`. The correct task is recorded retroactively here and on #13.
-11. `P2.4` (#14) is proposed, and `ADR 0005` is proposed with it. Three things carry a name that reads as `fvsbc`: this project's package, PyFVS's BC extension submodule, and the FVS variant that the FVS tree calls `FVSbc`. There is no import collision between the first two, which is worth stating because an earlier claim said there was; the problem is that three names and one spelling cannot be told apart in prose. The rename is 161 occurrences across 28 tracked files, of which ten are history and stay as written. **The repository rename is a public change and needs its own approval**, and the published Pages URL changes with it, so any outward link must move in the same change set.
-    **Resolved on 2026-10-23: all six subtasks are done, the four acceptance criteria are met, and `#14` is closed.** `ADR 0005` is accepted. Two statements in this proposal turned out to be wrong about the environment and are corrected in the ADR and the changelog: the precedent it cited for the `Renamed by` line, and the claim that the workspace symlink would need repointing.
-12. **The reference note filenames keep the old name, deliberately.** `notes/reference/fvsbc-build-spike.md`, `-smoke-run.md`, `-validation.md`, and `fvsbc-patchset.diff.gz` are cited by accepted ADR 0004, by the contract pages, and by these notes. `ADR 0005` says renaming them is its own step rather than a search and replace, and the step resolved to keeping them: renaming a file whose name an accepted ADR cites would strand that citation in a document that is not rewritten. Only the prose inside changed.
-13. **Open, and the maintainer's to decide: `ADR 0004` is still `Status: proposed`.** Its task, `P2.3`, is closed, and the ADR satisfied `P2`'s third acceptance criterion by recording the banked patch set. The other three ADRs of its generation read `accepted`, so the status looks like an oversight rather than a deliberate deferral. Marking an ADR accepted is the maintainer's act and I will not do it silently, so it is recorded here.
-14. **Open, and a settings change: this project's CI exercises one Python version where the workflow's own quality-gates page states two.** `.github/workflows/ci.yml` has a single `quality` job named `Quality gates`, and branch protection requires exactly that context. The workflow spec's `quality-gates.rst` states that the quality job runs on Python 3.11 **and** 3.12, and its example protection lists `"Quality gates, Python 3.11"` and `"Quality gates, Python 3.12"`. So every gate here has only ever run on the 3.12 interpreter, which is the one `.venv` provides. I noticed it while reading the required status checks during `P2.4` and said in that report that I would record it; this is the record, added a move later than it should have been. Changing CI or branch protection is a settings change and needs the maintainer's approval, so nothing has been changed.
-15. **Open, from the first synthetic run, and each needs a decision before subtask 7 can close.** Recorded with its evidence in `notes/reference/synthetic-run.md`. **(a)** The output database holds `FVS_Cases` and `FVS_Error` only; `FVS_Summary_Metric`, `FVS_Compute`, and `FVS_TreeList_Metric` need a `DATABASE` output block, and PyFVS already occupies that block, so a key's own is refused as used in the wrong context. The summary is available in memory instead. Which route the reader takes — the database, or the in-memory frame plus the database for cases and errors — is a decision, not a detail. **(b)** `FVS_Error` holds warnings as well as errors, so the output contract's "assert `FVS_Error` is empty" has to become "holds no error", or the fixture needs a BC-valid forest code. **(c)** The height units and the crown-ratio scale are still unverified in both directions for the target side, and each needs a controlled run that varies one input and watches what changes; the first run could not settle either, because `SITECODE FD 100` dominates the height it computed.
-    **Resolved on 2026-10-23.** **(a)** and **(b)** are decided and implemented: the reader takes the database for `FVS_Cases` and `FVS_Error`, takes the summary from PyFVS's in-memory frame, and fails a run on a row of severity `ERROR` rather than on a non-empty `FVS_Error`; the output contract says so at rules 1, 2, and 5, and its "Not verified" list is answered at three of four points. **(c)** remains open, and needs the two controlled runs.
-    **Resolved in full on 2026-10-23.** **(c)** is settled too: the height units are metres on both sides, proved by a run that varied `live_ht` alone and moved the summary's `top_ht` by the metre-to-foot factor, and the crown-ratio field is a crown class 1 to 9 that FVS expands to a percent by `n*10-5`, which `base/intree.f` states in its own comment. Both contract pages carry them, and the runs are in `notes/reference/synthetic-run.md`. Nothing in this note is open.
+The substance of these notes now lives in the focused plans under `notes/`, which is where the workflow
+model puts detail too long for this roadmap. What stays here is the ordering and the open decisions.
+
+1. The prototype's plan, and the phase's detail, are in `notes/p2-contracts-and-prototype.md`. It
+   carries each task's sections, the phase criteria with their evidence, the deviations, and four
+   proposals for the maintainer.
+2. **Open, and the maintainer's: the CI quality matrix.** `.github/workflows/ci.yml` runs one `quality`
+   job on Python 3.12, where `docs/reference/quality-gates.rst` in the workflow spec requires 3.11 and
+   3.12 and names the contexts `Quality gates, Python 3.11` and `Quality gates, Python 3.12`. Changing
+   CI or branch protection is a settings change. Recommendation in the plan, proposal 2.
+3. **Open, and the maintainer's: `ADR 0004` is still `Status: proposed`**, although its task is closed
+   and the phase's third acceptance criterion rests on it. It also contradicts itself and names the
+   wrong task issue. Recommendation in the plan, proposal 3.
+4. **Open: `FVS_Compute` and `FVS_Summary_Metric` are unreachable through PyFVS**, which occupies the
+   `DATABASE` output block. Recommendation in the plan, proposal 1.
+5. **Proposed adjacent work, not started: promote the oracle comparison into a repository test that can
+   fail.** Every comparison so far was an ad hoc script outside the repository, and three of them were
+   buggy in ways that produced false findings. A test that runs the first official case and asserts zero
+   differing lines would have caught them, and it needs a task of its own.
+6. **Proposed: pin the workflow revision in `AGENTS.md`.** It names the workflow spec with no path, URL,
+   or revision, and the project carries no local copy of the pages that govern it. Recommendation in the
+   plan, and the upstream gap is to be filed under `P2.5`.

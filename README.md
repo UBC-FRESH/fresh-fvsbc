@@ -25,12 +25,15 @@ FVS Fortran  ->  fork of PyFVS (build, FFI)  ->  fresh-fvsbc (BC semantics, tidy
 
 ## Status
 
-Phase 0 (bootstrap) is active on `feature/p0-bootstrap`. `ROADMAP.md` lists the phases, and the GitHub
-issues carry the live status.
+`ROADMAP.md` is the plan of record and the only home for status, and the GitHub issues carry the live
+status. At present `P2`, the contracts and the prototype, is active on
+`feature/p2-contracts-prototype`.
 
-**`fresh-fvsbc` does not build `FVSbc` yet.** Nothing is released, and no variant has been built. The build
-recipe is Phase 3 work. See [ADR 0001](notes/adr/0001-fork-pyfvs-as-the-build-and-ffi-layer.md) for why
-the BC variant is not buildable from the upstream repositories today.
+**The BC variant builds, imports, and runs.** The recipe is
+[ADR 0004](notes/adr/0004-the-fvsbc-build-recipe.md); the twelve-item patch the FVS source submodule
+needs is banked at `notes/reference/fvsbc-patchset.diff.gz`; and the numbers are compared against the FVS
+project's own BC test data in `notes/reference/fvsbc-validation.md`, with the limits of that comparison
+stated there. Nothing is released: there is no tag and no wheel.
 
 ## How this project works
 
