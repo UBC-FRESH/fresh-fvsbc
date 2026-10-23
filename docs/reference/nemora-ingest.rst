@@ -75,8 +75,10 @@ The mapping
      - ``crown_ratio``
      - Unlike the above, the two sides are **not** the same shape. `nemora` emits a fraction, and the
        tree-list field is a crown class 1 to 9, which FVS expands to a percent by ``class*10-5``. The
-       adapter converts, and rejects a fraction that maps outside 1 to 9, because the field's single
-       digit cannot carry it
+       adapter takes the class whose expanded percent is **nearest** the fraction's hundredths, so
+       0.45 becomes class 5 and FVS reads 45 percent, and it **rejects** a fraction at or above 0.9,
+       where the nearest class would be 10: the field's single digit cannot carry it, and rounding
+       down would understate a crown by up to five percent
    * - ``dg_incr``, ``htg_incr``
      - derived
      - ``0``. FVS computes growth, so an input value is history rather than a prediction
