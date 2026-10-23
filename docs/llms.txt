@@ -15,6 +15,10 @@
 - [Provenance contract](reference/provenance.html): what every run records, and where it lives.
 - [nemora ingestion contract](reference/nemora-ingest.html): how a synthetic stem population becomes a tree list, and what cannot be supplied.
 
+## Agent protocols
+
+- [Agent roles and models](agents/roles-and-models.html): this project's roles, the rule that separates the verifier from the implementer, and the log of the model chosen for each.
+
 ## API
 
 - [API reference](api/index.html): every public function, with its parameters, types, and return values.

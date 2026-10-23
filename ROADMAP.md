@@ -124,6 +124,8 @@ task's sections, the phase criteria and their evidence, the deviations, and the 
   - [ ] Move the multi-paragraph roadmap notes into the focused plan.
   - [ ] Pin the workflow revision in `AGENTS.md`, and file the missing agent pages upstream.
   - [ ] Record the `P2.3` incident, thirteen commits with no child issue, in the close-out report.
+  - [ ] Record this project's roles and open the model log at `docs/agents/roles-and-models.rst`.
+  - [ ] Have a separate Verifier session check every claim in the close-out report against its evidence.
 
 Acceptance criteria:
 

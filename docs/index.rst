@@ -19,3 +19,9 @@ project grows.
    :caption: API
 
    api/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Agent protocols
+
+   agents/index
