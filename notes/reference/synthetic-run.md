@@ -123,3 +123,14 @@ already-percent crown ratio that BC's single-digit field cannot carry. The contr
 item offered three answers and the true one was a fourth thing.
 
 Both are now on `docs/reference/tree-list.rst` and `docs/reference/nemora-ingest.rst`.
+
+## The determinism runs
+
+One case, run three times through the same path. Two runs with `RANNSEED 1` produced **byte-identical**
+summaries; a third with `RANNSEED 2` differed in one value at one period, year 30, 56 cubic feet against
+55. So the seed controls the variation these runs show, which answers the second item
+`docs/reference/provenance.rst` had left open.
+
+It answers it within a bound, and the bound is worth stating: two runs a second apart would not show a
+source that varies over a longer timescale, and four cycles on two plots would not show one that needs
+more. "No other source showed itself here" is the claim; "RANNSEED is the only source" is not.

@@ -72,6 +72,12 @@ Contract rules
 Not verified
 ------------
 
-- Whether PyFVS exposes the built variant list at run time, or whether `fresh-fvsbc` must read it from the
-  build.
-- Whether `RANNSEED` is the only source of nondeterminism, or whether FVS has others.
+- **Answered: PyFVS exposes the built variant list at run time.** `pyfvs.list_variants()` returns each
+  variant with the module it would import and a status, and it returned
+  ``{'BC': {'lib': 'pyfvs.fvsbc', 'status': 'OK'}}`` in this project's build. The status is what makes a
+  mistaken build visible, so the record's list is built by refusing a variant whose status is not `OK`.
+- **Answered within a bound: `RANNSEED` controls the variation these runs show.** Two runs of one case
+  with the seed fixed produced byte-identical summaries, and changing the seed alone changed one value in
+  one period. So the seed is the control, and no other source showed itself. What that does not establish
+  is that no other source exists: one that varies over a longer timescale than two runs a second apart, or
+  one that needs more cycles or more plots to appear, would not have shown up here.
