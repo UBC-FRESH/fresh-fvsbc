@@ -79,6 +79,7 @@ Goal: define the interfaces and the data contracts, then build the smallest prot
 
 - [x] P2.1 Define the interface and data contracts in `docs/` (#11)
 - [ ] P2.2 Build a prototype that exercises the contracts on synthetic data (#12)
+- [ ] P2.3 Record the FVS source patch set and its oracle comparison (#13)
 
 Acceptance criteria:
 
@@ -146,9 +147,13 @@ Acceptance criteria:
 
 ## Detailed Next Steps Notes
 
-1. `P2.2`'s build spike is done, and **`FVSbc` builds, imports, and runs a 200-year projection** with a nine-line patch set across four files plus one new file. See `notes/reference/fvsbc-build-spike.md`, `notes/reference/fvsbc-smoke-run.md`, and ADR 0004.
-2. **The smoke run found a defect: merchantable cubic volume stays 0 for every year.** Total cubic volume accumulates normally. The likely cause is unset merchantable volume equations, and it needs a decision: whether BC supplies a volume-equation keyword, or a coefficient table. This is the most important open item.
-3. Nothing has been compared against an official FVS-BC output, so the numbers are plausible rather than verified. PyFVS validates its variants against saved `.sum` references; `fvsbc` has none.
+1. `P2.3` records what `P2.2`'s build spike produced. **`FVSbc` builds, imports, and runs a 200-year projection.** The patch is now twelve items across nine modified files plus one new file, banked at `notes/reference/fvsbc-patchset.diff.gz` and listed in ADR 0004. Applying it to `ef5fa84` was checked to reproduce the working tree byte for byte. See `notes/reference/fvsbc-build-spike.md`.
+2. **The merchantable cubic volume defect is fixed and confirmed against an official reference.** `canada/bc/vols.f` never set `MCFV`, which `base/gradd.f` uses to build `OMCCUR`. The fix reproduces all nine of the reference's nonzero merchantable-volume rows value for value. Four further hypotheses were disproved on the way, and they are recorded. See `notes/reference/fvsbc-smoke-run.md`.
+3. **The numbers are now compared against the FVS project's own BC test data.** The first official case matches with the project's exact command and reports zero differing lines across all four stands; the second runs all fifteen stands and twelve of them match in every table. See `notes/reference/fvsbc-validation.md`, and item 8 for what the comparison does not establish.
 4. The prototype half of `P2.2` is unblocked. Whether it lands in `P2.2` or moves to `P3` is a scope decision.
-5. The patch set lives in the fork and is not pushed. Pushing it to `UBC-FRESH/PyFVS` needs an approval, and it is named in ADR 0004.
+5. The patch set is banked in this repository at `notes/reference/fvsbc-patchset.diff.gz`. It is not pushed to `UBC-FRESH/PyFVS`; that is a fork-side change, it needs an approval, and ADR 0004 names it.
 6. The seed omits task issue numbers from `templates/project/ROADMAP.md.tmpl`, while `docs/reference/workflow-model.rst` requires them. Reported as `UBC-FRESH/ubc-fresh-dev-workflow` issue #44. Until it is fixed, add the numbers by hand when a task's issue exists.
+7. **`P2.3` satisfies Phase 2's third acceptance criterion**, which asks that "the patch the FVS source submodule needs is recorded". The patch is recorded; the fork itself is unmodified and unpushed, as #10's out-of-scope section requires. `P2.2`, the synthetic-data prototype with checks that can fail, is still open, and so is the phase.
+8. **The oracle is a 2022 fixture and the project's own checker skips this variant**, so the comparison bounds rather than proves correctness. The `.sum.save` files carry `06-28-2022` in their `-999` headers, the source built here is `ef5fa84` of 2026-09-10, and the checker carries `#FVSbc -- Omit currently 20260226`. The residual is confined to three dense stands of the second case, and it is attributed, not proven, to upstream changes made after the fixture was written.
+9. **Proposed adjacent work, not started: promote the comparison into the repository as a test that can fail.** Every comparison so far was an ad hoc script outside the repository, and three of them were buggy in ways that produced false findings. A test that runs the first official case and asserts zero differing lines would have caught them. It needs a task of its own.
+10. **Disclosure: thirteen commits labelled `P2.2` delivered `P2.3`'s work**, and a fourteenth corrected the record they produced. `P2.2`'s deliverable is the synthetic-data prototype, so the label is wrong on those commits. They are not rewritten, on the rule in `docs/reference/phase-closeout.rst`. The correct task is recorded retroactively here and on #13.
