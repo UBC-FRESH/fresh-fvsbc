@@ -1,6 +1,6 @@
 # ADR 0002: fvsbc is a standalone package
 
-Status: accepted
+Status: accepted. Renamed by ADR 0005.
 Date: 2026-10-21
 Issues: #8
 

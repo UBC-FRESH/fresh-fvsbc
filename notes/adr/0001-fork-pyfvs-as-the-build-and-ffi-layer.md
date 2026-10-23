@@ -1,6 +1,6 @@
 # ADR 0001: Fork PyFVS as the FVS build and FFI layer
 
-Status: accepted
+Status: accepted. Renamed by ADR 0005.
 Date: 2026-10-21
 Issues: #8
 

@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use fresh-fvsbc, please cite the repository."
+title: "fresh-fvsbc"
+abstract: "A Python wrapper for the BC variant of the Forest Vegetation Simulator. It builds the FVSbc variant from a pinned fork of PyFVS and exposes BC keywords, species and BEC handling, and tidy simulation I/O."
+authors:
+  - name: "UBC FRESH Lab"
+repository-code: "https://github.com/UBC-FRESH/fresh-fvsbc"
+url: "https://ubc-fresh.github.io/fresh-fvsbc/"
+license: "MIT"

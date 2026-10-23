@@ -1,8 +1,24 @@
-# FVS-BC
+# fresh-fvsbc
 
-> Agent-facing index for FVS-BC. Read the linked pages before you change the project.
+> Agent-facing index for fresh-fvsbc. Read the linked pages before you change the project.
 
 ## Start here
 
 - [Home](index.html): the documentation home for the project.
+- [Reference contracts](reference/index.html): what `fresh-fvsbc` requires, page by page.
+
+## Reference
+
+- [Tree-list input contract](reference/tree-list.html): the FVS-BC tree-record format, its fields, and its species codes.
+- [Keyword-set contract](reference/keywords.html): the keyword vocabulary, the BC site and BEC input, and the tree-record format hazard.
+- [Output contract](reference/outputs.html): the SQLite tables an FVS-BC run writes, and the rules for reading them.
+- [Provenance contract](reference/provenance.html): what every run records, and where it lives.
+- [nemora ingestion contract](reference/nemora-ingest.html): how a synthetic stem population becomes a tree list, and what cannot be supplied.
+
+## Agent protocols
+
+- [Agent roles and models](agents/roles-and-models.html): this project's roles, the rule that separates the verifier from the implementer, and the log of the model chosen for each.
+
+## API
+
 - [API reference](api/index.html): every public function, with its parameters, types, and return values.
