@@ -92,7 +92,7 @@ task's sections, the phase criteria and their evidence, the deviations, and the 
   - [x] Write the output contract and the provenance record.
   - [x] Write the `nemora` ingestion contract.
   - [x] Add `CODE_OF_CONDUCT.md` and `CITATION.cff`.
-- [ ] P2.2 Build a prototype that exercises the contracts on synthetic data (#12) — one subtask is **deferred to `P3`**, not unfinished: reading `FVS_Compute` and `FVS_Summary_Metric`, which PyFVS makes unreachable
+- [x] P2.2 Build a prototype that exercises the contracts on synthetic data (#12) — its one open subtask was **transferred to `P3.2` (#19)**, not left unfinished: reading `FVS_Compute` and `FVS_Summary_Metric`, which PyFVS makes unreachable
   - [x] Run the build spike, and record the command, its output, and its exit status.
   - [x] Record the build outcome, and write the build-recipe ADR if the spike is conclusive.
   - [x] Write a synthetic stem population shaped like `nemora` output, as a fixture built at runtime in `tests/`.
@@ -101,7 +101,7 @@ task's sections, the phase criteria and their evidence, the deviations, and the 
   - [x] Answer the `TREEFMT` hazard: whether PyFVS injects its own format for a BC run, and whether it misaligns a list.
   - [x] Run the synthetic stand through the `DATABASE` path.
   - [x] Write the output reader for `FVS_Cases` and `FVS_Error`, and fail a run that holds a row of severity `ERROR`.
-  - [ ] Read `FVS_Compute` and `FVS_Summary_Metric`. Not reachable through PyFVS, which occupies the `DATABASE` output block; see the plan's proposals.
+  - [x] Read `FVS_Compute` and `FVS_Summary_Metric`. **Transferred to `P3.2` (#19)**, which builds the standalone executable that reaches them; PyFVS makes them unreachable by occupying the `DATABASE` output block.
   - [x] Write the `nemora` adapter: require `species` and `tree_age`, and reject a crown ratio the one-digit field cannot represent.
   - [x] Record provenance for the run, including the case id and run datetime from `FVS_Cases`.
   - [x] Create the package skeleton and extend the gates to cover it.
