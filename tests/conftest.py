@@ -1,4 +1,4 @@
-"""Make the framework scripts in ``scripts/`` and the ``fvsbc`` package importable from the tests.
+"""Make ``scripts/`` and the ``fresh-fvsbc`` package importable from the tests.
 
 ``scripts/`` holds the repository's own tooling, and ``src/`` holds the package this project
 ships. Neither is installed, so the suite puts both on the import path.

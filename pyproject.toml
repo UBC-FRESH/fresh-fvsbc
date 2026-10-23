@@ -1,8 +1,8 @@
-# Tool configuration for fvsbc. Each gate configured here is also a check in the
+# Tool configuration for fresh-fvsbc. Each gate configured here is also a check in the
 # green dashboard (scripts/dashboard.py).
 
 [project]
-name = "fvsbc"
+name = "fresh-fvsbc"
 version = "0.0.0"
 description = "A Python wrapper for the BC variant of the Forest Vegetation Simulator."
 readme = "README.md"
@@ -12,8 +12,8 @@ authors = [{ name = "UBC FRESH Lab" }]
 keywords = ["forest-modelling", "fvs", "british-columbia", "growth-and-yield"]
 
 [project.urls]
-Repository = "https://github.com/UBC-FRESH/fvsbc"
-Documentation = "https://ubc-fresh.github.io/fvsbc/"
+Repository = "https://github.com/UBC-FRESH/fresh-fvsbc"
+Documentation = "https://ubc-fresh.github.io/fresh-fvsbc/"
 
 [tool.ruff]
 line-length = 100
@@ -37,7 +37,7 @@ python_version = "3.11"
 strict = true
 warn_unreachable = true
 mypy_path = "scripts,src"
-files = ["scripts", "tests", "docs/conf.py", "src/fvsbc"]
+files = ["scripts", "tests", "docs/conf.py", "src/fresh_fvsbc"]
 
 [[tool.mypy.overrides]]
 module = ["numpydoc", "numpydoc.*"]
@@ -45,11 +45,11 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=scripts --cov=src/fvsbc --cov-branch --cov-report=term-missing --cov-fail-under=95"
+addopts = "--cov=scripts --cov=src/fresh_fvsbc --cov-branch --cov-report=term-missing --cov-fail-under=95"
 
 [tool.coverage.run]
 branch = true
-source = ["scripts", "src/fvsbc"]
+source = ["scripts", "src/fresh_fvsbc"]
 
 [tool.coverage.report]
 show_missing = true

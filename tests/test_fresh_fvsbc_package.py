@@ -1,4 +1,4 @@
-"""Tests for the ``fvsbc`` package skeleton.
+"""Tests for the ``fresh-fvsbc`` package skeleton.
 
 They check that the package imports, that it carries a version, and that the version agrees with
 the one ``pyproject.toml`` declares. The last check is the one worth having: the version lives in
@@ -11,7 +11,7 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
-import fvsbc
+import fresh_fvsbc
 
 ROOT: Path = Path(__file__).resolve().parents[1]
 
@@ -25,20 +25,20 @@ def declared_version() -> str:
 
 def test_package_imports_and_carries_a_version() -> None:
     """The package exposes a non-empty version string."""
-    assert isinstance(fvsbc.__version__, str)
-    assert fvsbc.__version__
+    assert isinstance(fresh_fvsbc.__version__, str)
+    assert fresh_fvsbc.__version__
 
 
 def test_package_version_matches_pyproject() -> None:
     """The version in the package equals the one that ``pyproject.toml`` declares."""
-    assert fvsbc.__version__ == declared_version()
+    assert fresh_fvsbc.__version__ == declared_version()
 
 
 def test_package_documents_itself() -> None:
     """The package module carries a docstring, which the lint rules require."""
-    assert fvsbc.__doc__
+    assert fresh_fvsbc.__doc__
 
 
 def test_package_exports_only_names_it_defines() -> None:
     """Every name in ``__all__`` exists on the package."""
-    assert all(hasattr(fvsbc, name) for name in fvsbc.__all__)
+    assert all(hasattr(fresh_fvsbc, name) for name in fresh_fvsbc.__all__)
