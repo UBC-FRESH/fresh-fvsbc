@@ -54,8 +54,9 @@ artifact is meant. The reference pages state the rule once, and the rest link to
   runs only after its own approval.
 - The history stays legible. The changelog, the two close-out reports, and the accepted ADRs keep the old
   name, because they record what was true when they were written. ADRs 0001 to 0004 each gain one
-  `Renamed by ADR 0005` line, following the precedent that ADR 0004 already sets with its
-  `Refined by ADR 0008` line.
+  `Renamed by ADR 0005` line on their status line, which is the form the `ubc-fresh-dev-workflow` seed
+  uses in its own `notes/adr/0004-human-approval-gates.md`. An earlier version of this paragraph
+  attributed that form to this repository's ADR 0004, which carries no such line and is still proposed.
 - Several note filenames carry the old name, including the banked patch set. They are stable paths that
   other files cite, so renaming them is its own step, done deliberately rather than by a search and replace.
 

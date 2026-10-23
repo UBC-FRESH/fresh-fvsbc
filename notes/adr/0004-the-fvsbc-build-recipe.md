@@ -1,6 +1,6 @@
 # ADR 0004: The `FVSbc` build recipe
 
-Status: proposed
+Status: proposed. Renamed by ADR 0005.
 Date: 2026-10-21
 Issues: #12
 
