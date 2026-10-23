@@ -1,8 +1,8 @@
 # ADR 0004: The `FVSbc` build recipe
 
-Status: proposed. Renamed by ADR 0005.
+Status: accepted on 2026-10-23, when the maintainer approved `P2`'s close-out report. Renamed by ADR 0005.
 Date: 2026-10-21
-Issues: #12
+Issues: #13
 
 ## Context
 
@@ -13,11 +13,13 @@ named the answer as a prerequisite for every later phase.
 The `P2.2` build spike answered it. The evidence, with the exact commands and their output, is in
 `notes/reference/fvsbc-build-spike.md`. In summary:
 
-- Adding `bc` to the variant matrix is **not** sufficient. Four defects stand in the way.
-- Three are fixed and the build completes: the variant compiles, links, and produces
-  `fvsbc.cpython-312-x86_64-linux-gnu.so`.
-- The fourth blocks the import. PyFVS's `src/api/fvs_step.f90` calls `cubrds`, which 23 variants define
-  and the BC variant does not.
+- Adding `bc` to the variant matrix is **not** sufficient. Four defects stood in the way.
+- **All four are fixed.** The variant compiles, links, produces
+  `fvsbc.cpython-312-x86_64-linux-gnu.so`, and the module imports.
+- The fourth was the one that blocked the import: PyFVS's `src/api/fvs_step.f90` calls `cubrds`, which 23
+  variants define and the BC variant does not. Item 5 below is its fix. **An earlier version of this
+  paragraph said the fourth still blocked the import**, while the Decision listed the fix; the
+  contradiction was corrected here, before the ADR was accepted rather than after.
 
 ## Decision
 
