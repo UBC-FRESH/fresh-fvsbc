@@ -1,6 +1,6 @@
 # ADR 0005: Rename the project to `fresh-fvsbc`
 
-Status: proposed
+Status: accepted on 2026-10-23. The maintainer chose the rename.
 Date: 2026-10-23
 Issues: #14 (P2.4)
 
@@ -25,7 +25,8 @@ accepted and are not rewritten.
 
 ## Decision
 
-Rename this project to `fresh-fvsbc`, in four places and one rule:
+Rename this project to `fresh-fvsbc`, in four places and one rule. Approved by the maintainer on
+2026-10-23, and the repository rename ran that day:
 
 - the distribution name is `fresh-fvsbc`, and the import name is `fresh_fvsbc`, with the package at
   `src/fresh_fvsbc/`. The underscore form is forced, because a hyphen is not valid in a Python identifier;
