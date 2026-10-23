@@ -18,7 +18,7 @@ Documentation = "https://ubc-fresh.github.io/fvsbc/"
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-src = ["scripts", "tests"]
+src = ["scripts", "src", "tests"]
 extend-exclude = ["tmp", "_build"]
 
 [tool.ruff.lint]
@@ -36,8 +36,8 @@ convention = "numpy"
 python_version = "3.11"
 strict = true
 warn_unreachable = true
-mypy_path = "scripts"
-files = ["scripts", "tests", "docs/conf.py"]
+mypy_path = "scripts,src"
+files = ["scripts", "tests", "docs/conf.py", "src/fvsbc"]
 
 [[tool.mypy.overrides]]
 module = ["numpydoc", "numpydoc.*"]
@@ -45,11 +45,11 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=scripts --cov-branch --cov-report=term-missing --cov-fail-under=95"
+addopts = "--cov=scripts --cov=src/fvsbc --cov-branch --cov-report=term-missing --cov-fail-under=95"
 
 [tool.coverage.run]
 branch = true
-source = ["scripts"]
+source = ["scripts", "src/fvsbc"]
 
 [tool.coverage.report]
 show_missing = true
