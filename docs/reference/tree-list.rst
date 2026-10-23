@@ -103,9 +103,13 @@ this record that was found.
      - ``tree_age``
      - Real, width 3, no decimals
 
-Not verified: whether the BC variant reads the same field order as PyFVS's template, since only the BC
-`TREFMT` widths were read and not the BC reader. The widths agree with PyFVS's template for fields 1 to 5
-and 7 to 17, and differ at field 6. Confirm the reader in `P2.2`.
+Resolved in `P2.2`, from the two format strings rather than from a run. Both declare **25 fields in the
+same order, with matching types**; only the widths differ, at positions 2 (`I8` against `I7`), 3 (`F9.3`
+against `F6.0`), 5 (`A4` against `A3`), 7 (`F3.1` against `F4.1`), 8 and 9 (`F3.0` against `F5.1`), 10
+(`F2.1` against `F5.1`), and 11 (`I2` against `I1`). The declared width totals **71 columns against 73**.
+So the field *order* question is settled: the two formats decode to the same field sequence, and the
+difference is numeric width, not field identity. Still not verified: whether BC's reader accepts every
+value that PyFVS's wider and narrower fields can produce, which the run in `P2.2` settles.
 
 The species codes
 -----------------
@@ -140,8 +144,18 @@ The open hazard
 ---------------
 
 PyFVS writes its own ``TREEFMT`` keyword when the caller's keyword set does not contain one. Its default
-format is **not** the BC variant's. See :doc:`keywords`. The two differ at the species field, ``A4``
-against ``A3``, and at the tree number, tree count, and height fields.
+format is **not** the BC variant's. See :doc:`keywords`. The two differ at eight of the 25 widths, and
+they total 71 columns against 73.
 
-Whether that injection reaches an `FVSbc` run, and whether it misaligns a treelist, is unverified. It is
-the first question for `P2.2`.
+Resolved in `P2.2`, from the injection's source and from the two format strings:
+
+- PyFVS injects it only when all three hold: the caller passed trees as data, the keyword set holds no
+  ``TREEFMT``, and it holds no ``TREESQL``. It also sits inside the branch that handles a keyword set, so
+  a keyword file passed **by path** never receives it.
+- Neither the official test cases nor the `P2.3` runs were exposed. Those keyword files were passed by
+  path, and they read their trees through ``TreeSQL``.
+- A list that PyFVS writes is read with the format PyFVS declared, so the injection does not corrupt
+  PyFVS's own output. The exposure is to a list PyFVS did **not** write: a caller who supplies a 73-column
+  BC list and also passes trees would have it read with the injected 71-column format.
+- The remedy needs no change to PyFVS. ``FVS(variant, treelist_format=...)`` takes an override for both the
+  Python template and the FVS format, so `fvsbc` can pass BC's.

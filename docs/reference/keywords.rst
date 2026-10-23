@@ -90,4 +90,7 @@ PyFVS injects a ``TREEFMT`` keyword when the caller's set lacks one, using its o
 than the BC variant's. `fvsbc` must not inherit that behaviour silently. Either it writes the BC
 ``TREEFMT`` itself, or it writes the format the build actually expects and records why.
 
-Which of those is correct depends on the build spike in `P2.2`.
+Resolved in `P2.2`. The injection is conditional, and avoiding it needs no change to PyFVS, so contract
+rule 4 stands: `fvsbc` passes BC's format through ``FVS(treelist_format=...)`` whenever it supplies trees
+as data. The injection's condition, and how the two formats differ, are in :doc:`tree-list` and are not
+repeated here.
