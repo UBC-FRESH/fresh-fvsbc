@@ -80,7 +80,7 @@ Goal: define the interfaces and the data contracts, then build the smallest prot
 - [x] P2.1 Define the interface and data contracts in `docs/` (#11)
 - [ ] P2.2 Build a prototype that exercises the contracts on synthetic data (#12)
 - [x] P2.3 Record the FVS source patch set and its oracle comparison (#13)
-- [ ] P2.4 Rename the project to `fresh-fvsbc` (#14)
+- [x] P2.4 Rename the project to `fresh-fvsbc` (#14)
 
 Acceptance criteria:
 
