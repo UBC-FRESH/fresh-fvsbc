@@ -220,7 +220,10 @@ before the work it describes is started.
 4. **`P3`'s shape.** `P3` is `planned` with a placeholder task and a placeholder criterion.
    **Recommendation: before `P3` is activated, its parent issue, its child issues, its roadmap subtask
    lines and its focused plan are written in that order**, and the maintainer approves the plan before
-   the first commit, which is what `workflow-model.rst` requires of an activated phase.
+   the first commit. `session-protocol.rst` requires the plan to be written before anything is edited,
+   and `workflow-model.rst` puts the plan of record in `ROADMAP.md` with the detail under `notes/`. An
+   earlier version of this proposal attributed the requirement to `workflow-model.rst` alone, which
+   does not state it; a Verifier session caught the false citation.
 
 ## Deviations and disclosures
 
