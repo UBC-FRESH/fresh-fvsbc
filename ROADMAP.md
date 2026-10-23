@@ -10,8 +10,8 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | --- | --- | --- | --- |
 | P0 Bootstrap | #1 | `feature/p0-bootstrap` | complete |
 | P1 Scope and design | #5 | `feature/p1-scope-design` | complete |
-| P2 Contracts and prototype | #10 | `feature/p2-contracts-prototype` | pr-open |
-| P3 Build | TBD | `feature/p3-build` | planned |
+| P2 Contracts and prototype | #10 | `feature/p2-contracts-prototype` | complete |
+| P3 Build | #17 | `feature/p3-build` | active |
 | P4 Verify | TBD | `feature/p4-verify` | planned |
 | P5 Release and deploy | TBD | `feature/p5-release` | planned |
 | P6 Operate and maintain | TBD | `feature/p6-operate` | planned |
@@ -73,7 +73,7 @@ Acceptance criteria:
 
 Parent issue: #10
 Branch: `feature/p2-contracts-prototype`
-Status: pr-open
+Status: complete
 
 Goal: define the interfaces and the data contracts, then build the smallest prototype that exercises them.
 
@@ -117,15 +117,15 @@ task's sections, the phase criteria and their evidence, the deviations, and the 
   - [x] Add the `Renamed by ADR 0005` line to ADRs 0001 to 0004.
   - [x] Rename the local directory.
 - [x] P2.5 Repair the plan of record after the workflow audit (#15)
-  - [ ] Add the indented subtask level to this roadmap for `P2.1` to `P2.4`, and link the plan from each task line.
-  - [ ] Reconcile parent issue `#10`: its child checklist and its scope, with a scope-change comment.
-  - [ ] Correct `README.md`'s status paragraph, which claims that no variant has been built.
-  - [ ] Correct the closed task issues' `Status:` and `Completion metadata:`.
-  - [ ] Move the multi-paragraph roadmap notes into the focused plan.
-  - [ ] Pin the workflow revision in `AGENTS.md`, and file the missing agent pages upstream.
-  - [ ] Record the `P2.3` incident, thirteen commits with no child issue, in the close-out report.
-  - [ ] Record this project's roles and open the model log at `docs/agents/roles-and-models.rst`.
-  - [ ] Have a separate Verifier session check every claim in the close-out report against its evidence.
+  - [x] Add the indented subtask level to this roadmap for `P2.1` to `P2.4`, and link the plan from each task line.
+  - [x] Reconcile parent issue `#10`: its child checklist and its scope, with a scope-change comment.
+  - [x] Correct `README.md`'s status paragraph, which claims that no variant has been built.
+  - [x] Correct the closed task issues' `Status:` and `Completion metadata:`.
+  - [x] Move the multi-paragraph roadmap notes into the focused plan.
+  - [x] Pin the workflow revision in `AGENTS.md`, and file the missing agent pages upstream.
+  - [x] Record the `P2.3` incident, thirteen commits with no child issue, in the close-out report.
+  - [x] Record this project's roles and open the model log at `docs/agents/roles-and-models.rst`.
+  - [x] Have a separate Verifier session check every claim in the close-out report against its evidence.
 
 Acceptance criteria:
 
@@ -136,17 +136,53 @@ Acceptance criteria:
 
 ## Phase 3: Build
 
-Parent issue: TBD
+Parent issue: #17
 Branch: `feature/p3-build`
-Status: planned
+Status: active
 
-Goal: implement the agreed scope, one task at a time, on the phase branch.
+Goal: implement the agreed scope of the BC layer on top of the validated prototype: make the build
+reproducible in CI, reach the two output tables PyFVS cannot, make the falsifiability evidence
+reproducible, and give the package a public API, a run orchestration, and a command-line entry point.
 
-- [ ] P3.1 Implement the first build task
+The detail for this phase is the focused plan `notes/p3-build.md`, written before the work began.
+
+- [ ] P3.1 The CI quality matrix, and a CI build of the variant (#18)
+  - [ ] Set the `quality` job's `name:` to `Quality gates, Python ${{ matrix.python-version }}` and its `setup-python` input to the matrix variable, and add a `[3.11, 3.12]` matrix.
+  - [ ] Add a job that applies ADR 0004's patch to the pinned fork, builds the BC variant, and imports `pyfvs.fvsbc`.
+  - [ ] After the matrix has run, set branch protection with the specification's four-context `PUT`, including `required_linear_history`, and read the rule back.
+  - [ ] Record the gate change in the changelog with its reason.
+- [ ] P3.2 Build the standalone `FVSbc` executable (#19)
+  - [ ] Build `bin/FVSbc` from the patched fork, and record the command and its output.
+  - [ ] Run one case through it with a `DATABASE` output block, and confirm `FVS_Compute` and `FVS_Summary_Metric` are written.
+  - [ ] Record the recipe as a new ADR.
+- [ ] P3.3 Commit the mutation harness (#20)
+  - [ ] Write the harness so that a mutation which does not apply is an error rather than a pass.
+  - [ ] Register the mutations already recorded for the five prototype modules.
+  - [ ] Run it in CI, or record why not.
+- [ ] P3.4 The public API over the five contracts, and three open decisions (#21)
+  - [ ] Export the five modules' public names, with `__all__` and numpydoc docstrings.
+  - [ ] Resolve the record-versus-dataframe question in `outputs.rst`.
+  - [ ] Resolve the species-assignment question in `nemora-ingest.rst`.
+  - [ ] Resolve the `BECINFO` question in `keywords.rst`.
+  - [ ] Add the API pages, and extend `tests/test_api_docstrings.py` to cover the package.
+- [ ] P3.5 Run orchestration (#22)
+  - [ ] Write the orchestration over the five prototype modules.
+  - [ ] Return the outputs with the provenance record, and fail a run that holds an error.
+  - [ ] Test it end to end, skipping when the built extension is absent and recording the skip.
+- [ ] P3.6 The command-line entry point (#23)
+  - [ ] Write the command over the orchestration.
+  - [ ] Test its exit codes for success, a failed run, and bad input.
+  - [ ] Document it in the README and in `docs/`.
 
 Acceptance criteria:
 
-- <State the criterion that shows this phase met its goal.>
+- The quality job runs on Python 3.11 and 3.12, and protection requires all four contexts the workflow spec names.
+- The pinned fork's BC variant builds from a clean checkout in CI.
+- The standalone executable writes `FVS_Compute` and `FVS_Summary_Metric`.
+- The mutation harness reproduces a named mutation failing a named test.
+- One synthetic run through the public API returns outputs carrying provenance.
+- The command-line entry point runs a case end to end.
+- `python scripts/dashboard.py` exits zero on both Python versions.
 
 ## Phase 4: Verify
 
