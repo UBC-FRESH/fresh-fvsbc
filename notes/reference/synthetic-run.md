@@ -86,3 +86,40 @@ fixture carries neither.
    height was 7.8 m, so BC did not take `live_ht` as the top height directly; `SITECODE FD 100`
    probably dominates it. Settling this needs a controlled run that varies `live_ht` alone and watches
    what changes. The crown-ratio scale is the same kind of question and the same kind of experiment.
+
+## The two controlled runs, and what they settled
+
+The first run could not separate the height units or the crown-ratio scale from the site index that
+dominates FVS's own height calculation. Both are now settled, one by a run and one by a reading.
+
+**The height units are metres on both sides.** One tree, one plot, the site fixed and only `live_ht`
+varied:
+
+| `live_ht` given | `top_ht` at year 0 |
+| --- | --- |
+| 5.0 | 16.0 |
+| 50.0 | 164.0 |
+| 200.0 | 656.0 |
+
+The ratios are 3.2, 3.28, and 3.28. That is the metre-to-foot factor, so the field takes metres and
+the summary reports feet; had the field taken feet, the ratio would have been 1.
+
+**The tree-list field is a crown class, not a fraction, a tenth, or a percentage.** `base/intree.f`
+says so in its own comment, at lines 349 to 357:
+
+```fortran
+C  CONVERT INPUT CROWN CLASS VALUES (1-9) TO PERCENT
+C  CROWN RATIO (1-99) IF NEEDED
+      IF(ICR(I).LE.0)GOTO 37
+      IF(ICR(I).LT.10) THEN
+        ICR(I)=ICR(I)*10-5
+      ELSE
+        IF(ICR(I).GT.99)ICR(I)=99
+      ENDIF
+```
+
+So the field holds 1 to 9, class 7 means 65 percent, and a value of 10 or more is taken as an
+already-percent crown ratio that BC's single-digit field cannot carry. The contract's framing of this
+item offered three answers and the true one was a fourth thing.
+
+Both are now on `docs/reference/tree-list.rst` and `docs/reference/nemora-ingest.rst`.

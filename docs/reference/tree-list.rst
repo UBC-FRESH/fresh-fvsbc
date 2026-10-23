@@ -78,7 +78,10 @@ this record that was found.
    * - 11
      - ``I1``
      - ``crown_ratio``
-     - Integer, width 1
+     - A **crown class**, 1 to 9, and not a percentage. FVS expands it in `base/intree.f`, at lines 349
+       to 357, where its own comment says so: a value below 10 becomes a percent crown ratio by
+       ``n*10-5``, so class 7 means 65 percent. A value of 10 or more is taken as an already-percent
+       crown ratio, which this field is too narrow to carry.
    * - 12
      - ``3(I2,I2)``
      - ``damage1``/``severity1``, then 2 and 3

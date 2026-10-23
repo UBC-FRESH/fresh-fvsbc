@@ -70,11 +70,13 @@ The mapping
      - Direct. Units are centimetres on both sides
    * - ``live_ht``
      - ``height_m``
-     - Units are **not** yet verified. See below
+     - **Metres on both sides**, confirmed by experiment. The adapter converts nothing
    * - ``crown_ratio``
      - ``crown_ratio``
-     - The tree-list field is one digit wide, so the adapter must know whether the source is a fraction or
-       a percentage, and must reject a value it cannot represent
+     - Unlike the above, the two sides are **not** the same shape. `nemora` emits a fraction, and the
+       tree-list field is a crown class 1 to 9, which FVS expands to a percent by ``class*10-5``. The
+       adapter converts, and rejects a fraction that maps outside 1 to 9, because the field's single
+       digit cannot carry it
    * - ``dg_incr``, ``htg_incr``
      - derived
      - ``0``. FVS computes growth, so an input value is history rather than a prediction
@@ -109,18 +111,20 @@ Three things are absent from `nemora`'s output and cannot be invented:
 The spatial fields, ``x`` and ``y``, have no home in the FVS tree list. FVS is distance-independent, so
 placement is dropped. It may still decide plot assignment, which is the one way it survives.
 
-Not verified
-------------
+Not verified, and what the run answered
+---------------------------------------
 
-- **Units for height.** `nemora` emits metres. Whether FVS-BC's ``live_ht`` expects metres or feet was not
-  established. The BC build includes `METRIC.F77` and `canada/bc/blkdat.f` includes it, which suggests
-  metric, but that is an inference and not a read.
-- **The crown-ratio scale.** Whether the tree-list field is a fraction, tenths, or a percentage. The
-  source side is settled by reading `nemora`: it clamps `crown_ratio` to [0, 1] and defaults it to
-  0.45, so the value that arrives at the adapter is a fraction rather than a percentage.
+- **Answered: the height units are metres on both sides.** A run that varied `live_ht` alone, with the
+  tree, the site, and everything else fixed, moved the summary's `top_ht` by 3.2 at one height and 3.28
+  at two others. That factor is the metre-to-foot conversion, so the field takes metres and the summary
+  reports feet. `nemora` emits metres, and the adapter passes them through unchanged.
+- **Answered: the tree-list field is a crown class, not a fraction, a tenth, or a percentage.** It is one
+  digit wide, it holds 1 to 9, and FVS expands it to a percent crown ratio by ``n*10-5``, which its own
+  comment in `base/intree.f` states. So class 7 is 65 percent. `nemora` emits a fraction, so the adapter
+  converts, and refuses a fraction whose class falls outside 1 to 9.
 - Whether a caller will ever have ``species``, or whether the project needs a species-assignment step.
   `nemora` not emitting it is a fact about its current surface, and the note
   `notes/reference/bc-treelist-and-species.md` records it.
 
-The first two are settled by the same successful run that answers the format hazard in
-:doc:`tree-list`.
+The first two were open when this page was written and are now settled, by the run recorded in
+`notes/reference/synthetic-run.md` rather than by another reading.
