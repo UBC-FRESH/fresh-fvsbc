@@ -10,7 +10,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | --- | --- | --- | --- |
 | P0 Bootstrap | #1 | `feature/p0-bootstrap` | complete |
 | P1 Scope and design | #5 | `feature/p1-scope-design` | complete |
-| P2 Contracts and prototype | #10 | `feature/p2-contracts-prototype` | active |
+| P2 Contracts and prototype | #10 | `feature/p2-contracts-prototype` | pr-open |
 | P3 Build | TBD | `feature/p3-build` | planned |
 | P4 Verify | TBD | `feature/p4-verify` | planned |
 | P5 Release and deploy | TBD | `feature/p5-release` | planned |
@@ -73,7 +73,7 @@ Acceptance criteria:
 
 Parent issue: #10
 Branch: `feature/p2-contracts-prototype`
-Status: active
+Status: pr-open
 
 Goal: define the interfaces and the data contracts, then build the smallest prototype that exercises them.
 
@@ -116,7 +116,7 @@ task's sections, the phase criteria and their evidence, the deviations, and the 
   - [x] Rename the living documents, and add the variant-versus-package wording rule.
   - [x] Add the `Renamed by ADR 0005` line to ADRs 0001 to 0004.
   - [x] Rename the local directory.
-- [ ] P2.5 Repair the plan of record after the workflow audit (#15)
+- [x] P2.5 Repair the plan of record after the workflow audit (#15)
   - [ ] Add the indented subtask level to this roadmap for `P2.1` to `P2.4`, and link the plan from each task line.
   - [ ] Reconcile parent issue `#10`: its child checklist and its scope, with a scope-change comment.
   - [ ] Correct `README.md`'s status paragraph, which claims that no variant has been built.

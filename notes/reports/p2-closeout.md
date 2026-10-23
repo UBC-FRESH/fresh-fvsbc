@@ -26,13 +26,16 @@ Settings changes, each with its exact command. Each one runs only after its own 
 - **Recommended, not run: the CI quality matrix.** Three jobs — `quality`, `dashboard`, `pre-commit` —
   each run on Python 3.12 alone, where `quality-gates.rst` requires the quality job on **3.11 and
   3.12** and names four required contexts. **The change is two parts, and the second must not be run
-  alone.** First, the workflow file changes **two things about the `quality` job**: its `name:` line
+  alone.** First, the workflow file changes **three things about the `quality` job**: the `setup-python` step's input becomes
+  `${{ matrix.python-version }}`, which without it would run 3.12 on both legs and put the 3.11 context
+  green without testing 3.11; its `name:` line
   becomes `Quality gates, Python ${{ matrix.python-version }}`, which is what the specification's own
   `ci.yml` uses, and it gains a `[3.11, 3.12]` matrix. **Both are required.** Adding a matrix to the
   current static `name: Quality gates` would produce contexts called `Quality gates (3.11)`, which no
   required check names, and the protection change would then demand checks that never report. **An
   earlier revision described only the matrix, and the second Verifier pass caught it.** Second, branch protection
-  is set with the specification's own command, which **sets all four contexts with `PUT`**:
+  is set with the specification's command **plus one field this project's record justifies**, and it uses
+  `PUT` because that is what replaces the body rather than merging into it:
 
   ```bash
   gh api -X PUT repos/UBC-FRESH/fresh-fvsbc/branches/main/protection --input - <<'JSON'
@@ -64,8 +67,9 @@ Settings changes, each with its exact command. Each one runs only after its own 
 
   The body is the specification's, **plus `required_linear_history: true`**, which `P1`'s close-out
   records as a deliberate addition stricter than the specification. A `PUT` replaces the whole body, so
-  omitting it would silently relax a rule this project chose. **The first revision carried only the two
-  `strict` fields**, which is not the specification's body; the second Verifier pass caught it. After
+  omitting it would silently relax a rule this project chose. **The revision at `0b6542d` carried
+  only `required_status_checks` and `strict`**, which is not the specification's body, and the first
+  revision at `fc83cd9` printed a `PATCH` rather than a `PUT`; the second Verifier pass caught both. After
   running it, read the rule back with
   `gh api repos/UBC-FRESH/fresh-fvsbc/branches/main/protection --jq '{.required_status_checks, .required_linear_history}'`
   and confirm `required_linear_history` survived, which the agent has not tested and the report does not
@@ -79,7 +83,7 @@ Settings changes, each with its exact command. Each one runs only after its own 
 | Criterion | Evidence | Status |
 | --- | --- | --- |
 | `docs/` states the interfaces and the data contracts: the tree-list input, the keyword set, the parsed outputs, and the provenance record | `tree-list.rst`, `keywords.rst` and `outputs.rst` each name the FVS commit they were read from, `ef5fa84`. `provenance.rst` does not, and says why: the contract is this project's own design and is not read from FVS. `nemora-ingest.rst` does not either, because it describes `nemora`'s output shape rather than an FVS format. **An earlier revision of this cell listed `nemora-ingest.rst` among the pages naming the commit, which is false; the second Verifier pass caught it** | met |
-| A prototype runs on synthetic data and exercises each contract, with checks that can fail | `src/fresh_fvsbc/{treelist,keywords,nemora,outputs,provenance}.py` with fifteen test modules, pytest green; a real BC run on a tree list this project wrote, in `notes/reference/synthetic-run.md` | **met with a stated limit.** Falsifiability is evidenced by mutations applied **by hand in the session** and recorded in `CHANGE_LOG.md`; **no committed harness reproduces them**, so a reader cannot re-run the check. Section 5 records it, and section 6 proposes the fix |
+| A prototype runs on synthetic data and exercises each contract, with checks that can fail | `src/fresh_fvsbc/{treelist,keywords,nemora,outputs,provenance}.py` with thirteen test modules, pytest green; a real BC run on a tree list this project wrote, in `notes/reference/synthetic-run.md` | **met with a stated limit.** Falsifiability is evidenced by mutations applied **by hand in the session** and recorded in `CHANGE_LOG.md`; **no committed harness reproduces them**, so a reader cannot re-run the check. Section 5 records it, and section 6 proposes the fix |
 | The build question in ADR 0001 is answered with evidence: either `bc` builds, or the patch the FVS source submodule needs is recorded | `notes/adr/0004-the-fvsbc-build-recipe.md` numbers twelve items; `notes/reference/fvsbc-patchset.diff.gz` touches ten files, nine modified and one new | **met with a stated limit.** The committed diff can be inspected, but the round trip that reproduces the working tree cannot be re-run here, because the base commit `ef5fa84` is in a fork that is not this repository. Verified once, in a scratch clone, and not verifiable from the record |
 | `python scripts/dashboard.py` exits zero on the head commit of the phase branch | green on `fc5cef2`; six gates; CI run `40035213071` succeeds on that exact head | **met on 3.12 only.** The specification requires the quality job on 3.11 and 3.12. Stated as a limit, with the settings change above as the fix |
 
@@ -89,7 +93,8 @@ Settings changes, each with its exact command. Each one runs only after its own 
   `a4ad4ea` is 2026-10-21T07:41:05Z. **The first revision of this report quoted the activation comment's
   timestamp here, and the Verifier caught it.**
 - **Branch from `main`.** Merge-base `cbcadf3`, the head of `main` at `P1`'s close-out.
-- **Commit messages that start with a task ID.** 40 of the 41 commits on the branch since `main`. The
+- **Commit messages that start with a task ID.** 40 of the 41 commits on the branch since `main` **at the
+evidence head `fc5cef2`**; the branch carries more now, and the count moves with each commit. The
   one that does not starts with the phase ID, and it is the phase activation.
 - **Gates for each commit.** Section 3.
 - **Roadmap and changelog in step.** Both changed in the same change set as the work they record for
@@ -181,5 +186,6 @@ Settings changes, each with its exact command. Each one runs only after its own 
 its evidence, reading only the committed artefacts. It did, on the first revision: 45 claims checked, 28
 supported, 13 unsupported, 2 unverifiable, and eight omissions, and its verdict was **do not approve as
 written**. This revision makes the corrections it named. Its findings are attached to #15 rather than summarised here, and they
-are **evidence for the Verifier row of the model log**, which that page still marks `Unproven`. One run
+are **evidence for or against the Verifier row of the model log**, in that page's own words, and the row
+still reads `Unproven`. One run
 by the same model is not proof that the role works, and the report does not claim it is.
