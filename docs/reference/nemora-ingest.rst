@@ -34,7 +34,7 @@ The input shape
    * - ``height_m``
      - Height, in metres
    * - ``crown_ratio``
-     - Crown ratio
+     - Crown ratio, as a fraction in [0, 1]
    * - ``basal_area_m2``, ``biomass_tonnes``, ``bark_thickness_cm``
      - Derived attributes
    * - ``attributes_provenance``
@@ -115,7 +115,9 @@ Not verified
 - **Units for height.** `nemora` emits metres. Whether FVS-BC's ``live_ht`` expects metres or feet was not
   established. The BC build includes `METRIC.F77` and `canada/bc/blkdat.f` includes it, which suggests
   metric, but that is an inference and not a read.
-- **The crown-ratio scale.** Whether the tree-list field is a fraction, tenths, or a percentage.
+- **The crown-ratio scale.** Whether the tree-list field is a fraction, tenths, or a percentage. The
+  source side is settled by reading `nemora`: it clamps `crown_ratio` to [0, 1] and defaults it to
+  0.45, so the value that arrives at the adapter is a fraction rather than a percentage.
 - Whether a caller will ever have ``species``, or whether the project needs a species-assignment step.
   `nemora` not emitting it is a fact about its current surface, and the note
   `notes/reference/bc-treelist-and-species.md` records it.
