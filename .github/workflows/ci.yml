@@ -83,9 +83,12 @@ jobs:
           git -C "$RUNNER_TEMP/PyFVS" submodule update --init --recursive
           echo "FVS source at $(git -C "$RUNNER_TEMP/PyFVS/fvs" rev-parse --short HEAD)"
 
-      - name: Apply the banked patch set
+      - name: Apply the banked patch sets
         run: |
+          gunzip -c notes/reference/pyfvs-patchset.diff.gz > "$RUNNER_TEMP/pyfvs.patch"
           gunzip -c notes/reference/fvsbc-patchset.diff.gz > "$RUNNER_TEMP/fvsbc.patch"
+          git -C "$RUNNER_TEMP/PyFVS" apply --check "$RUNNER_TEMP/pyfvs.patch"
+          git -C "$RUNNER_TEMP/PyFVS" apply "$RUNNER_TEMP/pyfvs.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/fvsbc.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/fvsbc.patch"
 
