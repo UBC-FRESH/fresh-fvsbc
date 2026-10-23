@@ -32,8 +32,9 @@ Rename this project to `fresh-fvsbc`, in four places and one rule. Approved by t
   `src/fresh_fvsbc/`. The underscore form is forced, because a hyphen is not valid in a Python identifier;
 - the GitHub repository is `UBC-FRESH/fresh-fvsbc`, and the URLs in `pyproject.toml` and `CITATION.cff`
   follow it;
-- the local checkout directory is renamed to `fresh-fvsbc`, and the workspace symlink that points at it is
-  repointed. The absolute paths are machine-specific, so they are not recorded here;
+- the local checkout directory is renamed to `fresh-fvsbc`. Nothing else has to move: the workspace
+  symlink points at the parent directory rather than at this project, so the new name appears through
+  it unchanged. The absolute paths are machine-specific, so they are not recorded here;
 - the FVS variant is unaffected. It stays `bc`, the PyFVS build flag stays `-Dfvsvariants=bc`, and the
   banked patch set is unchanged.
 
