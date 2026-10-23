@@ -80,6 +80,7 @@ Goal: define the interfaces and the data contracts, then build the smallest prot
 - [x] P2.1 Define the interface and data contracts in `docs/` (#11)
 - [ ] P2.2 Build a prototype that exercises the contracts on synthetic data (#12)
 - [x] P2.3 Record the FVS source patch set and its oracle comparison (#13)
+- [ ] P2.4 Rename the project to `fresh-fvsbc` (#14)
 
 Acceptance criteria:
 
@@ -157,3 +158,4 @@ Acceptance criteria:
 8. **The oracle is a 2022 fixture and the project's own checker skips this variant**, so the comparison bounds rather than proves correctness. The `.sum.save` files carry `06-28-2022` in their `-999` headers, the source built here is `ef5fa84` of 2026-09-10, and the checker carries `#FVSbc -- Omit currently 20260226`. The residual is confined to three dense stands of the second case, and it is attributed, not proven, to upstream changes made after the fixture was written.
 9. **Proposed adjacent work, not started: promote the comparison into the repository as a test that can fail.** Every comparison so far was an ad hoc script outside the repository, and three of them were buggy in ways that produced false findings. A test that runs the first official case and asserts zero differing lines would have caught them. It needs a task of its own.
 10. **Disclosure: thirteen commits labelled `P2.2` delivered `P2.3`'s work**, and a fourteenth corrected the record they produced. `P2.2`'s deliverable is the synthetic-data prototype, so the label is wrong on those commits. They are not rewritten, on the rule in `docs/reference/phase-closeout.rst`. The correct task is recorded retroactively here and on #13.
+11. `P2.4` (#14) is proposed, and `ADR 0005` is proposed with it. Three things carry a name that reads as `fvsbc`: this project's package, PyFVS's BC extension submodule, and the FVS variant that the FVS tree calls `FVSbc`. There is no import collision between the first two, which is worth stating because an earlier claim said there was; the problem is that three names and one spelling cannot be told apart in prose. The rename is 161 occurrences across 28 tracked files, of which ten are history and stay as written. **The repository rename is a public change and needs its own approval**, and the published Pages URL changes with it, so any outward link must move in the same change set.
