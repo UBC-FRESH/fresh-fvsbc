@@ -37,6 +37,9 @@ Two caveats, both verified:
 - One entry is misspelled upstream: ``xSALVAGE``, with a leading ``x``. A caller that writes ``SALVAGE``
   is writing a keyword the table does not hold.
 - The table has blank slots. A blank slot is not a keyword.
+- Matching is FVS's own. ``base/fndkey.f`` compares the caller's word with the table using FORTRAN's
+  ``.EQ.`` on character strings, so the comparison is exact and case sensitive. A validator that
+  accepted ``database`` would be accepting something FVS does not.
 
 BC-specific input
 -----------------
@@ -78,10 +81,17 @@ Contract rules
 2. `fresh-fvsbc` validates each keyword against the table above, and it rejects an unknown keyword by name
    rather than passing it through. A pass-through would let a typo reach Fortran, which reports it
    poorly.
-3. The validator warns on ``xSALVAGE``, since a caller almost certainly meant ``SALVAGE``.
+3. The validator warns on ``xSALVAGE``. The defect is FVS's rather than the caller's, so the warning's
+   job is to say which spelling the table holds. A caller who writes ``SALVAGE`` without the ``x`` is
+   writing a keyword the table does not hold, so that name is refused, and the refusal names
+   ``xSALVAGE``.
 4. `fresh-fvsbc` does not silently add a keyword the caller did not write, with one exception: the tree-record
    format, which it must control. See :doc:`tree-list` and the hazard below.
 5. A keyword set carries a hash, and the hash is part of the run's provenance. See :doc:`provenance`.
+   The hash is taken over the set's **rendered text** — the bytes a run was given — rather than over a
+   structure, so that it identifies exactly what FVS read, and it is written with its algorithm named,
+   as ``sha256:`` followed by the digest. Order is part of the identity, because FVS processes a set in
+   order.
 
 The open hazard
 ---------------
