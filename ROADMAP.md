@@ -146,9 +146,9 @@ reproducible, and give the package a public API, a run orchestration, and a comm
 
 The detail for this phase is the focused plan `notes/p3-build.md`, written before the work began.
 
-- [ ] P3.1 The CI quality matrix, and a CI build of the variant (#18)
+- [x] P3.1 The CI quality matrix, and a CI build of the variant (#18)
   - [x] Set the `quality` job's `name:` to `Quality gates, Python ${{ matrix.python-version }}` and its `setup-python` input to the matrix variable, and add a `[3.11, 3.12]` matrix.
-  - [ ] Add a job that applies ADR 0004's patch to the pinned fork, builds the BC variant, and imports `pyfvs.fvsbc`.
+  - [x] Add a job that applies ADR 0004's patch to the pinned fork, builds the BC variant, and imports `pyfvs.fvsbc`.
   - [x] After the matrix has run, set branch protection with the specification's four-context `PUT`, including `required_linear_history`, and read the rule back.
   - [x] Record the gate change in the changelog with its reason.
 - [ ] P3.2 Build the standalone `FVSbc` executable (#19)
