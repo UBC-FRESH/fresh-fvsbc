@@ -5,8 +5,10 @@ This file is the working contract for coding agents in fresh-fvsbc.
 fresh-fvsbc is a Python wrapper for the BC variant of the Forest Vegetation Simulator. It builds the FVSbc variant from a pinned fork of PyFVS and exposes BC keywords, species and BEC handling, and tidy simulation I/O.
 
 Keep this file short. Each rule below either checks itself or points to the page that explains it.
-The workflow rules come from the UBC-FRESH dev workflow, which this project was seeded from. Project-
-specific rules go at the end, each with its reason.
+The workflow rules come from the UBC-FRESH dev workflow, which this project was seeded from:
+`https://github.com/UBC-FRESH/ubc-fresh-dev-workflow`, revision `93b5cd9` of 2026-10-13. Read the page
+there that governs your task; this file states only this project's own rules and points at the shared
+ones rather than copying them. Project-specific rules go at the end, each with its reason.
 
 ## Session start
 
