@@ -26,8 +26,12 @@ Settings changes, each with its exact command. Each one runs only after its own 
 - **Recommended, not run: the CI quality matrix.** Three jobs — `quality`, `dashboard`, `pre-commit` —
   each run on Python 3.12 alone, where `quality-gates.rst` requires the quality job on **3.11 and
   3.12** and names four required contexts. **The change is two parts, and the second must not be run
-  alone.** First, the workflow file gains a `[3.11, 3.12]` matrix for `quality`, which is what creates
-  the `Quality gates, Python 3.11` and `Quality gates, Python 3.12` contexts. Second, branch protection
+  alone.** First, the workflow file changes **two things about the `quality` job**: its `name:` line
+  becomes `Quality gates, Python ${{ matrix.python-version }}`, which is what the specification's own
+  `ci.yml` uses, and it gains a `[3.11, 3.12]` matrix. **Both are required.** Adding a matrix to the
+  current static `name: Quality gates` would produce contexts called `Quality gates (3.11)`, which no
+  required check names, and the protection change would then demand checks that never report. **An
+  earlier revision described only the matrix, and the second Verifier pass caught it.** Second, branch protection
   is set with the specification's own command, which **sets all four contexts with `PUT`**:
 
   ```bash
@@ -41,7 +45,13 @@ Settings changes, each with its exact command. Each one runs only after its own 
         "Green dashboard summary",
         "Pre-commit parity"
       ]
-    }
+    },
+    "enforce_admins": false,
+    "required_pull_request_reviews": null,
+    "restrictions": null,
+    "allow_force_pushes": false,
+    "allow_deletions": false,
+    "required_linear_history": true
   }
   JSON
   ```
@@ -52,6 +62,15 @@ Settings changes, each with its exact command. Each one runs only after its own 
   (`Quality gates, Python 3.11`) that no job produced. The Verifier found it before approval. The command
   above is the specification's, and it sets the four contexts the specification names.
 
+  The body is the specification's, **plus `required_linear_history: true`**, which `P1`'s close-out
+  records as a deliberate addition stricter than the specification. A `PUT` replaces the whole body, so
+  omitting it would silently relax a rule this project chose. **The first revision carried only the two
+  `strict` fields**, which is not the specification's body; the second Verifier pass caught it. After
+  running it, read the rule back with
+  `gh api repos/UBC-FRESH/fresh-fvsbc/branches/main/protection --jq '{.required_status_checks, .required_linear_history}'`
+  and confirm `required_linear_history` survived, which the agent has not tested and the report does not
+  claim.
+
   **Default: approve the workflow change and hold the protection change until the matrix has run once**,
   so that the two new contexts exist before protection requires them.
 
@@ -59,7 +78,7 @@ Settings changes, each with its exact command. Each one runs only after its own 
 
 | Criterion | Evidence | Status |
 | --- | --- | --- |
-| `docs/` states the interfaces and the data contracts: the tree-list input, the keyword set, the parsed outputs, and the provenance record | `docs/reference/{tree-list,keywords,outputs,nemora-ingest}.rst` each name the FVS commit they were read from, `ef5fa84`; `provenance.rst` does not, and says why: it is this project's own design and is not read from FVS | met |
+| `docs/` states the interfaces and the data contracts: the tree-list input, the keyword set, the parsed outputs, and the provenance record | `tree-list.rst`, `keywords.rst` and `outputs.rst` each name the FVS commit they were read from, `ef5fa84`. `provenance.rst` does not, and says why: the contract is this project's own design and is not read from FVS. `nemora-ingest.rst` does not either, because it describes `nemora`'s output shape rather than an FVS format. **An earlier revision of this cell listed `nemora-ingest.rst` among the pages naming the commit, which is false; the second Verifier pass caught it** | met |
 | A prototype runs on synthetic data and exercises each contract, with checks that can fail | `src/fresh_fvsbc/{treelist,keywords,nemora,outputs,provenance}.py` with fifteen test modules, pytest green; a real BC run on a tree list this project wrote, in `notes/reference/synthetic-run.md` | **met with a stated limit.** Falsifiability is evidenced by mutations applied **by hand in the session** and recorded in `CHANGE_LOG.md`; **no committed harness reproduces them**, so a reader cannot re-run the check. Section 5 records it, and section 6 proposes the fix |
 | The build question in ADR 0001 is answered with evidence: either `bc` builds, or the patch the FVS source submodule needs is recorded | `notes/adr/0004-the-fvsbc-build-recipe.md` numbers twelve items; `notes/reference/fvsbc-patchset.diff.gz` touches ten files, nine modified and one new | **met with a stated limit.** The committed diff can be inspected, but the round trip that reproduces the working tree cannot be re-run here, because the base commit `ef5fa84` is in a fork that is not this repository. Verified once, in a scratch clone, and not verifiable from the record |
 | `python scripts/dashboard.py` exits zero on the head commit of the phase branch | green on `fc5cef2`; six gates; CI run `40035213071` succeeds on that exact head | **met on 3.12 only.** The specification requires the quality job on 3.11 and 3.12. Stated as a limit, with the settings change above as the fix |
@@ -81,7 +100,7 @@ Settings changes, each with its exact command. Each one runs only after its own 
 - **Approval gates.** The repository rename in `P2.4` was approved before it ran. Pages was approved and
   executed in `P0`'s close-out, and branch protection in `P1`'s. The approval dialogues themselves are
   not committed, so the reports are the record. **This phase published outside the repository**: it filed
-  `ubc-fresh-dev-workflow#45`, and the `P2.4` rename republished the project's public URL and its Pages
+  `ubc-fresh-dev-workflow#45` and `#46`, and the `P2.4` rename republished the project's public URL and its Pages
   path. **The first revision claimed the opposite, and the Verifier caught it.** Both were approved
   actions.
 
@@ -100,13 +119,14 @@ Settings changes, each with its exact command. Each one runs only after its own 
 | --- | --- | --- | --- |
 | `40035213071` | `fc5cef2` | success | `pull_request`, on the evidence head |
 | `40035298416` | `fc83cd9` | success | `pull_request`, the first report commit |
+| `40036088709` | `0b6542d` | success | `pull_request`, the revised report, the head the Verifier's second pass covers |
 | none before #16 | — | — | A phase branch gets runs **while its pull request is open**, which is why `feature/p0-bootstrap` and `feature/p1-scope-design` have runs and this branch had none until #16 opened. The first revision said no phase branch had ever had a run, which the run list contradicts |
 
 ## 5. Deviations
 
 | Deviation | Cause | Remedy |
 | --- | --- | --- |
-| **The first revision of this report overstated.** It asserted a mutation harness that exists nowhere in the repository or its history, printed a branch-protection command that would have dropped two required checks, repeated the false citation above, and carried four wrong numbers | The same class of failure the report itself documents: a plausible claim asserted more strongly than the evidence, written by the same session that had just been criticised for it | Found by the Verifier session before approval, and corrected in this revision. Its findings are attached to #15, and its verdict is cited in the header. **This row is the phase's most useful artefact**: it is the process catching the implementer |
+| **The first revision of this report overstated.** It asserted a mutation harness that exists nowhere in the repository or its history, printed a branch-protection command that would have dropped two required checks, repeated the false citation in section 6, and carried four wrong numbers | The same class of failure the report itself documents: a plausible claim asserted more strongly than the evidence, written by the same session that had just been criticised for it | Found by the Verifier session before approval, and corrected in this revision. Its findings are attached to #15, and its verdict is cited in the header. It is the process catching the implementer, which is what the row records rather than a claim about its value |
 | **A whole task's work ran with no child issue.** Thirteen commits labelled `P2.2` delivered `P2.3`'s work, and `#13` was created after it; twenty-four commits carry the `P2.2` label | The build spike was treated as an unplanned investigation rather than as a task, so the scaffold rule in `AGENTS.md` was not applied | The commits are not rewritten. `CHANGE_LOG.md` and the plan disclose it, `#13` was created retroactively, and the rule is now applied: no commit before its child issue exists |
 | **The roadmap carried no subtask level, and no focused plan existed in `notes/`** | The third level of the three-level structure was never written down, and the detail went into the issue body and fifteen prose items in the roadmap | `notes/p2-contracts-and-prototype.md` written, and the roadmap's `P2` block carries the subtask level: 39 lines when it was added at `c0ba0c9`, **41 at the evidence head**. The first revision gave only the stale figure |
 | **`README.md` claimed no variant had been built** while the roadmap and the changelog recorded that it did, violating `P0`'s own acceptance criterion | Nothing updated the front door when the build succeeded | Corrected at `c0ba0c9`. The stale sentence stood for **31 commits**, not the "six" the first revision claimed — the Verifier could not reproduce that number and neither can this revision |
@@ -117,7 +137,7 @@ Settings changes, each with its exact command. Each one runs only after its own 
 | **A false citation was published in an accepted ADR, and the accepted ADR was then edited** | `ADR 0005` claimed a precedent that does not exist here, and its body was corrected after acceptance | Corrected and disclosed, but **the correction should have been a new ADR**, since `notes/README.md` says an accepted ADR is superseded rather than rewritten. The rule was applied for the rest of the phase — until section 6 of this report broke it again in a smaller way, which the Verifier also caught |
 | **A test that could not fail** | The output reader limited a severity search to a message's leading tokens, which is unobservable because first-match-wins gives the same answer | The limit was removed and the test rewritten (`dcb9e12`) |
 | **No mutation harness is committed**, so the falsifiability evidence cannot be re-run by a reader | The mutations were applied by hand in the session; the harness was an ad hoc shell step, and the first revision's claim that it "now asserts its anchor is unique" describes a change that was never made | **Corrected here rather than papered over.** Section 6 proposes committing the harness as a `P3` task |
-| **The `P2.3` validation limits are absent from the first revision of this report** | They are in the plan and the changelog but were not carried into the report, so a reader of the report alone would not see them | Added: the oracle is a 2022 fixture; the FVS project's own checker skips this variant; the residual on three dense stands of the second case is attributed, not proven, to upstream changes; and the patch set is **banked, not pushed** |
+| **The `P2.3` validation limits are absent from the first revision of this report** | They are in the plan and the changelog but were not carried into the report, so a reader of the report alone would not see them | Added: the oracle is a 2022 fixture; the FVS project's own checker skips this variant; the residual on three dense stands of the second case is attributed, not proven, to upstream changes; the patch set is **banked, not pushed**; and at `-O0` the built variant processes no stand at all, a robustness limit whose cause is not established |
 | **`ADR 0004` is still `Status: proposed`**, its `Context` contradicts a later paragraph, and its `Issues:` names `#12` where the roadmap assigns it to `P2.3` | The status was never brought to `accepted` after `P2.3` closed | **Not the agent's act.** The plan's proposal 3 recommends the maintainer accepts it and that its `Context` and `Issues:` are corrected together |
 | **The CI quality matrix runs on one Python version** where the specification requires two, and the seed's own CI template does too | The seeded `ci.yml` was never changed, and branch protection matches it | **Not run.** Named with the corrected command in the Recommendation; the criterion is marked as met with the limit; and the seed defect is filed upstream as `ubc-fresh-dev-workflow#46` |
 | **The project had no roles page and no model log, and no reviewer was ever named** | Neither the agent nor the workflow audit named the gap until the maintainer asked who the reviewers were | `docs/agents/roles-and-models.rst` added (`bc793cb`), both rows marked `Unproven`, and this Verifier run is the first evidence for the Verifier row |
@@ -160,5 +180,6 @@ Settings changes, each with its exact command. Each one runs only after its own 
 `P2.5`'s last subtask required a **separate Verifier session** to check every claim in this report against
 its evidence, reading only the committed artefacts. It did, on the first revision: 45 claims checked, 28
 supported, 13 unsupported, 2 unverifiable, and eight omissions, and its verdict was **do not approve as
-written**. This revision makes the corrections it named. **Its findings are the evidence that the
-Verifier role works**, and they are attached to #15 rather than summarised here.
+written**. This revision makes the corrections it named. Its findings are attached to #15 rather than summarised here, and they
+are **evidence for the Verifier row of the model log**, which that page still marks `Unproven`. One run
+by the same model is not proof that the role works, and the report does not claim it is.
