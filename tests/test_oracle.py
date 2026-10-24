@@ -17,13 +17,11 @@ The case data is FVS's own and is **not** committed here, because its licence is
 ``AGENTS.md`` says to treat BC inventory data as restricted until it is. The test finds it through
 ``FVSBC_CASE_DIR`` and skips with a reason that says how to set it.
 
-**The comparison is exact only on the toolchain that produced the oracle.** It was wired into CI's
-build job and failed there: the runner's build differs from the oracle on 104 of 164 rows, in
-``Tpa``, ``CCF`` and ``CU M``, by one to five units, from the third row on. The cause is not
-established. CI
-installs ``gfortran`` from ``apt``, 13.2.0 on Ubuntu 24.04, where this project's passing run used
-13.3.0, so floating-point codegen is a candidate rather than a finding. The step is not in CI, and
-making it a gate needs a decision about tolerance or a pinned toolchain. See
+**The comparison is exact, and it runs in its own process for a reason.** It first ran in CI beside
+``tests/test_run.py`` and failed on 104 of 164 rows, in ``Tpa``, ``CCF`` and ``CU M``. The cause was
+not the toolchain: **FVS keeps its state in the process**, so a case run after another projection
+produces different numbers even in a different directory. Running the case in a child process makes
+the comparison pass in either order, and it is now a gate in CI's build job. See
 ``notes/reference/p4-acceptance.md``.
 """
 
@@ -32,11 +30,16 @@ from __future__ import annotations
 import os
 import shutil
 import sqlite3
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
 from fresh_fvsbc.outputs import errors_in, read_errors
+
+#: This file's directory, which the child process needs on its path.
+TESTS: Path = Path(__file__).resolve().parent
 
 #: The environment variable that names a PyFVS clone's ``fvs/tests/FVSbc``.
 CASE_DIR_ENV: str = "FVSBC_CASE_DIR"
@@ -165,6 +168,52 @@ def run_case(case: Path, workdir: Path) -> list[Path]:
     return sorted(path for path in workdir.glob("*.db") if path.name not in supplied)
 
 
+def run_case_in_child(case: Path, workdir: Path) -> list[Path]:
+    """Run the official case in a child process, and return the databases it wrote.
+
+    **FVS keeps its state in the process, not in the working directory.** A case run after another
+    projection in the same process produces different numbers: this comparison passes alone and
+    fails with 104 differing rows when ``tests/test_run.py`` runs first, which is how CI first ran
+    it. So each case gets its own process, and that is a property of FVS rather than of this test.
+
+    Parameters
+    ----------
+    case : Path
+        The case directory.
+    workdir : Path
+        Where to run, which must be empty.
+
+    Returns
+    -------
+    list of Path
+        The databases the child wrote.
+
+    Raises
+    ------
+    AssertionError
+        If the child fails, with its standard error attached.
+    """
+    script = (
+        "import sys; "
+        "sys.path.insert(0, 'tests'); "
+        "from pathlib import Path; "
+        "from test_oracle import run_case; "
+        f"run_case(Path({str(case)!r}), Path({str(workdir)!r}))"
+    )
+    finished = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=TESTS.parent,
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, "PYTHONPATH": str(TESTS.parent / "src")},
+    )
+    if finished.returncode != 0:
+        raise AssertionError(f"the child run failed: {finished.stderr[-2000:]}")
+    supplied = {database.name for database in case.glob("*.db")}
+    return sorted(path for path in workdir.glob("*.db") if path.name not in supplied)
+
+
 def test_identical_text_has_no_differences() -> None:
     """The comparator's baseline: the same text twice agrees."""
     text = "2020  21  3140\n2024  25  3081\n"
@@ -227,7 +276,7 @@ def test_the_official_case_matches_its_oracle(tmp_path: Path) -> None:
     case = case_directory()
     workdir = tmp_path / "case"
     workdir.mkdir()
-    written = run_case(case, workdir)
+    written = run_case_in_child(case, workdir)
     assert len(written) == 1, f"the run wrote {len(written)} databases: {written}"
 
     produced = (workdir / f"{CASE}.sum").read_text(encoding="latin-1")

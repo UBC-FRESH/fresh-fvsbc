@@ -133,7 +133,7 @@ OVERALL: GREEN. Every gate passed.
 ## The oracle comparison, and what it found
 
 `P4.2` (#27) turned `P2.3`'s ad hoc comparison into `tests/test_oracle.py`. It runs the command the FVS
-project's own `tests/FVSbc/makefile` runs, and on the machine that produced the oracle it passes:
+project's own `tests/FVSbc/makefile` runs, and it passes:
 
 ```text
 8 passed
@@ -141,8 +141,8 @@ zero differing lines across 164 rows, four stands
 FVS_Compute: 160 rows, with Year, SMVOL, MDVOL and LGVOL
 ```
 
-**It was then wired into CI's build job, and it failed.** The runner's build differs from the oracle on
-**104 of 164 rows**, from the third row on, in three columns:
+**Wired into CI's build job beside the end-to-end test, it failed on 104 of 164 rows**, in three
+columns:
 
 | Column | Produced against the oracle |
 | --- | --- |
@@ -150,25 +150,28 @@ FVS_Compute: 160 rows, with Year, SMVOL, MDVOL and LGVOL
 | `CCF` | 8 against 9 |
 | `CU M` | 54 against 53, 36 against 35 |
 
-The differences are one to five units, they appear early and accumulate, and every structural column
-agrees: the years, the stand headers, the column order, and the stride are identical. That is the
-signature of a **numerical** difference rather than a formatting or parsing one.
+**The cause is not the toolchain, and the first reading of this record said it was.** Three hypotheses
+were tested and each is dead:
 
-**The cause is not established.** The two builds differ in their toolchain: CI installs `gfortran` from
-`apt`, which is 13.2.0 on Ubuntu 24.04, where the passing run used 13.3.0. Floating-point codegen is a
-**candidate**, not a finding, and this note does not claim it. What the record does support is the
-narrower statement: **the oracle is exact on the toolchain that produced it, and this project has not
-shown that it is exact across toolchains.**
+- **The compiler version.** CI's `gfortran` is 13.3.0-6ubuntu2~24.04.1, **the same as the machine that
+  passes**, printed by the build job since this was asked.
+- **The instruction set.** The build passes no `-march`, and disabling AVX-512 and AVX2 through
+  `GLIBC_TUNABLES` on the passing machine changes nothing.
+- **The inputs.** The case's key, oracle and input database are byte-identical to the pinned commit
+  `ef5fa847`.
 
-The CI step was removed rather than loosened. Making the comparison a gate needs one of these, and the
-choice is the maintainer's because each changes what the check means:
+**What it is: FVS keeps its state in the process, not in the working directory.** Two runs on the same
+machine, from the same build, in two fresh directories, disagree when the second follows another
+projection. The test passed alone and failed with `tests/test_run.py` first, in the same pytest
+process, on both machines. A diagnostic step on the runner that ran the case twice in one process
+reported **zero** differing rows against the oracle for both, and the same step with the end-to-end
+test ahead of it reports 104.
 
-1. **A tolerance**, as PyFVS's own variant tests use (`np.isclose(..., atol=1)`). It would still catch a
-   column shift, a unit error and a stride fault, and it would stop catching a one-unit drift.
-2. **A pinned toolchain**, so the runner compiles with the version the oracle came from. It keeps the
-   check exact and makes the build depend on a compiler version.
-3. **A local-only check**, documented as exact on the producing toolchain, with CI running the
-   end-to-end test alone.
+**The test therefore runs its case in a child process**, and it passes in either order: 34 passed, 1
+skipped with both files in one process. It is now a gate in CI's build job, with `FVSBC_CASE_DIR` set
+to the clone that job already makes. No tolerance was needed, and none was added.
 
-Until one is chosen, the test runs where `FVSBC_CASE_DIR` points at a matching build, and CI does not
-run it.
+**This is a property of the library, not only of the test.** `run_case` is not re-entrant in a process:
+a second run inherits the first one's Fortran state. Two runs in one process are therefore not
+independent, and the directory isolation `run.py` documents is not enough on its own. That is recorded
+here and is a candidate for a task of its own.

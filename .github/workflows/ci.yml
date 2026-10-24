@@ -115,44 +115,19 @@ jobs:
           python -c "import pyfvs.fvsbc as m; print('imported', m.__name__)"
           python -c "import pyfvs; print(pyfvs.list_variants())"
 
-      # The end-to-end test skips in the quality job, because that job has no extension. This is the
-      # one place it can run, so it runs here rather than being a skip nobody ever converts.
+      # These skip in the quality job, which has no extension. This job has the extension and FVS's
+      # own case data in one place, so they run here rather than being skips nobody ever converts.
       #
-      # tests/test_oracle.py is deliberately NOT run here. It was wired in and failed: the runner's
-      # build differs numerically from the one that produced FVS's oracle, on 104 of 164 rows, so the
-      # comparison is exact only on the toolchain that produced it. Making it a gate needs a decision
-      # about tolerance or a pinned toolchain, and that is recorded rather than assumed.
-      - name: Run the end-to-end run test
-        run: |
-          python -m pip install --quiet pytest pandas
-          python -m pytest tests/test_run.py -q -o addopts="" -p no:cacheprovider
-
-      # Temporary diagnostic, and it does not gate: it answers whether the run is deterministic on
-      # this machine, which decides whether an exact oracle comparison can ever hold here. Remove
-      # once the answer is recorded.
-      - name: Diagnose the oracle difference
-        continue-on-error: true
+      # test_oracle.py first ran here beside test_run.py and failed on 104 of 164 rows. The cause was
+      # not the toolchain: FVS keeps its state in the process, so a case run after another projection
+      # produces different numbers. The test now runs its case in a child process, and it passes in
+      # either order.
+      - name: Run the tests that need the extension
         env:
           FVSBC_CASE_DIR: ${{ runner.temp }}/PyFVS/fvs/tests/FVSbc
         run: |
           python -m pip install --quiet pytest pandas
-          PYTHONPATH=tests:src python - <<'PY'
-          import tempfile
-          from pathlib import Path
-          from test_oracle import CASE, case_directory, differing_lines, run_case
-
-          case = case_directory()
-          produced = []
-          for index in (1, 2):
-              work = Path(tempfile.mkdtemp()) / f"run{index}"
-              work.mkdir()
-              run_case(case, work)
-              produced.append((work / f"{CASE}.sum").read_text(encoding="latin-1"))
-          expected = (case / f"{CASE}.sum.save").read_text(encoding="latin-1")
-          print("DIAG run1 vs run2:", len(differing_lines(produced[0], produced[1])))
-          print("DIAG run1 vs oracle:", len(differing_lines(produced[0], expected)))
-          print("DIAG run2 vs oracle:", len(differing_lines(produced[1], expected)))
-          PY
+          python -m pytest tests/test_run.py tests/test_oracle.py -q -o addopts="" -p no:cacheprovider
 
   dashboard:
     name: Green dashboard summary
