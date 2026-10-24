@@ -4,7 +4,9 @@ A Python wrapper for the BC variant of the Forest Vegetation Simulator. It write
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
-This is a **pre-1.0 release with known gaps**, listed in full at the end. The public API can change.
+This is a **pre-1.0 release with known gaps**, listed below. The list is not a formality: the
+capability this package does not have is a keyword block, and the limit it does not state is that a run
+is not re-entrant. The public API can change.
 
 ## The build this release wraps
 
@@ -32,18 +34,22 @@ is in the same sentence.
   `git apply --check` first, `-Dfvsvariants=bc`, exit 0, `list_variants()` reporting `BC` as `OK`
   (`P4.1`, commit `cf64bec`). **It shows the recipe is not specific to one working tree; it does not
   show the build is byte-reproducible**, and the machine that ran it differs from CI's.
-- **The test suite passes where the extension is built**: 370 passed, 2 skipped, coverage 98.92 percent
-  in the clean environment, with the two skips being the tests that the extension is *absent*. In the
+- **The test suite passes where the extension is built**: 378 passed, 2 skipped, coverage 98 percent
+  on the release branch, with the two skips being the tests that the extension is *absent*. In the
   project's own environment the counts invert and the end-to-end test skips instead. Neither skips
   silently.
 - **One synthetic run through the public API returns outputs carrying provenance**, with one
   `FVS_Cases` row, a summary of 5 rows and 22 columns, and `provenance.json` beside the outputs
-  (`notes/reference/synthetic-run.md`).
+  (`notes/reference/synthetic-run.md`). **That the outputs reproduce is shown; that they are right is
+  not**, and correctness rests on the oracle comparison below.
 - **The command runs a case end to end and exits 0** (`notes/reference/synthetic-run.md`). It exits 1
-  for a failed run and 2 for bad input, both tested.
+  for a failed run and 2 for bad input; **both are tested with a faked drive and in a subprocess, not
+  by a real failing run**.
 - **The build agrees with FVS's own oracle on the first official case**: zero differing lines across
-  164 rows and four stands, `FVS_Compute` at 160 rows. **The comparison covers one of the two official
-  cases, and it is exact on the toolchain that produced the oracle**; see gap 3.
+  164 rows and four stands, `FVS_Compute` at 160 rows, on the development machine **and** on CI's
+  runner. **The oracle is a 2022 fixture** (`FS2022.4`, revision `20221118`), the comparison covers one
+  of the two official cases, and it runs in a child process because FVS keeps its state in the process.
+  See gaps 3 and 4.
 - **The dashboard passes on Python 3.11 and 3.12**, in CI, with both records green (`P4.3`, run
   `40131167200`), and the branch protection still requires the four contexts with linear history.
 - **The mutation harness catches all 24 mutations in its set** (`python scripts/mutation_check.py`).
@@ -53,11 +59,13 @@ is in the same sentence.
 
 Each is open for a stated reason, and each says where it is recorded.
 
-1. **`run_case` is not re-entrant in a process.** A second run inherits the first one's Fortran state,
-   so two runs in one process are not independent, and the directory isolation the module documents is
-   not enough. A guard, a subprocess per run, or a documented restriction are the three routes, and the
-   choice changes the public API's contract. **The largest open item.** Recorded in
-   `notes/reference/p4-acceptance.md` and `notes/reports/p4-closeout.md`.
+1. **`run_case` is not re-entrant in a process, and a run is not thread-safe.** A second run inherits
+   the first one's Fortran state, so two runs in one process are not independent, and the directory
+   isolation the module documents is not enough. A run also changes the process's working directory for
+   the projection and restores it afterwards, so two threads that run at once will interfere. A guard,
+   a subprocess per run, or a documented restriction are the routes, and the choice changes the public
+   API's contract. **The largest open item.** Recorded in `notes/reference/p4-acceptance.md`,
+   `notes/reports/p4-closeout.md`, and `docs/reference/outputs.rst`.
 2. **Block keywords are refused, not written.** `COMMENT`, `COMPUTE`, `IF` and `DATABASE` take a block
    of records ended by `END`, and the keyword model has no room for one, so the validator refuses them
    by name rather than producing a file that cannot work. **A run that needs `COMPUTE` cannot be
@@ -79,6 +87,13 @@ Each is open for a stated reason, and each says where it is recorded.
    ADR 0008 for the standalone and in `P4`'s report for the extension.
 10. **The package needs a separately built extension.** Installing it does not build FVS; the variant
     comes from the pinned fork and the patch sets, by ADR 0004's recipe.
+11. **The reader exposes two of the database's 32 tables.** `FVS_Cases` and `FVS_Error` are the ones
+    the project has tested, and output contract rule 3 keeps an untested table out of the public API
+    even when a run writes it. The summary comes from the run in memory instead.
+12. **The `nemora` adapter requires `species` and `tree_age` from the caller**, because `nemora` emits
+    neither, and it fails rather than defaulting. **Species assignment is out of scope** until a
+    caller asks: `nemora` has no species machinery, so assigning one is a modelling question with a
+    research burden of its own.
 
 ## What is not in this release
 
