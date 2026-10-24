@@ -15,9 +15,16 @@ runs:
 
 The case data is FVS's own and is **not** committed here, because its licence is not established and
 ``AGENTS.md`` says to treat BC inventory data as restricted until it is. The test finds it through
-``FVSBC_CASE_DIR`` and skips with a reason that says how to set it. CI's build job sets it to the
-clone it already makes, so the comparison runs on every pull request rather than becoming a gate
-that never fires.
+``FVSBC_CASE_DIR`` and skips with a reason that says how to set it.
+
+**The comparison is exact only on the toolchain that produced the oracle.** It was wired into CI's
+build job and failed there: the runner's build differs from the oracle on 104 of 164 rows, in
+``Tpa``, ``CCF`` and ``CU M``, by one to five units, from the third row on. The cause is not
+established. CI
+installs ``gfortran`` from ``apt``, 13.2.0 on Ubuntu 24.04, where this project's passing run used
+13.3.0, so floating-point codegen is a candidate rather than a finding. The step is not in CI, and
+making it a gate needs a decision about tolerance or a pinned toolchain. See
+``notes/reference/p4-acceptance.md``.
 """
 
 from __future__ import annotations
