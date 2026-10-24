@@ -5,7 +5,7 @@
 parses that format string rather than restating it, so the layout cannot drift from the contract.
 
 ``T1``, and why the layout is not the declared one
--------------------------------------------------
+--------------------------------------------------
 
 BC's format opens ``I4,T1,I7``. ``T1`` is FORTRAN's *absolute column* directive, so it targets
 column 1, and ``tree_num`` is consequently read from columns 1 to 7 — its first four columns are

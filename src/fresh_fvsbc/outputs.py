@@ -17,7 +17,7 @@ The summary is still available, in two other places: ``FVS.summary`` returns it 
 run writes a fixed-width ``.sum`` report beside the database. Reading those is not this work.
 
 ``FVS_Error`` is not an error channel only
------------------------------------------
+------------------------------------------
 
 It holds FVS warnings as well as errors. A run whose site data is outside the model's range writes
 ``FVS03 WARNING: FOREST CODE INDICATES THE GEOGRAPHIC LOCATION IS OUTSIDE THE RANGE OF THE MODEL``,

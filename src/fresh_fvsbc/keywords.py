@@ -395,7 +395,13 @@ class KeywordSet:
         return keyword_set_hash(self.keywords)
 
     def render(self) -> str:
-        """Return the text that FVS would read for this set."""
+        """Return the text that FVS would read for this set.
+
+        Returns
+        -------
+        str
+            The rendered set, with one token per line.
+        """
         return render_keywords(self.keywords)
 
 
