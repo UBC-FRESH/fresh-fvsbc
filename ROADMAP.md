@@ -13,7 +13,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P2 Contracts and prototype | #10 | `feature/p2-contracts-prototype` | complete |
 | P3 Build | #17 | `feature/p3-build` | complete |
 | P4 Verify | #25 | `feature/p4-verify` | complete |
-| P5 Release and deploy | TBD | `feature/p5-release` | planned |
+| P5 Release and deploy | #31 | `feature/p5-release` | active |
 | P6 Operate and maintain | TBD | `feature/p6-operate` | planned |
 
 ## Lifecycle Map
@@ -222,18 +222,34 @@ Acceptance criteria:
 
 ## Phase 5: Release and deploy
 
-Parent issue: TBD
+Parent issue: #31
 Branch: `feature/p5-release`
-Status: planned
+Status: active
 
 Goal: tag a release, publish the docs, and verify the published artifacts from a clean checkout.
 
-- [ ] P5.1 Write the release notes and the known-gaps list
-- [ ] P5.2 Tag, publish, and verify from a clean checkout (maintainer approval required)
+The detail for this phase is the focused plan `notes/p5-release.md`, which carries each task's sections,
+the phase criteria, the order and its reason, and the open proposals.
+
+- [ ] P5.1 The release notes and the known-gaps list (#32)
+  - [ ] Record the build the release wraps: the PyFVS fork commit, the FVS source submodule, and the variant list, read from the pins rather than quoted.
+  - [ ] Write what the release is and what it does, in the README's terms rather than new ones.
+  - [ ] Write the known-gaps list from the `P2`, `P3` and `P4` reports, each item with the reason it is open.
+  - [ ] State what is verified and how, citing the commands and run ids rather than asserting.
+- [ ] P5.2 Tag, publish, and verify from a clean checkout (#33)
+  - [ ] Propose the tag name and the release body, and wait for approval before creating either.
+  - [ ] Propose the documentation publication and what it changes, and wait for approval.
+  - [ ] After approval, run each action and read it back.
+  - [ ] Verify from a clean checkout: install the release, run `python -m fresh_fvsbc --help`, and run one case.
+  - [ ] Check the published pages against the source at the tag.
 
 Acceptance criteria:
 
-- <State the criterion that shows this phase met its goal.>
+- The release notes name the build the release wraps: the PyFVS fork commit, the FVS source submodule, and the variant list.
+- The known-gaps list names every open item the `P2`, `P3` and `P4` reports carry, each with the reason it is open.
+- A clean checkout installs the release and runs `python -m fresh_fvsbc --help` and one case.
+- The published documentation matches the source at the tag, checked page by page for the pages that changed in the last phase.
+- `python scripts/dashboard.py` exits zero on the head commit of the phase branch.
 
 ## Phase 6: Operate and maintain
 
