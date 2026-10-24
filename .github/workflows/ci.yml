@@ -137,33 +137,50 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v5
 
-      - name: Set up Python
+      # Both interpreters, because P3's seventh criterion says the dashboard exits zero on both and
+      # the script used to run on 3.12 only. The job's name is deliberately unchanged: matrixing it
+      # would rename the required context, and P2 records a protection change that dropped two.
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Set up Python 3.12
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
 
-      - name: Install dev requirements
+      - name: Install the dev requirements for both
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements-dev.txt
+          for version in 3.11 3.12; do
+            "python$version" -m pip install --upgrade pip
+            "python$version" -m pip install -r requirements-dev.txt
+          done
 
-      - name: Run the dashboard
+      - name: Run the dashboard on both versions
         shell: bash
         run: |
           set +e
           mkdir -p runtime
-          python scripts/dashboard.py --markdown --json runtime/dashboard.json > runtime/dashboard.md
-          status=$?
-          cat runtime/dashboard.md >> "$GITHUB_STEP_SUMMARY"
-          exit $status
+          status=0
+          for version in 3.11 3.12; do
+            echo "### Dashboard on Python $version" >> "$GITHUB_STEP_SUMMARY"
+            "python$version" scripts/dashboard.py --markdown \
+              --json "runtime/dashboard-$version.json" > "runtime/dashboard-$version.md"
+            code=$?
+            cat "runtime/dashboard-$version.md" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$code" -ne 0 ]; then status="$code"; fi
+          done
+          exit "$status"
 
-      - name: Upload the dashboard record
+      - name: Upload the dashboard records
         if: always()
         uses: actions/upload-artifact@v6
         with:
           name: dashboard-record
-          path: runtime/dashboard.json
+          path: runtime/
 
   pre-commit:
     name: Pre-commit parity
