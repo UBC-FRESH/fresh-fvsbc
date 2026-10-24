@@ -151,10 +151,10 @@ The detail for this phase is the focused plan `notes/p3-build.md`, written befor
   - [x] Add a job that applies ADR 0004's patch to the pinned fork, builds the BC variant, and imports `pyfvs.fvsbc`.
   - [x] After the matrix has run, set branch protection with the specification's four-context `PUT`, including `required_linear_history`, and read the rule back.
   - [x] Record the gate change in the changelog with its reason.
-- [ ] P3.2 Build the standalone `FVSbc` executable (#19)
-  - [ ] Build `bin/FVSbc` from the patched fork, and record the command and its output.
-  - [ ] Run one case through it with a `DATABASE` output block, and confirm `FVS_Compute` and `FVS_Summary_Metric` are written.
-  - [ ] Record the recipe as a new ADR.
+- [x] P3.2 Build the standalone `FVSbc` executable (#19) — **proven and not adopted**; `FVS_Compute` holds `COMPUTE` expressions and the summary was already available in memory (ADR 0009)
+  - [x] Build `bin/FVSbc` from the patched fork, and record the command and its output.
+  - [x] Run one case through it with a `DATABASE` output block, and confirm `FVS_Compute` and `FVS_Summary_Metric` are written.
+  - [x] Record the recipe as a new ADR.
 - [x] P3.3 Commit the mutation harness (#20)
   - [x] Write the harness so that a mutation which does not apply is an error rather than a pass.
   - [x] Register the mutations already recorded for the five prototype modules.
