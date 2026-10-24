@@ -196,7 +196,7 @@ environment. The keyword set is the caller's, passed through unchanged; the comm
 `TREEDATA` by way of the orchestration and nothing else.
 
 ```bash
-RUN=/tmp/opencode/cli-run
+RUN=run
 PYTHONPATH=src python -m fresh_fvsbc population.json \
   --directory "$RUN" \
   --species FD --tree-age 60 \
@@ -217,16 +217,17 @@ Exit status `0`, and:
 
 ```text
 case 4b58cc58-7f18-410b-ba6f-7118e503016b
-ran bc in /tmp/opencode/cli-run
+ran bc in .../run
 summary: 5 rows, 22 columns
 warnings: 1
-provenance: /tmp/opencode/cli-run/provenance.json
+provenance: .../run/provenance.json
 ```
 
 The directory holds `run.key`, `run.tre`, `FVSOut.db`, `run.out`, `run.sum`, `provenance.json`, and
 PyFVS's own log, seven files. The report prints the resolved absolute path, which is why it names
-`/tmp/opencode/cli-run` rather than `$RUN`. The one warning is the `FVS03` site-code warning the
-synthetic stand always produces.
+`.../run` rather than `$RUN`, and the note writes it with a placeholder rather than with the directory
+it ran in, because a machine-specific path does not belong in a tracked file. The one warning is the
+`FVS03` site-code warning the synthetic stand always produces.
 
 The two other exit statuses are tested rather than recorded here, because they do not need the
 extension: `2` for a missing population file, an unknown keyword, a species that does not resolve, and

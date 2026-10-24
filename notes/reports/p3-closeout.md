@@ -44,7 +44,7 @@ change is proposed. Three external issues were filed in `P2` and remain open:
 | The standalone executable writes `FVS_Compute` and `FVS_Summary_Metric` | `CHANGE_LOG.md`'s `P3.2` entry, commit `fdbdc29`: the official case "runs with exit 0 and writes `FVS_Compute` (160 rows) and `FVS_Summary_Metric` (164 rows)", with `FVS_Cases` at four rows and `FVS_Error` absent. ADR 0008 records the recipe and ADR 0009 records that it is **proven and not adopted** | met |
 | The mutation harness reproduces a named mutation failing a named test | `scripts/mutation_check.py` carries 23 mutations; `23 of 23 mutations caught` on the evidence head. An anchor that does not match exits non-zero and says so, which happened twice in this phase and is recorded in section 5 | met |
 | One synthetic run through the public API returns outputs carrying provenance | `tests/test_run.py::test_a_synthetic_stand_runs_end_to_end` passes in the build job, the only job with the extension: run `40073616342`, `26 passed, 1 skipped`; `notes/reference/synthetic-run.md` records the run and, in a later section, the same path through the command | met |
-| The command-line entry point runs a case end to end | `notes/reference/synthetic-run.md` records the invocation, exit status `0`, the printed report, and the files it wrote, including PyFVS's own log. `src/fresh_fvsbc/cli.py` is at 100 percent coverage, from drives that are faked; the real drive is `run.py`'s and is covered in the build job | met |
+| The command-line entry point runs a case end to end | `notes/reference/synthetic-run.md` records the invocation, exit status `0`, the printed report, and the files the run left, including PyFVS's own log. `src/fresh_fvsbc/cli.py` is at 100 percent coverage, from drives that are faked; the real drive is `run.py`'s and is covered in the build job | met |
 | `python scripts/dashboard.py` exits zero on both Python versions | Green on the evidence head, locally. In CI the dashboard **script** runs in the `dashboard` job on 3.12 only; on 3.11 the six gates it wraps run individually in the quality job and pass | **met in substance, not in letter.** The gates pass on both versions; the script is run on one. Section 6 proposes the protection-safe fix, which cannot be made here without renaming a required context |
 
 **Six of seven met, one met in substance rather than in letter.** An earlier revision of this report
@@ -65,16 +65,17 @@ decision is separate: ADR 0009.
   commit, before any task's code. **Per-task plan comments were posted from `P3.5` on, and not before**:
   `#22` and `#23` carry one, `#18` through `#21` carry none. Section 5 records it.
 - **Branch from `main`.** Merge-base `6e99a41`, the squash-merge of `P2`.
-- **Commit messages that start with a task ID.** 21 of the 22 commits at the evidence head. The two that
-  do not are `ed03085`, which closes `P2.2` (#12) and starts with a verb, and this report's own commit.
-  Both are disclosed in section 5.
+- **Commit messages that start with a task ID.** 21 of the 22 commits at the evidence head. The one
+  that does not is `ed03085`, which closes `P2.2` (#12) and starts with a verb; it is disclosed in
+  section 5. This report's own commits sit on top of that head and are not counted.
 - **Gates for each commit.** Section 3, including the one commit that was committed red.
 - **Roadmap and changelog in step.** Each task's change set carries its roadmap tick and its changelog
   entry. **No mechanical test exists for "same change set"**, so this is a claim about the record
   rather than a verified fact.
 - **Child issues closed with closeout evidence.** `#18` through `#23` each carry a closeout comment.
-  **All six name a commit, two name a dashboard result** (`#18`, `#21`), and **three name a CI run**
-  (`#18`, `#22`, `#23`). `#12` was closed in this phase, late; section 5 records it.
+  **All six name a commit, one names a dashboard result** (`#21`), and **three name a CI run**
+  (`#18`, `#22`, `#23`). `#18` names the `Green dashboard summary` context, which is a job name rather
+  than a result. `#12` was closed in this phase, late; section 5 records it.
 - **Approval gates.** The branch-protection change in `P3.1` was approved before it ran. The `P3.3`
   before `P3.2` reorder was approved. No other settings change, publication, or private data was
   touched. The approval dialogues are not committed, so the reports and the issues are the record.
