@@ -75,6 +75,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends \
             gfortran meson ninja-build patchelf
+          # The compiler version is provenance: a build that produces different numbers from the
+          # oracle needs to be told apart from one that does not, and until now nothing recorded it.
+          gfortran --version | head -1
+          nproc
+          grep -m1 "model name" /proc/cpuinfo || true
 
       - name: Install the build requirements
         run: |
