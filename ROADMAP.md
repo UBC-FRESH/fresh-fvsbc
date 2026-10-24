@@ -155,10 +155,10 @@ The detail for this phase is the focused plan `notes/p3-build.md`, written befor
   - [ ] Build `bin/FVSbc` from the patched fork, and record the command and its output.
   - [ ] Run one case through it with a `DATABASE` output block, and confirm `FVS_Compute` and `FVS_Summary_Metric` are written.
   - [ ] Record the recipe as a new ADR.
-- [ ] P3.3 Commit the mutation harness (#20)
-  - [ ] Write the harness so that a mutation which does not apply is an error rather than a pass.
-  - [ ] Register the mutations already recorded for the five prototype modules.
-  - [ ] Run it in CI, or record why not.
+- [x] P3.3 Commit the mutation harness (#20)
+  - [x] Write the harness so that a mutation which does not apply is an error rather than a pass.
+  - [x] Register the mutations already recorded for the five prototype modules.
+  - [x] Run it in CI, or record why not.
 - [ ] P3.4 The public API over the five contracts, and three open decisions (#21)
   - [ ] Export the five modules' public names, with `__all__` and numpydoc docstrings.
   - [ ] Resolve the record-versus-dataframe question in `outputs.rst`.

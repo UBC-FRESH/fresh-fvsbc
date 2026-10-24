@@ -48,6 +48,11 @@ jobs:
       - name: Validate workflow surfaces
         run: python scripts/check_workflow.py
 
+      - name: Mutation harness
+        run: |
+          python scripts/mutation_check.py --control
+          python scripts/mutation_check.py
+
       - name: Build docs with warnings as errors
         run: sphinx-build -b html docs _build/html -W
 

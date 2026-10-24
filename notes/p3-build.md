@@ -184,6 +184,13 @@ recorded, not silent.
 
 **Risks.** A command that duplicates the API's logic. It calls the orchestration and adds no modelling.
 
+## Task order, and one deviation from it
+
+`P3.3`, the mutation harness, was run **before** `P3.2`, the standalone executable, which is not the
+numbered order. The reason: the harness is the tool every remaining task's tests will be checked with,
+and `P2` produced both a vacuous test and a mutation that never applied. Building it first means `P3.2`
+and `P3.4` to `P3.6` are verified with it rather than retro-fitted. The maintainer approved the reorder.
+
 ## Open decisions, as recommendations with defaults
 
 1. **Records or a dataframe from the reader.** `outputs.rst` says a dataframe; `pandas` is not a
