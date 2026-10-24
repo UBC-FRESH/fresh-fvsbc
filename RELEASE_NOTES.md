@@ -34,9 +34,10 @@ is in the same sentence.
   `git apply --check` first, `-Dfvsvariants=bc`, exit 0, `list_variants()` reporting `BC` as `OK`
   (`P4.1`, commit `cf64bec`). **It shows the recipe is not specific to one working tree; it does not
   show the build is byte-reproducible**, and the machine that ran it differs from CI's.
-- **The test suite passes where the extension is built**: 378 passed, 2 skipped, coverage 98 percent
-  on the release branch, with the two skips being the tests that the extension is *absent*. In the
-  project's own environment the counts invert and the end-to-end test skips instead. Neither skips
+- **The test suite passes**: 378 passed, 2 skipped, coverage 98 percent on the release branch. **The
+  two skips are the tests that need the built extension** — the end-to-end run and the oracle
+  comparison — because this environment has none. In the clean environment where the extension is
+  built, those two run and the two tests that the extension is *absent* skip instead. Neither skips
   silently.
 - **One synthetic run through the public API returns outputs carrying provenance**, with one
   `FVS_Cases` row, a summary of 5 rows and 22 columns, and `provenance.json` beside the outputs
