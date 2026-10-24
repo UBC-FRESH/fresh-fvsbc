@@ -169,10 +169,10 @@ The detail for this phase is the focused plan `notes/p3-build.md`, written befor
   - [x] Write the orchestration over the five prototype modules.
   - [x] Return the outputs with the provenance record, and fail a run that holds an error.
   - [x] Test it end to end, skipping when the built extension is absent and recording the skip.
-- [ ] P3.6 The command-line entry point (#23)
-  - [ ] Write the command over the orchestration.
-  - [ ] Test its exit codes for success, a failed run, and bad input.
-  - [ ] Document it in the README and in `docs/`.
+- [x] P3.6 The command-line entry point (#23)
+  - [x] Write the command over the orchestration.
+  - [x] Test its exit codes for success, a failed run, and bad input.
+  - [x] Document it in the README and in `docs/`.
 
 Acceptance criteria:
 
