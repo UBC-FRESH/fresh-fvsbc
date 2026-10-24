@@ -4,8 +4,8 @@ Phase: P3 Build
 Parent issue: #17
 Pull request: #24, `feature/p3-build` into `main`, opened as a draft so the matrix could be verified
 Evidence head: `ed03085`, the head that the gates in section 3 cover. **The branch carried 22 commits
-and 20 CI runs at that head**; it carries one commit and one run more now, because this report's own
-commit is not in the head it describes.
+and 20 CI runs at that head.** It carries this report's own revision commits and their runs on top of
+it, so those counts move with each revision and are never quoted for the branch's head.
 Report commit: the commit that adds this revision of the report. Its CI run is posted on the pull request.
 Date: 2026-10-24
 Status: queued for approval. Not merged. **Revised** after a Verifier session checked every claim in the
@@ -65,16 +65,16 @@ decision is separate: ADR 0009.
   commit, before any task's code. **Per-task plan comments were posted from `P3.5` on, and not before**:
   `#22` and `#23` carry one, `#18` through `#21` carry none. Section 5 records it.
 - **Branch from `main`.** Merge-base `6e99a41`, the squash-merge of `P2`.
-- **Commit messages that start with a task ID.** 20 of the 22 commits at the evidence head. The two that
+- **Commit messages that start with a task ID.** 21 of the 22 commits at the evidence head. The two that
   do not are `ed03085`, which closes `P2.2` (#12) and starts with a verb, and this report's own commit.
   Both are disclosed in section 5.
 - **Gates for each commit.** Section 3, including the one commit that was committed red.
 - **Roadmap and changelog in step.** Each task's change set carries its roadmap tick and its changelog
   entry. **No mechanical test exists for "same change set"**, so this is a claim about the record
   rather than a verified fact.
-- **Child issues closed with closeout evidence.** `#18` through `#23` each carry a closeout comment;
-  **three of the six name a CI run** (`#18`, `#22`, `#23`), and the other three name the commit and the
-  dashboard result. `#12` was closed in this phase, late; section 5 records it.
+- **Child issues closed with closeout evidence.** `#18` through `#23` each carry a closeout comment.
+  **All six name a commit, two name a dashboard result** (`#18`, `#21`), and **three name a CI run**
+  (`#18`, `#22`, `#23`). `#12` was closed in this phase, late; section 5 records it.
 - **Approval gates.** The branch-protection change in `P3.1` was approved before it ran. The `P3.3`
   before `P3.2` reorder was approved. No other settings change, publication, or private data was
   touched. The approval dialogues are not committed, so the reports and the issues are the record.
@@ -88,14 +88,15 @@ decision is separate: ADR 0009.
   present them as evidence. **One commit was committed red**, `cfb6b1d`, and the entry that records it
   was written by the commit that fixed it; section 5 carries it.
 - **The mutation harness** runs inside the quality job, so a stale anchor fails CI rather than being
-  found by hand. It caught two anchors and one mis-pointed mutation in this phase, both in section 5.
+  found by hand. It caught two anchors and one mis-pointed mutation in this phase, all three in
+  section 5.
 
 ## 4. CI evidence
 
 **At the evidence head: twenty runs, seventeen success, one failure, two cancelled.** Every run is a
 `pull_request` run, because CI runs on pull requests and pushes to `main` only; #24 was opened as a
 draft early so the matrix could be verified against a real pull request rather than in the abstract.
-The branch carries 21 runs now, the extra one being this report's commit.
+The runs this report's own revisions add are on top of that head and are not part of the count.
 
 The one failure is the first run of the build job, and it is the most useful row in the table:
 
