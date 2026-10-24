@@ -26,14 +26,16 @@ FVS Fortran  ->  fork of PyFVS (build, FFI)  ->  fresh-fvsbc (BC semantics, tidy
 ## Status
 
 `ROADMAP.md` is the plan of record and the only home for status, and the GitHub issues carry the live
-status. At present `P2`, the contracts and the prototype, is active on
-`feature/p2-contracts-prototype`.
+status. At present `P5`, release and deploy, is active on `feature/p5-release`; `P0` to `P4` are
+complete.
 
 **The BC variant builds, imports, and runs.** The recipe is
-[ADR 0004](notes/adr/0004-the-fvsbc-build-recipe.md); the twelve-item patch the FVS source submodule
-needs is banked at `notes/reference/fvsbc-patchset.diff.gz`; and the numbers are compared against the FVS
-project's own BC test data in `notes/reference/fvsbc-validation.md`, with the limits of that comparison
-stated there. Nothing is released: there is no tag and no wheel.
+[ADR 0004](notes/adr/0004-the-fvsbc-build-recipe.md); the patch sets the build needs are banked at
+`notes/reference/`; and the numbers are compared against the FVS project's own BC test data in
+`notes/reference/fvsbc-validation.md`, with the limits of that comparison stated there.
+
+**The first release, 0.1.0, is being prepared.** Its notes and its full list of known gaps are in
+[RELEASE_NOTES.md](RELEASE_NOTES.md); there is no tag and no wheel yet.
 
 ## How this project works
 
