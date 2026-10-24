@@ -59,10 +59,11 @@ Contract rules
    built from upstream `main` and does write the summary table, and it is **proven but not adopted**
    (ADR 0008, ADR 0009). The summary is taken from `FVS.summary` in memory, and it is also written as a
    fixed-width report beside the database.
-2. A parsed table is returned as a sequence of records whose keys are the database's column names.
-   `fresh-fvsbc` does not rename a column to something friendlier, because a rename breaks the trace back to the
-   FVS schema. A dataframe is one conversion away, and making it is the caller's choice, because `pandas` is not
-   a dependency of this project.
+2. A parsed table is returned as a dataframe whose column names are the database's column names.
+   `fresh-fvsbc` does not rename a column to something friendlier, because a rename breaks the trace back to
+   the FVS schema. `pandas` is a dependency for this reason, and it is the project's only runtime one. An
+   earlier revision returned records, because the project declared no dependencies at all; that was a
+   narrowing of this rule and it is withdrawn.
 3. `fresh-fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
    the database holds it.
 4. Every parsed table carries its `CaseID`, so a table can be joined back to `FVS_Cases`.

@@ -121,9 +121,12 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         identifier="outputs-renames-the-columns",
         module="src/fresh_fvsbc/outputs.py",
-        find="        return [dict(row) for row in cursor]",
-        replace="        return [{k.lower(): v for k, v in dict(row).items()} for row in cursor]",
-        test="tests/test_outputs.py::test_a_row_is_keyed_by_the_databases_own_column_names",
+        find="        return pd.DataFrame.from_records([dict(row) for row in cursor])",
+        replace=(
+            "        return pd.DataFrame.from_records("
+            "[{k.lower(): v for k, v in dict(row).items()} for row in cursor])"
+        ),
+        test="tests/test_outputs.py::test_the_columns_are_the_databases_own_names",
     ),
     Mutation(
         identifier="outputs-exposes-every-table",
@@ -177,8 +180,8 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         identifier="outputs-treats-every-row-as-an-error",
         module="src/fresh_fvsbc/outputs.py",
-        find='    return _rows_of_severity(rows, "ERROR")',
-        replace="    return list(rows)",
+        find='    return _rows_of_severity(table, "ERROR")',
+        replace="    return table",
         test="tests/test_outputs.py::test_a_run_with_only_warnings_is_not_failed",
     ),
     Mutation(
