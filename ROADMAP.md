@@ -208,9 +208,9 @@ the phase criteria, the order and its reason, and the open proposals.
   - [ ] Choose between running the script under both interpreters in the existing job and renaming the context with protection changed in the same approved move.
   - [ ] Write the change and the protection change, with its exact command, as a proposal.
   - [ ] After approval, run it and read the protection back.
-- [ ] P4.4 Close the `__all__` gap (#29)
-  - [ ] Add a test that every name in `__all__` resolves on the package.
-  - [ ] Add a mutation the harness catches.
+- [ ] P4.4 Close the `__all__` gap (#29) — **its premise was false**: the assertion exists since `6e99a41`, so the task became proving it can fail
+  - [ ] Add a mutation the harness catches, so the existing assertion's falsifiability is reproducible.
+  - [ ] Assert that `__all__` holds no duplicate, which nothing else checks.
 
 Acceptance criteria:
 

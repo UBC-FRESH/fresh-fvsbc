@@ -34,6 +34,12 @@ and a proposed task, not a fix inside this phase.
 4. **`P4.4` Close the `__all__` gap.** Nothing asserts that every name in the package's `__all__`
    resolves; it was checked by hand once.
 
+   **Corrected when the task started: the premise was false.**
+   `tests/test_fresh_fvsbc_package.py::test_package_exports_only_names_it_defines` asserts exactly
+   that, and it has existed since `6e99a41`, the `P2` merge, before `P3.4` recorded otherwise. The
+   task became making that assertion's falsifiability reproducible through the harness, which it now
+   is, plus a uniqueness assertion nothing else checks.
+
 ## The order, and why
 
 `P4.1` first: it produces the evidence the other three are judged against, and it is the only task that
