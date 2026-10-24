@@ -70,8 +70,12 @@ So a BEC value is a region, a zone, a subzone, and a series, with two derived re
 ``BECINFO`` appears nowhere in the keyword table and nowhere in the code except two comments. It is
 either a documented name for input that now arrives another way, or a stale comment.
 
-Not verified: how a caller supplies a BEC value today, and whether ``BECINFO`` is live. Resolve it in
-`P2.2`.
+**Answered in `P3`.** ``BECINFO`` is a **stale comment**. It appears nowhere in the keyword table and
+nowhere in the code except two comments in ``canada/bc/becset.f``. ``BECSET`` is called from
+``canada/bc/sitset.f``, not from the keyword reader, and it derives the BEC from the site species and the
+habitat data that ``SITECODE`` supplies. So **a caller does not supply a BEC value at all** — the model
+derives it — and there is no keyword to accept one. `P2.1` assigned this to `P2.2` and `P2.2` did not
+discharge it; it is discharged here.
 
 Contract rules
 --------------
