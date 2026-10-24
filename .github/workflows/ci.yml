@@ -136,7 +136,7 @@ jobs:
           FVSBC_CASE_DIR: ${{ runner.temp }}/PyFVS/fvs/tests/FVSbc
         run: |
           python -m pip install --quiet pytest pandas
-          PYTHONPATH=tests python - <<'PY'
+          PYTHONPATH=tests:src python - <<'PY'
           import tempfile
           from pathlib import Path
           from test_oracle import CASE, case_directory, differing_lines, run_case
