@@ -165,10 +165,10 @@ The detail for this phase is the focused plan `notes/p3-build.md`, written befor
   - [x] Resolve the species-assignment question in `nemora-ingest.rst`.
   - [x] Resolve the `BECINFO` question in `keywords.rst`.
   - [x] Add the API pages, and extend `tests/test_api_docstrings.py` to cover the package.
-- [ ] P3.5 Run orchestration (#22)
-  - [ ] Write the orchestration over the five prototype modules.
-  - [ ] Return the outputs with the provenance record, and fail a run that holds an error.
-  - [ ] Test it end to end, skipping when the built extension is absent and recording the skip.
+- [x] P3.5 Run orchestration (#22)
+  - [x] Write the orchestration over the five prototype modules.
+  - [x] Return the outputs with the provenance record, and fail a run that holds an error.
+  - [x] Test it end to end, skipping when the built extension is absent and recording the skip.
 - [ ] P3.6 The command-line entry point (#23)
   - [ ] Write the command over the orchestration.
   - [ ] Test its exit codes for success, a failed run, and bad input.
