@@ -1,6 +1,6 @@
 # ADR 0008: The standalone build uses upstream `main`
 
-Status: accepted on 2026-10-24.
+Status: accepted on 2026-10-24. Refined by ADR 0009, which does not adopt it.
 Date: 2026-10-24
 Issues: #19 (P3.2)
 Corrects: ADR 0007

@@ -55,9 +55,10 @@ Contract rules
 1. `fresh-fvsbc` asks for the database output by default. A run that cannot produce one is a reported failure,
    not a silent fall back to text. Through PyFVS's step API — the route this project uses — the database holds
    `FVS_Cases` and `FVS_Error`, and no more. The other tables need a `DATABASE` output block, PyFVS already
-   occupies that block, and PyFVS's own API exposes no way to ask for one, so `FVS_Compute`,
-   `FVS_Summary_Metric`, and `FVS_TreeList_Metric` are **not reachable through this route**. The summary is
-   taken from `FVS.summary` in memory, and it is also written as a fixed-width report beside the database.
+   occupies that block, and PyFVS's own API exposes no way to ask for one. A standalone `FVSbc` can be
+   built from upstream `main` and does write the summary table, and it is **proven but not adopted**
+   (ADR 0008, ADR 0009). The summary is taken from `FVS.summary` in memory, and it is also written as a
+   fixed-width report beside the database.
 2. A parsed table is returned as a sequence of records whose keys are the database's column names.
    `fresh-fvsbc` does not rename a column to something friendlier, because a rename breaks the trace back to the
    FVS schema. A dataframe is one conversion away, and making it is the caller's choice, because `pandas` is not
@@ -81,7 +82,9 @@ Not verified
   writes.
 - **Answered the same way.** BC's `dbsqlite` **is** reached, and the database is written without wiring in the
   BC variant. What cannot be reached through PyFVS is the request for a named table.
-- The summary is available in memory as well as in the fixed-width report, so it is not report-only. Whether
-  a caller needs `FVS_TreeList_Metric` or `FVS_Compute`, and what replaces them through this route, is open.
+- **Answered: `FVS_Compute` is not a general output table.** It holds the user's `COMPUTE` expressions, one
+  row per stand-period and one column per expression, and a keyword set that defines none produces no table
+  at all. This project defines none, so the table does not exist for its runs and is not in the reader's
+  surface. `FVS_TreeList_Metric` needs a `TREELIST` request, which the project does not make. See ADR 0009.
 
 All four are `P2.2` work, and the first three are answered by a single successful run.

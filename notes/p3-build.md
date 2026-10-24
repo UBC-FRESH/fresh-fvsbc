@@ -184,6 +184,14 @@ recorded, not silent.
 
 **Risks.** A command that duplicates the API's logic. It calls the orchestration and adds no modelling.
 
+## `P3.2`, resolved by explanation
+
+The standalone was built and works (ADR 0008) and is **not adopted** (ADR 0009). `FVS_Compute` turned out
+to hold the user's `COMPUTE` expressions rather than a general output table, and this project defines none;
+`FVS_Summary_Metric` was available in memory all along. So `P2.2`'s deferred subtask was a false
+requirement, and the output contract is corrected rather than the task left open. No CI job and no
+provenance change follow from it.
+
 ## Task order, and one deviation from it
 
 `P3.3`, the mutation harness, was run **before** `P3.2`, the standalone executable, which is not the
