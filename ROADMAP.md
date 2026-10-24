@@ -92,7 +92,7 @@ task's sections, the phase criteria and their evidence, the deviations, and the 
   - [x] Write the output contract and the provenance record.
   - [x] Write the `nemora` ingestion contract.
   - [x] Add `CODE_OF_CONDUCT.md` and `CITATION.cff`.
-- [x] P2.2 Build a prototype that exercises the contracts on synthetic data (#12) — its one open subtask was **transferred to `P3.2` (#19)**, not left unfinished: reading `FVS_Compute` and `FVS_Summary_Metric`, which PyFVS makes unreachable
+- [x] P2.2 Build a prototype that exercises the contracts on synthetic data (#12) — its one open subtask was **transferred to `P3.2` (#19)** and **discharged there** (ADR 0009): reading `FVS_Compute` and `FVS_Summary_Metric`, which PyFVS makes unreachable
   - [x] Run the build spike, and record the command, its output, and its exit status.
   - [x] Record the build outcome, and write the build-recipe ADR if the spike is conclusive.
   - [x] Write a synthetic stem population shaped like `nemora` output, as a fixture built at runtime in `tests/`.
