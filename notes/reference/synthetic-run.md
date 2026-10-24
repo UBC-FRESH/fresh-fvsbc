@@ -134,3 +134,102 @@ summaries; a third with `RANNSEED 2` differed in one value at one period, year 3
 It answers it within a bound, and the bound is worth stating: two runs a second apart would not show a
 source that varies over a longer timescale, and four cycles on two plots would not show one that needs
 more. "No other source showed itself here" is the claim; "RANNSEED is the only source" is not.
+
+## The first run the orchestration drove
+
+Date: 2026-10-24
+Issues: #22
+Phase: P3
+Build: the same patched fork, `e95172b`, submodule `ef5fa84`
+
+`fresh_fvsbc.run.run_population` drove the synthetic population end to end: it wrote `run.key` and
+`run.tre`, ran four cycles, read the database back, and wrote `provenance.json`. One `FVS_Cases` row,
+a summary of 5 rows and 22 columns, one `FVS03 WARNING` for the site code, no error row.
+
+```text
+cases rows:    1
+case id:       d1ae14d2-8d42-4fbf-9f2b-3bd85e6a1417
+run datetime:  2026-10-24-06:56:54
+variants:      ('BC',)
+seed:          1
+summary:       5 rows, 22 columns
+warnings:      1  FVS03 WARNING: FOREST CODE INDICATES THE GEOGRAPHIC LOCATION ...
+```
+
+This was run in the build environment, which has `pyfvs` and pandas; the project's own environment has
+neither the extension nor the variant, so `tests/test_run.py`'s end-to-end test skips there and the
+skip names why. The same suite was run in the build environment to prove the test itself passes:
+26 passed, 1 skipped, and the skip is the test that needs the extension to be *absent*.
+
+### What the first real key file taught
+
+Three findings, each of which the unit tests could not have made, because each is about what FVS does
+with a file rather than about what the module does with a dict:
+
+1. **The keyword renderer was wrong, and wrong for every keyword.** It wrote the name and then each
+   parameter on its own line. FVS reads the keyword from the first eight columns and the parameters
+   from ten-column fields of the *same* record, so a file written that way produced one
+   `FVS01 ERROR: INVALID KEYWORD WAS SPECIFIED` per parameter line: 26 of them for an eleven-keyword
+   set. `keywords.render_keyword` now writes fields, and `STDIDENT` and `TREEFMT` — which read the
+   records after them — keep the line form.
+2. **`STOP` is a keyword the table does not hold.** `base/keyrdr.f` matches it before the table
+   lookup. The validator refused it, and so refused every real key file.
+3. **A shifted `STDINFO` makes FVS write no database at all, and no error row either.** Two blank
+   fields in front of the values moved every field one place, and the run completed with a summary and
+   no database. The orchestration reported it as `MissingOutputError`, which is output contract rule 1
+   working: a run that cannot produce a database is a reported failure rather than a silent fall back.
+   The cause was the caller's key file, not the orchestration, and finding it took a bisect against
+   `tmp/synth-run/synthetic.key`, which writes the database.
+
+The database itself lands in the **working directory** under the fixed name `FVSOut.db`, not beside the
+keyword file, which is why the orchestration changes into the run's directory for the projection and
+restores the caller's afterwards.
+
+## The recorded invocation of the command
+
+Date: 2026-10-24
+Issues: #23
+Phase: P3
+
+The documented entry point, `python -m fresh_fvsbc`, run against the synthetic population in the build
+environment. The keyword set is the caller's, passed through unchanged; the command adds `TREEFMT` and
+`TREEDATA` by way of the orchestration and nothing else.
+
+```bash
+RUN=run
+PYTHONPATH=src python -m fresh_fvsbc population.json \
+  --directory "$RUN" \
+  --species FD --tree-age 60 \
+  --keyword "STDIDENT=SYNTHETIC   the command" \
+  --keyword STDINFO=712,CHS131,0,200,35,16 \
+  --keyword MANAGED=0,1 \
+  --keyword SITECODE=FD,100 \
+  --keyword INVYEAR=0 \
+  --keyword DESIGN=0,1,999,1,0,1,1 \
+  --keyword NUMCYCLE=4 \
+  --keyword RANNSEED=1 \
+  --keyword ECHOSUM \
+  --keyword PROCESS \
+  --keyword STOP
+```
+
+Exit status `0`, and:
+
+```text
+case 4b58cc58-7f18-410b-ba6f-7118e503016b
+ran bc in .../run
+summary: 5 rows, 22 columns
+warnings: 1
+provenance: .../run/provenance.json
+```
+
+The directory holds `run.key`, `run.tre`, `FVSOut.db`, `run.out`, `run.sum`, `provenance.json`, and
+PyFVS's own log, seven files. The report prints the resolved absolute path, which is why it names
+`.../run` rather than `$RUN`, and the note writes it with a placeholder rather than with the directory
+it ran in, because a machine-specific path does not belong in a tracked file. The one warning is the
+`FVS03` site-code warning the synthetic stand always produces.
+
+The two other exit statuses are tested rather than recorded here, because they do not need the
+extension: `2` for a missing population file, an unknown keyword, a species that does not resolve, and
+a malformed population; `1` for a run that cannot start, which in the project's own environment is the
+absent extension.

@@ -41,6 +41,39 @@ Two caveats, both verified:
   ``.EQ.`` on character strings, so the comparison is exact and case sensitive. A validator that
   accepted ``database`` would be accepting something FVS does not.
 
+How a keyword and its parameters are laid out
+---------------------------------------------
+
+A keyword is not a name followed by tokens. ``base/keyrdr.f`` reads the keyword from the first eight
+columns of a record and then reads each parameter from a **ten-column field of that same record**:
+
+.. code-block:: fortran
+
+   KEYWRD=RECORD(1:8)
+   J=1
+   DO 25 I=1,NF
+   J=J+10
+   KARD(I)=RECORD(J:J+9)
+
+So the first field is columns 11 to 20, the second 21 to 30, and so on, and a parameter wider than
+ten columns cannot be carried. A blank field is a field, which is why FVS's own files write
+``TIMEINT`` with an empty first field before the value.
+
+Three keywords are the exception, because they read records of their own rather than fields:
+
+- ``STDIDENT`` takes the record after it as the stand id and title (``canada/bc/initre.f``).
+- ``TREEFMT`` takes the two records after it as the format (``metric/base/intree.f``).
+- ``COMMENT``, ``COMPUTE``, ``IF`` and ``DATABASE`` take a **block** of records ended by ``END``.
+  `fresh-fvsbc` does not write these: its keyword model has no room for a block, and writing one as a
+  single record would start a block FVS reads to the end of the file. The validator refuses them by
+  name rather than producing a file that cannot work.
+
+``STOP`` is a keyword that the table does not hold. ``base/keyrdr.f`` compares each record's first
+eight characters with ``STOP`` before it consults the table, and a match ends the file with code 3, so
+``STOP`` is accepted and every real key file ends with it. The first version of the validator refused
+it, and refused every real key file with it; the run orchestration found that the first time it wrote
+one.
+
 BC-specific input
 -----------------
 
@@ -70,8 +103,12 @@ So a BEC value is a region, a zone, a subzone, and a series, with two derived re
 ``BECINFO`` appears nowhere in the keyword table and nowhere in the code except two comments. It is
 either a documented name for input that now arrives another way, or a stale comment.
 
-Not verified: how a caller supplies a BEC value today, and whether ``BECINFO`` is live. Resolve it in
-`P2.2`.
+**Answered in `P3`.** ``BECINFO`` is a **stale comment**. It appears nowhere in the keyword table and
+nowhere in the code except two comments in ``canada/bc/becset.f``. ``BECSET`` is called from
+``canada/bc/sitset.f``, not from the keyword reader, and it derives the BEC from the site species and the
+habitat data that ``SITECODE`` supplies. So **a caller does not supply a BEC value at all** — the model
+derives it — and there is no keyword to accept one. `P2.1` assigned this to `P2.2` and `P2.2` did not
+discharge it; it is discharged here.
 
 Contract rules
 --------------
@@ -85,8 +122,14 @@ Contract rules
    job is to say which spelling the table holds. A caller who writes ``SALVAGE`` without the ``x`` is
    writing a keyword the table does not hold, so that name is refused, and the refusal names
    ``xSALVAGE``.
-4. `fresh-fvsbc` does not silently add a keyword the caller did not write, with one exception: the tree-record
-   format, which it must control. See :doc:`tree-list` and the hazard below.
+4. `fresh-fvsbc` does not silently add a keyword the caller did not write, with one exception: the
+   tree-list handoff, which it must control. See :doc:`tree-list` and the hazard below.
+   The handoff is ``TREEFMT`` with BC's format and ``TREEDATA`` with a blank parameter, which are
+   written by the run and placed before the first ``PROCESS`` or ``STOP``. The rule's exception names
+   the tree-record format; ``TREEDATA`` is part of the same handoff because without it FVS never opens
+   the tree file, so the format and the instruction to use it cannot be separated. A set that already
+   carries either keyword is refused rather than overridden. This reading was recorded when the run
+   orchestration was written, because a rule read generously should say so.
 5. A keyword set carries a hash, and the hash is part of the run's provenance. See :doc:`provenance`.
    The hash is taken over the set's **rendered text** — the bytes a run was given — rather than over a
    structure, so that it identifies exactly what FVS read, and it is written with its algorithm named,

@@ -10,6 +10,15 @@ What the table is
 BC adds nothing to it. Six of the slots are blank, and a blank slot is not a keyword, so the table
 holds 144 named keywords.
 
+``STOP`` is not in the table, and is still a keyword
+----------------------------------------------------
+
+``base/keyrdr.f`` reads each record, upcases its first eight characters, and compares them with
+``STOP`` *before* it consults the table; a match ends the file with code 3. So ``STOP`` is a keyword
+that ``keywds.f`` does not hold, and it is in :data:`SPECIAL_KEYWORDS` rather than in the table.
+The run orchestration found this the first time it wrote a whole key file: every real key file ends
+with ``STOP``, and a validator that refused it refused all of them.
+
 Matching is FVS's own. ``base/fndkey.f`` compares the caller's word to the table with FORTRAN's
 ``.EQ.`` on character strings, which is an exact, case-sensitive, blank-padded comparison. A
 validator that accepted ``database`` would therefore accept something FVS does not, so this one does
@@ -40,12 +49,18 @@ from dataclasses import dataclass, field
 
 __all__ = [
     "BLANK_SLOTS",
+    "BLOCK_KEYWORDS",
+    "FIELD_WIDTH",
     "KEYWORDS",
     "KEYWORD_TABLE",
     "MISSPELLED_KEYWORD",
+    "RECORD_KEYWORDS",
+    "SPECIAL_KEYWORDS",
     "Keyword",
     "KeywordSet",
+    "KeywordWidthError",
     "UnknownKeywordError",
+    "UnsupportedKeywordError",
     "keyword_set_hash",
     "render_keyword",
     "render_keywords",
@@ -225,6 +240,27 @@ BLANK_SLOTS: tuple[int, ...] = tuple(
     slot for slot, name in enumerate(KEYWORD_TABLE, start=1) if name is None
 )
 
+#: The keywords FVS matches before it consults the table. ``base/keyrdr.f`` compares the record's
+#: first eight characters with ``STOP`` and returns code 3, which ends the keyword file, so ``STOP``
+#: is a keyword that ``base/keywds.f`` does not hold. A validator that refused it would refuse every
+#: real key file, which is what the run orchestration found the first time it wrote one.
+SPECIAL_KEYWORDS: frozenset[str] = frozenset({"STOP"})
+
+#: The width of a parameter field. ``base/keyrdr.f`` reads ``KARD(I)=RECORD(J:J+9)`` with ``J``
+#: stepping by ten from eleven, so every parameter is a ten-column field of the keyword's own record
+#: and a longer one cannot be carried.
+FIELD_WIDTH: int = 10
+
+#: The keywords whose content is a record of its own rather than a field of the keyword's record.
+#: ``canada/bc/initre.f`` reads the record after ``STDIDENT`` as the stand id and title, and
+#: ``intree.f`` reads the two after ``TREEFMT`` as the format.
+RECORD_KEYWORDS: frozenset[str] = frozenset({"STDIDENT", "TREEFMT"})
+
+#: The keywords whose content is a block of records ended by ``END``. This module does not write
+#: them: the keyword model has no room for a block, and a caller who wrote one as a single record
+#: would get something FVS reads as the start of a block and then swallows the rest of the file.
+BLOCK_KEYWORDS: frozenset[str] = frozenset({"COMMENT", "COMPUTE", "IF", "DATABASE"})
+
 #: The keyword whose spelling is defective in FVS, at slot 30.
 MISSPELLED_KEYWORD: str = "xSALVAGE"
 
@@ -237,6 +273,14 @@ MISSPELLING_WARNING: str = (
 
 class UnknownKeywordError(ValueError):
     """A keyword that FVS's table does not hold."""
+
+
+class KeywordWidthError(ValueError):
+    """A parameter that FVS's ten-column field cannot carry."""
+
+
+class UnsupportedKeywordError(ValueError):
+    """A keyword whose content is a block, which this module does not write."""
 
 
 def _near_miss(name: str) -> str | None:
@@ -295,10 +339,18 @@ def validate_keyword(keyword: Keyword) -> list[str]:
         If the name is not in the table. The message names the keyword, and names the table's
         spelling when the name is a near miss.
     """
-    if keyword.name not in KEYWORDS:
+    if keyword.name in BLOCK_KEYWORDS:
+        raise UnsupportedKeywordError(
+            f'"{keyword.name}" takes a block of records ended by END, and this module writes '
+            "single records only; writing it here would start a block FVS reads to the end"
+        )
+    if keyword.name not in KEYWORDS and keyword.name not in SPECIAL_KEYWORDS:
         near = _near_miss(keyword.name)
         hint = f' The table spells it "{near}".' if near is not None else ""
         raise UnknownKeywordError(f'"{keyword.name}" is not a keyword.{hint}')
+    if keyword.name not in RECORD_KEYWORDS:
+        for parameter in keyword.parameters:
+            _check_width(keyword.name, parameter)
     if keyword.name == MISSPELLED_KEYWORD:
         return [MISSPELLING_WARNING]
     return []
@@ -329,11 +381,36 @@ def validate_keywords(keywords: Sequence[Keyword]) -> list[str]:
     return warnings
 
 
-def render_keyword(keyword: Keyword) -> str:
-    """Render one keyword as the lines FVS reads for it.
+def _check_width(name: str, parameter: str) -> None:
+    """Refuse a parameter that FVS's ten-column field cannot carry.
 
-    FVS reads a keyword name and then its parameters as successive tokens, and its own keyword files
-    put each on its own line. Rendering that way keeps a parameter containing spaces intact.
+    Parameters
+    ----------
+    name : str
+        The keyword, for the message.
+    parameter : str
+        The parameter.
+
+    Raises
+    ------
+    KeywordWidthError
+        If the parameter is wider than :data:`FIELD_WIDTH`.
+    """
+    if len(parameter) > FIELD_WIDTH:
+        raise KeywordWidthError(
+            f'"{name}" has a parameter of {len(parameter)} characters, and FVS reads '
+            f"{FIELD_WIDTH}: {parameter!r}"
+        )
+
+
+def render_keyword(keyword: Keyword) -> str:
+    """Render one keyword as the record FVS reads for it.
+
+    FVS reads a keyword from the first eight columns of a record and its parameters from ten-column
+    fields of the same record, ``KARD(I)=RECORD(J:J+9)`` with ``J`` stepping by ten from eleven.
+    So a parameter is a field, and the field is padded rather than separated by a delimiter. Two
+    keywords are the exception and carry their content on the records that follow them:
+    ``STDIDENT`` and ``TREEFMT``.
 
     Parameters
     ----------
@@ -343,9 +420,20 @@ def render_keyword(keyword: Keyword) -> str:
     Returns
     -------
     str
-        The keyword's lines, each ending with a newline.
+        The keyword's record, ending with a newline, or the keyword and the records that follow it.
+
+    Raises
+    ------
+    KeywordWidthError
+        If a parameter is wider than the field FVS reads it from.
     """
-    return "".join(f"{line}\n" for line in (keyword.name, *keyword.parameters))
+    if keyword.name in RECORD_KEYWORDS:
+        return "".join(f"{line}\n" for line in (keyword.name, *keyword.parameters))
+    fields = []
+    for parameter in keyword.parameters:
+        _check_width(keyword.name, parameter)
+        fields.append(f"{parameter:<{FIELD_WIDTH}}")
+    return f"{keyword.name:<{FIELD_WIDTH}}{''.join(fields)}".rstrip() + "\n"
 
 
 def render_keywords(keywords: Sequence[Keyword]) -> str:
@@ -395,7 +483,13 @@ class KeywordSet:
         return keyword_set_hash(self.keywords)
 
     def render(self) -> str:
-        """Return the text that FVS would read for this set."""
+        """Return the text that FVS would read for this set.
+
+        Returns
+        -------
+        str
+            The rendered set, with one token per line.
+        """
         return render_keywords(self.keywords)
 
 

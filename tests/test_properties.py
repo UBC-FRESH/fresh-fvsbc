@@ -14,6 +14,8 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 
 import check_workflow as cw
+from fresh_fvsbc.keywords import BLOCK_KEYWORDS, KEYWORDS, SPECIAL_KEYWORDS, Keyword
+from fresh_fvsbc.run import with_tree_handoff
 
 CONTROL_CHARACTERS: Final[tuple[str, ...]] = tuple(
     chr(code) for code in (*range(0, 9), 11, 12, *range(14, 32), 127)
@@ -108,3 +110,34 @@ def test_changelog_order_matches_the_dates(dates: list[dt.date]) -> None:
     assert ("CHANGELOG-ORDER" in codes) == (dates != sorted(dates))
     assert "CHANGELOG-DATE" not in codes
     assert "CHANGELOG-EMPTY" not in codes
+
+
+@settings(max_examples=80, deadline=None)
+@given(
+    names=st.lists(
+        st.sampled_from(sorted(KEYWORDS | SPECIAL_KEYWORDS)),
+        min_size=1,
+        max_size=10,
+    )
+)
+def test_the_tree_handoff_only_ever_adds_its_two_keywords(names: list[str]) -> None:
+    """The handoff adds exactly ``TREEFMT`` and ``TREEDATA``, keeps the caller's order, and stays
+    before the projection starts.
+
+    The property is what contract rule 4 says: the caller's set is not silently reordered or
+    extended beyond the handoff, whatever it holds.
+    """
+    unsupported = BLOCK_KEYWORDS | {"TREEFMT", "TREEDATA"}
+    given = tuple(Keyword(name) for name in names if name not in unsupported)
+    handoff = with_tree_handoff(given)
+
+    added = [keyword.name for keyword in handoff if keyword.name not in {"TREEFMT", "TREEDATA"}]
+    assert added == [keyword.name for keyword in given]
+    assert [keyword.name for keyword in handoff].count("TREEFMT") == 1
+    assert [keyword.name for keyword in handoff].count("TREEDATA") == 1
+
+    positions = {keyword.name: index for index, keyword in enumerate(handoff)}
+    assert positions["TREEFMT"] + 1 == positions["TREEDATA"]
+    for name in ("PROCESS", "STOP"):
+        if name in positions:
+            assert positions["TREEDATA"] < positions[name]

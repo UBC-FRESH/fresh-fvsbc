@@ -10,6 +10,10 @@ license = "MIT"
 requires-python = ">=3.11"
 authors = [{ name = "UBC FRESH Lab" }]
 keywords = ["forest-modelling", "fvs", "british-columbia", "growth-and-yield"]
+dependencies = ["pandas>=2.0"]
+
+[project.scripts]
+fresh-fvsbc = "fresh_fvsbc.cli:main"
 
 [project.urls]
 Repository = "https://github.com/UBC-FRESH/fresh-fvsbc"
@@ -41,6 +45,12 @@ files = ["scripts", "tests", "docs/conf.py", "src/fresh_fvsbc"]
 
 [[tool.mypy.overrides]]
 module = ["numpydoc", "numpydoc.*"]
+ignore_missing_imports = true
+
+# PyFVS is the built variant, and the build is not installed where types are checked. It is also
+# untyped: it ships no stubs, so the override is the only option short of writing them here.
+[[tool.mypy.overrides]]
+module = ["pyfvs", "pyfvs.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

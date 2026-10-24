@@ -8,6 +8,7 @@ author = "UBC-FRESH"
 copyright = "2026, UBC-FRESH"
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 extensions: list[str] = [
     "sphinx.ext.autodoc",
