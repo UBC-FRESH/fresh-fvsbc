@@ -134,3 +134,53 @@ summaries; a third with `RANNSEED 2` differed in one value at one period, year 3
 It answers it within a bound, and the bound is worth stating: two runs a second apart would not show a
 source that varies over a longer timescale, and four cycles on two plots would not show one that needs
 more. "No other source showed itself here" is the claim; "RANNSEED is the only source" is not.
+
+## The first run the orchestration drove
+
+Date: 2026-10-24
+Issues: #22
+Phase: P3
+Build: the same patched fork, `e95172b`, submodule `ef5fa84`
+
+`fresh_fvsbc.run.run_population` drove the synthetic population end to end: it wrote `run.key` and
+`run.tre`, ran four cycles, read the database back, and wrote `provenance.json`. One `FVS_Cases` row,
+a summary of 5 rows and 22 columns, one `FVS03 WARNING` for the site code, no error row.
+
+```text
+cases rows:    1
+case id:       d1ae14d2-8d42-4fbf-9f2b-3bd85e6a1417
+run datetime:  2026-10-24-06:56:54
+variants:      ('BC',)
+seed:          1
+summary:       5 rows, 22 columns
+warnings:      1  FVS03 WARNING: FOREST CODE INDICATES THE GEOGRAPHIC LOCATION ...
+```
+
+This was run in the build environment, which has `pyfvs` and pandas; the project's own environment has
+neither the extension nor the variant, so `tests/test_run.py`'s end-to-end test skips there and the
+skip names why. The same suite was run in the build environment to prove the test itself passes:
+26 passed, 1 skipped, and the skip is the test that needs the extension to be *absent*.
+
+### What the first real key file taught
+
+Three findings, each of which the unit tests could not have made, because each is about what FVS does
+with a file rather than about what the module does with a dict:
+
+1. **The keyword renderer was wrong, and wrong for every keyword.** It wrote the name and then each
+   parameter on its own line. FVS reads the keyword from the first eight columns and the parameters
+   from ten-column fields of the *same* record, so a file written that way produced one
+   `FVS01 ERROR: INVALID KEYWORD WAS SPECIFIED` per parameter line: 26 of them for an eleven-keyword
+   set. `keywords.render_keyword` now writes fields, and `STDIDENT` and `TREEFMT` — which read the
+   records after them — keep the line form.
+2. **`STOP` is a keyword the table does not hold.** `base/keyrdr.f` matches it before the table
+   lookup. The validator refused it, and so refused every real key file.
+3. **A shifted `STDINFO` makes FVS write no database at all, and no error row either.** Two blank
+   fields in front of the values moved every field one place, and the run completed with a summary and
+   no database. The orchestration reported it as `MissingOutputError`, which is output contract rule 1
+   working: a run that cannot produce a database is a reported failure rather than a silent fall back.
+   The cause was the caller's key file, not the orchestration, and finding it took a bisect against
+   `tmp/synth-run/synthetic.key`, which writes the database.
+
+The database itself lands in the **working directory** under the fixed name `FVSOut.db`, not beside the
+keyword file, which is why the orchestration changes into the run's directory for the projection and
+restores the caller's afterwards.

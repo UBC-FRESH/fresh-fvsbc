@@ -59,6 +59,12 @@ Contract rules
    built from upstream `main` and does write the summary table, and it is **proven but not adopted**
    (ADR 0008, ADR 0009). The summary is taken from `FVS.summary` in memory, and it is also written as a
    fixed-width report beside the database.
+
+   The database's **name is fixed**: ``dbsqlite/dbsblkd.f`` has ``DATA DSNOUT/"FVSOut.db"``, so it
+   lands in the run's working directory under that name whatever the keyword file is called, and two
+   runs in one directory overwrite each other's database. A run therefore owns its directory. The
+   orchestration changes into it for the projection and restores the caller's directory afterwards,
+   which makes a run process-global rather than thread-safe.
 2. A parsed table is returned as a dataframe whose column names are the database's column names.
    `fresh-fvsbc` does not rename a column to something friendlier, because a rename breaks the trace back to
    the FVS schema. `pandas` is a dependency for this reason, and it is the project's only runtime one. An
