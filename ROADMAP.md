@@ -159,12 +159,12 @@ The detail for this phase is the focused plan `notes/p3-build.md`, written befor
   - [x] Write the harness so that a mutation which does not apply is an error rather than a pass.
   - [x] Register the mutations already recorded for the five prototype modules.
   - [x] Run it in CI, or record why not.
-- [ ] P3.4 The public API over the five contracts, and three open decisions (#21)
-  - [ ] Export the five modules' public names, with `__all__` and numpydoc docstrings.
-  - [ ] Resolve the record-versus-dataframe question in `outputs.rst`.
-  - [ ] Resolve the species-assignment question in `nemora-ingest.rst`.
-  - [ ] Resolve the `BECINFO` question in `keywords.rst`.
-  - [ ] Add the API pages, and extend `tests/test_api_docstrings.py` to cover the package.
+- [x] P3.4 The public API over the five contracts, and three open decisions (#21)
+  - [x] Export the five modules' public names, with `__all__` and numpydoc docstrings.
+  - [x] Resolve the record-versus-dataframe question in `outputs.rst`.
+  - [x] Resolve the species-assignment question in `nemora-ingest.rst`.
+  - [x] Resolve the `BECINFO` question in `keywords.rst`.
+  - [x] Add the API pages, and extend `tests/test_api_docstrings.py` to cover the package.
 - [ ] P3.5 Run orchestration (#22)
   - [ ] Write the orchestration over the five prototype modules.
   - [ ] Return the outputs with the provenance record, and fail a run that holds an error.
