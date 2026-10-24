@@ -11,7 +11,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P0 Bootstrap | #1 | `feature/p0-bootstrap` | complete |
 | P1 Scope and design | #5 | `feature/p1-scope-design` | complete |
 | P2 Contracts and prototype | #10 | `feature/p2-contracts-prototype` | complete |
-| P3 Build | #17 | `feature/p3-build` | active |
+| P3 Build | #17 | `feature/p3-build` | complete |
 | P4 Verify | TBD | `feature/p4-verify` | planned |
 | P5 Release and deploy | TBD | `feature/p5-release` | planned |
 | P6 Operate and maintain | TBD | `feature/p6-operate` | planned |
@@ -138,7 +138,7 @@ Acceptance criteria:
 
 Parent issue: #17
 Branch: `feature/p3-build`
-Status: active
+Status: complete
 
 Goal: implement the agreed scope of the BC layer on top of the validated prototype: make the build
 reproducible in CI, reach the two output tables PyFVS cannot, make the falsifiability evidence
