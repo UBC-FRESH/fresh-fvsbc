@@ -204,10 +204,10 @@ the phase criteria, the order and its reason, and the open proposals.
   - [x] Establish where the official case data comes from, and whether it may be committed, with its licence.
   - [x] Write the comparison as a repository test, skipping with a recorded reason when the data or the build is absent.
   - [x] Record the result, including the stands and rows it covers and the columns it does not.
-- [ ] P4.3 Make the dashboard's 3.11 evidence literal (#28)
-  - [ ] Choose between running the script under both interpreters in the existing job and renaming the context with protection changed in the same approved move.
-  - [ ] Write the change and the protection change, with its exact command, as a proposal.
-  - [ ] After approval, run it and read the protection back.
+- [x] P4.3 Make the dashboard's 3.11 evidence literal (#28) — both interpreters in the existing job, chosen by the maintainer, so no protection change
+  - [x] Choose between running the script under both interpreters in the existing job and renaming the context with protection changed in the same approved move.
+  - [x] Write the change and the protection change, with its exact command, as a proposal.
+  - [x] After approval, run it and read the protection back.
 - [x] P4.4 Close the `__all__` gap (#29) — **its premise was false**: the assertion exists since `6e99a41`, so the task became proving it can fail
   - [x] Add a mutation the harness catches, so the existing assertion's falsifiability is reproducible.
   - [x] Assert that `__all__` holds no duplicate, which nothing else checks.
