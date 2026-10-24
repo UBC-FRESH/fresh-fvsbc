@@ -195,11 +195,11 @@ Goal: show that the build meets its acceptance criteria, and record the evidence
 The detail for this phase is the focused plan `notes/p4-verify.md`, which carries each task's sections,
 the phase criteria, the order and its reason, and the open proposals.
 
-- [ ] P4.1 The acceptance checks, from a clean checkout (#26)
-  - [ ] Build the variant from the pin in a clean checkout, and record the command, the exit status, and the import.
-  - [ ] Run the full suite there, and record the count and the skips with their reasons.
-  - [ ] Run the command on the synthetic population, and record the exit status and the outputs.
-  - [ ] Record each of `P3`'s seven criteria with the evidence that produces it.
+- [x] P4.1 The acceptance checks, from a clean checkout (#26)
+  - [x] Build the variant from the pin in a clean checkout, and record the command, the exit status, and the import.
+  - [x] Run the full suite there, and record the count and the skips with their reasons.
+  - [x] Run the command on the synthetic population, and record the exit status and the outputs.
+  - [x] Record each of `P3`'s seven criteria with the evidence that produces it.
 - [ ] P4.2 Promote the oracle comparison into a repository test (#27)
   - [ ] Establish where the official case data comes from, and whether it may be committed, with its licence.
   - [ ] Write the comparison as a repository test, skipping with a recorded reason when the data or the build is absent.
