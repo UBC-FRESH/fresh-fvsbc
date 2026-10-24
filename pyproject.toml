@@ -12,6 +12,9 @@ authors = [{ name = "UBC FRESH Lab" }]
 keywords = ["forest-modelling", "fvs", "british-columbia", "growth-and-yield"]
 dependencies = ["pandas>=2.0"]
 
+[project.scripts]
+fresh-fvsbc = "fresh_fvsbc.cli:main"
+
 [project.urls]
 Repository = "https://github.com/UBC-FRESH/fresh-fvsbc"
 Documentation = "https://ubc-fresh.github.io/fresh-fvsbc/"

@@ -53,6 +53,26 @@ python scripts/dashboard.py
 `scripts/dashboard.py` runs every quality gate: lint, format, strict types, tests with the coverage
 gate, the workflow validator, and the docs build with warnings as errors.
 
+## Running a case
+
+The command reads a population file and a keyword set, runs one FVS-BC case, and reports where its
+outputs are. It needs the built variant; the build recipe is in ADR 0004.
+
+```bash
+python -m fresh_fvsbc population.json \
+  --directory run \
+  --species FD --tree-age 60 \
+  --keyword STDINFO=712,CHS131,0,200,35,16 \
+  --keyword SITECODE=FD,100 \
+  --keyword NUMCYCLE=4 \
+  --keyword PROCESS \
+  --keyword STOP
+```
+
+It exits `0` when the run completed, `1` when the run was attempted and failed, and `2` when the input
+was wrong before any run. The population file, the keyword fields, and the outputs are documented in
+`docs/usage.rst`.
+
 ## Repository map
 
 | Path | Purpose |
@@ -61,6 +81,7 @@ gate, the workflow validator, and the docs build with warnings as errors.
 | `ROADMAP.md` | Plan of record and issue tracker map |
 | `CHANGE_LOG.md` | Dated narrative of changes |
 | `docs/` | Documentation site |
+| `src/fresh_fvsbc/` | The package: the contracts, the orchestration, and the command |
 | `notes/adr/` | Decisions, one per file |
 | `notes/reference/` | Facts with provenance |
 | `notes/reports/` | Phase close-out reports |

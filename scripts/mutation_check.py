@@ -157,6 +157,20 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_keywords.py::test_the_intended_spelling_is_refused_and_points_at_the_table",
     ),
     Mutation(
+        identifier="command-reports-a-failed-run-as-bad-input",
+        module="src/fresh_fvsbc/cli.py",
+        find="        return EXIT_FAILED_RUN",
+        replace="        return EXIT_BAD_INPUT",
+        test="tests/test_command.py::test_a_run_that_holds_an_error_exits_one",
+    ),
+    Mutation(
+        identifier="command-drops-a-blank-field",
+        module="src/fresh_fvsbc/cli.py",
+        find='    return Keyword(name, tuple(fields.split(",")))',
+        replace='    return Keyword(name, tuple(field for field in fields.split(",") if field))',
+        test="tests/test_command.py::test_a_keyword_keeps_its_blank_fields",
+    ),
+    Mutation(
         identifier="run-puts-the-handoff-after-the-projection",
         module="src/fresh_fvsbc/run.py",
         find="            return (*given[:index], *handoff, *given[index:])",

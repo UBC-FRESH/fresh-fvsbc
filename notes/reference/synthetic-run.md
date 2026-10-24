@@ -184,3 +184,48 @@ with a file rather than about what the module does with a dict:
 The database itself lands in the **working directory** under the fixed name `FVSOut.db`, not beside the
 keyword file, which is why the orchestration changes into the run's directory for the projection and
 restores the caller's afterwards.
+
+## The recorded invocation of the command
+
+Date: 2026-10-24
+Issues: #23
+Phase: P3
+
+The documented entry point, `python -m fresh_fvsbc`, run against the synthetic population in the build
+environment. The keyword set is the caller's, passed through unchanged; the command adds `TREEFMT` and
+`TREEDATA` by way of the orchestration and nothing else.
+
+```bash
+PYTHONPATH=src python -m fresh_fvsbc population.json \
+  --directory run \
+  --species FD --tree-age 60 \
+  --keyword "STDIDENT=SYNTHETIC   the command" \
+  --keyword STDINFO=712,CHS131,0,200,35,16 \
+  --keyword MANAGED=0,1 \
+  --keyword SITECODE=FD,100 \
+  --keyword INVYEAR=0 \
+  --keyword DESIGN=0,1,999,1,0,1,1 \
+  --keyword NUMCYCLE=4 \
+  --keyword RANNSEED=1 \
+  --keyword ECHOSUM \
+  --keyword PROCESS \
+  --keyword STOP
+```
+
+Exit status `0`, and:
+
+```text
+case 4b58cc58-7f18-410b-ba6f-7118e503016b
+ran bc in /tmp/opencode/cli-run
+summary: 5 rows, 22 columns
+warnings: 1
+provenance: /tmp/opencode/cli-run/provenance.json
+```
+
+The directory holds `run.key`, `run.tre`, `FVSOut.db`, `run.out`, `run.sum`, `provenance.json`, and
+PyFVS's log. The one warning is the `FVS03` site-code warning the synthetic stand always produces.
+
+The two other exit statuses are tested rather than recorded here, because they do not need the
+extension: `2` for a missing population file, an unknown keyword, a species that does not resolve, and
+a malformed population; `1` for a run that cannot start, which in the project's own environment is the
+absent extension.
