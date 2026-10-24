@@ -12,7 +12,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P1 Scope and design | #5 | `feature/p1-scope-design` | complete |
 | P2 Contracts and prototype | #10 | `feature/p2-contracts-prototype` | complete |
 | P3 Build | #17 | `feature/p3-build` | complete |
-| P4 Verify | #25 | `feature/p4-verify` | active |
+| P4 Verify | #25 | `feature/p4-verify` | complete |
 | P5 Release and deploy | TBD | `feature/p5-release` | planned |
 | P6 Operate and maintain | TBD | `feature/p6-operate` | planned |
 
@@ -188,7 +188,7 @@ Acceptance criteria:
 
 Parent issue: #25
 Branch: `feature/p4-verify`
-Status: active
+Status: complete
 
 Goal: show that the build meets its acceptance criteria, and record the evidence in the changelog.
 
