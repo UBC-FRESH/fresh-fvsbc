@@ -1,6 +1,6 @@
 # ADR 0007: The standalone binary is not buildable from the pinned source
 
-Status: proposed
+Status: superseded by ADR 0008 on 2026-10-24.
 Date: 2026-10-24
 Issues: #19 (P3.2)
 Related: ADR 0004, ADR 0006
@@ -36,6 +36,10 @@ database configuration at all**. So the tables cannot be requested through the F
 standalone program was the only route to them.
 
 ## Decision
+
+**Superseded.** The conclusion below is true of the pinned branch and false of FVS: upstream `main`
+builds the standalone, and ADR 0008 records the recipe. The Decision is kept as written because a
+superseded ADR is evidence of what was believed and why.
 
 **The standalone binary is not a route this project can take from the pinned source**, and `P3.2` is
 re-scoped accordingly:
