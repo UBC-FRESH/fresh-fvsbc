@@ -231,11 +231,11 @@ Goal: tag a release, publish the docs, and verify the published artifacts from a
 The detail for this phase is the focused plan `notes/p5-release.md`, which carries each task's sections,
 the phase criteria, the order and its reason, and the open proposals.
 
-- [ ] P5.1 The release notes and the known-gaps list (#32)
-  - [ ] Record the build the release wraps: the PyFVS fork commit, the FVS source submodule, and the variant list, read from the pins rather than quoted.
-  - [ ] Write what the release is and what it does, in the README's terms rather than new ones.
-  - [ ] Write the known-gaps list from the `P2`, `P3` and `P4` reports, each item with the reason it is open.
-  - [ ] State what is verified and how, citing the commands and run ids rather than asserting.
+- [x] P5.1 The release notes and the known-gaps list (#32)
+  - [x] Record the build the release wraps: the PyFVS fork commit, the FVS source submodule, and the variant list, read from the pins rather than quoted.
+  - [x] Write what the release is and what it does, in the README's terms rather than new ones.
+  - [x] Write the known-gaps list from the `P2`, `P3` and `P4` reports, each item with the reason it is open.
+  - [x] State what is verified and how, citing the commands and run ids rather than asserting.
 - [ ] P5.2 Tag, publish, and verify from a clean checkout (#33)
   - [ ] Propose the tag name and the release body, and wait for approval before creating either.
   - [ ] Propose the documentation publication and what it changes, and wait for approval.
