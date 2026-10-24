@@ -124,9 +124,14 @@ Not verified, and what the run answered
   digit wide, it holds 1 to 9, and FVS expands it to a percent crown ratio by ``n*10-5``, which its own
   comment in `base/intree.f` states. So class 7 is 65 percent. `nemora` emits a fraction, so the adapter
   converts, and refuses a fraction whose class falls outside 1 to 9.
-- Whether a caller will ever have ``species``, or whether the project needs a species-assignment step.
-  `nemora` not emitting it is a fact about its current surface, and the note
-  `notes/reference/bc-treelist-and-species.md` records it.
+- **Answered: species assignment is out of scope.** `nemora`'s source contains no species machinery
+  at all -- no species field, no assignment, no table to look one up in -- so the alternatives are not
+  "require it" and "derive it", but "require it" and "build a species-assignment capability", which is
+  a modelling question with a research burden of its own. The adapter therefore keeps requiring
+  ``species`` from the caller, and it fails when the caller does not supply one. A species-assignment
+  step is out of scope until a caller asks for one, and the note
+  `notes/reference/bc-treelist-and-species.md` records what `nemora` does and does not carry.
 
-The first two were open when this page was written and are now settled, by the run recorded in
-`notes/reference/synthetic-run.md` rather than by another reading.
+All three were open when this page was written and are now settled: the first two by the run recorded
+in `notes/reference/synthetic-run.md` rather than by another reading, and the third by reading
+`nemora`'s surface.

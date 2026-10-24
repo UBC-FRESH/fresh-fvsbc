@@ -5,6 +5,7 @@
 ## Start here
 
 - [Home](index.html): the documentation home for the project.
+- [Running a case](usage.html): the command, its population file, its keyword set, and its exit codes.
 - [Reference contracts](reference/index.html): what `fresh-fvsbc` requires, page by page.
 
 ## Reference

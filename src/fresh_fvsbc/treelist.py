@@ -5,7 +5,7 @@
 parses that format string rather than restating it, so the layout cannot drift from the contract.
 
 ``T1``, and why the layout is not the declared one
--------------------------------------------------
+--------------------------------------------------
 
 BC's format opens ``I4,T1,I7``. ``T1`` is FORTRAN's *absolute column* directive, so it targets
 column 1, and ``tree_num`` is consequently read from columns 1 to 7 — its first four columns are
@@ -40,6 +40,7 @@ __all__ = [
     "PLANTS_SYMBOLS",
     "READ_COLUMNS",
     "RECORD_WIDTH",
+    "TREE_LIST_END",
     "WRITE_COLUMNS",
     "AmbiguousSpeciesError",
     "FieldWidthError",
@@ -47,12 +48,16 @@ __all__ = [
     "TreeListFields",
     "UnknownSpeciesError",
     "resolve_species",
+    "write_tree_file",
     "write_tree_list",
     "write_tree_record",
 ]
 
 #: BC's tree-record format, from ``canada/bc/blkdat.f``, in ``BLOCK DATA BLKDAT``.
 BC_TREFMT: str = "(I4,T1,I7,F6.0,I1,A3,F5.1,F4.1,2F5.1,F5.1,I1,3(I2,I2),2I1,I2,2I3,2I1,F3.0)"
+
+#: The line that ends a tree-data file. ``intree.f`` reads until a line contains ``-999``.
+TREE_LIST_END: str = "-999\n"
 
 #: The fields, in the order the format declares them. The names come from the corresponding PyFVS
 #: template, and the contract page carries the same list beside the edit descriptors.
@@ -530,3 +535,24 @@ def write_tree_list(records: Sequence[TreeListFields]) -> str:
         The records, each on its own line and each ending with a newline.
     """
     return "".join(f"{write_tree_record(record)}\n" for record in records)
+
+
+def write_tree_file(records: Sequence[TreeListFields]) -> str:
+    """Write a tree list as the file FVS reads, terminator and all.
+
+    FVS does not take a filename for tree data: ``metric/base/intree.f`` opens the file named
+    after the keyword file and reads records until a line contains ``-999``. A list without that
+    line runs to the end of the file and is reported as a read error, so the terminator belongs
+    with the writer rather than at a call site.
+
+    Parameters
+    ----------
+    records : Sequence[TreeListFields]
+        The trees, in the order to write them.
+
+    Returns
+    -------
+    str
+        The records, each on its own line, followed by the terminating line.
+    """
+    return write_tree_list(records) + TREE_LIST_END

@@ -17,7 +17,7 @@ The summary is still available, in two other places: ``FVS.summary`` returns it 
 run writes a fixed-width ``.sum`` report beside the database. Reading those is not this work.
 
 ``FVS_Error`` is not an error channel only
------------------------------------------
+------------------------------------------
 
 It holds FVS warnings as well as errors. A run whose site data is outside the model's range writes
 ``FVS03 WARNING: FOREST CODE INDICATES THE GEOGRAPHIC LOCATION IS OUTSIDE THE RANGE OF THE MODEL``,
@@ -29,9 +29,10 @@ failed, and this module separates the two by reading the severity FVS writes int
 from __future__ import annotations
 
 import sqlite3
-from collections.abc import Sequence
 from pathlib import Path
 from typing import Literal, TypeAlias
+
+import pandas as pd
 
 __all__ = [
     "CASES_COLUMNS",
@@ -42,7 +43,6 @@ __all__ = [
     "OutputError",
     "RunFailedError",
     "Severity",
-    "TableRow",
     "UnknownTableError",
     "check_run",
     "errors_in",
@@ -52,10 +52,6 @@ __all__ = [
     "severity_of",
     "warnings_in",
 ]
-
-#: One row of a table, keyed by the database's own column names. The contract forbids renaming, so a
-#: key is exactly what FVS called the column.
-TableRow: TypeAlias = dict[str, object]
 
 #: The severity FVS writes into a message, or ``UNKNOWN`` for a message that names none.
 Severity: TypeAlias = Literal["ERROR", "WARNING", "UNKNOWN"]
@@ -162,7 +158,7 @@ def severity_of(message: str) -> Severity:
     return "UNKNOWN"
 
 
-def read_table(db_path: str | Path, table: str) -> list[TableRow]:
+def read_table(db_path: str | Path, table: str) -> pd.DataFrame:
     """Read one table from a run's output database.
 
     Parameters
@@ -174,8 +170,8 @@ def read_table(db_path: str | Path, table: str) -> list[TableRow]:
 
     Returns
     -------
-    list of TableRow
-        One row per record, keyed by the database's own column names.
+    pandas.DataFrame
+        One row per record, with the database's own column names.
 
     Raises
     ------
@@ -198,12 +194,12 @@ def read_table(db_path: str | Path, table: str) -> list[TableRow]:
             cursor = connection.execute(f'SELECT * FROM "{table}"')
         except sqlite3.OperationalError as exc:
             raise UnknownTableError(f"{table!r} is not in the database at {path}") from exc
-        return [dict(row) for row in cursor]
+        return pd.DataFrame.from_records([dict(row) for row in cursor])
     finally:
         connection.close()
 
 
-def read_cases(db_path: str | Path) -> list[TableRow]:
+def read_cases(db_path: str | Path) -> pd.DataFrame:
     """Read ``FVS_Cases``, the table that identifies the run.
 
     Parameters
@@ -213,13 +209,13 @@ def read_cases(db_path: str | Path) -> list[TableRow]:
 
     Returns
     -------
-    list of TableRow
+    pandas.DataFrame
         One row per case.
     """
     return read_table(db_path, "FVS_Cases")
 
 
-def read_errors(db_path: str | Path) -> list[TableRow]:
+def read_errors(db_path: str | Path) -> pd.DataFrame:
     """Read ``FVS_Error``, which holds messages of more than one severity.
 
     Parameters
@@ -229,51 +225,54 @@ def read_errors(db_path: str | Path) -> list[TableRow]:
 
     Returns
     -------
-    list of TableRow
+    pandas.DataFrame
         Every row, errors and warnings together. Use :func:`errors_in` and :func:`warnings_in` to
         separate them.
     """
     return read_table(db_path, "FVS_Error")
 
 
-def _rows_of_severity(rows: Sequence[TableRow], severity: Severity) -> list[TableRow]:
-    """Return the rows whose message carries ``severity``."""
-    return [row for row in rows if severity_of(str(row.get("Message", ""))) == severity]
+def _rows_of_severity(table: pd.DataFrame, severity: Severity) -> pd.DataFrame:
+    """Return the rows of ``FVS_Error`` whose message carries ``severity``."""
+    if table.empty:
+        return table
+    keep = table["Message"].map(lambda message: severity_of(str(message)) == severity)
+    return table[keep]
 
 
-def errors_in(rows: Sequence[TableRow]) -> list[TableRow]:
+def errors_in(table: pd.DataFrame) -> pd.DataFrame:
     """Return the rows of severity ``ERROR``.
 
     Parameters
     ----------
-    rows : Sequence[TableRow]
-        Rows from ``FVS_Error``.
+    table : pandas.DataFrame
+        A table from ``FVS_Error``.
 
     Returns
     -------
-    list of TableRow
+    pandas.DataFrame
         The errors, in the order they were read.
     """
-    return _rows_of_severity(rows, "ERROR")
+    return _rows_of_severity(table, "ERROR")
 
 
-def warnings_in(rows: Sequence[TableRow]) -> list[TableRow]:
+def warnings_in(table: pd.DataFrame) -> pd.DataFrame:
     """Return the rows of severity ``WARNING``.
 
     Parameters
     ----------
-    rows : Sequence[TableRow]
-        Rows from ``FVS_Error``.
+    table : pandas.DataFrame
+        A table from ``FVS_Error``.
 
     Returns
     -------
-    list of TableRow
+    pandas.DataFrame
         The warnings, in the order they were read.
     """
-    return _rows_of_severity(rows, "WARNING")
+    return _rows_of_severity(table, "WARNING")
 
 
-def check_run(db_path: str | Path) -> list[TableRow]:
+def check_run(db_path: str | Path) -> pd.DataFrame:
     """Report a run as failed when its output holds an error, and return its warnings.
 
     The contract says a run whose ``FVS_Error`` is non-empty is failed. In practice that table also
@@ -287,7 +286,7 @@ def check_run(db_path: str | Path) -> list[TableRow]:
 
     Returns
     -------
-    list of TableRow
+    pandas.DataFrame
         The warnings, which do not make a run failed.
 
     Raises
@@ -296,9 +295,9 @@ def check_run(db_path: str | Path) -> list[TableRow]:
         If any message is of severity ``ERROR``. The message names each one, because a failure that
         does not say what failed is not a report.
     """
-    rows = read_errors(db_path)
-    errors = errors_in(rows)
-    if errors:
-        texts = "; ".join(str(row.get("Message", "")).strip() for row in errors)
+    table = read_errors(db_path)
+    errors = errors_in(table)
+    if not errors.empty:
+        texts = "; ".join(str(message).strip() for message in errors["Message"])
         raise RunFailedError(f"the run reported {len(errors)} error(s): {texts}")
-    return warnings_in(rows)
+    return warnings_in(table)

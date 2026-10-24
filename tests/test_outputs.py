@@ -10,6 +10,7 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from fresh_fvsbc.outputs import (
@@ -90,22 +91,22 @@ def test_only_the_tested_tables_are_exposed() -> None:
     assert set(EXPOSED_TABLES) <= set(DATABASE_TABLES)
 
 
-def test_a_row_is_keyed_by_the_databases_own_column_names(tmp_path: Path) -> None:
+def test_the_columns_are_the_databases_own_names(tmp_path: Path) -> None:
     """Contract rule 2: a column is never renamed, because that breaks the trace to the schema."""
     path = a_database(tmp_path / "out.db")
-    rows = read_cases(path)
-    assert len(rows) == 1
-    assert set(rows[0]) == {"CaseID", "StandID", "Variant"}
-    assert rows[0]["CaseID"] == "case-0"
-    assert rows[0]["Variant"] == "BC"
+    table = read_cases(path)
+    assert isinstance(table, pd.DataFrame)
+    assert len(table) == 1
+    assert list(table.columns) == ["CaseID", "StandID", "Variant"]
+    assert table["CaseID"].iloc[0] == "case-0"
+    assert table["Variant"].iloc[0] == "BC"
 
 
 def test_every_exposed_table_carries_the_identity_column(tmp_path: Path) -> None:
     """Contract rule 4: a parsed table can be joined back to ``FVS_Cases``."""
     path = a_database(tmp_path / "out.db", messages=(WARNING,))
-    for table in EXPOSED_TABLES:
-        for row in read_table(path, table):
-            assert IDENTITY_COLUMN in row
+    for name in EXPOSED_TABLES:
+        assert IDENTITY_COLUMN in list(read_table(path, name).columns)
 
 
 def test_an_unexposed_table_is_refused_even_though_the_database_holds_it(tmp_path: Path) -> None:
@@ -155,17 +156,27 @@ def test_the_first_severity_in_a_message_is_the_one_that_counts() -> None:
 def test_the_two_kinds_of_row_are_separated(tmp_path: Path) -> None:
     """``FVS_Error`` holds warnings as well as errors, so a reader has to separate them."""
     path = a_database(tmp_path / "out.db", messages=(WARNING, ERROR, WARNING))
-    rows = read_errors(path)
-    assert len(rows) == 3
-    assert [str(row["Message"])[:6] for row in errors_in(rows)] == ["FVS16 "]
-    assert [str(row["Message"])[:6] for row in warnings_in(rows)] == ["FVS03 ", "FVS03 "]
+    table = read_errors(path)
+    assert len(table) == 3
+    assert list(errors_in(table)["Message"].str[:6]) == ["FVS16 "]
+    assert list(warnings_in(table)["Message"].str[:6]) == ["FVS03 ", "FVS03 "]
+
+
+def test_an_empty_error_table_is_filtered_without_error(tmp_path: Path) -> None:
+    """A run with no messages must not fail the filters."""
+    path = a_database(tmp_path / "out.db")
+    table = read_errors(path)
+    assert table.empty
+    assert errors_in(table).empty
+    assert warnings_in(table).empty
 
 
 def test_a_run_with_only_warnings_is_not_failed(tmp_path: Path) -> None:
     """A site outside the model's range is a warning, and the contract's rule must not fail it."""
     path = a_database(tmp_path / "out.db", messages=(WARNING,))
     warnings = check_run(path)
-    assert [row["Message"] for row in warnings] == [WARNING]
+    assert isinstance(warnings, pd.DataFrame)
+    assert warnings["Message"].tolist() == [WARNING]
 
 
 def test_a_run_with_an_error_is_failed_and_says_what_failed(tmp_path: Path) -> None:
@@ -180,7 +191,7 @@ def test_a_run_with_an_error_is_failed_and_says_what_failed(tmp_path: Path) -> N
 def test_a_run_with_no_messages_is_clean(tmp_path: Path) -> None:
     """An empty ``FVS_Error`` is the normal case, and it has no warnings either."""
     path = a_database(tmp_path / "out.db")
-    assert check_run(path) == []
+    assert check_run(path).empty
 
 
 def test_a_run_with_no_database_cannot_be_checked(tmp_path: Path) -> None:

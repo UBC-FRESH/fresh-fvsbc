@@ -10,13 +10,18 @@ import pytest
 
 from fresh_fvsbc.keywords import (
     BLANK_SLOTS,
+    FIELD_WIDTH,
     KEYWORD_TABLE,
     KEYWORDS,
     MISSPELLED_KEYWORD,
     MISSPELLING_WARNING,
+    RECORD_KEYWORDS,
+    SPECIAL_KEYWORDS,
     Keyword,
     KeywordSet,
+    KeywordWidthError,
     UnknownKeywordError,
+    UnsupportedKeywordError,
     keyword_set_hash,
     render_keyword,
     render_keywords,
@@ -166,20 +171,68 @@ def test_a_set_stops_at_the_first_unknown_keyword() -> None:
         validate_keywords([Keyword("STDIDENT"), Keyword("NOPE"), Keyword("ALSONOPE")])
 
 
-def test_a_keyword_renders_as_its_name_then_its_parameters() -> None:
-    """FVS reads successive tokens, and its own files put each on its own line."""
-    assert render_keyword(Keyword("STDIDENT", ("101",))) == "STDIDENT\n101\n"
+def test_a_field_keyword_renders_ten_column_fields_on_its_own_record() -> None:
+    """``keyrdr.f`` reads ``KARD(I)=RECORD(J:J+9)``, so a parameter is a field, not a line."""
+    assert render_keyword(Keyword("VOLUME", ("FD", "17.5"))) == "VOLUME    FD        17.5\n"
+    assert render_keyword(Keyword("TIMEINT", ("", "5"))) == "TIMEINT             5\n"
+
+
+def test_each_field_starts_ten_columns_after_the_last() -> None:
+    """The columns are the contract: a field one column out is a different parameter."""
+    record = render_keyword(Keyword("VOLUME", ("FD", "17.5")))
+    assert record.index("FD") == FIELD_WIDTH
+    assert record.index("17.5") == 2 * FIELD_WIDTH
 
 
 def test_a_keyword_without_parameters_renders_as_one_line() -> None:
-    """A valueless keyword is one line, which is how FVS's own files carry them."""
+    """A valueless keyword is one record, which is how FVS's own files carry them."""
     assert render_keyword(Keyword("ECHOSUM")) == "ECHOSUM\n"
 
 
-def test_a_parameter_may_contain_spaces() -> None:
-    """A SQL statement is one parameter, so it survives rendering whole."""
+def test_a_field_parameter_may_contain_spaces() -> None:
+    """A field is read as text, so a space inside one does not end it."""
+    assert render_keyword(Keyword("MGMTID", ("A B",))) == "MGMTID    A B\n"
+
+
+def test_a_parameter_wider_than_the_field_is_refused() -> None:
+    """A field is ten columns, so a longer parameter would be split into the next one."""
     statement = "SELECT * FROM FVS_StandInit WHERE Stand_ID = 'Fir.15'"
-    assert render_keyword(Keyword("StandSQL", (statement,))) == f"StandSQL\n{statement}\n"
+    with pytest.raises(KeywordWidthError, match="FVS reads 10"):
+        render_keyword(Keyword("StandSQL", (statement,)))
+
+
+def test_a_wide_parameter_is_refused_when_the_set_is_built() -> None:
+    """The refusal comes at construction, before anything is written."""
+    with pytest.raises(KeywordWidthError, match="11 characters"):
+        KeywordSet((Keyword("MGMTID", ("elevenchars",)),))
+
+
+def test_stdident_carries_its_title_on_the_following_record() -> None:
+    """``initre.f`` reads the record after ``STDIDENT``, not a field of its own record."""
+    assert render_keyword(Keyword("STDIDENT", ("101  the title",))) == "STDIDENT\n101  the title\n"
+
+
+def test_the_tree_format_carries_its_lines_on_the_following_records() -> None:
+    """``intree.f`` reads the two records after ``TREEFMT``, so its parameters are lines."""
+    assert render_keyword(Keyword("TREEFMT", ("(I4,", "F3.0)"))) == "TREEFMT\n(I4,\nF3.0)\n"
+
+
+def test_the_two_record_keywords_are_the_ones_the_reader_reads() -> None:
+    """The set is what makes the renderer's two shapes possible, so it is asserted."""
+    assert frozenset({"STDIDENT", "TREEFMT"}) == RECORD_KEYWORDS
+
+
+def test_a_block_keyword_is_refused_rather_than_written_as_one_record() -> None:
+    """A block written as a single record would start a block FVS reads to the end of the file."""
+    with pytest.raises(UnsupportedKeywordError, match="block of records ended by END"):
+        validate_keyword(Keyword("COMPUTE", ("0",)))
+
+
+def test_stop_is_a_keyword_although_the_table_does_not_hold_it() -> None:
+    """``keyrdr.f`` matches ``STOP`` before it consults the table, so a key file may end with it."""
+    assert KEYWORDS.isdisjoint({"STOP"})
+    assert "STOP" in SPECIAL_KEYWORDS
+    assert KeywordSet((Keyword("STOP"),)).render() == "STOP\n"
 
 
 def test_a_set_renders_as_the_concatenation_of_its_keywords() -> None:

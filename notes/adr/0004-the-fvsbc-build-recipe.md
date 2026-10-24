@@ -1,6 +1,6 @@
 # ADR 0004: The `FVSbc` build recipe
 
-Status: accepted on 2026-10-23, when the maintainer approved `P2`'s close-out report. Renamed by ADR 0005.
+Status: accepted on 2026-10-23, when the maintainer approved `P2`'s close-out report. Renamed by ADR 0005. Refined by ADR 0006 for the rebuild instructions.
 Date: 2026-10-21
 Issues: #13
 
