@@ -53,8 +53,9 @@ one was met by a different mechanism than the words suggest.
 - **A plan before each task.** `#26`, `#27`, `#28` and `#29` each carry a plan comment posted before
   that task's first code commit. `P4.4`'s plan says its own premise had already failed.
 - **Branch from `main`.** `89db30e`, the squash-merge of `P3`.
-- **Commit messages that start with a task ID.** All 15 commits at the evidence head. Two of them,
-  `8d7b879` and `1abb5a8`, are a CI diagnostic and its repair, and both start with `P4.2`.
+- **Commit messages that start with a task ID.** 14 of the 15 commits at the evidence head. The one
+  that does not is `83545d2`, the activation commit, which starts with the phase ID. `8d7b879` and
+  `1abb5a8`, a CI diagnostic and its repair, both start with `P4.2`.
 - **Gates for each commit.** Section 3.
 - **Roadmap and changelog in step.** Each task's change set carries its roadmap tick and its changelog
   entry. **No mechanical test exists for "same change set"**, so this is a claim about the record.
@@ -70,8 +71,10 @@ one was met by a different mechanism than the words suggest.
 
 - **On the evidence head `b7656bf`:** all six dashboard gates green, run locally, and CI run
   `40131457849` succeeds on that exact head.
-- **Per commit:** every commit's changelog entry records the dashboard result for its change set.
-  **Those records are the implementer's claims, not independent evidence.**
+- **Per commit:** every commit that changes code or a contract carries a changelog entry for its
+  change set. **The four roadmap-only commits** (`d14ca8a`, `f5117f6`, `6170793`, `b7656bf`) carry none
+  of their own, and their dashboard result is the one their parent task's entry records. **Those
+  records are the implementer's claims, not independent evidence.**
 - **The mutation harness** runs inside the quality job. The registry grew from 23 to 24 in this phase.
 - **The oracle comparison and the end-to-end test** run in the build job, the only job with the
   extension and FVS's case data: `34 passed, 1 skipped` on `cab1df7` and later.
@@ -110,9 +113,9 @@ The failure is the most useful row, and it is the one that produced this phase's
 | --- | --- | --- |
 | **`P4.4`'s premise was false.** `P3.4` recorded, and `P3`'s approved close-out report repeated, that nothing asserts every name in `__all__` resolves. `tests/test_fresh_fvsbc_package.py` has asserted it since `6e99a41`, before the claim was made | The claim was asserted rather than checked, and the file it was about was never opened | The task became proving the assertion can fail: a mutation was added and the registry is 24 of 24, plus a uniqueness assertion nothing else checks. `notes/p4-verify.md` and the roadmap line carry the correction. **`notes/reports/p3-closeout.md` is approved and is not edited**; the false claim stays in it and this report carries the correction |
 | **The agent's first explanation of the oracle failure was wrong.** It recorded that the runner's toolchain produced different numbers, and named the compiler version as a candidate | The explanation was plausible and asserted before it was tested, which is the failure this project's record has now made three times | Three hypotheses were tested and each died: the compiler (**13.3.0 on the runner, the same as the passing machine**), the instruction set (no `-march`, and `GLIBC_TUNABLES` changes nothing), and the inputs (byte-identical to the pin). The cause is **FVS keeps its state in the process**, and the test now runs its case in a child process. The wrong entries stay in the changelog with corrections beside them |
-| **A CI diagnostic was added, broken, repaired, and removed.** `1abb5a8` failed because `PYTHONPATH=tests` dropped `src` | The same mistake as an earlier subprocess in `P3.5`, made again | Fixed in `8d7b879`, and the step was removed in `cab1df7` once it had answered the question. **It is the second occurrence of that exact mistake**, and the record says so rather than counting it once |
+| **A CI diagnostic was added, broken, repaired, and removed.** Its step in `1abb5a8` failed because `PYTHONPATH=tests` dropped `src`; the run is green because the step was `continue-on-error` | The same mistake as an earlier subprocess in `P3.5`, made again | Fixed in `8d7b879`, and the step was removed in `cab1df7` once it had answered the question. **It is the second occurrence of that exact mistake**, and the record says so rather than counting it once |
 | **`run_case` is not re-entrant in a process.** A second run inherits the first one's Fortran state, so two runs in one process are not independent and the directory isolation `run.py` documents is not enough | Found by the oracle test, not by design; the library's docstring says a run owns its directory and does not say the process is shared | **Not fixed, and out of scope for a verification phase.** Recorded in `notes/reference/p4-acceptance.md` and named in section 6 as the largest open item |
-| **The `P4.3` cost estimate was pessimistic.** The plan said the job would roughly double to about two and a half minutes | Estimated rather than measured | Measured at **one minute forty-seven**, against one twelve before. The correction is in the changelog |
+| **The `P4.3` cost estimate was pessimistic.** The plan said the job would roughly double to about two and a half minutes | Estimated rather than measured | Measured at **one minute forty-seven**, against one minute ten and one minute fourteen on two earlier runs. The correction is in the changelog |
 | **`-O0` is not a usable configuration.** An experiment to test whether the optimiser affected the numbers produced a build that wrote no database at all | The variant is fragile at `-O0`, which ADR 0008 already recorded for the standalone | Recorded, not pursued: it is consistent with the existing ADR and it was not the cause being sought |
 
 ## 6. Next phase
@@ -131,7 +134,8 @@ from this phase. What this report can say is what `P5` inherits, in order of wei
 4. **`scripts/check_workflow.py` does not catch a POSIX temporary path** in a tracked file, though it
    catches a home-directory path. Four such paths were in a tracked note until `P3`'s close-out.
 5. **`run.py`'s drive body** is covered only where the extension is built, so the quality job reports
-   that file at 96 percent while the gate is met at 98 percent overall.
+   that file at **87 percent** and the build environment at 96, while the gate is met at 98 percent
+   overall.
 
 ## 7. Decision
 
