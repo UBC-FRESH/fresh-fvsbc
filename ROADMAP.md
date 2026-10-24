@@ -200,10 +200,10 @@ the phase criteria, the order and its reason, and the open proposals.
   - [x] Run the full suite there, and record the count and the skips with their reasons.
   - [x] Run the command on the synthetic population, and record the exit status and the outputs.
   - [x] Record each of `P3`'s seven criteria with the evidence that produces it.
-- [ ] P4.2 Promote the oracle comparison into a repository test (#27)
-  - [ ] Establish where the official case data comes from, and whether it may be committed, with its licence.
-  - [ ] Write the comparison as a repository test, skipping with a recorded reason when the data or the build is absent.
-  - [ ] Record the result, including the stands and rows it covers and the columns it does not.
+- [x] P4.2 Promote the oracle comparison into a repository test (#27)
+  - [x] Establish where the official case data comes from, and whether it may be committed, with its licence.
+  - [x] Write the comparison as a repository test, skipping with a recorded reason when the data or the build is absent.
+  - [x] Record the result, including the stands and rows it covers and the columns it does not.
 - [ ] P4.3 Make the dashboard's 3.11 evidence literal (#28)
   - [ ] Choose between running the script under both interpreters in the existing job and renaming the context with protection changed in the same approved move.
   - [ ] Write the change and the protection change, with its exact command, as a proposal.
