@@ -8,18 +8,21 @@ and 20 CI runs at that head.** It carries this report's own revision commits and
 it, so those counts move with each revision and are never quoted for the branch's head.
 Report commit: the commit that adds this revision of the report. Its CI run is posted on the pull request.
 Date: 2026-10-24
-Status: queued for approval. Not merged. **Revised** after a Verifier session checked every claim in the
-first revision; its thirteen findings are attached to #17 and its corrections are in section 5.
+Status: queued for approval. Not merged. **Revised three times** after Verifier passes; thirteen findings,
+then five, then three residuals, all closed by evidence on #17, and the verdict of the last pass is that
+the report is ready for the maintainer to approve.
 
 ## Recommendation
 
 Approve these actions. The agent carries them out in this order, and reads back each result.
 
-1. Mark pull request #24 ready for review: `gh pr ready 24`.
-2. Squash-merge pull request #24, and delete the branch `feature/p3-build`:
+Pull request #24 is **queued ready for review**, so the first action is the maintainer's decision
+rather than the agent's.
+
+1. Squash-merge pull request #24, and delete the branch `feature/p3-build`:
    `gh pr merge 24 --squash --delete-branch`.
-3. Close parent issue #17 with a closeout comment that cites the merge commit.
-4. Launch `P4`, after approving its scope in section 6: create its parent issue, its branch
+2. Close parent issue #17 with a closeout comment that cites the merge commit.
+3. Launch `P4`, after approving its scope in section 6: create its parent issue, its branch
    `feature/p4-verify`, its child issues as sub-issues, and its roadmap subtask lines, then start its
    first task.
 
@@ -181,7 +184,7 @@ Not in `P4`, and named so it is not lost:
 
 ## 7. Decision
 
-Approve recommendations 1 to 4, or amend them. The phase's six tasks are complete and its branch is
+Approve recommendations 1 to 3, or amend them. The phase's six tasks are complete and its branch is
 green; six of its seven acceptance criteria are met and one is met in substance rather than in letter,
 and both are stated above rather than left to be found.
 
