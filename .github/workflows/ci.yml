@@ -127,6 +127,33 @@ jobs:
           python -m pip install --quiet pytest pandas
           python -m pytest tests/test_run.py -q -o addopts="" -p no:cacheprovider
 
+      # Temporary diagnostic, and it does not gate: it answers whether the run is deterministic on
+      # this machine, which decides whether an exact oracle comparison can ever hold here. Remove
+      # once the answer is recorded.
+      - name: Diagnose the oracle difference
+        continue-on-error: true
+        env:
+          FVSBC_CASE_DIR: ${{ runner.temp }}/PyFVS/fvs/tests/FVSbc
+        run: |
+          python -m pip install --quiet pytest pandas
+          PYTHONPATH=tests python - <<'PY'
+          import tempfile
+          from pathlib import Path
+          from test_oracle import CASE, case_directory, differing_lines, run_case
+
+          case = case_directory()
+          produced = []
+          for index in (1, 2):
+              work = Path(tempfile.mkdtemp()) / f"run{index}"
+              work.mkdir()
+              run_case(case, work)
+              produced.append((work / f"{CASE}.sum").read_text(encoding="latin-1"))
+          expected = (case / f"{CASE}.sum.save").read_text(encoding="latin-1")
+          print("DIAG run1 vs run2:", len(differing_lines(produced[0], produced[1])))
+          print("DIAG run1 vs oracle:", len(differing_lines(produced[0], expected)))
+          print("DIAG run2 vs oracle:", len(differing_lines(produced[1], expected)))
+          PY
+
   dashboard:
     name: Green dashboard summary
     runs-on: ubuntu-24.04
