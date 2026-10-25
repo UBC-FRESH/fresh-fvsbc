@@ -490,6 +490,50 @@ def test_a_carbrept_option_writes_the_two_carbon_tables(tmp_path: Path) -> None:
     assert "Merch_Carbon_Removed" in list(harvest.columns)
 
 
+def test_simfire_schedules_the_fire_a_consumption_row_needs(tmp_path: Path) -> None:
+    """``SIMFIRE`` inside ``FMIN`` is what makes a consumption row exist, and no keyword does.
+
+    ``DBSFMFUEL`` is called from ``fmfout.f``, inside the routine that runs when something burns,
+    so the ``DATABASE`` option ``BURNREDB`` and the ``BURNREPT`` option both write nothing without
+    a fire event. ``SIMFIRE`` schedules one as activity 2506, and the fuel options are needed as
+    well: without them the routine never reaches the consumption call. The row is real — a 100
+    percent burn consumes tonnes per hectare and reports the share of duff.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword(
+            "DATABASE",
+            (),
+            ("DSNOut", "FVSOut.db", "Summary", "FuelsOut", "FuelReDB", "BURNREDB", "ComputDB"),
+        ),
+        Keyword("STDIDENT", ("FIRE   simfire",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword(
+            "FMIN",
+            (),
+            ("FUELOUT            2", "FUELREPT           2", "BURNREPT", "SIMFIRE            1"),
+        ),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    frame = read_table(result.database, "FVS_Consumption_Metric")
+    assert len(frame) == 1
+    assert frame["Total_Consumption"].iloc[0] > 0.0
+    assert "Percent_Consumption_Duff" in list(frame.columns)
+
+
 def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     """An ``IF`` block is written as a conditional, and FVS's report shows it read the condition."""
     pytest.importorskip(

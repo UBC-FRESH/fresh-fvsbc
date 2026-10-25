@@ -30,6 +30,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P19 Release 0.6.0 | #90 | `feature/p19-release-0-6-0` | complete |
 | P20 The carbon tables | #95 | `feature/p20-carbon` | complete |
 | P21 Release 0.7.0 | #99 | `feature/p21-release-0-7-0` | complete |
+| P22 The consumption table | #103 | `feature/p22-consumption` | active |
 
 ## Lifecycle Map
 
@@ -621,6 +622,28 @@ Acceptance criteria:
 - The package reports `0.7.0`, and the notes say what changed and what remains.
 - A clean checkout installs it and reads a carbon table with a non-zero total.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 22: The consumption table
+
+Parent issue: #103
+Branch: `feature/p22-consumption`
+Status: active
+
+Goal: expose the consumption table, which needs a fire event rather than an option — and record why the
+burn report beside it cannot be exposed at all.
+
+- [ ] P22.1 Write `SIMFIRE` and expose the consumption table (#104)
+  - [ ] Expose `FVS_Consumption_Metric`.
+  - [ ] A run with `SIMFIRE` and the fuel options writes one row with non-zero consumption.
+  - [ ] Record why the burn report cannot be exposed.
+  - [ ] Correct the contract pages, the reachability record, and the triage.
+
+Acceptance criteria:
+
+- A run with `SIMFIRE` writes one consumption row with non-zero consumption.
+- The reader exposes fourteen tables.
+- The burn report's dead gate is recorded with the two assignments that prove it.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

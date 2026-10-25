@@ -1,7 +1,7 @@
 # Which of the 44 tables a run here can actually write
 
-Found while trying to expose more tables (`P17`, `P18`, `P20`). **Thirteen are exposed; the rest are not
-all reachable, and the reason differs by table.** This note records what was checked rather than
+Found while trying to expose more tables (`P17`, `P18`, `P20`, `P22`). **Fourteen are exposed; the rest
+are not all reachable, and the reason differs by table.** This note records what was checked rather than
 guessed.
 
 ## The tables an option reaches
@@ -50,6 +50,52 @@ Two properties a caller should know:
   zero. The first period of a run carries a real total — 13.6 tonnes of carbon per hectare on the
   synthetic stand — so a zero in that column is a value, and a NULL is the absence of one.
 
+## Consumption: reachable, but only when something burns
+
+`FVS_Consumption_Metric` is written by `DBSFMFUEL`, called from `fmfout.f:227` — inside the routine that
+runs when a fire occurs. Neither the `DATABASE` option `BURNREDB` nor the `BURNREPT` option is enough on
+its own, and the fuel options are needed as well or the routine never reaches the call.
+
+A fire is an **activity**, not a keyword: `FMBURN` looks for activity 2506 with `OPFIND`, and the `FMIN`
+option **`SIMFIRE`** is what schedules it. The recipe that works:
+
+```text
+DATABASE
+DSNOut
+FVSOut.db
+Summary
+FuelsOut
+FuelReDB
+BURNREDB
+ComputDB
+END
+
+FMIN
+FUELOUT            2
+FUELREPT           2
+BURNREPT
+SIMFIRE            1
+END
+```
+
+That run writes one consumption row: 22.569 tonnes per hectare consumed, 77.31 percent of the duff and
+82.2 percent of the 7.6 cm plus fraction, with smoke production per size class. It is exposed.
+
+## The burn report: a gate nothing can satisfy
+
+`FVS_BurnReport_Metric` is written by `DBSFMBURN`, called from `fmfout.f:102` inside
+`IF (IFMBRB .LT. 0 .AND. IFIRE .GE. 0)`. `IFMBRB` is assigned in exactly two places:
+
+```text
+fminit.f:853    IFMBRB = 9999            (initialisation)
+fmin.f:228      IFMBRB = IY(1)           (the BURNREPT option)
+```
+
+`IY(1)` is the inventory year, so the gate needs a **negative** value that neither assignment produces.
+It is satisfied by `INVYEAR -1` — verified, the table appears — but a stand inventoried in year -1 is
+invalid input that shifts the whole calendar, so this is a dead branch rather than a recipe. The table is
+**not exposed**, and `keywords.rst` says why.
+
 ## Dwarf mistletoe and root disease: no writer at all
 
 ```text
@@ -64,10 +110,12 @@ expose a table that is always empty.
 
 ## What that means for the gap
 
-The reader exposes **thirteen**. Of the remaining 31:
+The reader exposes **fourteen**. Of the remaining 30:
 
 - some are reachable with a `DATABASE` option and a keyword the model already supports;
-- carbon is reachable through `CARBREPT`, and its two tables are now exposed;
+- carbon is reachable through `CARBREPT`, and consumption through `SIMFIRE`; all three tables are
+  exposed;
+- the burn report's gate cannot be satisfied by valid input;
 - dwarf mistletoe and root disease have no writer.
 
 **The gap is not "36 tables need a triggering case".** It is a mixture of three things, and the triage
