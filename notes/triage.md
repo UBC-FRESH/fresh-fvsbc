@@ -31,6 +31,11 @@ says which review changed it.
 
 ## Found, and not yet fixed
 
+- **The remaining tables are not all reachable, and the reason differs by table.** `FVS_Carbon_Metric`'s
+  writer has one call site, in the fire-carbon report path, and the `DATABASE` option alone does not
+  reach it; the dwarf-mistletoe and root-disease writers **do not exist in this source at all**.
+  Evidence and scope in `notes/reference/table-reachability.md`.
+
 - **The contract's table list is the base schema's, and BC builds the metric one.** Twenty-four names are
   wrong for this variant and at least two real tables are missing. Evidence and scope in
   `notes/reference/table-names.md`; the correction needs the metric schema read in full, because part of
