@@ -8,6 +8,19 @@ Pre-1.0, and the public API can change. The gaps that remain are listed at the e
 
 ## What changed since 0.8.0
 
+- **Four more tables are readable, and they close the per-tree hole.** `FVS_TreeList_Metric`,
+  `FVS_CutList_Metric`, `FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` join the fourteen, so
+  the reader exposes **eighteen**. Before this release the package had **no per-tree output at all**: a
+  caller who wanted to know what happened to individual trees had to parse a fixed-width report.
+- **An option alone is not enough, and that is now the pattern rather than the exception.** `TREELIDB`
+  without a `TREELIST` request writes nothing, `CUTLIDB` without a `CUTLIST` request and an actual removal
+  writes nothing, and `INVSTATS` without `STATS` writes nothing. The `DATABASE` block names the table; a
+  second keyword asks FVS to produce the rows.
+- **FVS spells one column differently in the two per-tree tables**: `CCum` in the tree list and `CCuM` in
+  the cut list. The reader does not rename it, and the output contract says so.
+- **Two of the five attempted tables resisted, and the reasons are recorded**: `FVS_Mortality_Metric` needs
+  a fire that kills trees, and `FVS_Stats_Stand` needs a stand with more than one sample point.
+
 - **The table gap is corrected, and the correction is the sweep's.** `notes/reference/table-reachability.md`
   now classifies all 44 tables mechanically: **fourteen exposed, 25 with a writer and a call site, five
   with a writer that nothing calls, none without a writer.** The five this build cannot write are
@@ -117,8 +130,8 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes fourteen of 44 tables.** The other 30 are classified in
-   `notes/reference/table-reachability.md`: 25 have a writer and a call site and are candidates, five have
+1. **The reader exposes eighteen of 44 tables.** The other 26 are classified in
+   `notes/reference/table-reachability.md`: 21 have a writer and a call site and are candidates, five have
    a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. A call site
    is not a promise; each candidate needs its own case, and `notes/reference/table-candidates.md` gives
    each one a cost, a risk and a value.

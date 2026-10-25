@@ -135,6 +135,8 @@ EXPOSED_TABLES: tuple[str, ...] = (
     "FVS_Cases",
     "FVS_Compute",
     "FVS_Consumption_Metric",
+    "FVS_CutList_Metric",
+    "FVS_Down_Wood_Cov_Metric",
     "FVS_Down_Wood_Vol_Metric",
     "FVS_Error",
     "FVS_Fuels_Metric",
@@ -144,7 +146,9 @@ EXPOSED_TABLES: tuple[str, ...] = (
     "FVS_PotFire_Metric",
     "FVS_SnagDet_Metric",
     "FVS_SnagSum_Metric",
+    "FVS_Stats_Species_Metric",
     "FVS_Summary_Metric",
+    "FVS_TreeList_Metric",
 )
 
 #: The severities FVS spells into a message, usually in the second token.

@@ -568,6 +568,76 @@ def test_a_mistoe_block_is_accepted_by_fvs(tmp_path: Path) -> None:
     assert not result.summary.empty
 
 
+def test_a_treelist_request_writes_the_per_tree_tables(tmp_path: Path) -> None:
+    """The per-tree listings need a request as well as their ``DATABASE`` option.
+
+    This is the first per-tree output the package has: one row per tree per period, with the FVS,
+    PLANTS and FIA species codes, which is what a caller needs to join a result to anything else.
+    The cut list holds the same shape for the trees a removal took, so it is empty unless something
+    is actually cut — the fixture stand carries three trees and a basal area of three, so a residual
+    above that cancels the thinning and writes no cut list.
+
+    **FVS spells one column differently in the two tables**: ``CCum`` in the tree list and ``CCuM``
+    in the cut list. That is FVS's schema, not this reader's, and a caller joining on the name has
+    to know it.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword(
+            "DATABASE",
+            (),
+            (
+                "DSNOut",
+                "FVSOut.db",
+                "Summary",
+                "TREELIDB",
+                "CUTLIDB",
+                "DWDCVDB",
+                "INVSTATS",
+                "ComputDB",
+            ),
+        ),
+        Keyword("STDIDENT", ("TREES  per tree",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("TREELIST"),
+        Keyword("CUTLIST"),
+        Keyword("STATS"),
+        Keyword("THINBBA", ("1", "0.0")),
+        Keyword("FMIN", (), ("DWDCVOUT", "FUELOUT            2")),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    trees = read_table(result.database, "FVS_TreeList_Metric")
+    cuts = read_table(result.database, "FVS_CutList_Metric")
+    cover = read_table(result.database, "FVS_Down_Wood_Cov_Metric")
+    stats = read_table(result.database, "FVS_Stats_Species_Metric")
+
+    assert not trees.empty
+    assert {"TreeId", "SpeciesFVS", "SpeciesPLANTS", "SpeciesFIA"} <= set(trees.columns)
+    assert not cuts.empty, "the thinning removed everything, so the cut list must carry rows"
+    identity = {"CaseID", "StandID", "Year", "TreeId", "TreeIndex", "SpeciesFVS"}
+    assert identity <= set(trees.columns)
+    assert identity <= set(cuts.columns)
+    assert "CCum" in list(trees.columns)
+    assert "CCuM" in list(cuts.columns)
+    assert not cover.empty
+    assert any(name.startswith("DWD_Cover_") for name in cover.columns)
+    assert not stats.empty
+    assert "TreesPerHa" in list(stats.columns)
+
+
 def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     """An ``IF`` block is written as a conditional, and FVS's report shows it read the condition."""
     pytest.importorskip(

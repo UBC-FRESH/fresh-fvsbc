@@ -70,8 +70,8 @@ Some keywords are the exception, because they read records of their own rather t
   later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it
   first. The validator refuses a set that puts it after ``STDIDENT``, ``STDINFO`` or ``STANDSQL``.
   **``FMIN`` is how a caller asks for the fuels, potfire, carbon and consumption tables**: ``FUELOUT``,
-  ``FUELREPT``, ``POTFIRE``, ``CARBREPT`` and ``SIMFIRE`` are options inside it rather than keywords,
-  which is why they are not in the table. Each writes its tables only when the ``DATABASE`` block names
+  ``FUELREPT``, ``POTFIRE``, ``CARBREPT``, ``SIMFIRE`` and ``DWDCVOUT`` are options inside it rather
+  than keywords, which is why they are not in the table. Each writes its tables only when the ``DATABASE`` block names
   the matching option — ``FuelsOut``, ``FuelReDB``, ``PotfirDB``, ``CARBREDB`` or ``BURNREDB`` — and the
   option alone is never enough for carbon or consumption: ``CARBREDB`` needs ``CARBREPT``, and
   ``BURNREDB`` needs an actual fire, which ``SIMFIRE`` schedules as activity 2506.
@@ -80,6 +80,11 @@ Some keywords are the exception, because they read records of their own rather t
   ``IF (IFMBRB .LT. 0)``, and ``IFMBRB`` is set to ``9999`` at initialisation and to the inventory year
   by ``BURNREPT`` — never negative unless ``INVYEAR`` is given an invalid negative year, which shifts the
   whole simulation. It is not exposed.
+
+  **Some tables need a request as well as an option.** ``FVS_TreeList_Metric`` needs ``TREELIDB`` in
+  the ``DATABASE`` block *and* a ``TREELIST`` keyword; ``FVS_CutList_Metric`` needs ``CUTLIDB`` and
+  ``CUTLIST``, and an actual removal; ``FVS_Stats_Species_Metric`` needs ``INVSTATS`` and ``STATS``.
+  The option alone is accepted and writes nothing, which is the same trap ``CARBREDB`` sets.
 
   **``MISTOE`` is a block, and its sub-keywords are not keywords either.** ``MISTPINF``, ``MISTGMOD``,
   ``DMAUTO`` and the rest are options inside it, read by ``MISIN``. A run with a ``MISTOE`` block is

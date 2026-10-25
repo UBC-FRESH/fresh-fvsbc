@@ -5,8 +5,7 @@ looked for across `tmp/pyfvs/fvs` excluding the build directory, the `SUBROUTINE
 mentions it is the writer, and the writer's call sites are counted with `grep -rl "CALL <name>"` in
 `bin/FVSbc_buildDir`.
 
-**Counts: 14 exposed, 25 with a writer and a call site, 5 with a writer and no call site, and none
-without a writer.**
+**Counts, after `P27`: 18 exposed, 21 with a writer and a call site, 5 with a writer and no call site, and 0 without a writer.**
 
 ## The correction this sweep forced
 
@@ -31,12 +30,12 @@ claim was the one that needed the most evidence.
 | `FVS_Climate_Metric` | `DBSCLSUM` | clauestb.f | writer and call site |
 | `FVS_Compute` | `DBSCMPU` | oplist.f | exposed |
 | `FVS_Consumption_Metric` | `DBSFMFUEL` | fmfout.f | exposed |
-| `FVS_CutList_Metric` | `DBSCUTS` | prtrls.f | writer and call site |
+| `FVS_CutList_Metric` | `DBSCUTS` | prtrls.f | exposed |
 | `FVS_DM_Spp_Sum_Metric` | `DBSMIS1` | misprt.f | writer and call site |
 | `FVS_DM_Stnd_Sum_Metric` | `DBSMIS1` | misprt.f | writer and call site |
 | `FVS_DM_Sz_Sum_Metric` | `DBSMIS1` | misprt.f | writer and call site |
 | `FVS_DM_TreeList_Metric` | `DBSMIS1` | misprt.f | writer and call site |
-| `FVS_Down_Wood_Cov_Metric` | `DBSFMDWCOV` | fmdout.f | writer and call site |
+| `FVS_Down_Wood_Cov_Metric` | `DBSFMDWCOV` | fmdout.f | exposed |
 | `FVS_Down_Wood_Vol_Metric` | `DBSFMDWVOL` | fmdout.f | exposed |
 | `FVS_EconHarvestValue_Metric` | `DBSECHARV` | — | writer, no call site |
 | `FVS_EconSummary_Metric` | `DBSECSUM` | — | writer, no call site |
@@ -61,11 +60,11 @@ claim was the one that needed the most evidence.
 | `FVS_Regen_Tally_Metric` | `DBSTALLY` | estab.f | writer and call site |
 | `FVS_SnagDet_Metric` | `DBSFMDSNAG` | fmsout.f | exposed |
 | `FVS_SnagSum_Metric` | `DBSFMSSNAG` | fmssum.f | exposed |
-| `FVS_Stats_Species_Metric` | `DBSSTATS` | stats.f | writer and call site |
+| `FVS_Stats_Species_Metric` | `DBSSTATS` | stats.f | exposed |
 | `FVS_Stats_Stand` | `DBSSTATS` | stats.f | writer and call site |
 | `FVS_StrClass_Metric` | `DBSSTRCLASS` | sstage.f | writer and call site |
 | `FVS_Summary_Metric` | `DBSSUMRY` | disply.f,sumout.f | exposed |
-| `FVS_TreeList_Metric` | `DBSTRLS` | prtrls.f | writer and call site |
+| `FVS_TreeList_Metric` | `DBSTRLS` | prtrls.f | exposed |
 
 ## The candidates, one by one
 
@@ -101,9 +100,24 @@ Each of these was found by running, not by reading:
 | `FVS_Fuels_Metric`, `FVS_PotFire_Metric`, `FVS_PotFire_Cond_Metric` | `FUELOUT`, `FUELREPT`, `POTFIRE` inside `FMIN` |
 | `FVS_Carbon_Metric`, `FVS_Hrv_Carbon` | `CARBREPT` inside `FMIN` |
 | `FVS_Consumption_Metric` | `SIMFIRE` inside `FMIN` — a fire event, not an option |
+| `FVS_TreeList_Metric`, `FVS_CutList_Metric` | `TREELIDB`/`CUTLIDB` plus a `TREELIST`/`CUTLIST` request, and for the cut list an actual removal |
+| `FVS_Stats_Species_Metric` | `INVSTATS` plus `STATS` |
+| `FVS_Down_Wood_Cov_Metric` | `DWDCVDB` plus `DWDCVOUT` inside `FMIN` |
 | `FVS_BurnReport_Metric` | **none**: the gate needs an invalid input |
 | `FVS_DM_*_Metric` (4) | **not found**: `MISTOE` is a block and its sub-keywords are accepted, but the tables need an infection state |
 | `FVS_RD_*_Metric` (3) | **not found**: `RDIN` starts the block, and its required parameters were not determined |
+
+## Two that resisted, and why
+
+- **`FVS_Stats_Stand`** did not appear even with `INVSTATS` and `STATS`, while
+  `FVS_Stats_Species_Metric` did. Its writer, `dbsstats.f`, describes it as the *distribution of stand
+  attributes among sample points*, and the fixture stand carries a single point. **What would close it**:
+  a multi-point stand, which the fixture generator does not produce.
+- **`FVS_Mortality_Metric`** did not appear even with `MORTREDB` accepted — the report echoes `FFE
+  MORTALITY INFO SENT TO SPECIFIED DATABASE` — and a `SIMFIRE` fire. The writer returns early on
+  `IF(IMORTF.EQ.0)`, and the option sets `IMORTF=1`, so the call itself is not reached; most likely the
+  three-tree fixture loses nothing to the fire. **What would close it**: a fire that kills trees, which
+  needs a stand the FFE mortality model will act on.
 
 ## Dwarf mistletoe and root disease: blocks, and a state we do not have
 

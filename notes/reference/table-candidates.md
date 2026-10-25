@@ -4,6 +4,11 @@
 have a writer and a call site** — the candidates — five have a writer that nothing calls, and one has a
 gate no valid input satisfies.
 
+**Four are wired as of `P27`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
+`FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` — which took the reader from fourteen tables to
+eighteen. They stay in place below, marked **wired**, because their estimates are the record of what they
+cost and the evidence for the estimates on the rest.
+
 This note exists so the remaining work can be planned rather than apologised for. It gives each candidate
 what we actually know, why the table exists, and an estimate of the cost, the risk and the value of wiring
 it in. **The estimates are mine, they are ranges, and they are not commitments.** Every one of them can
@@ -68,12 +73,12 @@ wants to know what happened to individual trees has to parse a fixed-width repor
 
 | Table | Writer, called from | Why it exists |
 | --- | --- | --- |
-| `FVS_TreeList_Metric` | `DBSTRLS`, `prtrls.f` | the per-tree listing — species, dbh, height, damage, volume, per cycle |
-| `FVS_CutList_Metric` | `DBSCUTS`, `prtrls.f` | the trees removed, with the reason and the volume |
-| `FVS_ATRTList_Metric` | `DBSATRTLS`, `prtrls.f` | the attribute list: the same trees with the full attribute set |
-| `FVS_FIAVBC_TreeList` | `DBS_FIAVBC_TRLS`, `fvs.f` | a tree list in the shape the US Forest Service's FIA database expects |
-| `FVS_FIAVBC_CutList` | `DBS_FIAVBC_CUTLST`, `cuts.f` | the same for removals |
-| `FVS_FIAVBC_ATRTList` | `DBS_FIAVBC_ATRTLS`, `cuts.f` | the same for attributes |
+| `FVS_TreeList_Metric` | `DBSTRLS`, `prtrls.f` | the per-tree listing — species, dbh, height, damage, volume, per cycle | | |
+| `FVS_CutList_Metric` | `DBSCUTS`, `prtrls.f` | the trees removed, with the reason and the volume | | |
+| `FVS_ATRTList_Metric` | `DBSATRTLS`, `prtrls.f` | the attribute list: the same trees with the full attribute set | | |
+| `FVS_FIAVBC_TreeList` | `DBS_FIAVBC_TRLS`, `fvs.f` | a tree list in the shape the US Forest Service's FIA database expects | | |
+| `FVS_FIAVBC_CutList` | `DBS_FIAVBC_CUTLST`, `cuts.f` | the same for removals | | |
+| `FVS_FIAVBC_ATRTList` | `DBS_FIAVBC_ATRTLS`, `cuts.f` | the same for attributes | | |
 
 The three `FIAVBC` tables are a different matter from the three `prtrls` ones: their names belong to the
 **FIA reporting variant** of BC, not to plain `FVSbc`, so their call sites may sit behind a variant flag
@@ -83,9 +88,9 @@ that this build never sets. Test them last in this group, and expect them not to
 
 | Table | Writer, called from | Why it exists |
 | --- | --- | --- |
-| `FVS_Mortality_Metric` | `DBSFMMORT`, `fmfout.f` | mortality by agent and size, which the summary only totals |
-| `FVS_Down_Wood_Cov_Metric` | `DBSFMDWCOV`, `fmdout.f` | down wood as **cover** rather than volume — the input coarse woody debris models want |
-| `FVS_BurnReport_Metric` | `DBSFMBURN`, `fmfout.f` | the burn conditions of a fire: moisture by size class, wind, flame length |
+| `FVS_Mortality_Metric` | `DBSFMMORT`, `fmfout.f` | mortality by agent and size, which the summary only totals | | |
+| `FVS_Down_Wood_Cov_Metric` | `DBSFMDWCOV`, `fmdout.f` | down wood as **cover** rather than volume — the input coarse woody debris models want | | |
+| `FVS_BurnReport_Metric` | `DBSFMBURN`, `fmfout.f` | the burn conditions of a fire: moisture by size class, wind, flame length | | |
 
 `FVS_Mortality_Metric` and `FVS_Down_Wood_Cov_Metric` sit in the two routines the package already
 triggers (`fmfout.f` for a fire, `fmdout.f` for the fuel output), so they are likely one option each.
@@ -94,11 +99,11 @@ triggers (`fmfout.f` for a fire, `fmdout.f` for the fuel output), so they are li
 
 | Table | Writer, called from | Why it exists |
 | --- | --- | --- |
-| `FVS_Stats_Stand` | `DBSSTATS`, `stats.f` | stand-level statistics: quadratic mean diameter, basal area, volumes, by species and total |
-| `FVS_Stats_Species_Metric` | `DBSSTATS`, `stats.f` | the same broken down by species |
-| `FVS_StrClass_Metric` | `DBSSTRCLASS`, `sstage.f` | **structural stage** — the class BC uses for old-growth and habitat assessment |
-| `FVS_Climate_Metric` | `DBSCLSUM`, `clauestb.f` | the climate the run used: temperature, precipitation, and the derived indices |
-| `FVS_CanProfile` | `DBSFMCANPR`, `fmpocr.f` | the canopy profile by height layer — the vertical structure a fuel or wildlife model wants |
+| `FVS_Stats_Stand` | `DBSSTATS`, `stats.f` | stand-level statistics: quadratic mean diameter, basal area, volumes, by species and total | | |
+| `FVS_Stats_Species_Metric` | `DBSSTATS`, `stats.f` | the same broken down by species | | |
+| `FVS_StrClass_Metric` | `DBSSTRCLASS`, `sstage.f` | **structural stage** — the class BC uses for old-growth and habitat assessment | | |
+| `FVS_Climate_Metric` | `DBSCLSUM`, `clauestb.f` | the climate the run used: temperature, precipitation, and the derived indices | | |
+| `FVS_CanProfile` | `DBSFMCANPR`, `fmpocr.f` | the canopy profile by height layer — the vertical structure a fuel or wildlife model wants | | |
 
 `FVS_StrClass_Metric` is the highest-value table in this group for BC work: structural stage is the
 currency of old-growth and biodiversity assessment in this province, and nothing else in the package
@@ -108,9 +113,9 @@ carries it.
 
 | Table | Writer, called from | Why it exists |
 | --- | --- | --- |
-| `FVS_Regen_Tally_Metric` | `DBSTALLY`, `estab.f` | the regeneration tally: what established, by species and height class |
-| `FVS_Regen_Sprouts_Metric` | `DBSSPRT`, `esuckr.f` | sprout regeneration, which is how many BC hardwoods regenerate |
-| `FVS_Regen_SitePrep` | `DBSSITEPREP`, `estab.f` | the site preparation applied before planting |
+| `FVS_Regen_Tally_Metric` | `DBSTALLY`, `estab.f` | the regeneration tally: what established, by species and height class | | |
+| `FVS_Regen_Sprouts_Metric` | `DBSSPRT`, `esuckr.f` | sprout regeneration, which is how many BC hardwoods regenerate | | |
+| `FVS_Regen_SitePrep` | `DBSSITEPREP`, `estab.f` | the site preparation applied before planting | | |
 
 These need an establishment model to be active, so the recipe is a keyword set that plants or allows
 natural regeneration — more than an option, less than an infection state.
@@ -119,13 +124,13 @@ natural regeneration — more than an option, less than an infection state.
 
 | Table | Writer, called from | Why it exists |
 | --- | --- | --- |
-| `FVS_DM_Spp_Sum_Metric` | `DBSMIS1`, `misprt.f` | dwarf mistletoe summary by species |
-| `FVS_DM_Stnd_Sum_Metric` | `DBSMIS1`, `misprt.f` | dwarf mistletoe summary for the stand |
-| `FVS_DM_Sz_Sum_Metric` | `DBSMIS1`, `misprt.f` | dwarf mistletoe summary by size class |
-| `FVS_DM_TreeList_Metric` | `DBSMIS1`, `misprt.f` | dwarf mistletoe per tree |
-| `FVS_RD_Sum_Metric` | `DBSRD1`, `rdpr.f` | root disease summary |
-| `FVS_RD_Det_Metric` | `DBSRD1`, `rdpr.f` | root disease detail by centre and species |
-| `FVS_RD_Beetle_Metric` | `DBSRD1`, `rdpr.f` | the bark-beetle interaction with root disease |
+| `FVS_DM_Spp_Sum_Metric` | `DBSMIS1`, `misprt.f` | dwarf mistletoe summary by species | | |
+| `FVS_DM_Stnd_Sum_Metric` | `DBSMIS1`, `misprt.f` | dwarf mistletoe summary for the stand | | |
+| `FVS_DM_Sz_Sum_Metric` | `DBSMIS1`, `misprt.f` | dwarf mistletoe summary by size class | | |
+| `FVS_DM_TreeList_Metric` | `DBSMIS1`, `misprt.f` | dwarf mistletoe per tree | | |
+| `FVS_RD_Sum_Metric` | `DBSRD1`, `rdpr.f` | root disease summary | | |
+| `FVS_RD_Det_Metric` | `DBSRD1`, `rdpr.f` | root disease detail by centre and species | | |
+| `FVS_RD_Beetle_Metric` | `DBSRD1`, `rdpr.f` | the bark-beetle interaction with root disease | | |
 
 **These are the ones the sweep re-opened, and they are the most expensive.** `P26` established that both
 families are block keywords — `MISTOE` and `RDIN` — and that `MISTOE`'s block form is accepted by FVS and
@@ -138,7 +143,7 @@ an infected stand", and that is a change to the fixture contract as much as to t
 
 | Table | Writer, called from | Why it exists |
 | --- | --- | --- |
-| `FVS_CalibStats` | `DBSCALIB`, `dgdriv.f`, `initre.f`, `regent.f` | the calibration statistics FVS computes when it is calibrated against measured plots |
+| `FVS_CalibStats` | `DBSCALIB`, `dgdriv.f`, `initre.f`, `regent.f` | the calibration statistics FVS computes when it is calibrated against measured plots | | |
 
 Niche: it is only meaningful for a calibrated run, and this package does not calibrate.
 
@@ -148,34 +153,35 @@ Effort is the work to wire one table, assuming the trigger is found on the first
 **S** is the proven option pattern — half a day. **M** needs a keyword or a block the model does not have
 — one to two days. **L** needs an inventory state or a modelling setup — open-ended.
 
-| Table | Effort | Risk | Value |
-| --- | --- | --- | --- |
-| `FVS_TreeList_Metric` | S | low — checkable against the tree list the run consumed | **high** — no per-tree output exists at all |
-| `FVS_CutList_Metric` | S | low — same check | **high** — removals are the question most runs ask |
-| `FVS_ATRTList_Metric` | S | medium — wide, and the attribute meanings are undocumented here | medium |
-| `FVS_Mortality_Metric` | S | low | **high** — mortality by agent is the forest-health question |
-| `FVS_Down_Wood_Cov_Metric` | S | low | medium — CWD models |
-| `FVS_Stats_Stand` | S | medium — no oracle; checkable only for internal consistency | **high** — the numbers most reports quote |
-| `FVS_Stats_Species_Metric` | S | medium — same | medium |
-| `FVS_StrClass_Metric` | S | medium — the class boundaries are a model choice, not a fact | **high** for BC old-growth work |
-| `FVS_Climate_Metric` | S | **high** — no way to check the indices without a second source | medium |
-| `FVS_CanProfile` | M | medium — the trigger is a guess (`CANFPROF`) | medium |
-| `FVS_Regen_Tally_Metric` | M | medium — needs an establishment model active | **high** for BC silviculture |
-| `FVS_Regen_Sprouts_Metric` | M | medium | medium |
-| `FVS_Regen_SitePrep` | M | medium | low |
-| `FVS_CalibStats` | S | **high** — meaningless without calibration | low |
-| `FVS_FIAVBC_*` (3) | M | **high** — probably behind a variant flag this build never sets | medium, to FIA users only |
-| `FVS_DM_*` (4) | **L** | high — needs an infected stand the fixtures cannot express | **high** in BC |
-| `FVS_RD_*` (3) | **L** | high — same, plus `RDIN`'s required parameters are undetermined | **high** in BC |
-| `FVS_BurnReport_Metric` | — | **cannot be wired** — the gate needs an invalid input | none |
+| Table | Effort | Risk | Value | Status |
+| --- | --- | --- | --- | --- |
+| `FVS_TreeList_Metric` | S | low — checkable against the tree list the run consumed | **high** — no per-tree output exists at all | **wired in `P27`** |
+| `FVS_CutList_Metric` | S | low — same check | **high** — removals are the question most runs ask | **wired in `P27`** |
+| `FVS_ATRTList_Metric` | S | medium — wide, and the attribute meanings are undocumented here | medium | |
+| `FVS_Mortality_Metric` | S | low | **high** — mortality by agent is the forest-health question | |
+| `FVS_Down_Wood_Cov_Metric` | S | low | medium — CWD models | **wired in `P27`** |
+| `FVS_Stats_Stand` | S | medium — no oracle; checkable only for internal consistency | **high** — the numbers most reports quote | |
+| `FVS_Stats_Species_Metric` | S | medium — same | medium | **wired in `P27`** |
+| `FVS_StrClass_Metric` | S | medium — the class boundaries are a model choice, not a fact | **high** for BC old-growth work | |
+| `FVS_Climate_Metric` | S | **high** — no way to check the indices without a second source | medium | |
+| `FVS_CanProfile` | M | medium — the trigger is a guess (`CANFPROF`) | medium | |
+| `FVS_Regen_Tally_Metric` | M | medium — needs an establishment model active | **high** for BC silviculture | |
+| `FVS_Regen_Sprouts_Metric` | M | medium | medium | |
+| `FVS_Regen_SitePrep` | M | medium | low | |
+| `FVS_CalibStats` | S | **high** — meaningless without calibration | low | |
+| `FVS_FIAVBC_*` (3) | M | **high** — probably behind a variant flag this build never sets | medium, to FIA users only | |
+| `FVS_DM_*` (4) | **L** | high — needs an infected stand the fixtures cannot express | **high** in BC | |
+| `FVS_RD_*` (3) | **L** | high — same, plus `RDIN`'s required parameters are undetermined | **high** in BC | |
+| `FVS_BurnReport_Metric` | — | **cannot be wired** — the gate needs an invalid input | none | |
 
 ## A proposed order
 
 Cheapest first, and each step leaves the dashboard green:
 
-1. **The five `S` tables with low or medium risk that sit in routines already triggered** —
-   `FVS_Mortality_Metric`, `FVS_Down_Wood_Cov_Metric`, `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
-   `FVS_Stats_Stand`. Five tables, the proven pattern, and it closes the per-tree hole.
+1. **Done in `P27`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`, `FVS_Down_Wood_Cov_Metric`, and
+   `FVS_Stats_Species_Metric`, which came along with the statistics option. Four tables, and the
+   per-tree hole is closed. **Two from this step resisted**: `FVS_Mortality_Metric` needs a fire that
+   kills trees, and `FVS_Stats_Stand` needs a stand with more than one sample point.
 2. **`FVS_StrClass_Metric` and `FVS_ATRTList_Metric`** — same pattern, higher value in BC, wider table.
 3. **`FVS_Regen_*` (3)** and **`FVS_CanProfile`** — the `M` group, one phase each.
 4. **`FVS_Stats_Species_Metric`, `FVS_Climate_Metric`, `FVS_CalibStats`** — the low-value tail.
