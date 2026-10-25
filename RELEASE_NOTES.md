@@ -104,11 +104,10 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes fourteen of 44 tables, and the rest are not all reachable.** Some take a
-   `DATABASE` option; the fuels, potfire and carbon ones additionally need an `FMIN` block, and
-   consumption needs a fire event; the burn report's gate cannot be satisfied by valid input; dwarf
-   mistletoe and root disease have no writer in this source. `notes/reference/table-reachability.md` has
-   the evidence for each verdict.
+1. **The reader exposes fourteen of 44 tables.** The other 30 are classified in
+   `notes/reference/table-reachability.md`: 25 have a writer and a call site and are candidates, five have
+   a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. A call site
+   is not a promise; each candidate needs its own case.
 2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is

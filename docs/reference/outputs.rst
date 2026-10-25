@@ -122,6 +122,7 @@ Not verified
   run produces: a `DATABASE` block names the tables, and a table it does not name is absent.
 - `FVS_Compute` holds the user's `COMPUTE` expressions, one row per stand-period and one column per
   expression, and a keyword set that defines none produces no table at all.
-- **Whether the rest can be written at all.** `notes/reference/table-reachability.md` records what was
-  checked: four more tables take a `DATABASE` option, carbon's writer is reached only from the fire-carbon
-  report path, and the dwarf-mistletoe and root-disease writers do not exist in this source.
+- **Which of the rest can be written.** `notes/reference/table-reachability.md` classifies all 44 by
+  writer and call site: 25 have a writer and a call site and are candidates, five have a writer that
+  nothing calls, and one has a gate no valid input satisfies. A call site is not a promise — each
+  candidate needs a case, because the triggers found so far were options inside blocks, not keywords.

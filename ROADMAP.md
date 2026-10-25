@@ -32,6 +32,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P21 Release 0.7.0 | #99 | `feature/p21-release-0-7-0` | complete |
 | P22 The consumption table | #103 | `feature/p22-consumption` | complete |
 | P23 Release 0.8.0 | #107 | `feature/p23-release-0-8-0` | complete |
+| P24 The sweep over the remaining tables | #111 | `feature/p24-sweep` | active |
 
 ## Lifecycle Map
 
@@ -667,6 +668,27 @@ Acceptance criteria:
 - The package reports `0.8.0`, and the notes say what changed and what remains.
 - A clean checkout installs it and reads a consumption row with a non-zero total.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 24: The sweep over the remaining tables
+
+Parent issue: #111
+Branch: `feature/p24-sweep`
+Status: active
+
+Goal: classify all 44 tables mechanically, so the table question closes with a record instead of an open
+invitation — and correct the claim the sweep disproves.
+
+- [ ] P24.1 Sweep the 44 tables and correct the record (#112)
+  - [ ] Sweep all 44: writer by source mention, call sites by `grep -rl "CALL <name>"`.
+  - [ ] Rewrite the reachability note as the definitive classification.
+  - [ ] Correct the "no writer" claim in every live document.
+  - [ ] Record the correction in the changelog.
+
+Acceptance criteria:
+
+- Every one of the 44 tables has a verdict, and each is reproducible with the commands the note names.
+- The wrong "no writer" claim is corrected in every live document.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
