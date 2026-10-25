@@ -58,7 +58,9 @@ __all__ = [
     "NESTED_KEYWORDS",
     "RECORD_KEYWORDS",
     "SPECIAL_KEYWORDS",
+    "STAND_KEYWORDS",
     "Keyword",
+    "KeywordOrderError",
     "KeywordSet",
     "KeywordWidthError",
     "UnknownKeywordError",
@@ -271,6 +273,11 @@ NESTED_KEYWORDS: frozenset[str] = frozenset({"IF"})
 #: Every keyword that takes a block of some kind.
 BLOCK_KEYWORDS: frozenset[str] = LINES_KEYWORDS | NESTED_KEYWORDS
 
+#: The keywords that start a stand's setup. A ``DATABASE`` block must precede the first of them:
+#: FVS refuses it later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, which is
+#: what the official case avoids by putting the block first.
+STAND_KEYWORDS: frozenset[str] = frozenset({"STDIDENT", "STDINFO", "STANDSQL"})
+
 #: The keyword whose spelling is defective in FVS, at slot 30.
 MISSPELLED_KEYWORD: str = "xSALVAGE"
 
@@ -291,6 +298,10 @@ class KeywordWidthError(ValueError):
 
 class UnsupportedKeywordError(ValueError):
     """A keyword whose content is a block, which this module does not write."""
+
+
+class KeywordOrderError(ValueError):
+    """A keyword FVS refuses in the position the set gives it."""
 
 
 def _near_miss(name: str) -> str | None:
@@ -393,6 +404,15 @@ def validate_keywords(keywords: Sequence[Keyword]) -> list[str]:
         On the first keyword whose name is not in the table. Validation stops there rather than
         reporting the rest, because a set with an unknown keyword cannot be run.
     """
+    seen_stand = False
+    for keyword in keywords:
+        if keyword.name == "DATABASE" and seen_stand:
+            raise KeywordOrderError(
+                "a DATABASE block must precede the stand setup; FVS refuses it later with "
+                "'KEYWORD ENTERED IS USED IN WRONG CONTEXT'. The official case puts it first"
+            )
+        if keyword.name in STAND_KEYWORDS:
+            seen_stand = True
     warnings: list[str] = []
     for keyword in keywords:
         warnings.extend(validate_keyword(keyword))

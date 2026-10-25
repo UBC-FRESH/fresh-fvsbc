@@ -90,6 +90,7 @@ DATABASE_TABLES: tuple[str, ...] = (
     "FVS_Stats_Species",
     "FVS_Stats_Stand",
     "FVS_StrClass",
+    "FVS_Summary_Metric",
 )
 
 #: The columns of ``FVS_Cases``, from ``dbsqlite/dbscase.f``.
@@ -113,7 +114,12 @@ IDENTITY_COLUMN: str = "CaseID"
 
 #: The tables this reader exposes. Contract rule 3: a table it has not tested is not in the API, and
 #: these two are the ones a run through the FFI is known to write.
-EXPOSED_TABLES: tuple[str, ...] = ("FVS_Cases", "FVS_Error")
+EXPOSED_TABLES: tuple[str, ...] = (
+    "FVS_Cases",
+    "FVS_Compute",
+    "FVS_Error",
+    "FVS_Summary_Metric",
+)
 
 #: The severities FVS spells into a message, usually in the second token.
 _SEVERITIES: dict[str, Severity] = {"ERROR:": "ERROR", "WARNING:": "WARNING"}
@@ -194,7 +200,11 @@ def read_table(db_path: str | Path, table: str) -> pd.DataFrame:
             cursor = connection.execute(f'SELECT * FROM "{table}"')
         except sqlite3.OperationalError as exc:
             raise UnknownTableError(f"{table!r} is not in the database at {path}") from exc
-        return pd.DataFrame.from_records([dict(row) for row in cursor])
+        frame = pd.DataFrame.from_records([dict(row) for row in cursor])
+        if frame.empty:
+            # A table with no rows still has a schema, and a frame without columns loses it.
+            frame = pd.DataFrame(columns=[column[0] for column in cursor.description])
+        return frame
     finally:
         connection.close()
 

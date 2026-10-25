@@ -53,3 +53,14 @@ surface depend on it**.
   caller ever defines compute expressions. Keeping it costs one compressed patch and one ADR.
 - **Keep `P2.2`'s subtask open as unfinished.** Rejected: it asks for something that does not exist for
   this project's runs, and an item that can never close is not a checklist item.
+
+## Correction, 2026-10-25
+
+**This ADR's Context says the tables are unreachable because PyFVS occupies the `DATABASE` block,
+and that is wrong.** A `DATABASE` block is refused only when it comes after the stand setup;
+placed first, FVS accepts it and writes `FVS_Compute` and `FVS_Summary_Metric` through the
+extension. `P9` (#50) verified it and corrected the pages that repeated the claim.
+
+**The decision stands**: the standalone is still not adopted, because the reason for adopting it
+was reaching tables that the extension can reach. What changes is that the reason is gone, not
+that the alternative is now better.

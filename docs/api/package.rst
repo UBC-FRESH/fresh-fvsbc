@@ -35,3 +35,7 @@ below are listed in the order the pipeline uses them.
 .. automodule:: fresh_fvsbc.run
    :members:
    :show-inheritance:
+
+.. automodule:: fresh_fvsbc.cli
+   :members:
+   :show-inheritance:

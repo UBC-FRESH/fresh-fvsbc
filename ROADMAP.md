@@ -17,6 +17,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P6 Operate and maintain | #37 | `feature/p6-operate` | complete |
 | P7 Keyword blocks and gate hygiene | #43 | `feature/p7-blocks-and-gates` | complete |
 | P8 Release 0.2.0 | #47 | `feature/p8-release-0-2-0` | complete |
+| P9 The database block | #50 | `feature/p9-database-block` | complete |
 
 ## Lifecycle Map
 
@@ -327,6 +328,35 @@ Acceptance criteria:
 - The package reports `0.2.0`, the notes name the build it wraps and the gaps that remain, and a clean checkout installs the release and runs one case.
 - The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit of the phase branch.
+
+## Phase 9: The database block
+
+Parent issue: #50
+Branch: `feature/p9-database-block`
+Status: complete
+
+Goal: correct a conclusion in the record that is wrong — `FVS_Compute` is reachable — then make the
+`DATABASE` block first-class and expose the two tables it unlocks.
+
+- [x] P9.1 Correct the record on `FVS_Compute` (#51)
+  - [x] Correct the triage's row: the constraint is the block's **position**, not PyFVS's ownership.
+  - [x] Correct `RELEASE_NOTES.md`'s gap, which says the table cannot be read.
+  - [x] Add a correction note to ADR 0009 rather than rewriting it.
+- [x] P9.2 Make the `DATABASE` block first-class (#52)
+  - [x] A rule in the orchestration: the block must precede the stand setup, and a set that puts it later is refused.
+  - [x] Expose `FVS_Compute` and `FVS_Summary_Metric` in the reader, which rule 3 permits once they are tested.
+  - [x] A test that a run with the block first writes both tables, and one that a late block is refused.
+  - [x] Correct `outputs.rst` and `keywords.rst`.
+- [x] P9.3 Put the command on the API page (#53)
+  - [x] Add the `automodule` entry for `fresh_fvsbc.cli`.
+
+Acceptance criteria:
+
+- The record says the tables are reachable, and says what was wrong before.
+- A set whose `DATABASE` block comes after the stand is refused with a message that says to put it first.
+- `FVS_Compute` and `FVS_Summary_Metric` are read from a real run through the public reader.
+- `fresh_fvsbc.cli` appears on the API page.
+- `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
 

@@ -27,7 +27,8 @@ ad-hoc slicing.
 The tables
 ----------
 
-The database component creates 32 `FVS_`-prefixed tables:
+The database component creates 33 `FVS_`-prefixed tables. **It was thirty-two**, and the official
+case writes ``FVS_Summary_Metric``, which the list lacked until `P9`:
 
 .. code-block:: text
 
@@ -77,7 +78,9 @@ Contract rules
    earlier revision returned records, because the project declared no dependencies at all; that was a
    narrowing of this rule and it is withdrawn.
 3. `fresh-fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
-   the database holds it.
+   the database holds it. **Four are exposed**: `FVS_Cases`, `FVS_Compute`, `FVS_Error` and
+   `FVS_Summary_Metric`. The last two are written only when a `DATABASE` block asks for them, and the
+   block must come before the stand setup — see :doc:`keywords`.
 4. Every parsed table carries its `CaseID`, so a table can be joined back to `FVS_Cases`.
 5. `FVS_Error` is read on every run, and it holds **warnings as well as errors**: a run whose site data is
    outside the model's range writes an `FVS03 WARNING` row, which is not a failure. So a run is reported as
@@ -96,7 +99,7 @@ Not verified
 
 - The column list of every table other than `FVS_Cases` and `FVS_Error`. Those two were read; neither of the
   other thirty is exposed, so their columns are still unread.
-- **Answered by the first synthetic run.** BC populates only some of the thirty-two tables: through PyFVS's
+- **Answered by the first synthetic run.** BC populates only some of the tables: through PyFVS's
   step API the database holds `FVS_Cases` and `FVS_Error`, and the official cases write a further set because
   their keyword files ask for it. So the list above is what the component can create, not what a given run
   writes.

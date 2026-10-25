@@ -55,8 +55,9 @@ reopen it.
 
 1. **`IF` blocks are refused, not written.** `IF` wraps keywords ended by `ENDIF`, which needs a nested
    model; `COMMENT`, `COMPUTE` and `DATABASE` are supported.
-2. **`FVS_Compute` is still not written.** It needs a `DATABASE` block asking for `ComputDB`, and PyFVS
-   occupies that block. The expression can be defined; the table cannot be read.
+2. **`FVS_Compute` needs a `DATABASE` block placed before the stand.** With one, the table is written and
+   readable. Without it, nothing is; `P3.2` concluded the tables were unreachable and was wrong about
+   why, and `P9` corrected the record.
 3. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 4. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
@@ -67,7 +68,7 @@ reopen it.
 7. **A parameter passed to the command cannot contain a comma.**
 8. **At `-O0` the variant writes no database at all**, so the optimiser is not optional.
 9. **The package needs a separately built extension.** Installing it does not build FVS.
-10. **The reader exposes two of the database's 32 tables.**
+10. **The reader exposes four of the database's 33 tables.**
 11. **The `nemora` adapter requires `species` and `tree_age`**, and species assignment is out of scope.
 
 ## What is not in this release
