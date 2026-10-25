@@ -263,7 +263,7 @@ RECORD_KEYWORDS: frozenset[str] = frozenset({"STDIDENT", "TREEFMT"})
 #: The keywords whose content is a block of **text lines** ended by ``END``. A caller supplies the
 #: lines, and the writer supplies the terminator, because a block without one swallows the rest of
 #: the file.
-LINES_KEYWORDS: frozenset[str] = frozenset({"COMMENT", "COMPUTE", "DATABASE", "FMIN"})
+LINES_KEYWORDS: frozenset[str] = frozenset({"COMMENT", "COMPUTE", "DATABASE", "FMIN", "MISTOE"})
 
 #: The keywords whose block holds **other keywords** rather than lines: ``IF`` opens a conditional
 #: whose body is a sequence of keywords and whose terminator is ``ENDIF``. That is a nested
