@@ -28,7 +28,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P17 The fuels and potfire tables | #82 | `feature/p17-extension-tables` | complete |
 | P18 What the remaining tables need | #86 | `feature/p18-table-reachability` | complete |
 | P19 Release 0.6.0 | #90 | `feature/p19-release-0-6-0` | complete |
-| P20 The carbon tables | #95 | `feature/p20-carbon` | active |
+| P20 The carbon tables | #95 | `feature/p20-carbon` | complete |
 
 ## Lifecycle Map
 
@@ -584,16 +584,16 @@ Acceptance criteria:
 
 Parent issue: #95
 Branch: `feature/p20-carbon`
-Status: active
+Status: complete
 
 Goal: expose the two carbon tables, because the writer they need is one option away and no keyword
 reaches it.
 
-- [ ] P20.1 Write `CARBREPT` and expose the carbon tables (#96)
-  - [ ] Expose `FVS_Carbon_Metric` and `FVS_Hrv_Carbon`.
-  - [ ] A run with `CARBREPT` in an `FMIN` block writes both, and the first period carries a non-zero total.
-  - [ ] Document the NULL that FVS writes into `Total_Stand_Carbon` when a component is undefined.
-  - [ ] Correct the contract pages, the reachability record, and the module docstring.
+- [x] P20.1 Write `CARBREPT` and expose the carbon tables (#96)
+  - [x] Expose `FVS_Carbon_Metric` and `FVS_Hrv_Carbon`.
+  - [x] A run with `CARBREPT` in an `FMIN` block writes both, and the first period carries a non-zero total.
+  - [x] Document the NULL that FVS writes into `Total_Stand_Carbon` when a component is undefined.
+  - [x] Correct the contract pages, the reachability record, and the module docstring.
 
 Acceptance criteria:
 
