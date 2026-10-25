@@ -27,18 +27,25 @@ ad-hoc slicing.
 The tables
 ----------
 
-The database component creates 33 `FVS_`-prefixed tables. **It was thirty-two**, and the official
-case writes ``FVS_Summary_Metric``, which the list lacked until `P9`:
+The metric build creates 44 `FVS_`-prefixed tables. **An earlier revision listed 33, and they were
+the *base* schema's names**: `dbsqlite/` creates `FVS_Down_Wood_Vol` and `FVS_SnagDet`, where this
+variant's schema creates `FVS_Down_Wood_Vol_Metric` and `FVS_SnagDet_Metric`, so most of the old
+list named tables a run here never writes. `notes/reference/table-names.md` has the evidence, and
+the list below is derived from the schema's four layers with the most specific module winning:
 
 .. code-block:: text
 
-   FVS_BurnReport FVS_CalibStats FVS_CanProfile FVS_Carbon FVS_Cases FVS_Climate
-   FVS_Compute FVS_Consumption FVS_DM_Spp_Sum FVS_DM_Stnd_Sum FVS_DM_Sz_Sum
-   FVS_Down_Wood_Cov FVS_Down_Wood_Vol FVS_EconHarvestValue FVS_EconSummary
-   FVS_Error FVS_Fuels FVS_Hrv_Carbon FVS_Mortality FVS_RD_Beetle FVS_RD_Det
-   FVS_RD_Sum FVS_Regen_HabType FVS_Regen_Ingrow FVS_Regen_SitePrep
-   FVS_Regen_Sprouts FVS_Regen_Tally FVS_SnagDet FVS_SnagSum FVS_Stats_Species
-   FVS_Stats_Stand FVS_StrClass
+   FVS_ATRTList_Metric FVS_BurnReport_Metric FVS_CalibStats FVS_CanProfile
+   FVS_Carbon_Metric FVS_Cases FVS_Climate_Metric FVS_Compute FVS_Consumption_Metric
+   FVS_CutList_Metric FVS_DM_Spp_Sum_Metric FVS_DM_Stnd_Sum_Metric FVS_DM_Sz_Sum_Metric
+   FVS_DM_TreeList_Metric FVS_Down_Wood_Cov_Metric FVS_Down_Wood_Vol_Metric
+   FVS_EconHarvestValue_Metric FVS_EconSummary_Metric FVS_Error FVS_FIAVBC_ATRTList
+   FVS_FIAVBC_CutList FVS_FIAVBC_Summary FVS_FIAVBC_TreeList FVS_Fuels_Metric
+   FVS_Hrv_Carbon FVS_InvReference FVS_Mortality_Metric FVS_PotFire_Cond_Metric
+   FVS_PotFire_Metric FVS_RD_Beetle_Metric FVS_RD_Det_Metric FVS_RD_Sum_Metric
+   FVS_Regen_HabType FVS_Regen_Ingrow_Metric FVS_Regen_SitePrep FVS_Regen_Sprouts_Metric
+   FVS_Regen_Tally_Metric FVS_SnagDet_Metric FVS_SnagSum_Metric FVS_Stats_Species_Metric
+   FVS_Stats_Stand FVS_StrClass_Metric FVS_Summary_Metric FVS_TreeList_Metric
 
 The run's identity is `FVS_Cases`. Its columns, from `dbsqlite/dbscase.f`, are:
 

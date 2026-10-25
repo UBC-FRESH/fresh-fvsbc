@@ -60,14 +60,14 @@ def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) ->
     return path
 
 
-def test_the_table_list_is_the_contracts_thirty_three() -> None:
-    """The database component creates the tables the contract names, and no others.
+def test_the_table_list_is_the_metric_builds_forty_four() -> None:
+    """The metric build creates the tables the contract names, and no others.
 
-    **It was thirty-two**, and the official case writes ``FVS_Summary_Metric``, which the list
-    lacked. The count is corrected here and on the contract page.
+    **The list was the base schema's**, 33 names, most of which a run here never writes. It is
+    derived from the schema's four layers now; ``notes/reference/table-names.md`` has the evidence.
     """
-    assert len(DATABASE_TABLES) == 33
-    assert len(set(DATABASE_TABLES)) == 33
+    assert len(DATABASE_TABLES) == 44
+    assert len(set(DATABASE_TABLES)) == 44
     assert all(name.startswith("FVS_") for name in DATABASE_TABLES)
     assert "FVS_Cases" in DATABASE_TABLES
     assert "FVS_Error" in DATABASE_TABLES
