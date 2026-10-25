@@ -24,9 +24,11 @@ import argparse
 import json
 import sys
 from collections.abc import Mapping, Sequence
+from functools import partial
 from pathlib import Path
 
 from fresh_fvsbc.keywords import (
+    LINES_KEYWORDS,
     Keyword,
     KeywordWidthError,
     UnknownKeywordError,
@@ -58,8 +60,13 @@ EXIT_FAILED_RUN: int = 1
 EXIT_BAD_INPUT: int = 2
 
 
-class CommandInputError(Exception):
-    """Input the command cannot use, which is refused before a run is attempted."""
+class CommandInputError(ValueError):
+    """Input the command cannot use, which is refused before a run is attempted.
+
+    It is raised while the entries are parsed, inside the command's own ``try``, so the message
+    reaches the caller rather than being replaced by ``argparse``'s generic one for a failed
+    ``type=``.
+    """
 
 
 #: What the run raises when the input is wrong: a keyword FVS does not hold, one it cannot
@@ -130,11 +137,24 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--keyword",
         action="append",
-        default=[],
+        dest="entries",
+        type=partial(_tagged, "keyword"),
         metavar="NAME[=FIELD,...]",
         help=(
             "one keyword, in the order given; the fields are FVS's own parameter fields, and "
             "a blank one is written as a gap, as in --keyword TIMEINT=,5"
+        ),
+    )
+    parser.add_argument(
+        "--block",
+        action="append",
+        dest="entries",
+        type=partial(_tagged, "block"),
+        metavar="NAME[=FIELD,...]|LINE|LINE",
+        help=(
+            "one keyword that takes a block of lines, in the order given; the fields come before "
+            "the first |, and each | starts a line, as in "
+            '--block "DATABASE|DSNOut|FVSOut.db|ComputDB"'
         ),
     )
     parser.add_argument(
@@ -145,6 +165,25 @@ def _parser() -> argparse.ArgumentParser:
         help=f"the keyword file's name inside DIR (default: {KEYWORD_FILE_NAME})",
     )
     return parser
+
+
+def _tagged(kind: str, text: str) -> tuple[str, str]:
+    """Tag an entry with the option that produced it, so the two options keep their order.
+
+    Parameters
+    ----------
+    kind : str
+        ``"keyword"`` or ``"block"``.
+    text : str
+        The raw argument.
+
+    Returns
+    -------
+    tuple of str
+        The kind and the text, parsed later, because ``argparse`` replaces a ``type=`` callable's
+        message with a generic one and the message is the useful part.
+    """
+    return kind, text
 
 
 def _parse_keyword(text: str) -> Keyword:
@@ -172,6 +211,34 @@ def _parse_keyword(text: str) -> Keyword:
     if not separator:
         return Keyword(name)
     return Keyword(name, tuple(fields.split(",")))
+
+
+def _parse_block(text: str) -> Keyword:
+    """Parse one ``--block`` argument.
+
+    Parameters
+    ----------
+    text : str
+        The argument, as ``NAME|LINE|LINE`` or ``NAME=FIELD,...|LINE|LINE``.
+
+    Returns
+    -------
+    Keyword
+        The keyword, its fields, and its lines.
+
+    Raises
+    ------
+    CommandInputError
+        If the argument names no keyword, or names one that takes no block of lines.
+    """
+    head, *lines = text.split("|")
+    keyword = _parse_keyword(head)
+    if keyword.name not in LINES_KEYWORDS:
+        raise CommandInputError(
+            f"--block names {keyword.name!r}, which does not take a block of lines; "
+            f"use --keyword for it, and --block for {', '.join(sorted(LINES_KEYWORDS))}"
+        )
+    return Keyword(keyword.name, keyword.parameters, tuple(lines))
 
 
 def _read_population(path: Path) -> list[Mapping[str, object]]:
@@ -247,7 +314,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     """
     args = _parser().parse_args(argv)
     try:
-        keywords = tuple(_parse_keyword(text) for text in args.keyword)
+        keywords = tuple(
+            _parse_block(text) if kind == "block" else _parse_keyword(text)
+            for kind, text in (args.entries or ())
+        )
         population = _read_population(args.population)
         result = run_population(
             population,

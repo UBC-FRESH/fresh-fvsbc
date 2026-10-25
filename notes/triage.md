@@ -29,6 +29,13 @@ says which review changed it.
 | 11 | The reader exposes four of the database's 33 tables | **accepted** | Testing a table, then exposing it | Output contract rule 3 keeps an untested table out of the public API. `FVS_Compute` and `FVS_Summary_Metric` were added in `P9` once a `DATABASE` block could ask for them; **the other 29 need their own tests**. Reopened by a caller who needs one of them |
 | 12 | The `nemora` adapter requires `species` and `tree_age` from the caller | **accepted** | A species-assignment capability | `nemora` emits neither, and assigning a species is a modelling question with a research burden. The adapter fails rather than defaulting, which is the honest behaviour. **Reopened by a caller who asks for species assignment**, not by one who has populations without species: every `nemora` population has none, so that condition would fire on the normal case and would make the row unowned |
 
+## Closed in `P11`
+
+- **The command could not write a keyword block.** `--keyword NAME=FIELD,...` sets fields and a block
+  needs lines, so `0.3.0` shipped with no way to ask for a `DATABASE` block and the tables it exposes
+  were unreachable from the shell. Found by `P10`'s clean-checkout verification, not by a test. `P11.1`
+  adds `--block`, and the test that would have caught it.
+
 ## What this does not do
 
 - **It fixes nothing.** `P6.2` is the one fix this phase takes.

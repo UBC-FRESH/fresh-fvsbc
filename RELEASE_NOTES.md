@@ -1,10 +1,20 @@
-# fresh-fvsbc 0.3.0
+# fresh-fvsbc 0.3.1
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.3.0
+
+- **The command can write a keyword block.** `--block NAME=FIELDS|LINE|LINE` writes the fields before the
+  first `|` and one line per `|`, so a shell user can ask for the tables `0.3.0` exposes:
+  `--block "DATABASE|DSNOut|FVSOut.db|Summary|ComputDB"`. `--keyword` and `--block` keep their relative
+  order, because a `DATABASE` block must precede the stand.
+- **`0.3.0` could not do this**, and nothing tested it: `--keyword NAME=FIELD,...` sets fields, a block
+  needs lines, so `--keyword DATABASE=DSNOut,...` rendered an empty block and the tables were never
+  written. `P10`'s clean-checkout verification found it; the test that would have caught it is now in.
 
 ## What changed since 0.2.0
 
