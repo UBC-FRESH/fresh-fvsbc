@@ -257,10 +257,32 @@ def test_a_database_block_first_is_accepted() -> None:
     assert rendered.startswith("DATABASE\nDSNOut\nFVSOut.db\nSummary\nEND\nSTDIDENT")
 
 
-def test_a_nested_block_is_refused_by_name() -> None:
-    """``IF`` holds keywords rather than lines, and this model has no room for that."""
-    with pytest.raises(UnsupportedKeywordError, match="block of keywords ended by ENDIF"):
-        validate_keyword(Keyword("IF", lines=("MOD(AGE,60) EQ 0",)))
+def test_a_conditional_renders_its_condition_then_body_then_endif() -> None:
+    """``IF`` takes a condition, ``THEN``, the keywords and ``ENDIF``, as the official case does."""
+    rendered = render_keyword(
+        Keyword("IF", (), ("MOD(AGE,60) EQ 0",), (Keyword("THINBBA", ("0", "0.0")),))
+    )
+    assert rendered == "IF\nMOD(AGE,60) EQ 0\nTHEN\nTHINBBA   0         0.0\nENDIF\n"
+
+
+def test_a_conditional_renders_its_else_branch() -> None:
+    """An ``ELSE`` branch follows the body. No fixture in this repository uses one."""
+    rendered = render_keyword(
+        Keyword("IF", (), ("AGE GT 50",), (Keyword("ECHOSUM"),), (Keyword("NODEBUG"),))
+    )
+    assert rendered == "IF\nAGE GT 50\nTHEN\nECHOSUM\nELSE\nNODEBUG\nENDIF\n"
+
+
+def test_a_conditional_validates_its_body() -> None:
+    """An unknown keyword inside a conditional is refused like one outside it."""
+    with pytest.raises(UnknownKeywordError, match="is not a keyword"):
+        KeywordSet((Keyword("IF", (), ("AGE GT 50",), (Keyword("NOTAKEYWORD"),)),))
+
+
+def test_nested_keywords_on_a_keyword_that_takes_none_are_refused() -> None:
+    """A conditional body under a keyword that takes none would swallow the rest of the file."""
+    with pytest.raises(UnsupportedKeywordError, match="does not take nested keywords"):
+        validate_keyword(Keyword("ECHOSUM", nested=(Keyword("ECHOSUM"),)))
 
 
 def test_lines_on_a_keyword_that_takes_none_are_refused() -> None:

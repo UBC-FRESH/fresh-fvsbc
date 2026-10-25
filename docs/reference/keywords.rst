@@ -68,9 +68,9 @@ Some keywords are the exception, because they read records of their own rather t
   rest of the file. **A ``DATABASE`` block must precede the stand setup**: FVS refuses it later with
   ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it first. The
   validator refuses a set that puts it after ``STDIDENT``, ``STDINFO`` or ``STANDSQL``.
-- ``IF`` takes a block of **keywords** rather than lines, ended by ``ENDIF``, with ``THEN``, ``ELSE``
-  and ``ALSOTRY`` in between. That is a nested structure the keyword model does not have, so the
-  validator refuses it by name rather than writing a file FVS would read to the end.
+- ``IF`` takes a block of **keywords** rather than lines: the condition record, ``THEN``, the body, and
+  ``ENDIF``, with an optional ``ELSE`` branch. The official case's form is the one the run test checks.
+  **``ALSOTRY`` is not modelled**, because no fixture here uses it.
 
 ``STOP`` is a keyword that the table does not hold. ``base/keyrdr.f`` compares each record's first
 eight characters with ``STOP`` before it consults the table, and a match ends the file with code 3, so
