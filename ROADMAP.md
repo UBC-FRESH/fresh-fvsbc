@@ -35,6 +35,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P24 The sweep over the remaining tables | #111 | `feature/p24-sweep` | complete |
 | P25 The notes describe the next release | #115 | `feature/p25-notes-for-the-next-release` | complete |
 | P26 The damage-agent blocks | #119 | `feature/p26-dm-rd` | complete |
+| P27 The cheap tables | #123 | `feature/p27-the-cheap-five` | active |
 
 ## Lifecycle Map
 
@@ -732,6 +733,28 @@ Acceptance criteria:
 - A run with a `MISTOE` block is accepted, and the report echoes its sub-keyword.
 - The reachability note says what was tried, what FVS said, and what would close the gap.
 - `notes/reference/table-candidates.md` covers all 25 candidates with an estimate each.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 27: The cheap tables
+
+Parent issue: #123
+Branch: `feature/p27-the-cheap-five`
+Status: active
+
+Goal: take the five tables the candidate note called cheapest, close the per-tree hole, and record the two
+that resist.
+
+- [ ] P27.1 The four tables, and the two that resisted (#124)
+  - [ ] Expose `FVS_TreeList_Metric`, `FVS_CutList_Metric`, `FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric`.
+  - [ ] A run with `TREELIDB`, `CUTLIDB`, `DWDCVDB`, `INVSTATS` and the matching requests writes all four.
+  - [ ] Record why `FVS_Mortality_Metric` and `FVS_Stats_Stand` did not appear.
+  - [ ] Update the contract pages, the reachability note and the candidate note.
+
+Acceptance criteria:
+
+- A run writes all four tables, and the reader exposes eighteen.
+- The per-tree test asserts the identity columns and the `CCum`/`CCuM` difference.
+- The two that resisted are recorded with what would close them.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

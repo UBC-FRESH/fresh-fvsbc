@@ -63,6 +63,10 @@ def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) ->
         connection.execute("create table FVS_Carbon_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_Hrv_Carbon (CaseID text, Year integer)")
         connection.execute("create table FVS_Consumption_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_CutList_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_Down_Wood_Cov_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_Stats_Species_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_TreeList_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagDet_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagSum_Metric (CaseID text, Year integer)")
         connection.commit()
@@ -109,6 +113,8 @@ def test_only_the_tested_tables_are_exposed() -> None:
         "FVS_Cases",
         "FVS_Compute",
         "FVS_Consumption_Metric",
+        "FVS_CutList_Metric",
+        "FVS_Down_Wood_Cov_Metric",
         "FVS_Down_Wood_Vol_Metric",
         "FVS_Error",
         "FVS_Fuels_Metric",
@@ -118,7 +124,9 @@ def test_only_the_tested_tables_are_exposed() -> None:
         "FVS_PotFire_Metric",
         "FVS_SnagDet_Metric",
         "FVS_SnagSum_Metric",
+        "FVS_Stats_Species_Metric",
         "FVS_Summary_Metric",
+        "FVS_TreeList_Metric",
     )
     assert set(EXPOSED_TABLES) <= set(DATABASE_TABLES)
 

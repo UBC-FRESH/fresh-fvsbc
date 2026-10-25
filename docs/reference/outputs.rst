@@ -86,15 +86,25 @@ Contract rules
    earlier revision returned records, because the project declared no dependencies at all; that was a
    narrowing of this rule and it is withdrawn.
 3. `fresh-fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
-   the database holds it. **Fourteen are exposed**: `FVS_Carbon_Metric`, `FVS_Cases`, `FVS_Compute`,
-   `FVS_Consumption_Metric`, `FVS_Down_Wood_Vol_Metric`, `FVS_Error`, `FVS_Fuels_Metric`,
-   `FVS_Hrv_Carbon`, `FVS_InvReference`, `FVS_PotFire_Cond_Metric`, `FVS_PotFire_Metric`,
-   `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric` and `FVS_Summary_Metric`. Most are written only when a
-   `DATABASE` block asks for them, and the block must come before the stand setup — see
-   :doc:`keywords`. The fuels, potfire and carbon tables additionally need an `FMIN` block, and the
-   consumption table needs a fire event: `SIMFIRE` schedules one, and without it the consumption writer
-   is never reached. The row counts of the four the official dump carries are checked against it in
+   the database holds it. **Eighteen are exposed**: `FVS_Carbon_Metric`, `FVS_Cases`, `FVS_Compute`,
+   `FVS_Consumption_Metric`, `FVS_CutList_Metric`, `FVS_Down_Wood_Cov_Metric`,
+   `FVS_Down_Wood_Vol_Metric`, `FVS_Error`, `FVS_Fuels_Metric`, `FVS_Hrv_Carbon`, `FVS_InvReference`,
+   `FVS_PotFire_Cond_Metric`, `FVS_PotFire_Metric`, `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`,
+   `FVS_Stats_Species_Metric`, `FVS_Summary_Metric` and `FVS_TreeList_Metric`. Most are written only
+   when a `DATABASE` block asks for them, and the block must come before the stand setup — see
+   :doc:`keywords`. Several need a second trigger: the fuels, potfire and carbon tables an `FMIN`
+   block, consumption a fire event (`SIMFIRE` schedules one), and the per-tree tables a `TREELIST` or
+   `CUTLIST` request. The row counts of the four the official dump carries are checked against it in
    `tests/test_oracle.py`.
+
+   **`FVS_TreeList_Metric` and `FVS_CutList_Metric` are the per-tree tables**, one row per tree per
+   period, with the FVS, PLANTS and FIA species codes so a result can be joined to anything else.
+   **FVS spells one column differently in the two**: `CCum` in the tree list and `CCuM` in the cut
+   list. That is FVS's schema, and a caller joining on the name has to know it.
+
+   **The cut list is empty unless something is cut.** The option and the request are not enough: a
+   thinning whose residual is above the stand's basal area is cancelled by FVS, and a cancelled
+   removal writes no rows.
 
    **A carbon table can carry NULLs.** `FVS_Carbon_Metric`'s `Total_Stand_Carbon` is NULL in a period
    where one of its components is undefined, and the reader returns it as `NaN` rather than inventing a
