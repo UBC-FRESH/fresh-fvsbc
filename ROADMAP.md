@@ -30,7 +30,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P19 Release 0.6.0 | #90 | `feature/p19-release-0-6-0` | complete |
 | P20 The carbon tables | #95 | `feature/p20-carbon` | complete |
 | P21 Release 0.7.0 | #99 | `feature/p21-release-0-7-0` | complete |
-| P22 The consumption table | #103 | `feature/p22-consumption` | active |
+| P22 The consumption table | #103 | `feature/p22-consumption` | complete |
 
 ## Lifecycle Map
 
@@ -628,16 +628,16 @@ Acceptance criteria:
 
 Parent issue: #103
 Branch: `feature/p22-consumption`
-Status: active
+Status: complete
 
 Goal: expose the consumption table, which needs a fire event rather than an option — and record why the
 burn report beside it cannot be exposed at all.
 
-- [ ] P22.1 Write `SIMFIRE` and expose the consumption table (#104)
-  - [ ] Expose `FVS_Consumption_Metric`.
-  - [ ] A run with `SIMFIRE` and the fuel options writes one row with non-zero consumption.
-  - [ ] Record why the burn report cannot be exposed.
-  - [ ] Correct the contract pages, the reachability record, and the triage.
+- [x] P22.1 Write `SIMFIRE` and expose the consumption table (#104)
+  - [x] Expose `FVS_Consumption_Metric`.
+  - [x] A run with `SIMFIRE` and the fuel options writes one row with non-zero consumption.
+  - [x] Record why the burn report cannot be exposed.
+  - [x] Correct the contract pages, the reachability record, and the triage.
 
 Acceptance criteria:
 
