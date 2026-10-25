@@ -24,9 +24,9 @@ The spike for `P6.2`, run on 2026-10-25 in the build environment:
 | Two runs of the **same** case in one process | identical, 0 differing cells |
 | The official case after a synthetic one, one process | **104 differing rows** |
 | The official case alone, or in a child process | 0 |
-| A subprocess per run, synthetic case | 0.50 s against 0.12 s in-process, a constant **+0.38 s** |
+| A subprocess per run, synthetic case | 0.44 to 0.50 s against 0.02 to 0.12 s in-process. **The overhead is a constant of about 0.4 s**, and the ratio is meaningless for a case that takes hundredths of a second |
 | A subprocess per run, official case | 1.03 s child drive against 0.86 s in-process, about **+19 percent** |
-| Tests a guard would break at the time of measurement | none, one real drive per process. **The test this change adds would break it**, because it runs two projections in one process on purpose |
+| Tests a guard would break at the time of measurement | none, one real drive per process. **`tests/test_oracle.py::test_a_run_after_another_case_is_not_contaminated` would break it**, because it runs two projections in one process on purpose |
 
 **The bug is not "any second run".** It is a run inheriting a *different* case's state. That is worse
 than a second-run rule would suggest, because a guard cannot tell the two apart.
