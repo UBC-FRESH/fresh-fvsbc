@@ -1,10 +1,23 @@
-# fresh-fvsbc 0.8.0
+# fresh-fvsbc 0.9.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.8.0
+
+- **The table gap is corrected, and the correction is the sweep's.** `notes/reference/table-reachability.md`
+  now classifies all 44 tables mechanically: **fourteen exposed, 25 with a writer and a call site, five
+  with a writer that nothing calls, none without a writer.** The five this build cannot write are
+  `FVS_EconHarvestValue_Metric`, `FVS_EconSummary_Metric`, `FVS_FIAVBC_Summary`, `FVS_Regen_HabType` and
+  `FVS_Regen_Ingrow_Metric`.
+- **An earlier note was wrong.** `0.8.0`'s gap list said the dwarf-mistletoe and root-disease writers do
+  not exist in this source. They do — `DBSMIS1`, called from `misprt.f`, and `DBSRD1`, called from
+  `rdpr.f` — and the grep that "proved" otherwise searched for symbol names that are not in the source.
+  **The published `0.8.0` release body keeps the original text**, because a release body is immutable;
+  this file is the working copy for `0.9.0` and says what is true now.
 
 ## What changed since 0.7.0
 
