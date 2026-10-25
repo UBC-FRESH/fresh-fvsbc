@@ -33,6 +33,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r docs/requirements.txt
+          # autodoc imports the package, which imports pandas, its one runtime dependency. Without
+          # this the build fails with four autodoc warnings and Pages has been stale since P3.4
+          # added the API pages. The dashboard's docs gate never caught it because that job installs
+          # requirements-dev.txt, which pulls pandas in as a dev requirement.
+          python -m pip install "pandas>=2.0"
 
       - name: Build documentation
         run: sphinx-build -b html docs _build/html -W
