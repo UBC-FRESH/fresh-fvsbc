@@ -14,6 +14,10 @@ When
 workflow's model log already assumes, and a quarter is long enough for a backlog to change and short
 enough that a gap does not go unnoticed.
 
+**The first review was the seed rather than a scheduled one**: it was held on 2026-10-25, at the end
+of `P6.3` (#40), when the cadence was set, and it is off the schedule by design. The schedule starts
+with the January 2027 row below.
+
 A review that was not held is visible in the table below, because the row for its date has no review
 against it. That is the whole reason the table is here: "quarterly" on its own is a sentence, not a
 commitment.
