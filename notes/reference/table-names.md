@@ -41,3 +41,21 @@ The metric schema also creates tables through a dynamic `CREATE TABLE ' // TRIM`
 (`FVS_CalibStats`, `FVS_TreeList_Metric`, the `FVS_Regen_*` family) do not appear in either grep. A list
 written from a partial read would replace one wrong list with another, so the correction is its own task
 with the schema read in full.
+
+## Corrected in `P12.2`
+
+The list is now derived from the schema's **four layers**, with the most specific module winning:
+`dbsqlite/`, then `vdbsqlite/`, then `metric/dbsqlite/`, then `metric/vdbsqlite/`. That resolves the
+dynamic statements too, because `TBLNAME` is read from the same files, and it excludes the three
+`_East_` tables, which belong to the eastern variants rather than BC.
+
+**The result is 44 tables**, and the check is the official case's own database: it writes seven, and all
+seven are in the list.
+
+```text
+FVS_Cases  FVS_Compute  FVS_Down_Wood_Vol_Metric  FVS_InvReference
+FVS_SnagDet_Metric  FVS_SnagSum_Metric  FVS_Summary_Metric
+```
+
+**What was wrong**: the old list was the base `dbsqlite/`'s, so twenty-four of its names were tables this
+variant never writes, and it lacked five that it does.
