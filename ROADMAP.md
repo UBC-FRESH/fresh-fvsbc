@@ -26,6 +26,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P15 The conditional | #75 | `feature/p15-if-blocks` | complete |
 | P16 Release 0.5.0 | #79 | `feature/p16-release-0-5-0` | complete |
 | P17 The fuels and potfire tables | #82 | `feature/p17-extension-tables` | complete |
+| P18 What the remaining tables need | #86 | `feature/p18-table-reachability` | active |
 
 ## Lifecycle Map
 
@@ -535,6 +536,26 @@ Acceptance criteria:
 
 - `FMIN` renders as a line block, and a run with it writes the three tables.
 - The reader exposes eleven tables, and the three are non-empty with their identity column.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 18: What the remaining tables need
+
+Parent issue: #86
+Branch: `feature/p18-table-reachability`
+Status: active
+
+Goal: record which of the 44 tables a run here can write, and why the rest cannot.
+
+- [ ] P18.1 Record which tables a run can write (#87)
+  - [ ] The four reachable with an option, and which option.
+  - [ ] Carbon: the writer's single call site, the accepted option, and the file `CALBSTAT` writes to.
+  - [ ] Dwarf mistletoe and root disease: the absence of a writer.
+  - [ ] The triage entry.
+
+Acceptance criteria:
+
+- Each verdict names the evidence: a call site, an option the run's report echoes, or the absence of a writer.
+- The triage says the gap is a mixture rather than 36 recipes.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
