@@ -29,6 +29,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P18 What the remaining tables need | #86 | `feature/p18-table-reachability` | complete |
 | P19 Release 0.6.0 | #90 | `feature/p19-release-0-6-0` | complete |
 | P20 The carbon tables | #95 | `feature/p20-carbon` | complete |
+| P21 Release 0.7.0 | #99 | `feature/p21-release-0-7-0` | active |
 
 ## Lifecycle Map
 
@@ -599,6 +600,27 @@ Acceptance criteria:
 
 - A run with `CARBREPT` in an `FMIN` block writes both carbon tables, with a non-zero total in the first period.
 - The reader exposes thirteen tables, and the NULL that FVS writes is documented rather than hidden.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 21: Release 0.7.0
+
+Parent issue: #99
+Branch: `feature/p21-release-0-7-0`
+Status: active
+
+Goal: release `0.7.0`, because `main` carries the two carbon tables and the trigger that reaches them.
+
+- [ ] P21.1 Version and notes for 0.7.0 (#100)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.6.0".
+  - [ ] Replace the table gap with thirteen exposed.
+  - [ ] Add the carbon run to what is verified.
+
+Acceptance criteria:
+
+- The package reports `0.7.0`, and the notes say what changed and what remains.
+- A clean checkout installs it and reads a carbon table with a non-zero total.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

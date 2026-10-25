@@ -1,10 +1,22 @@
-# fresh-fvsbc 0.6.0
+# fresh-fvsbc 0.7.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.6.0
+
+- **Two carbon tables are readable.** `FVS_Carbon_Metric` and `FVS_Hrv_Carbon` join the eleven, so the
+  reader exposes **thirteen**.
+- **The trigger was an option, not a keyword.** `CARBREPT` inside an `FMIN` block is what sets `ICRPTB`
+  and lets `fmcrbout.f` reach `DBSFMCRPT`, the carbon writer's only call site. The `DATABASE` option
+  `CARBREDB` alone is accepted and writes nothing, which is why the previous release recorded carbon as
+  unreachable.
+- **A carbon total can be NULL.** `Total_Stand_Carbon` is NULL in a period where one of its components
+  is undefined, and the reader returns `NaN` rather than inventing a zero — a zero there is a value, and
+  a NULL is the absence of one.
 
 ## What changed since 0.5.0
 
@@ -63,7 +75,10 @@ recipe.
 - The build agrees with FVS's own oracle on the first official case: zero differing lines across 164
   rows. **The oracle is a 2022 fixture** (`FS2022.4`), and the comparison covers one of the two official
   cases.
-- Four exposed tables hold the dump's row counts, and a `DATABASE` block placed first makes them written.
+- The exposed tables the official dump carries hold its row counts, and a `DATABASE` block placed first
+  makes them written.
+- A run with `CARBREPT` writes both carbon tables, and the first period carries a non-zero total — 13.6
+  tonnes of carbon per hectare on the synthetic stand.
 - The command runs a case end to end and exits `0`; `1` and `2` are tested with a faked drive and in a
   subprocess, not by a real failing run.
 - The dashboard passes on Python 3.11 and 3.12 in CI.
@@ -74,10 +89,11 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes eleven of 44 tables, and the rest are not all reachable.** Four more take a
-   `DATABASE` option; carbon needs the fire-carbon report path, which no option reaches; dwarf mistletoe
-   and root disease have no writer in this source. `notes/reference/table-reachability.md` has the
-   evidence for each verdict.
+1. **The reader exposes thirteen of 44 tables, and the rest are not all reachable.** Six take a
+   `DATABASE` option, and the fuels, potfire and carbon ones additionally need an `FMIN` block; the burn
+   report and consumption tables need an actual fire event, which no option supplies; dwarf mistletoe and
+   root disease have no writer in this source. `notes/reference/table-reachability.md` has the evidence
+   for each verdict.
 2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
