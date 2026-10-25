@@ -86,13 +86,18 @@ Contract rules
    earlier revision returned records, because the project declared no dependencies at all; that was a
    narrowing of this rule and it is withdrawn.
 3. `fresh-fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
-   the database holds it. **Eleven are exposed**: `FVS_Cases`, `FVS_Compute`,
-   `FVS_Down_Wood_Vol_Metric`, `FVS_Error`, `FVS_Fuels_Metric`, `FVS_InvReference`,
+   the database holds it. **Thirteen are exposed**: `FVS_Carbon_Metric`, `FVS_Cases`, `FVS_Compute`,
+   `FVS_Down_Wood_Vol_Metric`, `FVS_Error`, `FVS_Fuels_Metric`, `FVS_Hrv_Carbon`, `FVS_InvReference`,
    `FVS_PotFire_Cond_Metric`, `FVS_PotFire_Metric`, `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric` and
    `FVS_Summary_Metric`. Most are written only when a `DATABASE` block asks for them, and the block must
-   come before the stand setup — see :doc:`keywords`. The row counts of the four the official dump
-   carries are
-   checked against it in `tests/test_oracle.py`.
+   come before the stand setup — see :doc:`keywords`. The fuels, potfire and carbon tables additionally
+   need an `FMIN` block. The row counts of the four the official dump carries are checked against it in
+   `tests/test_oracle.py`.
+
+   **A carbon table can carry NULLs.** `FVS_Carbon_Metric`'s `Total_Stand_Carbon` is NULL in a period
+   where one of its components is undefined, and the reader returns it as `NaN` rather than inventing a
+   zero. A caller summing that column has to decide what a missing component means, and the reader does
+   not decide for them.
 4. Every parsed table carries its `CaseID`, so a table can be joined back to `FVS_Cases`.
 5. `FVS_Error` is read on every run, and it holds **warnings as well as errors**: a run whose site data is
    outside the model's range writes an `FVS03 WARNING` row, which is not a failure. So a run is reported as

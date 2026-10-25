@@ -1,23 +1,54 @@
 # Which of the 44 tables a run here can actually write
 
-Found while trying to expose more tables (`P17`, `P18`). **Eleven are exposed; the rest are not all
-reachable, and the reason differs by table.** This note records what was checked rather than guessed.
+Found while trying to expose more tables (`P17`, `P18`, `P20`). **Thirteen are exposed; the rest are not
+all reachable, and the reason differs by table.** This note records what was checked rather than
+guessed.
 
-## The four that are reachable with an option
+## The tables an option reaches
 
 `FVS_Fuels_Metric`, `FVS_PotFire_Metric` and `FVS_PotFire_Cond_Metric` need an **`FMIN` block** with
 `FUELOUT`, `FUELREPT` and `POTFIRE` — they are options inside it, not keywords — and a `DATABASE` block
-asking for `FuelsOut`, `FuelReDB` and `PotfirDB`. `FVS_Down_Wood_Vol_Metric` and the two snag tables take
-the `DATABASE` options the official case already uses.
+asking for `FuelsOut`, `FuelReDB` and `PotfirDB`. `FVS_Carbon_Metric` and `FVS_Hrv_Carbon` need
+`CARBREPT` in the same block and `CARBREDB` in the `DATABASE` block. `FVS_Down_Wood_Vol_Metric` and the
+two snag tables take the `DATABASE` options the official case already uses.
 
-## Carbon: the writer exists, and one option does not reach it
+## Carbon: reachable, but only through `CARBREPT`
 
 `FVS_Carbon_Metric` is created by `metric/dbsqlite/dbsfmcrpt.f`, and **`DBSFMCRPT` has one call site in
-the whole source**: `fmcrbout.f:212`, inside the fire-carbon report path. The `DATABASE` option
-`CARBREDB` is accepted — the run's own report says `CARBREDB   CARBON REPORTS SENT TO SPECIFIED
-DATABASE.` — and **no table appears**. `CALBSTAT` is accepted too, and writes its statistics to **unit
-13**, a file, not the database. So carbon needs the fire-carbon report path, not an option alone, and it
-was not found in the time this note took.
+the whole source**: `fmcrbout.f:212`. That routine returns early on `IF (ICRPTB .EQ. 0) GOTO 900`, and
+`ICRPTB` is set by the `FMIN` option **`CARBREPT`**. The `DATABASE` option `CARBREDB` alone is accepted
+— the run's own report says `CARBREDB   CARBON REPORTS SENT TO SPECIFIED DATABASE.` — and writes
+nothing, because the writer is never reached. `CALBSTAT` is a different thing entirely: it writes
+calibration statistics to **unit 13**, a file.
+
+So the recipe is two lines in two blocks, and no keyword at all:
+
+```text
+DATABASE
+DSNOut
+FVSOut.db
+Summary
+CARBREDB
+ComputDB
+END
+
+FMIN
+CARBREPT
+END
+```
+
+That run writes **`FVS_Carbon_Metric`** (14 columns, from live above- and below-ground carbon through
+down dead wood, forest floor and shrub/herb to the total and the carbon released by fire) and
+**`FVS_Hrv_Carbon`** (9 columns: products, landfill, energy, emissions, merchantable carbon stored and
+removed). Both are exposed.
+
+Two properties a caller should know:
+
+- `CARBREPT` alone is enough. `FUELOUT`, `FUELREPT` and `POTFIRE` are not needed for carbon.
+- **The total can be NULL.** A period whose components FVS leaves undefined carries NULL in
+  `Total_Stand_Carbon` and in `Standing_Dead`, and the reader returns `NaN` rather than inventing a
+  zero. The first period of a run carries a real total — 13.6 tonnes of carbon per hectare on the
+  synthetic stand — so a zero in that column is a value, and a NULL is the absence of one.
 
 ## Dwarf mistletoe and root disease: no writer at all
 
@@ -33,10 +64,10 @@ expose a table that is always empty.
 
 ## What that means for the gap
 
-The reader exposes eleven. Of the remaining 33:
+The reader exposes **thirteen**. Of the remaining 31:
 
 - some are reachable with a `DATABASE` option and a keyword the model already supports;
-- carbon needs the fire-carbon report path;
+- carbon is reachable through `CARBREPT`, and its two tables are now exposed;
 - dwarf mistletoe and root disease have no writer.
 
 **The gap is not "36 tables need a triggering case".** It is a mixture of three things, and the triage
