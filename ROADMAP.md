@@ -22,6 +22,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P11 The command's block form, and 0.3.1 | #58 | `feature/p11-block-form` | complete |
 | P12 The table names | #62 | `feature/p12-table-names` | complete |
 | P13 The tables the official case writes | #67 | `feature/p13-tables` | complete |
+| P14 Release 0.4.0 | #71 | `feature/p14-release-0-4-0` | active |
 
 ## Lifecycle Map
 
@@ -450,6 +451,26 @@ Acceptance criteria:
 
 - The reader exposes eight tables, and each of the four the dump carries holds the dump's row count.
 - `FVS_InvReference` is exposed, and its exposure says why the dump cannot check it.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 14: Release 0.4.0
+
+Parent issue: #71
+Branch: `feature/p14-release-0-4-0`
+Status: active
+
+Goal: release `0.4.0`, because `main` carries eight exposed tables instead of four and a table list that
+names what the build creates.
+
+- [ ] P14.1 Version and notes for 0.4.0 (#71)
+  - [ ] Bump the version in two files.
+  - [ ] Rewrite the notes.
+  - [ ] Narrow the table gap to the 36 the official case does not write.
+
+Acceptance criteria:
+
+- The package reports `0.4.0`, the notes say what changed and what remains, and a clean checkout installs it and reads two of the new tables.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
