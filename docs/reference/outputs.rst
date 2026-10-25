@@ -61,12 +61,13 @@ Contract rules
 --------------
 
 1. `fresh-fvsbc` asks for the database output by default. A run that cannot produce one is a reported failure,
-   not a silent fall back to text. Through PyFVS's step API — the route this project uses — the database holds
-   `FVS_Cases` and `FVS_Error`, and no more. The other tables need a `DATABASE` output block, PyFVS already
-   occupies that block, and PyFVS's own API exposes no way to ask for one. A standalone `FVSbc` can be
-   built from upstream `main` and does write the summary table, and it is **proven but not adopted**
-   (ADR 0008, ADR 0009). The summary is taken from `FVS.summary` in memory, and it is also written as a
-   fixed-width report beside the database.
+   not a silent fall back to text. **Which tables it holds is the keyword set's business**: a `DATABASE`
+   block names them, the model renders the block, and a table the block does not name is absent. An earlier
+   revision of this page said the database held `FVS_Cases` and `FVS_Error` and no more, because PyFVS's
+   step API occupied the block; that was wrong, and the run that reads eleven tables disproved it. A
+   standalone `FVSbc` can be built from upstream `main` and writes the summary table, and it is **proven but
+   not adopted** (ADR 0008, ADR 0009). The summary is also taken from `FVS.summary` in memory, and it is
+   written as a fixed-width report beside the database.
 
    The database's name is **a default, not a fixture**: ``dbsqlite/dbsblkd.f`` initialises ``DSNOUT``
    to ``"FVSOut.db"``, and a ``DATABASE`` block may replace it with a ``DSNOut`` option, which
@@ -108,17 +109,12 @@ Contract rules
 Not verified
 ------------
 
-- The column list of every table other than `FVS_Cases` and `FVS_Error`. Those two were read; neither of the
-  other thirty is exposed, so their columns are still unread.
-- **Answered by the first synthetic run.** BC populates only some of the tables: through PyFVS's
-  step API the database holds `FVS_Cases` and `FVS_Error`, and the official cases write a further set because
-  their keyword files ask for it. So the list above is what the component can create, not what a given run
-  writes.
-- **Answered the same way.** BC's `dbsqlite` **is** reached, and the database is written without wiring in the
-  BC variant. What cannot be reached through PyFVS is the request for a named table.
-- **Answered: `FVS_Compute` is not a general output table.** It holds the user's `COMPUTE` expressions, one
-  row per stand-period and one column per expression, and a keyword set that defines none produces no table
-  at all. This project defines none, so the table does not exist for its runs and is not in the reader's
-  surface. `FVS_TreeList_Metric` needs a `TREELIST` request, which the project does not make. See ADR 0009.
-
-All four are `P2.2` work, and the first three are answered by a single successful run.
+- The column list of the tables the reader does not expose. Eleven are read, and their columns are the
+  schema's; the other thirty-three are still unread.
+- Which of the 44 tables a given run writes. The list above is what the component can create, not what a
+  run produces: a `DATABASE` block names the tables, and a table it does not name is absent.
+- `FVS_Compute` holds the user's `COMPUTE` expressions, one row per stand-period and one column per
+  expression, and a keyword set that defines none produces no table at all.
+- **Whether the rest can be written at all.** `notes/reference/table-reachability.md` records what was
+  checked: four more tables take a `DATABASE` option, carbon's writer is reached only from the fire-carbon
+  report path, and the dwarf-mistletoe and root-disease writers do not exist in this source.

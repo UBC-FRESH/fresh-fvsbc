@@ -27,7 +27,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P16 Release 0.5.0 | #79 | `feature/p16-release-0-5-0` | complete |
 | P17 The fuels and potfire tables | #82 | `feature/p17-extension-tables` | complete |
 | P18 What the remaining tables need | #86 | `feature/p18-table-reachability` | complete |
-| P19 Release 0.6.0 | #90 | `feature/p19-release-0-6-0` | active |
+| P19 Release 0.6.0 | #90 | `feature/p19-release-0-6-0` | complete |
 
 ## Lifecycle Map
 
@@ -563,15 +563,15 @@ Acceptance criteria:
 
 Parent issue: #90
 Branch: `feature/p19-release-0-6-0`
-Status: active
+Status: complete
 
 Goal: release `0.6.0`, because `main` carries three more tables and a record of which of the rest can be
 written at all.
 
-- [ ] P19.1 Version and notes for 0.6.0 (#91)
-  - [ ] Bump the version in two files.
-  - [ ] Rewrite the notes.
-  - [ ] Replace the table gap with what the reachability record says.
+- [x] P19.1 Version and notes for 0.6.0 (#91)
+  - [x] Bump the version in two files.
+  - [x] Rewrite the notes.
+  - [x] Replace the table gap with what the reachability record says.
 
 Acceptance criteria:
 
