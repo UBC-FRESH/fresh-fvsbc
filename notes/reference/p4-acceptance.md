@@ -175,3 +175,8 @@ to the clone that job already makes. No tolerance was needed, and none was added
 a second run inherits the first one's Fortran state. Two runs in one process are therefore not
 independent, and the directory isolation `run.py` documents is not enough on its own. That is recorded
 here and is a candidate for a task of its own.
+
+**Corrected on 2026-10-25.** That task was `P6.2` (#39), and ADR 0010 fixed it: `run_case` now drives
+the projection in a child process, so two runs in one process are independent and a run is thread-safe.
+**The paragraph above describes the code as it stood during `P4`**, and it is kept as written because it
+is that phase's record.

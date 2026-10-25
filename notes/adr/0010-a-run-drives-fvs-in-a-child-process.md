@@ -25,8 +25,8 @@ The spike for `P6.2`, run on 2026-10-25 in the build environment:
 | The official case after a synthetic one, one process | **104 differing rows** |
 | The official case alone, or in a child process | 0 |
 | A subprocess per run, synthetic case | 0.50 s against 0.12 s in-process, a constant **+0.38 s** |
-| A subprocess per run, official case | 1.03 s drive, so **+37 percent** |
-| Tests a guard would break today | none, one real drive per process |
+| A subprocess per run, official case | 1.03 s child drive against 0.86 s in-process, about **+19 percent** |
+| Tests a guard would break at the time of measurement | none, one real drive per process. **The test this change adds would break it**, because it runs two projections in one process on purpose |
 
 **The bug is not "any second run".** It is a run inheriting a *different* case's state. That is worse
 than a second-run rule would suggest, because a guard cannot tell the two apart.
@@ -50,8 +50,11 @@ either simple option.
 
 - **Two runs in one process are independent, and a run is thread-safe**, because the parent shares
   nothing between them and never changes directory.
-- **Each run costs about 0.38 s more**, a constant: interpreter start and imports. On the official case
-  that is 37 percent, and on the synthetic case it is four times a small number.
+- **Each run costs about 0.4 s more**, a constant: interpreter start and imports. **The absolute figure
+  is the load-bearing one**, because the relative cost depends entirely on the case: about 19 percent on
+  the official case, and several times a synthetic case that takes hundredths of a second. A second
+  measurement of the same spike put the synthetic child at 0.44 s against 0.02 to 0.07 s in-process, so
+  any "N times" figure is a statement about the case rather than about the mechanism.
 - **The summary crosses the boundary as a file.** The child writes `summary.csv` from `FVS.summary`, and
   the parent reads it. The output contract's substance holds — the summary is still FVS's own frame
   rather than a re-derivation — and the file is inspectable.

@@ -377,9 +377,10 @@ def _drive(key_name: str, *, variant: str, directory: Path) -> _Drive:
     summary_path = directory / SUMMARY_FILE_NAME
     variants_path = directory / VARIANTS_FILE_NAME
     if not summary_path.is_file() or not variants_path.is_file():
+        detail = (finished.stderr or finished.stdout).strip()[-2000:]
         raise RunError(
             "the child process exited cleanly but wrote no "
-            f"{SUMMARY_FILE_NAME} or {VARIANTS_FILE_NAME}"
+            f"{SUMMARY_FILE_NAME} or {VARIANTS_FILE_NAME}: {detail}"
         )
     return _Drive(
         summary=pd.read_csv(summary_path),
@@ -411,8 +412,9 @@ class RunResult:
         The summary the run produced in memory, which the output contract names as the route to
         that table through this API.
     directory : Path
-        The run's directory, which holds the keyword file, the tree list, the database, the
-        reports, and the provenance record.
+        The run's directory, which holds the keyword file, the tree list, the database, the reports,
+        the provenance record, and the two files the child process wrote: ``summary.csv`` and
+        ``variants.json``.
     keyword_file : Path
         The keyword file written.
     database : Path
