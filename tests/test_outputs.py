@@ -69,6 +69,7 @@ def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) ->
         connection.execute("create table FVS_TreeList_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_ATRTList_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_StrClass_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_CanProfile (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagDet_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagSum_Metric (CaseID text, Year integer)")
         connection.commit()
@@ -112,6 +113,7 @@ def test_only_the_tested_tables_are_exposed() -> None:
     """Contract rule 3: a table the reader has not tested is not in the API."""
     assert EXPOSED_TABLES == (
         "FVS_ATRTList_Metric",
+        "FVS_CanProfile",
         "FVS_Carbon_Metric",
         "FVS_Cases",
         "FVS_Compute",

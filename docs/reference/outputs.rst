@@ -86,7 +86,8 @@ Contract rules
    earlier revision returned records, because the project declared no dependencies at all; that was a
    narrowing of this rule and it is withdrawn.
 3. `fresh-fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
-   the database holds it. **Twenty are exposed**: `FVS_ATRTList_Metric`, `FVS_Carbon_Metric`,
+   the database holds it. **Twenty-one are exposed**: `FVS_ATRTList_Metric`, `FVS_CanProfile`,
+   `FVS_Carbon_Metric`,
    `FVS_Cases`, `FVS_Compute`, `FVS_Consumption_Metric`, `FVS_CutList_Metric`,
    `FVS_Down_Wood_Cov_Metric`, `FVS_Down_Wood_Vol_Metric`, `FVS_Error`, `FVS_Fuels_Metric`,
    `FVS_Hrv_Carbon`, `FVS_InvReference`, `FVS_PotFire_Cond_Metric`, `FVS_PotFire_Metric`,

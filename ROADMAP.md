@@ -38,6 +38,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P27 The cheap tables | #123 | `feature/p27-the-cheap-five` | complete |
 | P28 StrClass and ATRTList | #127 | `feature/p28-strclass-atrtlist` | complete |
 | P29 Release 0.9.0 | #131 | `feature/p29-release-0-9-0` | complete |
+| P30 CanProfile and the fixture limits | #135 | `feature/p30-canprofile-fixture` | active |
 
 ## Lifecycle Map
 
@@ -798,6 +799,25 @@ Acceptance criteria:
 - The package reports `0.9.0`, and the notes say what changed and what remains.
 - A clean checkout installs it and reads a per-tree table and the structural stage.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 30: CanProfile and the fixture limits
+
+Parent issue: #135
+Branch: `feature/p30-canprofile-fixture`
+Status: active
+
+Goal: test the claim that the fixture is the binding constraint, and take whatever table does not need it.
+
+- [ ] P30.1 The canopy profile, and what the fixture cannot reach (#136)
+  - [ ] Expose `FVS_CanProfile`.
+  - [ ] Test the fixture claim: more plots, a bigger stand under a fire, and an infected stand.
+  - [ ] Record the three results with their evidence, and withdraw the claim they disprove.
+
+Acceptance criteria:
+
+- A run with `CANFPROF` writes the canopy profile, and the reader exposes twenty-one.
+- The fixture claim is tested, not repeated, and the note says what each experiment returned.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

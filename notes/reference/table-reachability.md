@@ -5,7 +5,7 @@ looked for across `tmp/pyfvs/fvs` excluding the build directory, the `SUBROUTINE
 mentions it is the writer, and the writer's call sites are counted with `grep -rl "CALL <name>"` in
 `bin/FVSbc_buildDir`.
 
-**Counts, after `P28`: 20 exposed, 19 with a writer and a call site, 5 with a writer and no call site, and 0 without a writer.**
+**Counts, after `P30`: 21 exposed, 18 with a writer and a call site, 5 with a writer and no call site, and 0 without a writer.**
 
 ## The correction this sweep forced
 
@@ -24,7 +24,7 @@ claim was the one that needed the most evidence.
 | `FVS_ATRTList_Metric` | `DBSATRTLS` | prtrls.f | exposed |
 | `FVS_BurnReport_Metric` | `DBSFMBURN` | fmfout.f | writer and call site |
 | `FVS_CalibStats` | `DBSCALIB` | dgdriv.f,regent.f | writer and call site |
-| `FVS_CanProfile` | `DBSFMCANPR` | fmpocr.f | writer and call site |
+| `FVS_CanProfile` | `DBSFMCANPR` | fmpocr.f | exposed |
 | `FVS_Carbon_Metric` | `DBSFMCRPT` | fmcrbout.f | exposed |
 | `FVS_Cases` | `DBSCASE` | dbs_fiavbc_atrtls.f,dbs_fiavbc_cutlst.f,dbs_fiavbc_trls.f,dbsatrtls.f,dbscalib.f,dbsclsum.f,dbscmpu.f,dbscuts.f,dbserror.f,dbsfmburn.f,dbsfmcanpr.f,dbsfmcrpt.f,dbsfmdsnag.f,dbsfmdwcov.f,dbsfmdwvol.f,dbsfmfuel.f,dbsfmhrpt.f,dbsfmmort.f,dbsfmpf.f,dbsfmpfc.f,dbsfmssnag.f,dbsfuels.f,dbsingrow.f,dbsmis.f,dbsplothab.f,dbsprssql.f,dbsrd.f,dbsreference.f,dbssiteprep.f,dbssprt.f,dbsstats.f,dbsstrclass.f,dbssumry.f,dbstally.f,dbstrls.f | exposed |
 | `FVS_Climate_Metric` | `DBSCLSUM` | clauestb.f | writer and call site |
@@ -105,9 +105,17 @@ Each of these was found by running, not by reading:
 | `FVS_Down_Wood_Cov_Metric` | `DWDCVDB` plus `DWDCVOUT` inside `FMIN` |
 | `FVS_StrClass_Metric` | `STRCLSDB` plus the `STRCLASS` request |
 | `FVS_ATRTList_Metric` | `ATRTLIDB` plus `ATRTLIST` **and a treatment that leaves trees** |
+| `FVS_CanProfile` | `CANFPROF` inside `FMIN` |
 | `FVS_BurnReport_Metric` | **none**: the gate needs an invalid input |
 | `FVS_DM_*_Metric` (4) | **not found**: `MISTOE` is a block and its sub-keywords are accepted, but the tables need an infection state |
 | `FVS_RD_*_Metric` (3) | **not found**: `RDIN` starts the block, and its required parameters were not determined |
+
+## What the fixture can and cannot express
+
+`notes/reference/fixture-limits.md` records three experiments that tested the claim that the fixture was the
+binding constraint. **Two of the three blockers are not the fixture**: `FVS_Stats_Stand` reports "one sample
+point" although the tree list carries five plot ids, and `FVS_Mortality_Metric` still does not appear with
+200 trees under a 100 percent burn. The dwarf-mistletoe rating is not read from the damage columns either.
 
 ## Two that resisted, and why
 

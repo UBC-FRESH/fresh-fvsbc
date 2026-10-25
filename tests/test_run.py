@@ -683,6 +683,41 @@ def test_a_treatment_writes_the_attribute_list_and_the_structural_stage(tmp_path
     assert {"TreeId", "SpeciesFVS", "SpeciesPLANTS"} <= set(attributes.columns)
 
 
+def test_canfprof_writes_the_canopy_profile(tmp_path: Path) -> None:
+    """``CANFPROF`` inside ``FMIN`` writes the canopy fuels profile, one row per height layer.
+
+    The table is the vertical structure a fuel or wildlife model wants: canopy fuel bulk density by
+    height, in metric and imperial columns. It needs no stand state beyond trees, so it is reachable
+    with the fixture as it stands.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "ComputDB")),
+        Keyword("STDIDENT", ("CANOPY profile",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("FMIN", (), ("CANFPROF",)),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    frame = read_table(result.database, "FVS_CanProfile")
+    assert not frame.empty
+    assert {"Height_m", "Canopy_Fuel_kg_m3", "Height_ft", "Canopy_Fuel_lbs_acre_ft"} <= set(
+        frame.columns
+    )
+
+
 def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     """An ``IF`` block is written as a conditional, and FVS's report shows it read the condition."""
     pytest.importorskip(
