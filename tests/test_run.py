@@ -26,7 +26,7 @@ from fresh_fvsbc.keywords import (
     keyword_set_hash,
 )
 from fresh_fvsbc.nemora import MissingAssignmentError, to_tree_list
-from fresh_fvsbc.outputs import MissingOutputError, RunFailedError
+from fresh_fvsbc.outputs import MissingOutputError, RunFailedError, read_table
 from fresh_fvsbc.provenance import Provenance
 from fresh_fvsbc.treelist import BC_TREFMT, TreeListFields, write_tree_record
 from nemora_fixtures import synthetic_population
@@ -410,6 +410,43 @@ def test_run_population_refuses_a_population_without_species(tmp_path: Path) -> 
     """The adapter's refusal is the run's refusal, because the run does not add a default."""
     with pytest.raises(MissingAssignmentError, match="needs a species"):
         run.run_population(synthetic_population(), tree_age=60.0, directory=tmp_path / "run")
+
+
+def test_a_database_block_first_writes_the_tables_it_asks_for(tmp_path: Path) -> None:
+    """A ``DATABASE`` block placed first makes ``FVS_Compute`` and the summary readable.
+
+    ``P3.2`` concluded the tables were unreachable because PyFVS occupies the block. **It was the
+    block's position**: after the stand, FVS refuses it with ``KEYWORD ENTERED IS USED IN WRONG
+    CONTEXT``; first, it is accepted.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "ComputDB")),
+        Keyword("STDIDENT", ("DBTEST   tables",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("COMPUTE", ("0",), ("BigVol = spmcdbh(3,0,0, 20.0, 999.0, 0,999,0)",)),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    compute = read_table(result.database, "FVS_Compute")
+    summary = read_table(result.database, "FVS_Summary_Metric")
+    assert not compute.empty
+    # FVS uppercases the expression's name in the table.
+    assert "BIGVOL" in list(compute.columns)
+    assert not summary.empty
+    assert "Tph" in list(summary.columns)
 
 
 def test_a_compute_block_reaches_fvs(tmp_path: Path) -> None:

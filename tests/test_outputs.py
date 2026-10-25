@@ -51,17 +51,23 @@ def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) ->
             connection.execute(
                 "insert into FVS_Error values (?, ?, ?)", ("case-0", "SYNTHETIC", message)
             )
-        connection.execute("create table FVS_Compute (CaseID text, Year integer)")
+        connection.execute("create table FVS_Compute (CaseID text, Year integer, BigVol real)")
+        connection.execute("create table FVS_Summary_Metric (CaseID text, Year integer, Tpa real)")
+        connection.execute("create table FVS_Down_Wood_Vol_Metric (CaseID text, Year integer)")
         connection.commit()
     finally:
         connection.close()
     return path
 
 
-def test_the_table_list_is_the_contracts_thirty_two() -> None:
-    """The database component creates the tables the contract names, and no others."""
-    assert len(DATABASE_TABLES) == 32
-    assert len(set(DATABASE_TABLES)) == 32
+def test_the_table_list_is_the_contracts_thirty_three() -> None:
+    """The database component creates the tables the contract names, and no others.
+
+    **It was thirty-two**, and the official case writes ``FVS_Summary_Metric``, which the list
+    lacked. The count is corrected here and on the contract page.
+    """
+    assert len(DATABASE_TABLES) == 33
+    assert len(set(DATABASE_TABLES)) == 33
     assert all(name.startswith("FVS_") for name in DATABASE_TABLES)
     assert "FVS_Cases" in DATABASE_TABLES
     assert "FVS_Error" in DATABASE_TABLES
@@ -87,7 +93,7 @@ def test_the_cases_columns_are_the_contracts_twelve() -> None:
 
 def test_only_the_tested_tables_are_exposed() -> None:
     """Contract rule 3: a table the reader has not tested is not in the API."""
-    assert EXPOSED_TABLES == ("FVS_Cases", "FVS_Error")
+    assert EXPOSED_TABLES == ("FVS_Cases", "FVS_Compute", "FVS_Error", "FVS_Summary_Metric")
     assert set(EXPOSED_TABLES) <= set(DATABASE_TABLES)
 
 
@@ -113,7 +119,7 @@ def test_an_unexposed_table_is_refused_even_though_the_database_holds_it(tmp_pat
     """Rule 3 is about what the reader exposes, not about what is present."""
     path = a_database(tmp_path / "out.db")
     with pytest.raises(UnknownTableError, match="is not exposed"):
-        read_table(path, "FVS_Compute")
+        read_table(path, "FVS_Down_Wood_Vol_Metric")
 
 
 def test_a_table_the_database_lacks_is_refused(tmp_path: Path) -> None:

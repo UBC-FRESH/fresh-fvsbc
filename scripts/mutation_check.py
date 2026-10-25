@@ -121,9 +121,9 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         identifier="outputs-renames-the-columns",
         module="src/fresh_fvsbc/outputs.py",
-        find="        return pd.DataFrame.from_records([dict(row) for row in cursor])",
+        find="        frame = pd.DataFrame.from_records([dict(row) for row in cursor])",
         replace=(
-            "        return pd.DataFrame.from_records("
+            "        frame = pd.DataFrame.from_records("
             "[{k.lower(): v for k, v in dict(row).items()} for row in cursor])"
         ),
         test="tests/test_outputs.py::test_the_columns_are_the_databases_own_names",
@@ -155,6 +155,13 @@ MUTATIONS: tuple[Mutation, ...] = (
         find='    for candidate in (name.upper(), f"x{name}", f"x{name.upper()}"):',
         replace="    for candidate in ():",
         test="tests/test_keywords.py::test_the_intended_spelling_is_refused_and_points_at_the_table",
+    ),
+    Mutation(
+        identifier="keywords-accepts-a-late-database-block",
+        module="src/fresh_fvsbc/keywords.py",
+        find='        if keyword.name == "DATABASE" and seen_stand:',
+        replace="        if False:",
+        test="tests/test_keywords.py::test_a_database_block_must_precede_the_stand",
     ),
     Mutation(
         identifier="keywords-drops-the-block-terminator",

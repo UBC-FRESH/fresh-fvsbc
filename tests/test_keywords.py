@@ -18,6 +18,7 @@ from fresh_fvsbc.keywords import (
     RECORD_KEYWORDS,
     SPECIAL_KEYWORDS,
     Keyword,
+    KeywordOrderError,
     KeywordSet,
     KeywordWidthError,
     UnknownKeywordError,
@@ -240,6 +241,20 @@ def test_the_three_line_blocks_are_accepted() -> None:
     """``COMMENT``, ``COMPUTE`` and ``DATABASE`` take lines, and each is a keyword FVS reads."""
     for name in ("COMMENT", "COMPUTE", "DATABASE"):
         assert validate_keyword(Keyword(name, lines=("x",))) == []
+
+
+def test_a_database_block_must_precede_the_stand() -> None:
+    """FVS refuses a ``DATABASE`` block after the stand, so the set is refused before it runs."""
+    with pytest.raises(KeywordOrderError, match="must precede the stand setup"):
+        KeywordSet((Keyword("STDIDENT", ("x",)), Keyword("DATABASE", (), ("Summary",))))
+
+
+def test_a_database_block_first_is_accepted() -> None:
+    """The official case puts the block first, and so must a caller."""
+    rendered = KeywordSet(
+        (Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary")), Keyword("STDIDENT", ("x",)))
+    ).render()
+    assert rendered.startswith("DATABASE\nDSNOut\nFVSOut.db\nSummary\nEND\nSTDIDENT")
 
 
 def test_a_nested_block_is_refused_by_name() -> None:
