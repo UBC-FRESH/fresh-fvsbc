@@ -31,7 +31,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P20 The carbon tables | #95 | `feature/p20-carbon` | complete |
 | P21 Release 0.7.0 | #99 | `feature/p21-release-0-7-0` | complete |
 | P22 The consumption table | #103 | `feature/p22-consumption` | complete |
-| P23 Release 0.8.0 | #107 | `feature/p23-release-0-8-0` | active |
+| P23 Release 0.8.0 | #107 | `feature/p23-release-0-8-0` | complete |
 
 ## Lifecycle Map
 
@@ -651,16 +651,16 @@ Acceptance criteria:
 
 Parent issue: #107
 Branch: `feature/p23-release-0-8-0`
-Status: active
+Status: complete
 
 Goal: release `0.8.0`, because `main` carries the consumption table and the record of why the burn report
 cannot be exposed.
 
-- [ ] P23.1 Version and notes for 0.8.0 (#108)
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.7.0".
-  - [ ] Replace the table gap with fourteen exposed.
-  - [ ] Add the consumption run to what is verified.
+- [x] P23.1 Version and notes for 0.8.0 (#108)
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.7.0".
+  - [x] Replace the table gap with fourteen exposed.
+  - [x] Add the consumption run to what is verified.
 
 Acceptance criteria:
 
