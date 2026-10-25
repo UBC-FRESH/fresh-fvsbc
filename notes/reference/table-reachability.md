@@ -67,6 +67,11 @@ claim was the one that needed the most evidence.
 | `FVS_Summary_Metric` | `DBSSUMRY` | disply.f,sumout.f | exposed |
 | `FVS_TreeList_Metric` | `DBSTRLS` | prtrls.f | writer and call site |
 
+## The candidates, one by one
+
+`notes/reference/table-candidates.md` takes the 25 candidates and gives each one what we know, why it
+exists, and an estimate of the cost, the risk and the value of wiring it in, with a proposed order.
+
 ## What a call site does and does not mean
 
 A call site means the writer runs **when its module runs**. It does not mean a keyword set can make that
@@ -97,3 +102,28 @@ Each of these was found by running, not by reading:
 | `FVS_Carbon_Metric`, `FVS_Hrv_Carbon` | `CARBREPT` inside `FMIN` |
 | `FVS_Consumption_Metric` | `SIMFIRE` inside `FMIN` — a fire event, not an option |
 | `FVS_BurnReport_Metric` | **none**: the gate needs an invalid input |
+| `FVS_DM_*_Metric` (4) | **not found**: `MISTOE` is a block and its sub-keywords are accepted, but the tables need an infection state |
+| `FVS_RD_*_Metric` (3) | **not found**: `RDIN` starts the block, and its required parameters were not determined |
+
+## Dwarf mistletoe and root disease: blocks, and a state we do not have
+
+Both families have writers with call sites (`DBSMIS1` from `misprt.f`, `DBSRD1` from `rdpr.f`), and both
+writers are called unconditionally. What gates them is the module being *on*, and what makes it produce
+rows is the stand carrying an **infection**.
+
+What was tried, and what happened:
+
+- **`MISRPTS`, `RDSUM` and `RDDETAIL` alone** — the three `DATABASE` options — write no tables at all.
+- **`MISTOE` as a plain keyword** — refused, because it swallowed the following records. It is a block,
+  terminated by `END`, and its sub-keywords (`MISTPINF`, `MISTGMOD`, `DMAUTO`, …) are read by `MISIN`.
+  It is now a line block in the model, and a run with a `MISTPINF` line is accepted and echoed:
+  `Date/Cycle= 0; Species= PW (1); Proportion to Infect= 0.50`.
+- **That run still writes no dwarf-mistletoe table.** `MISFLG` is set to `.FALSE.` in `misin.f` and is
+  turned on elsewhere, so a block alone does not enable the model, and an infected proportion at date 0
+  does not by itself produce the statistics the tables carry.
+- **`RDIN` with `0 1`** — refused with `FVS04 ERROR: A REQUIRED PARAMETER IS MISSING OR A PARAMETER IS
+  INCORRECT`. Its field layout is in `rdin.f`, but which field is required was not determined, so `RDIN`
+  is **not** modelled and the root-disease tables stay unexposed.
+
+**What would close these**: a stand with a mistletoe rating per tree and a root-disease centre, which is
+an inventory question rather than a keyword question. The fixture generator has no such field.

@@ -13,6 +13,7 @@ from fresh_fvsbc.keywords import (
     FIELD_WIDTH,
     KEYWORD_TABLE,
     KEYWORDS,
+    LINES_KEYWORDS,
     MISSPELLED_KEYWORD,
     MISSPELLING_WARNING,
     RECORD_KEYWORDS,
@@ -237,10 +238,21 @@ def test_a_block_line_is_written_whole_rather_than_as_a_field() -> None:
     assert expression in render_keyword(Keyword("COMPUTE", (), (expression,)))
 
 
-def test_the_three_line_blocks_are_accepted() -> None:
-    """``COMMENT``, ``COMPUTE`` and ``DATABASE`` take lines, and each is a keyword FVS reads."""
-    for name in ("COMMENT", "COMPUTE", "DATABASE"):
+def test_every_line_block_is_accepted() -> None:
+    """Each name in ``LINES_KEYWORDS`` takes lines, and each is a keyword FVS reads.
+
+    The set has grown by discovery rather than by design: ``FMIN`` in ``P17``, because the fuels
+    and potfire options live inside it, and ``MISTOE`` in ``P26``, because the dwarf-mistletoe
+    options do.
+    """
+    for name in sorted(LINES_KEYWORDS):
         assert validate_keyword(Keyword(name, lines=("x",))) == []
+
+
+def test_a_mistoe_block_renders_its_lines_and_its_terminator() -> None:
+    """``MISTOE`` is a block whose sub-keywords are not keywords, so a caller supplies the lines."""
+    keyword = Keyword("MISTOE", (), ("MISTPINF        0        1       0.5",))
+    assert render_keyword(keyword) == "MISTOE\nMISTPINF        0        1       0.5\nEND\n"
 
 
 def test_a_database_block_must_precede_the_stand() -> None:

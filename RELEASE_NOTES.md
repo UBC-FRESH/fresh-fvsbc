@@ -120,7 +120,8 @@ it.
 1. **The reader exposes fourteen of 44 tables.** The other 30 are classified in
    `notes/reference/table-reachability.md`: 25 have a writer and a call site and are candidates, five have
    a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. A call site
-   is not a promise; each candidate needs its own case.
+   is not a promise; each candidate needs its own case, and `notes/reference/table-candidates.md` gives
+   each one a cost, a risk and a value.
 2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is

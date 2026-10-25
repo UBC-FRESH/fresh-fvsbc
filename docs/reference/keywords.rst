@@ -63,7 +63,8 @@ Some keywords are the exception, because they read records of their own rather t
 
 - ``STDIDENT`` takes the record after it as the stand id and title (``canada/bc/initre.f``).
 - ``TREEFMT`` takes the two records after it as the format (``metric/base/intree.f``).
-- ``COMMENT``, ``COMPUTE``, ``DATABASE`` and ``FMIN`` take a **block of text lines** ended by ``END``.
+- ``COMMENT``, ``COMPUTE``, ``DATABASE``, ``FMIN`` and ``MISTOE`` take a **block of text lines** ended by
+  ``END``.
   A caller supplies the lines and the writer supplies the terminator, because a block without one
   swallows the rest of the file. **A ``DATABASE`` block must precede the stand setup**: FVS refuses it
   later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it
@@ -79,6 +80,13 @@ Some keywords are the exception, because they read records of their own rather t
   ``IF (IFMBRB .LT. 0)``, and ``IFMBRB`` is set to ``9999`` at initialisation and to the inventory year
   by ``BURNREPT`` — never negative unless ``INVYEAR`` is given an invalid negative year, which shifts the
   whole simulation. It is not exposed.
+
+  **``MISTOE`` is a block, and its sub-keywords are not keywords either.** ``MISTPINF``, ``MISTGMOD``,
+  ``DMAUTO`` and the rest are options inside it, read by ``MISIN``. A run with a ``MISTOE`` block is
+  accepted and the report echoes the sub-keyword, but **the dwarf-mistletoe tables do not appear**: they
+  need an infection state, and a block alone does not create one. ``RDIN`` starts the equivalent block for
+  root disease; its required parameters were not determined, so it is not modelled, and the root-disease
+  tables are likewise unexposed.
 - ``IF`` takes a block of **keywords** rather than lines: the condition record, ``THEN``, the body, and
   ``ENDIF``, with an optional ``ELSE`` branch. The official case's form is the one the run test checks.
   **``ALSOTRY`` is not modelled**, because no fixture here uses it.

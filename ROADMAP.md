@@ -34,6 +34,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P23 Release 0.8.0 | #107 | `feature/p23-release-0-8-0` | complete |
 | P24 The sweep over the remaining tables | #111 | `feature/p24-sweep` | complete |
 | P25 The notes describe the next release | #115 | `feature/p25-notes-for-the-next-release` | complete |
+| P26 The damage-agent blocks | #119 | `feature/p26-dm-rd` | active |
 
 ## Lifecycle Map
 
@@ -709,6 +710,28 @@ Acceptance criteria:
 
 - `RELEASE_NOTES.md` on `main` no longer claims to describe `0.8.0`.
 - The correction is the first entry of the next release's section.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 26: The damage-agent blocks
+
+Parent issue: #119
+Branch: `feature/p26-dm-rd`
+Status: active
+
+Goal: take the dwarf-mistletoe and root-disease tables the sweep re-opened, and find out whether the block
+keywords that start them are enough.
+
+- [ ] P26.1 The damage-agent blocks, and what they do not reach (#120)
+  - [ ] `MISTOE` joins the line blocks.
+  - [ ] A run with a `MISTOE` block is accepted and echoes its sub-keyword.
+  - [ ] Record what was tried and what would close the gap.
+  - [ ] Write `notes/reference/table-candidates.md`.
+
+Acceptance criteria:
+
+- A run with a `MISTOE` block is accepted, and the report echoes its sub-keyword.
+- The reachability note says what was tried, what FVS said, and what would close the gap.
+- `notes/reference/table-candidates.md` covers all 25 candidates with an estimate each.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
