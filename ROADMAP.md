@@ -39,7 +39,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P28 StrClass and ATRTList | #127 | `feature/p28-strclass-atrtlist` | complete |
 | P29 Release 0.9.0 | #131 | `feature/p29-release-0-9-0` | complete |
 | P30 CanProfile and the fixture limits | #135 | `feature/p30-canprofile-fixture` | complete |
-| P31 The three questions, answered | #139 | `feature/p31-three-questions` | active |
+| P31 The three questions, answered | #139 | `feature/p31-three-questions` | complete |
 
 ## Lifecycle Map
 
@@ -825,16 +825,16 @@ Acceptance criteria:
 
 Parent issue: #139
 Branch: `feature/p31-three-questions`
-Status: active
+Status: complete
 
 Goal: answer the three questions `P30` called unknown by reading the source, and take the four tables they
 unblock.
 
-- [ ] P31.1 The three questions, answered, and the four tables (#140)
-  - [ ] Expose `FVS_Stats_Stand`, `FVS_Mortality_Metric` and the two dwarf-mistletoe summaries.
-  - [ ] A run with `DESIGN` field 4 above 1, `MORTREPT` and a fire, and damage code 30 writes them.
-  - [ ] Replace the note that called the fixture the constraint with the three answers.
-  - [ ] Update the contract pages, the reachability note and the candidate note.
+- [x] P31.1 The three questions, answered, and the four tables (#140)
+  - [x] Expose `FVS_Stats_Stand`, `FVS_Mortality_Metric` and the two dwarf-mistletoe summaries.
+  - [x] A run with `DESIGN` field 4 above 1, `MORTREPT` and a fire, and damage code 30 writes them.
+  - [x] Replace the note that called the fixture the constraint with the three answers.
+  - [x] Update the contract pages, the reachability note and the candidate note.
 
 Acceptance criteria:
 
