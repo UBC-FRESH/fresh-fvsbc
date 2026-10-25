@@ -77,6 +77,9 @@ project has not trialled a second model and does not claim one.
 Re-checks
 ---------
 
-The workflow's ``P5.2`` quarterly review re-checks every row, and this project re-checks a row when
-the provider or the model changes. A re-check that keeps a choice adds a row with its new date and its
-evidence; a re-check that changes one adds a row for the new choice.
+**Every row is re-checked at this project's quarterly review**, whose cadence and records are in
+:doc:`reviews` and ``notes/reviews/``, and a row is re-checked sooner when the provider or the model
+changes. A re-check that keeps a choice adds a row with its new date and its evidence; a re-check that
+changes one adds a row for the new choice. The first review, on 2026-10-25, recorded the evidence for
+both rows below and changed neither. **An earlier revision of this paragraph named the seed workflow's
+``P5.2``**, which is a task in that repository rather than this one's cadence.

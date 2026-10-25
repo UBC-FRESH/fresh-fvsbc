@@ -296,7 +296,9 @@ The detail for each phase lives in its focused plan under `notes/`; the evidence
   maintainer's to set rather than the table's to assume.
 - **`run_case`'s non-re-entrancy and the thread-safety limit** are `P6.2`, and the mechanism is a
   decision rather than an assumption.
-- **The review cadence and its first review** are `P6.3`.
+- **The review cadence and its first review** are `P6.3`: quarterly, on the first Monday of January,
+  April, July and October, with the records in `notes/reviews/` and a due-date table that makes a missed
+  review visible.
 
 **Every earlier open decision is closed, and an earlier revision of this section listed five of them as
 open for four phases.** The CI quality matrix was done in `P3.1` (#18); `ADR 0004` was accepted on
