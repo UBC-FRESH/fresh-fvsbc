@@ -338,11 +338,18 @@ class Keyword:
     lines : tuple of str, optional
         The body of a block keyword, one record per entry. Only :data:`LINES_KEYWORDS` take lines,
         and the writer adds the ``END`` that closes them.
+    nested : tuple of Keyword, optional
+        The body of a **conditional**, which holds keywords rather than lines. Only ``IF`` takes
+        one, and the writer adds the ``ENDIF`` that closes it.
+    otherwise : tuple of Keyword, optional
+        The ``ELSE`` branch of a conditional.
     """
 
     name: str
     parameters: tuple[str, ...] = ()
     lines: tuple[str, ...] = ()
+    nested: tuple[Keyword, ...] = ()
+    otherwise: tuple[Keyword, ...] = ()
 
 
 def validate_keyword(keyword: Keyword) -> list[str]:
@@ -364,14 +371,15 @@ def validate_keyword(keyword: Keyword) -> list[str]:
         If the name is not in the table. The message names the keyword, and names the table's
         spelling when the name is a near miss.
     """
-    if keyword.name in NESTED_KEYWORDS:
+    if (keyword.nested or keyword.otherwise) and keyword.name not in NESTED_KEYWORDS:
         raise UnsupportedKeywordError(
-            f'"{keyword.name}" opens a block of keywords ended by ENDIF, and this model holds '
-            "lines rather than nested keywords; writing it would start a block FVS reads to the end"
+            f'"{keyword.name}" does not take nested keywords; only '
+            f"{', '.join(sorted(NESTED_KEYWORDS))} does"
         )
-    if keyword.lines and keyword.name not in LINES_KEYWORDS:
+    if keyword.lines and keyword.name not in LINES_KEYWORDS | NESTED_KEYWORDS:
         raise UnsupportedKeywordError(
-            f'"{keyword.name}" does not take lines; only {", ".join(sorted(LINES_KEYWORDS))} do'
+            f'"{keyword.name}" does not take lines; only '
+            f"{', '.join(sorted(LINES_KEYWORDS | NESTED_KEYWORDS))} do"
         )
     if keyword.name not in KEYWORDS and keyword.name not in SPECIAL_KEYWORDS:
         near = _near_miss(keyword.name)
@@ -380,9 +388,13 @@ def validate_keyword(keyword: Keyword) -> list[str]:
     if keyword.name not in RECORD_KEYWORDS:
         for parameter in keyword.parameters:
             _check_width(keyword.name, parameter)
+    warnings: list[str] = []
+    if keyword.name in NESTED_KEYWORDS:
+        warnings.extend(validate_keywords(keyword.nested))
+        warnings.extend(validate_keywords(keyword.otherwise))
     if keyword.name == MISSPELLED_KEYWORD:
-        return [MISSPELLING_WARNING]
-    return []
+        warnings.append(MISSPELLING_WARNING)
+    return warnings
 
 
 def validate_keywords(keywords: Sequence[Keyword]) -> list[str]:
@@ -472,6 +484,13 @@ def render_keyword(keyword: Keyword) -> str:
         _check_width(keyword.name, parameter)
         fields.append(f"{parameter:<{FIELD_WIDTH}}")
     head = f"{keyword.name:<{FIELD_WIDTH}}{''.join(fields)}".rstrip() + "\n"
+    if keyword.name in NESTED_KEYWORDS:
+        body = "".join(render_keyword(entry) for entry in keyword.nested)
+        otherwise = ""
+        if keyword.otherwise:
+            otherwise = "ELSE\n" + "".join(render_keyword(entry) for entry in keyword.otherwise)
+        lines = "".join(f"{line}\n" for line in keyword.lines)
+        return head + lines + "THEN\n" + body + otherwise + "ENDIF\n"
     if keyword.name in LINES_KEYWORDS:
         return head + "".join(f"{line}\n" for line in keyword.lines) + "END\n"
     return head

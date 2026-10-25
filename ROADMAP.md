@@ -23,6 +23,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P12 The table names | #62 | `feature/p12-table-names` | complete |
 | P13 The tables the official case writes | #67 | `feature/p13-tables` | complete |
 | P14 Release 0.4.0 | #71 | `feature/p14-release-0-4-0` | complete |
+| P15 The conditional | #75 | `feature/p15-if-blocks` | active |
 
 ## Lifecycle Map
 
@@ -471,6 +472,28 @@ Acceptance criteria:
 
 - The package reports `0.4.0`, the notes say what changed and what remains, and a clean checkout installs it and reads two of the new tables.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 15: The conditional
+
+Parent issue: #75
+Branch: `feature/p15-if-blocks`
+Status: active
+
+Goal: write `IF` blocks, the last keyword form the model could not express.
+
+- [ ] P15.1 Write the conditional (#76)
+  - [ ] The model holds `nested` and `otherwise` beside `lines`, and only `IF` may carry them.
+  - [ ] The writer emits the official case's form, and the `ELSE` branch.
+  - [ ] The validator recurses into a conditional's body.
+  - [ ] A run with an `IF` block succeeds and FVS's report carries the condition.
+  - [ ] Correct `docs/reference/keywords.rst`.
+
+Acceptance criteria:
+
+- An `IF` block renders the official case's form, and an `ELSE` branch renders too.
+- An unknown keyword inside a conditional is refused like one outside it.
+- A run with an `IF` block succeeds, and FVS's report carries the condition.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
