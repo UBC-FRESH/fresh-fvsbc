@@ -59,14 +59,16 @@ So the first field is columns 11 to 20, the second 21 to 30, and so on, and a pa
 ten columns cannot be carried. A blank field is a field, which is why FVS's own files write
 ``TIMEINT`` with an empty first field before the value.
 
-Three keywords are the exception, because they read records of their own rather than fields:
+Some keywords are the exception, because they read records of their own rather than fields:
 
 - ``STDIDENT`` takes the record after it as the stand id and title (``canada/bc/initre.f``).
 - ``TREEFMT`` takes the two records after it as the format (``metric/base/intree.f``).
-- ``COMMENT``, ``COMPUTE``, ``IF`` and ``DATABASE`` take a **block** of records ended by ``END``.
-  `fresh-fvsbc` does not write these: its keyword model has no room for a block, and writing one as a
-  single record would start a block FVS reads to the end of the file. The validator refuses them by
-  name rather than producing a file that cannot work.
+- ``COMMENT``, ``COMPUTE`` and ``DATABASE`` take a **block of text lines** ended by ``END``. A caller
+  supplies the lines and the writer supplies the terminator, because a block without one swallows the
+  rest of the file.
+- ``IF`` takes a block of **keywords** rather than lines, ended by ``ENDIF``, with ``THEN``, ``ELSE``
+  and ``ALSOTRY`` in between. That is a nested structure the keyword model does not have, so the
+  validator refuses it by name rather than writing a file FVS would read to the end.
 
 ``STOP`` is a keyword that the table does not hold. ``base/keyrdr.f`` compares each record's first
 eight characters with ``STOP`` before it consults the table, and a match ends the file with code 3, so
