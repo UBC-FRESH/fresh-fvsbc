@@ -22,7 +22,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P11 The command's block form, and 0.3.1 | #58 | `feature/p11-block-form` | complete |
 | P12 The table names | #62 | `feature/p12-table-names` | complete |
 | P13 The tables the official case writes | #67 | `feature/p13-tables` | complete |
-| P14 Release 0.4.0 | #71 | `feature/p14-release-0-4-0` | active |
+| P14 Release 0.4.0 | #71 | `feature/p14-release-0-4-0` | complete |
 
 ## Lifecycle Map
 
@@ -457,15 +457,15 @@ Acceptance criteria:
 
 Parent issue: #71
 Branch: `feature/p14-release-0-4-0`
-Status: active
+Status: complete
 
 Goal: release `0.4.0`, because `main` carries eight exposed tables instead of four and a table list that
 names what the build creates.
 
-- [ ] P14.1 Version and notes for 0.4.0 (#71)
-  - [ ] Bump the version in two files.
-  - [ ] Rewrite the notes.
-  - [ ] Narrow the table gap to the 36 the official case does not write.
+- [x] P14.1 Version and notes for 0.4.0 (#72)
+  - [x] Bump the version in two files.
+  - [x] Rewrite the notes.
+  - [x] Narrow the table gap to the 36 the official case does not write.
 
 Acceptance criteria:
 
