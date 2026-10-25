@@ -38,7 +38,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P27 The cheap tables | #123 | `feature/p27-the-cheap-five` | complete |
 | P28 StrClass and ATRTList | #127 | `feature/p28-strclass-atrtlist` | complete |
 | P29 Release 0.9.0 | #131 | `feature/p29-release-0-9-0` | complete |
-| P30 CanProfile and the fixture limits | #135 | `feature/p30-canprofile-fixture` | active |
+| P30 CanProfile and the fixture limits | #135 | `feature/p30-canprofile-fixture` | complete |
 
 ## Lifecycle Map
 
@@ -805,14 +805,14 @@ Acceptance criteria:
 
 Parent issue: #135
 Branch: `feature/p30-canprofile-fixture`
-Status: active
+Status: complete
 
 Goal: test the claim that the fixture is the binding constraint, and take whatever table does not need it.
 
-- [ ] P30.1 The canopy profile, and what the fixture cannot reach (#136)
-  - [ ] Expose `FVS_CanProfile`.
-  - [ ] Test the fixture claim: more plots, a bigger stand under a fire, and an infected stand.
-  - [ ] Record the three results with their evidence, and withdraw the claim they disprove.
+- [x] P30.1 The canopy profile, and what the fixture cannot reach (#136)
+  - [x] Expose `FVS_CanProfile`.
+  - [x] Test the fixture claim: more plots, a bigger stand under a fire, and an infected stand.
+  - [x] Record the three results with their evidence, and withdraw the claim they disprove.
 
 Acceptance criteria:
 
