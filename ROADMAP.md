@@ -262,11 +262,11 @@ Goal: keep the project current: triage incoming ideas, review on a cadence, and 
 The detail for this phase is the focused plan `notes/p6-operate.md`, which carries each task's sections,
 the phase criteria, the order and its reason, and the open proposals.
 
-- [ ] P6.1 Triage the twelve known gaps (#38)
-  - [ ] Read the twelve gaps and, for each, the report that carries it.
-  - [ ] Assign each a disposition: fix now, fix later with a named phase, or accepted with a reason.
-  - [ ] Record the table where a reader looks, and say what the disposition costs.
-  - [ ] Propose a phase for anything marked fix-later that no phase covers.
+- [x] P6.1 Triage the twelve known gaps (#38)
+  - [x] Read the twelve gaps and, for each, the report that carries it.
+  - [x] Assign each a disposition: fix now, fix later with a named phase, or accepted with a reason.
+  - [x] Record the table where a reader looks, and say what the disposition costs.
+  - [x] Propose a phase for anything marked fix-later that no phase covers.
 - [ ] P6.2 Make two runs in one process safe (#39)
   - [ ] Spike both mechanisms and record what each costs: a guard that refuses a second run, and a subprocess per run.
   - [ ] Bring the choice back as a decision with the evidence, before changing the API.
