@@ -1,10 +1,23 @@
-# fresh-fvsbc 0.7.0
+# fresh-fvsbc 0.8.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.7.0
+
+- **The consumption table is readable.** `FVS_Consumption_Metric` joins the thirteen, so the reader
+  exposes **fourteen**.
+- **It needs a fire, not an option.** A fire in FVS is an *activity*, not a keyword: `FMBURN` looks for
+  activity 2506 with `OPFIND`, and the `FMIN` option `SIMFIRE` schedules it. `DBSFMFUEL` is called from
+  inside the routine that runs when something burns, so the `DATABASE` option `BURNREDB` alone writes
+  nothing. One run reports 22.569 tonnes per hectare consumed and 77.31 percent of the duff.
+- **The burn report beside it cannot be exposed.** `FVS_BurnReport_Metric` is written only inside
+  `IF (IFMBRB .LT. 0)`, and `IFMBRB` is assigned `9999` at initialisation and the inventory year by
+  `BURNREPT` — never negative unless `INVYEAR` is given an invalid negative year, which shifts the whole
+  simulation. That is a dead branch in this source, and the pages say so.
 
 ## What changed since 0.6.0
 
@@ -79,6 +92,8 @@ recipe.
   makes them written.
 - A run with `CARBREPT` writes both carbon tables, and the first period carries a non-zero total — 13.6
   tonnes of carbon per hectare on the synthetic stand.
+- A run with `SIMFIRE` writes one consumption row, and it carries a non-zero consumption — 22.569 tonnes
+  per hectare on the same stand.
 - The command runs a case end to end and exits `0`; `1` and `2` are tested with a faked drive and in a
   subprocess, not by a real failing run.
 - The dashboard passes on Python 3.11 and 3.12 in CI.
@@ -89,11 +104,11 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes thirteen of 44 tables, and the rest are not all reachable.** Six take a
-   `DATABASE` option, and the fuels, potfire and carbon ones additionally need an `FMIN` block; the burn
-   report and consumption tables need an actual fire event, which no option supplies; dwarf mistletoe and
-   root disease have no writer in this source. `notes/reference/table-reachability.md` has the evidence
-   for each verdict.
+1. **The reader exposes fourteen of 44 tables, and the rest are not all reachable.** Some take a
+   `DATABASE` option; the fuels, potfire and carbon ones additionally need an `FMIN` block, and
+   consumption needs a fire event; the burn report's gate cannot be satisfied by valid input; dwarf
+   mistletoe and root disease have no writer in this source. `notes/reference/table-reachability.md` has
+   the evidence for each verdict.
 2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
