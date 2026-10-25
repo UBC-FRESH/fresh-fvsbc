@@ -37,7 +37,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P26 The damage-agent blocks | #119 | `feature/p26-dm-rd` | complete |
 | P27 The cheap tables | #123 | `feature/p27-the-cheap-five` | complete |
 | P28 StrClass and ATRTList | #127 | `feature/p28-strclass-atrtlist` | complete |
-| P29 Release 0.9.0 | #131 | `feature/p29-release-0-9-0` | active |
+| P29 Release 0.9.0 | #131 | `feature/p29-release-0-9-0` | complete |
 
 ## Lifecycle Map
 
@@ -782,16 +782,16 @@ Acceptance criteria:
 
 Parent issue: #131
 Branch: `feature/p29-release-0-9-0`
-Status: active
+Status: complete
 
 Goal: release `0.9.0`, because `main` carries six more tables — including the first per-tree output the
 package has had, and the BC-specific structural stage.
 
-- [ ] P29.1 Version and notes for 0.9.0 (#132)
-  - [ ] Bump the version in two files.
-  - [ ] Reorder "What changed since 0.8.0" into one account, with the six tables and the correct counts.
-  - [ ] Add the per-tree and stage runs to what is verified.
-  - [ ] Check that no bullet still says eighteen or fourteen exposed.
+- [x] P29.1 Version and notes for 0.9.0 (#132)
+  - [x] Bump the version in two files.
+  - [x] Reorder "What changed since 0.8.0" into one account, with the six tables and the correct counts.
+  - [x] Add the per-tree and stage runs to what is verified.
+  - [x] Check that no bullet still says eighteen or fourteen exposed.
 
 Acceptance criteria:
 
