@@ -33,6 +33,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P22 The consumption table | #103 | `feature/p22-consumption` | complete |
 | P23 Release 0.8.0 | #107 | `feature/p23-release-0-8-0` | complete |
 | P24 The sweep over the remaining tables | #111 | `feature/p24-sweep` | complete |
+| P25 The notes describe the next release | #115 | `feature/p25-notes-for-the-next-release` | complete |
 
 ## Lifecycle Map
 
@@ -689,6 +690,25 @@ Acceptance criteria:
 
 - Every one of the 44 tables has a verdict, and each is reproducible with the commands the note names.
 - The wrong "no writer" claim is corrected in every live document.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 25: The notes describe the next release
+
+Parent issue: #115
+Branch: `feature/p25-notes-for-the-next-release`
+Status: complete
+
+Goal: stop `RELEASE_NOTES.md` on `main` from claiming to be the published `0.8.0` body.
+
+- [x] P25.1 Retitle the notes for the next release and carry the correction (#116)
+  - [x] Move the title to `0.9.0`.
+  - [x] Add "What changed since 0.8.0" with the sweep's correction.
+  - [x] Leave every earlier section exactly as it was published.
+
+Acceptance criteria:
+
+- `RELEASE_NOTES.md` on `main` no longer claims to describe `0.8.0`.
+- The correction is the first entry of the next release's section.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
