@@ -26,15 +26,17 @@ says which review changed it.
 | 8 | A parameter passed to the command cannot contain a comma | **accepted** | A different argument syntax | It is documented, and the API has no such limit. **Reopened by a caller who needs a comma**, because the workaround is to use the API |
 | 9 | At `-O0` the variant writes no database at all | **accepted** | Nothing: it is a build requirement | The optimiser is not optional, and ADR 0008 records it for the standalone and `P4`'s report for the extension. **Reopened if a build at `-O0` ever works**, which would mean the requirement was a different flag |
 | 10 | The package needs a separately built extension | **accepted** | A build integration, which is a different project | This package wraps a pinned build of one variant; building FVS is PyFVS's and ADR 0004's concern. **Reopened if the project ever distributes a wheel**, where the dependency has to be expressed |
-| 11 | The reader exposes fourteen of the database's 44 tables | **accepted** | Testing a table, then exposing it | Output contract rule 3 keeps an untested table out of the public API. Fourteen are exposed, and the rest are not all reachable: some take a `DATABASE` option, carbon takes `CARBREPT` and consumption `SIMFIRE` inside an `FMIN` block, the burn report's gate cannot be satisfied by valid input, and the dwarf-mistletoe and root-disease writers do not exist in this source (`notes/reference/table-reachability.md`). **What is left is a decision about which tables are worth a case, not 30 tests.** Reopened by a caller who needs one of them |
+| 11 | The reader exposes fourteen of the database's 44 tables | **accepted** | Testing a table, then exposing it | Output contract rule 3 keeps an untested table out of the public API. Fourteen are exposed, and the rest are not all reachable: some take a `DATABASE` option, carbon takes `CARBREPT` and consumption `SIMFIRE` inside an `FMIN` block, the burn report's gate cannot be satisfied by valid input, five tables have a writer nothing calls, and the rest are candidates that each need a case (`notes/reference/table-reachability.md`). **What is left is a decision about which tables are worth a case, not 30 tests.** Reopened by a caller who needs one of them |
 | 12 | The `nemora` adapter requires `species` and `tree_age` from the caller | **accepted** | A species-assignment capability | `nemora` emits neither, and assigning a species is a modelling question with a research burden. The adapter fails rather than defaulting, which is the honest behaviour. **Reopened by a caller who asks for species assignment**, not by one who has populations without species: every `nemora` population has none, so that condition would fire on the normal case and would make the row unowned |
 
 ## Found, and not yet fixed
 
-- **The remaining tables are not all reachable, and the reason differs by table.** `FVS_Carbon_Metric`'s
-  writer has one call site, in the fire-carbon report path, and the `DATABASE` option alone does not
-  reach it; the dwarf-mistletoe and root-disease writers **do not exist in this source at all**.
-  Evidence and scope in `notes/reference/table-reachability.md`.
+- **The remaining tables are not all reachable, and the reason differs by table.** `P24` settled it
+  mechanically: 25 of the 30 have a writer and a call site, five have a writer that nothing calls, and the
+  burn report's gate needs an invalid input. **This corrects an earlier entry in this file** that said the
+  dwarf-mistletoe and root-disease writers do not exist — they do, as `DBSMIS1` and `DBSRD1`; the grep
+  that "proved" otherwise searched for the wrong symbol names. Evidence in
+  `notes/reference/table-reachability.md`.
 
 - **The contract's table list is the base schema's, and BC builds the metric one.** Twenty-four names are
   wrong for this variant and at least two real tables are missing. Evidence and scope in
