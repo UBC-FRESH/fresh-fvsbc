@@ -22,6 +22,7 @@ import pytest
 
 from fresh_fvsbc import cli, run
 from fresh_fvsbc.keywords import Keyword
+from fresh_fvsbc.outputs import read_table
 from fresh_fvsbc.run import KEYWORD_FILE_NAME
 from nemora_fixtures import synthetic_population
 
@@ -329,6 +330,132 @@ def test_the_command_passes_the_callers_keywords_through(
         ]
     )
     assert list(captured[0]) == [Keyword("STDINFO", ("712", "CHS131")), Keyword("PROCESS")]
+
+
+def test_a_block_argument_parses_its_lines() -> None:
+    """Each ``|`` starts a line, and the fields are empty when there is no ``=``."""
+    keyword = cli._parse_block("DATABASE|DSNOut|FVSOut.db|ComputDB")
+    assert keyword.name == "DATABASE"
+    assert keyword.parameters == ()
+    assert keyword.lines == ("DSNOut", "FVSOut.db", "ComputDB")
+
+
+def test_a_block_argument_parses_fields_and_lines() -> None:
+    """The fields come before the first ``|``, and the expression survives whole."""
+    keyword = cli._parse_block("COMPUTE=0|BigVol = spmcdbh(3,0,0, 20.0, 999.0, 0,999,0)")
+    assert keyword.parameters == ("0",)
+    assert keyword.lines == ("BigVol = spmcdbh(3,0,0, 20.0, 999.0, 0,999,0)",)
+
+
+def test_a_block_for_a_keyword_that_takes_no_lines_exits_two(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A block under a keyword that takes none would be swallowed, so it is refused."""
+    code = cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--block",
+            "ECHOSUM|x",
+        ]
+    )
+    assert code == cli.EXIT_BAD_INPUT
+    assert "does not take a block of lines" in capsys.readouterr().err
+
+
+def test_the_two_options_keep_their_relative_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A ``DATABASE`` block must precede the stand, so the order across both options matters."""
+    captured: list[Sequence[Keyword]] = []
+
+    def stub(
+        population: Sequence[dict[str, object]],
+        *,
+        directory: str | Path,
+        species: str | None = None,
+        tree_age: float | None = None,
+        keywords: Sequence[Keyword] = (),
+        variant: str = "bc",
+        plot_fields: object = None,
+        key_name: str = KEYWORD_FILE_NAME,
+    ) -> run.RunResult:
+        captured.append(keywords)
+        raise run.RunError("stub")
+
+    monkeypatch.setattr(cli, "run_population", stub)
+    cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--block",
+            "DATABASE|DSNOut|FVSOut.db|ComputDB",
+            "--keyword",
+            "STDIDENT=x",
+        ]
+    )
+    assert [keyword.name for keyword in captured[0]] == ["DATABASE", "STDIDENT"]
+
+
+def test_a_run_through_the_command_writes_a_compute_table(tmp_path: Path) -> None:
+    """The gap `0.3.0` shipped with: the command could not ask for a block.
+
+    So the table was never written, and the clean-checkout verification found it.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    code = cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--block",
+            "DATABASE|DSNOut|FVSOut.db|Summary|ComputDB",
+            "--keyword",
+            "STDIDENT=CLI   block",
+            "--keyword",
+            "STDINFO=712,CHS131,0,200,35,16",
+            "--keyword",
+            "MANAGED=0,1",
+            "--keyword",
+            "SITECODE=FD,100",
+            "--keyword",
+            "INVYEAR=0",
+            "--keyword",
+            "DESIGN=0,1,999,1,0,1,1",
+            "--keyword",
+            "NUMCYCLE=2",
+            "--keyword",
+            "RANNSEED=1",
+            "--block",
+            "COMPUTE=0|BigVol = spmcdbh(3,0,0, 20.0, 999.0, 0,999,0)",
+            "--keyword",
+            "ECHOSUM",
+            "--keyword",
+            "PROCESS",
+            "--keyword",
+            "STOP",
+        ]
+    )
+    assert code == cli.EXIT_OK
+    compute = read_table(tmp_path / "run" / "FVSOut.db", "FVS_Compute")
+    assert not compute.empty
+    assert "BIGVOL" in list(compute.columns)
 
 
 def test_the_documented_entry_point_reports_bad_input_with_exit_two(tmp_path: Path) -> None:

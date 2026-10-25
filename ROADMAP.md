@@ -19,6 +19,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P8 Release 0.2.0 | #47 | `feature/p8-release-0-2-0` | complete |
 | P9 The database block | #50 | `feature/p9-database-block` | complete |
 | P10 Release 0.3.0 | #55 | `feature/p10-release-0-3-0` | complete |
+| P11 The command's block form, and 0.3.1 | #58 | `feature/p11-block-form` | active |
 
 ## Lifecycle Map
 
@@ -376,6 +377,33 @@ Acceptance criteria:
 
 - The package reports `0.3.0`, the notes say what changed and what remains, and a clean checkout installs the release and runs one case.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 11: The command's block form, and 0.3.1
+
+Parent issue: #58
+Branch: `feature/p11-block-form`
+Status: active
+
+Goal: let the command write a keyword block, so a shell user can reach the tables `0.3.0` exposes, then
+release `0.3.1`.
+
+- [ ] P11.1 The command's block form (#59)
+  - [ ] A `--block NAME=FIELDS|LINE|LINE` option.
+  - [ ] One ordered destination shared with `--keyword`.
+  - [ ] Refuse a `--block` for a keyword that takes no lines.
+  - [ ] A test that a run through the command with a `DATABASE` block first writes `FVS_Compute`.
+  - [ ] Document the syntax.
+- [ ] P11.2 Version and notes for 0.3.1 (#60)
+  - [ ] Bump the version in two files.
+  - [ ] Rewrite the notes.
+  - [ ] Record the closed gap in the triage.
+
+Acceptance criteria:
+
+- `--block` writes a block, and the two options keep their relative order.
+- A run through the command with a `DATABASE` block first writes `FVS_Compute`.
+- The package reports `0.3.1` and a clean checkout installs it.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

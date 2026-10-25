@@ -51,6 +51,17 @@ parameter fields, so a blank field is written as a gap:
 
    --keyword TIMEINT=,5
 
+``--block NAME=FIELDS|LINE|LINE`` writes a keyword that takes a **block of lines**: the fields come
+before the first ``|`` and each ``|`` starts a line. This is how a caller asks for the database tables:
+
+.. code-block:: bash
+
+   --block "DATABASE|DSNOut|FVSOut.db|Summary|ComputDB"
+
+``--keyword`` and ``--block`` keep their relative order, because a ``DATABASE`` block must precede the
+stand setup — see :doc:`reference/keywords`. A ``--block`` for a keyword that takes no lines is refused
+with exit ``2``.
+
 The names are validated against FVS's table, so a typo is refused rather than passed to Fortran. Two
 limits are worth knowing:
 
