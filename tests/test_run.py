@@ -412,6 +412,46 @@ def test_run_population_refuses_a_population_without_species(tmp_path: Path) -> 
         run.run_population(synthetic_population(), tree_age=60.0, directory=tmp_path / "run")
 
 
+def test_an_fmin_block_writes_the_fuels_and_potfire_tables(tmp_path: Path) -> None:
+    """``FMIN`` is a block of options, and three tables are written only when it asks for them.
+
+    ``FUELOUT``, ``FUELREPT`` and ``POTFIRE`` are options inside it, not keywords: they are not in
+    ``keywds.f``'s table, which is why the model could not express them until ``FMIN`` was a line
+    block.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword(
+            "DATABASE",
+            (),
+            ("DSNOut", "FVSOut.db", "Summary", "FuelsOut", "FuelReDB", "PotfirDB", "ComputDB"),
+        ),
+        Keyword("STDIDENT", ("FMIN   fuels",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword(
+            "FMIN", (), ("FUELOUT            2", "FUELREPT           2", "POTFIRE            2")
+        ),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    for name in ("FVS_Fuels_Metric", "FVS_PotFire_Metric", "FVS_PotFire_Cond_Metric"):
+        frame = read_table(result.database, name)
+        assert not frame.empty, name
+        assert "CaseID" in list(frame.columns)
+
+
 def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     """An ``IF`` block is written as a conditional, and FVS's report shows it read the condition."""
     pytest.importorskip(

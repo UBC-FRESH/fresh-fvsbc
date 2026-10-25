@@ -57,6 +57,9 @@ def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) ->
             "create table FVS_Down_Wood_Vol_Metric (CaseID text, Year integer, DWD_Volume real)"
         )
         connection.execute("create table FVS_InvReference (CaseID text, SpeciesFVS text)")
+        connection.execute("create table FVS_Fuels_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_PotFire_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_PotFire_Cond_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagDet_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagSum_Metric (CaseID text, Year integer)")
         connection.commit()
@@ -103,7 +106,10 @@ def test_only_the_tested_tables_are_exposed() -> None:
         "FVS_Compute",
         "FVS_Down_Wood_Vol_Metric",
         "FVS_Error",
+        "FVS_Fuels_Metric",
         "FVS_InvReference",
+        "FVS_PotFire_Cond_Metric",
+        "FVS_PotFire_Metric",
         "FVS_SnagDet_Metric",
         "FVS_SnagSum_Metric",
         "FVS_Summary_Metric",
@@ -133,7 +139,7 @@ def test_an_unexposed_table_is_refused_even_though_the_database_holds_it(tmp_pat
     """Rule 3 is about what the reader exposes, not about what is present."""
     path = a_database(tmp_path / "out.db")
     with pytest.raises(UnknownTableError, match="is not exposed"):
-        read_table(path, "FVS_Fuels_Metric")
+        read_table(path, "FVS_Carbon_Metric")
 
 
 def test_a_table_the_database_lacks_is_refused(tmp_path: Path) -> None:
