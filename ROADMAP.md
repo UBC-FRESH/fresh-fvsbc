@@ -24,6 +24,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P13 The tables the official case writes | #67 | `feature/p13-tables` | complete |
 | P14 Release 0.4.0 | #71 | `feature/p14-release-0-4-0` | complete |
 | P15 The conditional | #75 | `feature/p15-if-blocks` | complete |
+| P16 Release 0.5.0 | #79 | `feature/p16-release-0-5-0` | active |
 
 ## Lifecycle Map
 
@@ -494,6 +495,25 @@ Acceptance criteria:
 - An `IF` block renders the official case's form, and an `ELSE` branch renders too.
 - An unknown keyword inside a conditional is refused like one outside it.
 - A run with an `IF` block succeeds, and FVS's report carries the condition.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 16: Release 0.5.0
+
+Parent issue: #79
+Branch: `feature/p16-release-0-5-0`
+Status: active
+
+Goal: release `0.5.0`, because `main` carries `IF` blocks and nobody can use them from a release.
+
+- [ ] P16.1 Version and notes for 0.5.0 (#80)
+  - [ ] Bump the version in two files.
+  - [ ] Rewrite the notes.
+  - [ ] Drop the `IF` gap.
+
+Acceptance criteria:
+
+- The package reports `0.5.0`, the notes say what changed and what remains, and a clean checkout installs it and runs a case with an `IF` block.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
