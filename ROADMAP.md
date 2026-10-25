@@ -289,8 +289,9 @@ Acceptance criteria:
 The detail for each phase lives in its focused plan under `notes/`; the evidence lives in
 `notes/reports/`. What stays here is the ordering and the open decisions.
 
-- **The current open items are the twelve known gaps in `RELEASE_NOTES.md`**, and `P6.1` gives each a
-  disposition rather than leaving it recorded and unowned.
+- **The current open items are the twelve known gaps in `RELEASE_NOTES.md`**, and **`notes/triage.md`
+  gives each a disposition** — fix now, fix later with a phase, or accepted with the reason and what
+  would reopen it. It is the backlog the review cadence reviews against.
 - **`run_case`'s non-re-entrancy and the thread-safety limit** are `P6.2`, and the mechanism is a
   decision rather than an assumption.
 - **The review cadence and its first review** are `P6.3`.
