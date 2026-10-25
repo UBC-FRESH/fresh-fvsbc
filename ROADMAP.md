@@ -21,6 +21,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P10 Release 0.3.0 | #55 | `feature/p10-release-0-3-0` | complete |
 | P11 The command's block form, and 0.3.1 | #58 | `feature/p11-block-form` | complete |
 | P12 The table names | #62 | `feature/p12-table-names` | complete |
+| P13 The tables the official case writes | #67 | `feature/p13-tables` | active |
 
 ## Lifecycle Map
 
@@ -419,15 +420,36 @@ are wrong for this variant. Record it, then correct it from the schema.
 - [x] P12.1 Record that the list names the wrong schema (#63)
   - [x] Read the schema the variant actually builds.
   - [x] Record the evidence in `notes/reference/table-names.md`.
-- [ ] P12.2 Correct the list from the metric schema (#64)
-  - [ ] Read the metric schema in full, including the dynamic statement.
-  - [ ] Correct the list, the page and the tests.
-  - [ ] Confirm the official case's database names only tables in the corrected list.
+- [x] P12.2 Correct the list from the metric schema (#64)
+  - [x] Read the metric schema in full, including the dynamic statement.
+  - [x] Correct the list, the page and the tests.
+  - [x] Confirm the official case's database names only tables in the corrected list.
 
 Acceptance criteria:
 
 - The evidence is recorded, with the file that shows it.
 - The list, the page and the tests name the metric schema's tables, and every exposed table is in the list.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 13: The tables the official case writes
+
+Parent issue: #67
+Branch: `feature/p13-tables`
+Status: active
+
+Goal: expose the four tables the official case writes that the reader did not, and check them against
+FVS's own database dump.
+
+- [ ] P13.1 Expose the four tables and check them against the dump (#68)
+  - [ ] Expose `FVS_Down_Wood_Vol_Metric`, `FVS_InvReference`, `FVS_SnagDet_Metric` and `FVS_SnagSum_Metric`.
+  - [ ] Parse the dump's per-table CSV sections, mapping the two names it writes differently.
+  - [ ] A test that every exposed table the dump carries holds the dump's row count.
+  - [ ] Correct the contract page's exposed list.
+
+Acceptance criteria:
+
+- The reader exposes eight tables, and each of the four the dump carries holds the dump's row count.
+- `FVS_InvReference` is exposed, and its exposure says why the dump cannot check it.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

@@ -37,7 +37,7 @@ from pathlib import Path
 import pytest
 
 from fresh_fvsbc.keywords import Keyword
-from fresh_fvsbc.outputs import errors_in, read_errors
+from fresh_fvsbc.outputs import EXPOSED_TABLES, errors_in, read_errors, read_table
 from fresh_fvsbc.run import run_population
 from nemora_fixtures import synthetic_population
 
@@ -263,6 +263,89 @@ def test_a_directory_without_the_case_skips(
     monkeypatch.setenv(CASE_DIR_ENV, str(tmp_path))
     with pytest.raises(pytest.skip.Exception, match="holds no"):
         case_directory()
+
+
+#: The names the official dump uses for two tables whose database names carry ``_Metric``. The dump
+#: writes the base schema's name for these two and the metric name for the rest, so the mapping is
+#: explicit rather than guessed.
+DUMP_NAMES: dict[str, str] = {
+    "FVS_SnagDet_Metric": "FVS_SnagDet",
+    "FVS_SnagSum_Metric": "FVS_SnagSum",
+}
+
+
+def dump_sections(text: str) -> dict[str, list[str]]:
+    """Split the official database dump into one list of CSV rows per table.
+
+    The dump opens with an index of table names in columns, then repeats each name on its own line
+    followed by a header and its rows. A line that is a bare table name starts a section.
+
+    Parameters
+    ----------
+    text : str
+        The dump's text.
+
+    Returns
+    -------
+    dict
+        Each table's rows, the header included, keyed by the table's name.
+    """
+    sections: dict[str, list[str]] = {}
+    current: str | None = None
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("FVS_") and "," not in stripped:
+            current = stripped
+            sections.setdefault(current, [])
+        elif current is not None and "," in stripped:
+            sections[current].append(stripped)
+    return sections
+
+
+def test_the_official_dump_names_the_tables_the_reader_exposes() -> None:
+    """The reader exposes a table only when the official case's dump has rows for it.
+
+    ``FVS_InvReference`` is the exception: it postdates the 2022 fixture, so the dump has no section
+    for it and its exposure rests on the schema rather than on the dump.
+    """
+    case = case_directory()
+    sections = dump_sections((case / f"{CASE}DBdump.txt.save").read_text(encoding="latin-1"))
+    named = {DUMP_NAMES.get(name, name) for name in EXPOSED_TABLES} - {
+        "FVS_InvReference",
+        "FVS_Error",
+    }
+    assert named <= set(sections)
+
+
+def test_the_exposed_tables_match_the_dump_row_for_row(tmp_path: Path) -> None:
+    """Every exposed table with a dump section holds the same number of rows.
+
+    The dump is FVS's own rendering of the same run, so a row count is the cheapest check that the
+    reader is returning the whole table rather than a slice of it.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    case = case_directory()
+    sections = dump_sections((case / f"{CASE}DBdump.txt.save").read_text(encoding="latin-1"))
+    workdir = tmp_path / "official"
+    workdir.mkdir()
+    written = run_case_in_child(case, workdir)
+    assert len(written) == 1
+    database = written[0]
+
+    checked = 0
+    for name in EXPOSED_TABLES:
+        # The summary's dump section is empty while the database holds its 164 rows, and the
+        # ``.sum`` comparison above already checks those. ``FVS_InvReference`` postdates the
+        # fixture.
+        if name in {"FVS_Cases", "FVS_Error", "FVS_InvReference", "FVS_Summary_Metric"}:
+            continue
+        rows = sections[DUMP_NAMES.get(name, name)]
+        expected = len(rows) - 1  # the header
+        assert len(read_table(database, name)) == expected, name
+        checked += 1
+    assert checked >= 3
 
 
 def test_a_run_after_another_case_is_not_contaminated(tmp_path: Path) -> None:
