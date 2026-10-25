@@ -4,15 +4,16 @@
 have a writer and a call site** — the candidates — five have a writer that nothing calls, and one has a
 gate no valid input satisfies.
 
-**Seven are wired as of `P30`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
+**Eleven are wired as of `P31`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
 `FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` in `P27`, `FVS_StrClass_Metric` and
-`FVS_ATRTList_Metric` in `P28`, then `FVS_CanProfile` in `P30` — which took the reader from fourteen
-tables to twenty-one.
+`FVS_ATRTList_Metric` in `P28`, `FVS_CanProfile` in `P30`, then `FVS_Stats_Stand`, `FVS_Mortality_Metric`,
+`FVS_DM_Spp_Sum_Metric` and `FVS_DM_Stnd_Sum_Metric` in `P31`. The reader went from fourteen tables to
+**twenty-five**.
 
-**The "fixture is the constraint" claim was tested and is mostly wrong.** `notes/reference/fixture-limits.md`
-records it: `FVS_Stats_Stand` reports "one sample point" although the tree list carries five plot ids, and
-`FVS_Mortality_Metric` still does not appear with 200 trees under a 100 percent burn. Both are questions
-about FVS, not about the fixture. They stay in place below, marked **wired**, because their estimates are the record of what they
+**Every estimate on this page that said "needs an infection state" or "needs a stand the fixture cannot
+express" was wrong**, and `notes/reference/fixture-limits.md` records why: the three blockers were a
+keyword field (`DESIGN` field 4), a keyword option (`MORTREPT`), and a damage code (30, not 21). **The
+fixture was never the constraint.** They stay in place below, marked **wired**, because their estimates are the record of what they
 cost and the evidence for the estimates on the rest.
 
 This note exists so the remaining work can be planned rather than apologised for. It gives each candidate
@@ -164,9 +165,9 @@ Effort is the work to wire one table, assuming the trigger is found on the first
 | `FVS_TreeList_Metric` | S | low — checkable against the tree list the run consumed | **high** — no per-tree output exists at all | **wired in `P27`** |
 | `FVS_CutList_Metric` | S | low — same check | **high** — removals are the question most runs ask | **wired in `P27`** |
 | `FVS_ATRTList_Metric` | S | medium — wide, and the attribute meanings are undocumented here | medium | **wired in `P28`** |
-| `FVS_Mortality_Metric` | S | low | **high** — mortality by agent is the forest-health question | |
+| `FVS_Mortality_Metric` | S | low | **high** — mortality by agent is the forest-health question | **wired in `P31`** |
 | `FVS_Down_Wood_Cov_Metric` | S | low | medium — CWD models | **wired in `P27`** |
-| `FVS_Stats_Stand` | S | medium — no oracle; checkable only for internal consistency | **high** — the numbers most reports quote | |
+| `FVS_Stats_Stand` | S | medium — no oracle; checkable only for internal consistency | **high** — the numbers most reports quote | **wired in `P31`** |
 | `FVS_Stats_Species_Metric` | S | medium — same | medium | **wired in `P27`** |
 | `FVS_StrClass_Metric` | S | medium — the class boundaries are a model choice, not a fact | **high** for BC old-growth work | **wired in `P28`** |
 | `FVS_Climate_Metric` | S | **high** — no way to check the indices without a second source | medium | |
@@ -176,7 +177,7 @@ Effort is the work to wire one table, assuming the trigger is found on the first
 | `FVS_Regen_SitePrep` | M | medium | low | |
 | `FVS_CalibStats` | S | **high** — meaningless without calibration | low | |
 | `FVS_FIAVBC_*` (3) | M | **high** — probably behind a variant flag this build never sets | medium, to FIA users only | |
-| `FVS_DM_*` (4) | **L** | high — needs an infected stand the fixtures cannot express | **high** in BC | |
+| `FVS_DM_*` (4) | S | low — damage code 30 and a severity | **high** in BC | **two of four wired in `P31`** |
 | `FVS_RD_*` (3) | **L** | high — same, plus `RDIN`'s required parameters are undetermined | **high** in BC | |
 | `FVS_BurnReport_Metric` | — | **cannot be wired** — the gate needs an invalid input | none | |
 

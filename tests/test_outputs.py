@@ -70,6 +70,10 @@ def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) ->
         connection.execute("create table FVS_ATRTList_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_StrClass_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_CanProfile (CaseID text, Year integer)")
+        connection.execute("create table FVS_Stats_Stand (CaseID text, Year integer)")
+        connection.execute("create table FVS_Mortality_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_DM_Spp_Sum_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_DM_Stnd_Sum_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagDet_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagSum_Metric (CaseID text, Year integer)")
         connection.commit()
@@ -119,17 +123,21 @@ def test_only_the_tested_tables_are_exposed() -> None:
         "FVS_Compute",
         "FVS_Consumption_Metric",
         "FVS_CutList_Metric",
+        "FVS_DM_Spp_Sum_Metric",
+        "FVS_DM_Stnd_Sum_Metric",
         "FVS_Down_Wood_Cov_Metric",
         "FVS_Down_Wood_Vol_Metric",
         "FVS_Error",
         "FVS_Fuels_Metric",
         "FVS_Hrv_Carbon",
         "FVS_InvReference",
+        "FVS_Mortality_Metric",
         "FVS_PotFire_Cond_Metric",
         "FVS_PotFire_Metric",
         "FVS_SnagDet_Metric",
         "FVS_SnagSum_Metric",
         "FVS_Stats_Species_Metric",
+        "FVS_Stats_Stand",
         "FVS_StrClass_Metric",
         "FVS_Summary_Metric",
         "FVS_TreeList_Metric",

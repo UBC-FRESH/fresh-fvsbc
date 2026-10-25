@@ -1,69 +1,98 @@
-# What the fixture can and cannot express
+# The three questions, answered from the source
 
-`P29`'s close-out recommended the fixture as the next phase, on the claim that it was "the binding
-constraint, not the code". `P30` tested that claim with three experiments. **Two of the three suspected
-blockers are not the fixture at all**, and the third needs a route that was not found.
+`P30` closed by calling three FVS behaviours unknown and recommending an investigation phase. That was
+wrong: **all three are readable in the source, and two of them are a keyword field each.** This note records
+the answers, the lines they come from, and what they unblock.
 
-This note exists so the next attempt starts from the evidence rather than from the recommendation it
-replaces.
+The version of this file written earlier the same day said the fixture was the binding constraint. It was
+not. The constraint was **three keyword fields and one damage code**.
 
-## The fixture already produces several plots
+## 1. How FVS counts sample points: `DESIGN` field 4
 
-`to_tree_list` assigns `plot_id` per stand — `plots.setdefault(stand, len(plots) + 1)` — so passing five
-stands gives five plots. The tree list proves it:
-
-```text
-   1  1     10FD  18.9 0.0  4.9 ...
-   1  4     10FD  21.3 0.0  5.1 ...
-   2  1     10FD  53.1 0.0  7.8 ...
-```
-
-Plot 1 has trees, plot 2 has trees, and so on to plot 5. **Nothing needs adding to the fixture for
-multi-plot input.**
-
-## `FVS_Stats_Stand` is not blocked by the plot count
-
-The run with five plots still writes only `FVS_Stats_Species_Metric`, and its report says:
+`initre.f:798`, in the `DESIGN` handler:
 
 ```text
-DISTRIBUTION OF ATTRIBUTES AMONG SAMPLE POINTS CANNOT BE COMPUTED WITH ONE SAMPLE POINT.
+IF ( LNOTBK(4) ) IPTINV = IFIX( ARRAY(4) )
 ```
 
-So FVS counts **one** sample point although the tree list carries five plot ids. `stats.f` returns early on
-`IF(.NOT.LSTATS .OR. ITRN.EQ.0)`, and its comment at line 147 is explicit: with one point it writes the
-species statistics and goes on. Whatever makes FVS see a single point, it is not the number of plot ids in
-the tree list — so **the fixture is not the blocker**, and the next thing to read is how FVS derives its
-point count.
-
-## `FVS_Mortality_Metric` is not blocked by the stand size
-
-A five-plot population with **40 trees per stand** and a 100 percent `SIMFIRE` burn writes `FVS_Fuels_Metric`
-and no mortality table. `MORTREDB` is accepted — the report echoes `FFE MORTALITY INFO SENT TO SPECIFIED
-DATABASE` — and the writer returns early on `IF(IMORTF.EQ.0)`, which the option sets to 1. So the call is
-not reached, or nothing dies.
-
-**What would settle it**: a fire the FFE mortality model acts on, which needs a fuel model the stand's fuel
-load actually supports. That is a keyword question before it is a fixture question.
-
-## The dwarf-mistletoe rating is not the damage field
-
-Setting `damage1 = 21` with severity 2 on every tree, with a `MISTOE` block and `MISRPTS`, produces:
+`IPTINV` is the inventory point count. `initre.f:330` defaults it to `IPTKNT`, the number of points counted
+in the tree list, and `stats.f:147` then says:
 
 ```text
-NUMBER OF RECORDS WITH MISTLETOE                  0
+IF(IPTINV.GT.1) GO TO 50
+C  1 POINT.  PRINT ERROR MESSAGE AND GO WRITE SPECIES STATS TO DATABASE.
 ```
 
-and no dwarf-mistletoe table. The rating is not read from the damage columns: `comprs.f` moves it with
-`MISGET`/`MISPUT`, and the only `MISPUT` callers in the source are `MISPUTZ` in the regeneration routines,
-which **zero** it. Where the input sets a non-zero rating was not found.
+Every run in this project passed `DESIGN 0 1 999 1 ...` — field 4 is **1**. Five plots in the tree list
+made no difference, because the field overrode the count.
 
-So `damage1` is the wrong lever, and a fixture parameter for it would be a guess dressed as a feature.
+**With `DESIGN 0 1 999 5 0 5 1`, `FVS_Stats_Stand` is written.** The fixture never needed to change: the
+adapter already maps one plot per stand.
 
-## What this changes
+## 2. What makes the mortality table appear: `MORTREPT`
 
-- **The recommendation was wrong in two places.** `FVS_Stats_Stand` and `FVS_Mortality_Metric` are not
-  fixture problems; they are questions about how FVS counts sample points and what makes FFE kill a tree.
-- **The mistletoe route is unknown, not absent.** It exists — `MISGET`/`MISPUT` are the interface — but the
-  input path to it was not found in the time this note took.
-- **Nothing was added to the fixture**, because nothing was shown to be missing. A parameter that does not
-  reach FVS would be worse than none: it would look like capability.
+`fmfout.f:294` gates the whole section:
+
+```text
+IF (IFMMRB .LT. 0 .AND. IFIRE .GE. 0) THEN
+```
+
+`fmin.f:1372`, the `MORTREPT` option (number 28):
+
+```text
+IFMMRB = -1
+IFMMRE = -1
+```
+
+and its echo says it plainly: *"THE TREE MORTALITY REPORT WILL BE WRITTEN WHEN A FIRE OCCURS."*
+
+This project passed `MORTREDB` — the `DATABASE` option — and never `MORTREPT`. **With `MORTREPT` and
+`SIMFIRE`, `FVS_Mortality_Metric` is written**, on the three-tree fixture, with no fire that kills anything
+special.
+
+Note the contrast with the burn report, whose gate is the same shape: `BURNREPT` sets `IFMBRB = IY(1)`,
+which is **not** negative, so that one really is dead. The mortality option sets `-1`, so that one works.
+The two looked identical from the outside and are not.
+
+## 3. How a mistletoe rating enters: damage codes 30 to 34
+
+`misdam.f:63-80`:
+
+```text
+IMIST(ITREE)=0
+IF(.NOT.MISFLG) GO TO 9000
+DO 100 J=1,5,2
+   IF(ICODES(J).EQ.30.OR.ICODES(J).EQ.31.OR.ICODES(J).EQ.32.
+  &   OR.ICODES(J).EQ.33.OR.ICODES(J).EQ.34) THEN
+      IMIST(ITREE)=ICODES(J+1)
+```
+
+The damage code pair is (code, severity), codes **30 to 34** are dwarf mistletoe, and **the severity is the
+Hawksworth rating**, clamped to 0 to 6. `MISFLG` is `.TRUE.` from `misin0.f:86`, before any keyword is read.
+
+The earlier attempt used **code 21** and got `NUMBER OF RECORDS WITH MISTLETOE 0`. With **code 30 and
+severity 3**, the run reports eight infected records and writes `FVS_DM_Spp_Sum_Metric` and
+`FVS_DM_Stnd_Sum_Metric`.
+
+The adapter still hardcodes `damage1..3` to zero. That is a real gap — but it is an **adapter** gap of one
+parameter, not an inventory-state problem, and the route is now known.
+
+## What this says about the method
+
+Three questions that `P30` called unknown were answered by reading three files. The mistake was not the
+reading; it was treating "I ran an experiment and it did not work" as evidence about the software rather
+than about the experiment. A negative experiment constrains what I tried, not what FVS does.
+
+**The rule this project should keep**: before calling a behaviour unknown, grep for the variable that gates
+it and read the assignment. `IFMMRB`, `IPTINV` and `IMIST` each had a single obvious assignment.
+
+## What is still open
+
+- **`FVS_DM_Sz_Sum_Metric` and `FVS_DM_TreeList_Metric`**: all five `DBSMIS*` routines are called from
+  `misprt.f`, and two tables appear while these two do not. Their gates (`IDM3`, `IDM6`) are set to 1 by
+  `MISRPTS`, so something else — probably a per-cycle flag — decides. One more read.
+- **The root-disease tables**: `RDIN`'s field list is in `rdin.f` (date, method, two spread rates, the
+  Monte Carlo count, and a disease type 1 to 4), and the required parameter that was refused was not
+  identified. Also one more read.
+- **The regeneration tables**: they need an establishment model active, which is a keyword set, not a
+  fixture.

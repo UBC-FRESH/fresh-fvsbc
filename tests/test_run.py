@@ -718,6 +718,116 @@ def test_canfprof_writes_the_canopy_profile(tmp_path: Path) -> None:
     )
 
 
+def test_design_field_four_sets_the_sample_point_count(tmp_path: Path) -> None:
+    """``DESIGN``'s fourth field is the inventory point count, and the stand statistics need two.
+
+    ``initre.f`` reads it: ``IF ( LNOTBK(4) ) IPTINV = IFIX( ARRAY(4) )``. ``stats.f`` then reports
+    "CANNOT BE COMPUTED WITH ONE SAMPLE POINT" unless it is above one, which is what every run here
+    did until this field was set. **The fixture never had to change**: the adapter already maps one
+    plot per stand, so five stands give five plot ids in the tree list.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "INVSTATS", "ComputDB")),
+        Keyword("STDIDENT", ("POINTS five",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "5", "0", "5", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("STATS"),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(stands=("S1", "S2", "S3", "S4", "S5")),
+        species="FD",
+        tree_age=60.0,
+        keywords=keywords,
+        directory=tmp_path,
+    )
+    frame = read_table(result.database, "FVS_Stats_Stand")
+    assert not frame.empty
+    assert {"Characteristic", "Average", "Sample_Size"} <= set(frame.columns)
+
+
+def test_mortrept_and_a_fire_write_the_mortality_table(tmp_path: Path) -> None:
+    """``MORTREPT`` is the ``FMIN`` option that sets ``IFMMRB`` to -1, and the writer needs a fire.
+
+    ``fmfout.f`` gates the section on ``IF (IFMMRB .LT. 0 .AND. IFIRE .GE. 0)``, and ``fmin.f``
+    sets ``IFMMRB = -1`` for ``MORTREPT``. The ``DATABASE`` option ``MORTREDB`` alone is accepted
+    and writes nothing, the same trap as ``CARBREDB`` and ``BURNREDB``.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword(
+            "DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "MORTREDB", "FuelsOut", "ComputDB")
+        ),
+        Keyword("STDIDENT", ("MORT   fire",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("FMIN", (), ("FUELOUT            2", "MORTREPT", "SIMFIRE            1")),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    frame = read_table(result.database, "FVS_Mortality_Metric")
+    assert not frame.empty
+    assert {"SpeciesFVS", "Killed_class1", "Total_class1"} <= set(frame.columns)
+
+
+def test_damage_code_thirty_is_the_mistletoe_rating(tmp_path: Path) -> None:
+    """``misdam.f`` maps damage codes 30 to 34 onto the Hawksworth rating, and the severity is it.
+
+    ``IMIST(ITREE)=ICODES(J+1)`` for codes 30 to 34, clamped to 0 to 6. Code 21, a guess,
+    registers as no mistletoe at all: the report says ``NUMBER OF RECORDS WITH MISTLETOE 0``.
+    With 30 and a severity of 3 the run reports eight infected records and writes both tables.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    records = to_tree_list(synthetic_population(), species="FD", tree_age=60.0)
+    for record in records:
+        record["damage1"] = 30
+        record["severity1"] = 3
+    keywords = (
+        Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "MISRPTS", "ComputDB")),
+        Keyword("STDIDENT", ("MIST   damage",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("MISTOE"),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_case(records, keywords, directory=tmp_path)
+    stand = read_table(result.database, "FVS_DM_Stnd_Sum_Metric")
+    species = read_table(result.database, "FVS_DM_Spp_Sum_Metric")
+    assert not stand.empty
+    assert not species.empty
+    assert {"Mean_DMR", "Inf_TPH"} <= set(species.columns)
+
+
 def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     """An ``IF`` block is written as a conditional, and FVS's report shows it read the condition."""
     pytest.importorskip(

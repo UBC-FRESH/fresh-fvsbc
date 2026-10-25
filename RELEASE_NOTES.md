@@ -8,6 +8,22 @@ Pre-1.0, and the public API can change. The gaps that remain are listed at the e
 
 ## What changed since 0.8.0
 
+- **Four more tables, and three questions answered by reading the source instead of guessing.**
+  `FVS_Stats_Stand`, `FVS_Mortality_Metric`, `FVS_DM_Spp_Sum_Metric` and `FVS_DM_Stnd_Sum_Metric` join the
+  twenty-one, so the reader exposes **twenty-five of 44**.
+- **`DESIGN`'s fourth field is the inventory point count.** Every run here passed `1`, so `FVS_Stats_Stand`
+  — the distribution among sample points — could not be computed and said so. With `5` it is written. The
+  fixture never needed to change; the adapter already maps one plot per stand.
+- **`MORTREPT` is what makes the mortality table appear**, because `fmin.f` sets `IFMMRB = -1` for it and
+  `fmfout.f` gates the section on `IF (IFMMRB .LT. 0 .AND. IFIRE .GE. 0)`. `MORTREDB` alone is accepted and
+  writes nothing. The burn report's `BURNREPT` sets its equivalent to the inventory year, which is why that
+  one really is dead — two options that look identical and behave oppositely.
+- **A mistletoe rating enters through the damage columns**: `misdam.f` maps damage codes **30 to 34** onto
+  the Hawksworth rating, with the severity as the rating. Code 21, an earlier guess, registers as no
+  mistletoe at all.
+- **The previous release's "the fixture is the binding constraint" was wrong**, and
+  `notes/reference/fixture-limits.md` now records the three answers with the lines they come from.
+
 - **One more table, and a claim withdrawn.** `FVS_CanProfile` joins the twenty — the canopy fuels profile by
   height layer, which is the vertical structure a fuel or wildlife model wants — so the reader exposes
   **twenty-one of 44**. Its trigger, `CANFPROF` inside `FMIN`, was a guess in the candidate note and the
@@ -152,8 +168,8 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes twenty-one of 44 tables.** The other 23 are classified in
-   `notes/reference/table-reachability.md`: 18 have a writer and a call site and are candidates, five have
+1. **The reader exposes twenty-five of 44 tables.** The other 19 are classified in
+   `notes/reference/table-reachability.md`: 14 have a writer and a call site and are candidates, five have
    a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. A call site
    is not a promise; each candidate needs its own case, and `notes/reference/table-candidates.md` gives
    each one a cost, a risk and a value.
