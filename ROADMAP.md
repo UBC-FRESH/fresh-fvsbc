@@ -25,6 +25,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P14 Release 0.4.0 | #71 | `feature/p14-release-0-4-0` | complete |
 | P15 The conditional | #75 | `feature/p15-if-blocks` | complete |
 | P16 Release 0.5.0 | #79 | `feature/p16-release-0-5-0` | complete |
+| P17 The fuels and potfire tables | #82 | `feature/p17-extension-tables` | active |
 
 ## Lifecycle Map
 
@@ -514,6 +515,26 @@ Acceptance criteria:
 
 - The package reports `0.5.0`, the notes say what changed and what remains, and a clean checkout installs it and runs a case with an `IF` block.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 17: The fuels and potfire tables
+
+Parent issue: #82
+Branch: `feature/p17-extension-tables`
+Status: active
+
+Goal: reach the tables that need an extension, starting with the three one `FMIN` block unlocks.
+
+- [ ] P17.1 Write `FMIN` and expose the three tables (#83)
+  - [ ] `FMIN` joins the line blocks.
+  - [ ] Expose `FVS_Fuels_Metric`, `FVS_PotFire_Metric` and `FVS_PotFire_Cond_Metric`.
+  - [ ] A run with an `FMIN` block writes all three, and the reader returns them.
+  - [ ] Correct the two contract pages.
+
+Acceptance criteria:
+
+- `FMIN` renders as a line block, and a run with it writes the three tables.
+- The reader exposes eleven tables, and the three are non-empty with their identity column.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

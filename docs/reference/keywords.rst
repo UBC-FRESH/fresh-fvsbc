@@ -63,11 +63,13 @@ Some keywords are the exception, because they read records of their own rather t
 
 - ``STDIDENT`` takes the record after it as the stand id and title (``canada/bc/initre.f``).
 - ``TREEFMT`` takes the two records after it as the format (``metric/base/intree.f``).
-- ``COMMENT``, ``COMPUTE`` and ``DATABASE`` take a **block of text lines** ended by ``END``. A caller
-  supplies the lines and the writer supplies the terminator, because a block without one swallows the
-  rest of the file. **A ``DATABASE`` block must precede the stand setup**: FVS refuses it later with
-  ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it first. The
-  validator refuses a set that puts it after ``STDIDENT``, ``STDINFO`` or ``STANDSQL``.
+- ``COMMENT``, ``COMPUTE``, ``DATABASE`` and ``FMIN`` take a **block of text lines** ended by ``END``.
+  A caller supplies the lines and the writer supplies the terminator, because a block without one
+  swallows the rest of the file. **A ``DATABASE`` block must precede the stand setup**: FVS refuses it
+  later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it
+  first. The validator refuses a set that puts it after ``STDIDENT``, ``STDINFO`` or ``STANDSQL``.
+  **``FMIN`` is how a caller asks for the fuels and potfire tables**: ``FUELOUT``, ``FUELREPT`` and
+  ``POTFIRE`` are options inside it rather than keywords, which is why they are not in the table.
 - ``IF`` takes a block of **keywords** rather than lines: the condition record, ``THEN``, the body, and
   ``ENDIF``, with an optional ``ELSE`` branch. The official case's form is the one the run test checks.
   **``ALSOTRY`` is not modelled**, because no fixture here uses it.
