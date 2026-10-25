@@ -291,7 +291,9 @@ The detail for each phase lives in its focused plan under `notes/`; the evidence
 
 - **The current open items are the twelve known gaps in `RELEASE_NOTES.md`**, and **`notes/triage.md`
   gives each a disposition** — fix now, fix later with a phase, or accepted with the reason and what
-  would reopen it. It is the backlog the review cadence reviews against.
+  would reopen it. It is the backlog the review cadence reviews against. **Two rows are proposed for a
+  `P7`** — the block keywords and the validator's temporary-path pattern — and its scope is the
+  maintainer's to set rather than the table's to assume.
 - **`run_case`'s non-re-entrancy and the thread-safety limit** are `P6.2`, and the mechanism is a
   decision rather than an assumption.
 - **The review cadence and its first review** are `P6.3`.

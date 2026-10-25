@@ -59,8 +59,8 @@ is in the same sentence.
 ## Known gaps
 
 Each is open for a stated reason, and each says where it is recorded. **Every one is triaged in
-`notes/triage.md`**, which says which are being fixed, which are scheduled, and which are accepted with
-the reason and what would reopen them.
+`notes/triage.md`**, which says which are being fixed, which are proposed for a later phase, and which are
+accepted with the reason and what would reopen them.
 
 1. **`run_case` is not re-entrant in a process, and a run is not thread-safe.** A second run inherits
    the first one's Fortran state, so two runs in one process are not independent, and the directory
