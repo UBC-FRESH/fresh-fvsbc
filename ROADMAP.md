@@ -272,10 +272,10 @@ the phase criteria, the order and its reason, and the open proposals.
   - [x] Bring the choice back as a decision with the evidence, before changing the API.
   - [x] Implement the chosen mechanism, with the docstrings and docs corrected to match.
   - [x] Add the test that shows the second run cannot silently disagree, and a mutation the harness catches.
-- [ ] P6.3 Set the review cadence and record the first review (#40)
-  - [ ] State the cadence, what it covers, and who holds it.
-  - [ ] Record the first review: the triaged backlog, the release's state, and the model log's re-checks.
-  - [ ] Say where the next review is recorded, so that a missed one is visible rather than silent.
+- [x] P6.3 Set the review cadence and record the first review (#40)
+  - [x] State the cadence, what it covers, and who holds it.
+  - [x] Record the first review: the triaged backlog, the release's state, and the model log's re-checks.
+  - [x] Say where the next review is recorded, so that a missed one is visible rather than silent.
 
 Acceptance criteria:
 
