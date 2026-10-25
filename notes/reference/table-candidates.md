@@ -4,9 +4,9 @@
 have a writer and a call site** — the candidates — five have a writer that nothing calls, and one has a
 gate no valid input satisfies.
 
-**Four are wired as of `P27`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
-`FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` — which took the reader from fourteen tables to
-eighteen. They stay in place below, marked **wired**, because their estimates are the record of what they
+**Six are wired as of `P28`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
+`FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` in `P27`, then `FVS_StrClass_Metric` and
+`FVS_ATRTList_Metric` in `P28` — which took the reader from fourteen tables to twenty. They stay in place below, marked **wired**, because their estimates are the record of what they
 cost and the evidence for the estimates on the rest.
 
 This note exists so the remaining work can be planned rather than apologised for. It gives each candidate
@@ -157,12 +157,12 @@ Effort is the work to wire one table, assuming the trigger is found on the first
 | --- | --- | --- | --- | --- |
 | `FVS_TreeList_Metric` | S | low — checkable against the tree list the run consumed | **high** — no per-tree output exists at all | **wired in `P27`** |
 | `FVS_CutList_Metric` | S | low — same check | **high** — removals are the question most runs ask | **wired in `P27`** |
-| `FVS_ATRTList_Metric` | S | medium — wide, and the attribute meanings are undocumented here | medium | |
+| `FVS_ATRTList_Metric` | S | medium — wide, and the attribute meanings are undocumented here | medium | **wired in `P28`** |
 | `FVS_Mortality_Metric` | S | low | **high** — mortality by agent is the forest-health question | |
 | `FVS_Down_Wood_Cov_Metric` | S | low | medium — CWD models | **wired in `P27`** |
 | `FVS_Stats_Stand` | S | medium — no oracle; checkable only for internal consistency | **high** — the numbers most reports quote | |
 | `FVS_Stats_Species_Metric` | S | medium — same | medium | **wired in `P27`** |
-| `FVS_StrClass_Metric` | S | medium — the class boundaries are a model choice, not a fact | **high** for BC old-growth work | |
+| `FVS_StrClass_Metric` | S | medium — the class boundaries are a model choice, not a fact | **high** for BC old-growth work | **wired in `P28`** |
 | `FVS_Climate_Metric` | S | **high** — no way to check the indices without a second source | medium | |
 | `FVS_CanProfile` | M | medium — the trigger is a guess (`CANFPROF`) | medium | |
 | `FVS_Regen_Tally_Metric` | M | medium — needs an establishment model active | **high** for BC silviculture | |
@@ -182,7 +182,9 @@ Cheapest first, and each step leaves the dashboard green:
    `FVS_Stats_Species_Metric`, which came along with the statistics option. Four tables, and the
    per-tree hole is closed. **Two from this step resisted**: `FVS_Mortality_Metric` needs a fire that
    kills trees, and `FVS_Stats_Stand` needs a stand with more than one sample point.
-2. **`FVS_StrClass_Metric` and `FVS_ATRTList_Metric`** — same pattern, higher value in BC, wider table.
+2. **Done in `P28`** — `FVS_StrClass_Metric` and `FVS_ATRTList_Metric`. The attribute list needed
+   more than the note predicted: it is the *after-treatment* listing, so it needs a removal that leaves
+   trees, and a removal that takes everything creates the table and inserts nothing.
 3. **`FVS_Regen_*` (3)** and **`FVS_CanProfile`** — the `M` group, one phase each.
 4. **`FVS_Stats_Species_Metric`, `FVS_Climate_Metric`, `FVS_CalibStats`** — the low-value tail.
 5. **The damage agents (7)** — a phase of its own, and it needs a fixture change first, so it should be

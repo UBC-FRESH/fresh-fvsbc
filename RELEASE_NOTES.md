@@ -8,6 +8,14 @@ Pre-1.0, and the public API can change. The gaps that remain are listed at the e
 
 ## What changed since 0.8.0
 
+- **Two more tables, and one of them is the BC-specific one.** `FVS_StrClass_Metric` carries the
+  **structural stage** — the class BC uses for old-growth and habitat assessment — and
+  `FVS_ATRTList_Metric` the after-treatment attribute list. The reader exposes **twenty of 44**.
+- **The attribute list is the sharpest case yet of a table that needs more than a request.** Its writer
+  returns unless it is called from `cuts.f`, so it is written only after a cutting operation, and a
+  removal that takes everything creates the table and inserts **nothing**. A partial removal — a residual
+  of zero with half the selected trees taken — is what produces rows.
+
 - **Four more tables are readable, and they close the per-tree hole.** `FVS_TreeList_Metric`,
   `FVS_CutList_Metric`, `FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` join the fourteen, so
   the reader exposes **eighteen**. Before this release the package had **no per-tree output at all**: a
@@ -130,8 +138,8 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes eighteen of 44 tables.** The other 26 are classified in
-   `notes/reference/table-reachability.md`: 21 have a writer and a call site and are candidates, five have
+1. **The reader exposes twenty of 44 tables.** The other 24 are classified in
+   `notes/reference/table-reachability.md`: 19 have a writer and a call site and are candidates, five have
    a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. A call site
    is not a promise; each candidate needs its own case, and `notes/reference/table-candidates.md` gives
    each one a cost, a risk and a value.
