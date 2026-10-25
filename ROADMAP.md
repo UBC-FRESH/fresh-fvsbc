@@ -25,7 +25,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P14 Release 0.4.0 | #71 | `feature/p14-release-0-4-0` | complete |
 | P15 The conditional | #75 | `feature/p15-if-blocks` | complete |
 | P16 Release 0.5.0 | #79 | `feature/p16-release-0-5-0` | complete |
-| P17 The fuels and potfire tables | #82 | `feature/p17-extension-tables` | active |
+| P17 The fuels and potfire tables | #82 | `feature/p17-extension-tables` | complete |
 
 ## Lifecycle Map
 
@@ -521,15 +521,15 @@ Acceptance criteria:
 
 Parent issue: #82
 Branch: `feature/p17-extension-tables`
-Status: active
+Status: complete
 
 Goal: reach the tables that need an extension, starting with the three one `FMIN` block unlocks.
 
-- [ ] P17.1 Write `FMIN` and expose the three tables (#83)
-  - [ ] `FMIN` joins the line blocks.
-  - [ ] Expose `FVS_Fuels_Metric`, `FVS_PotFire_Metric` and `FVS_PotFire_Cond_Metric`.
-  - [ ] A run with an `FMIN` block writes all three, and the reader returns them.
-  - [ ] Correct the two contract pages.
+- [x] P17.1 Write `FMIN` and expose the three tables (#83)
+  - [x] `FMIN` joins the line blocks.
+  - [x] Expose `FVS_Fuels_Metric`, `FVS_PotFire_Metric` and `FVS_PotFire_Cond_Metric`.
+  - [x] A run with an `FMIN` block writes all three, and the reader returns them.
+  - [x] Correct the two contract pages.
 
 Acceptance criteria:
 
