@@ -60,6 +60,8 @@ def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) ->
         connection.execute("create table FVS_Fuels_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_PotFire_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_PotFire_Cond_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_Carbon_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_Hrv_Carbon (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagDet_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagSum_Metric (CaseID text, Year integer)")
         connection.commit()
@@ -102,11 +104,13 @@ def test_the_cases_columns_are_the_contracts_twelve() -> None:
 def test_only_the_tested_tables_are_exposed() -> None:
     """Contract rule 3: a table the reader has not tested is not in the API."""
     assert EXPOSED_TABLES == (
+        "FVS_Carbon_Metric",
         "FVS_Cases",
         "FVS_Compute",
         "FVS_Down_Wood_Vol_Metric",
         "FVS_Error",
         "FVS_Fuels_Metric",
+        "FVS_Hrv_Carbon",
         "FVS_InvReference",
         "FVS_PotFire_Cond_Metric",
         "FVS_PotFire_Metric",
@@ -139,7 +143,7 @@ def test_an_unexposed_table_is_refused_even_though_the_database_holds_it(tmp_pat
     """Rule 3 is about what the reader exposes, not about what is present."""
     path = a_database(tmp_path / "out.db")
     with pytest.raises(UnknownTableError, match="is not exposed"):
-        read_table(path, "FVS_Carbon_Metric")
+        read_table(path, "FVS_BurnReport_Metric")
 
 
 def test_a_table_the_database_lacks_is_refused(tmp_path: Path) -> None:

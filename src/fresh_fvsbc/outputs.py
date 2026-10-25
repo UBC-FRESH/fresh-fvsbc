@@ -6,15 +6,19 @@ exposes the tables it has tested, and separates the two kinds of row that ``FVS_
 What the run actually gives, and why this reader is shaped this way
 -------------------------------------------------------------------
 
-The contract says the database is the primary output and names 32 ``FVS_`` tables. A run driven
-through PyFVS's step API — the route this project uses — produces a database holding
-**``FVS_Cases`` and ``FVS_Error``**, and no more. The rest need a ``DATABASE`` output block to ask
-for them, and PyFVS already occupies that block: a keyword file carrying its own is refused with
-``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT AND WAS IGNORED``. PyFVS's own API exposes
-no output-database configuration either, so there is no supported way to ask through it.
+The contract says the database is the primary output and names 44 ``FVS_`` tables. **Which of
+them a run writes is the keyword set's business**: a ``DATABASE`` block names the tables, and a
+table it does not name is absent. An earlier revision of this docstring said a run produced
+``FVS_Cases`` and ``FVS_Error`` and no more, because PyFVS occupied the block; both claims were
+wrong, and the run that reads thirteen tables disproved them.
 
-The summary is still available, in two other places: ``FVS.summary`` returns it in memory, and the
-run writes a fixed-width ``.sum`` report beside the database. Reading those is not this work.
+Some tables need more than a ``DATABASE`` option. ``FMIN`` is a block of options — ``FUELOUT``,
+``POTFIRE`` and ``CARBREPT`` live inside it, not in the keyword table — and it is how a caller
+reaches the fuels, potfire and carbon tables. ``notes/reference/table-reachability.md`` records
+which of the rest can be written at all, and why the others cannot.
+
+The summary is also returned in memory by ``FVS.summary``, and the run writes a fixed-width ``.sum``
+report beside the database.
 
 ``FVS_Error`` is not an error channel only
 ------------------------------------------
@@ -126,11 +130,13 @@ IDENTITY_COLUMN: str = "CaseID"
 #: The tables this reader exposes. Contract rule 3: a table it has not tested is not in the API, and
 #: these two are the ones a run through the FFI is known to write.
 EXPOSED_TABLES: tuple[str, ...] = (
+    "FVS_Carbon_Metric",
     "FVS_Cases",
     "FVS_Compute",
     "FVS_Down_Wood_Vol_Metric",
     "FVS_Error",
     "FVS_Fuels_Metric",
+    "FVS_Hrv_Carbon",
     "FVS_InvReference",
     "FVS_PotFire_Cond_Metric",
     "FVS_PotFire_Metric",

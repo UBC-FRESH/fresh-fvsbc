@@ -452,6 +452,44 @@ def test_an_fmin_block_writes_the_fuels_and_potfire_tables(tmp_path: Path) -> No
         assert "CaseID" in list(frame.columns)
 
 
+def test_a_carbrept_option_writes_the_two_carbon_tables(tmp_path: Path) -> None:
+    """``CARBREPT`` inside ``FMIN`` is what reaches the carbon writer, and no keyword does.
+
+    ``DBSFMCRPT`` has one call site, in ``fmcrbout.f``, and that routine returns early unless
+    ``ICRPTB`` is set. ``CARBREPT`` is the option that sets it, and the ``DATABASE`` option
+    ``CARBREDB`` alone leaves both tables absent. The values are real: a year-0 stand carries
+    non-zero carbon, and a period whose components FVS leaves undefined carries NULL.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "CARBREDB", "ComputDB")),
+        Keyword("STDIDENT", ("CARBON  fmin",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("FMIN", (), ("CARBREPT",)),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    stand = read_table(result.database, "FVS_Carbon_Metric")
+    harvest = read_table(result.database, "FVS_Hrv_Carbon")
+    assert not stand.empty
+    assert not harvest.empty
+    assert stand["Total_Stand_Carbon"].iloc[0] > 0.0
+    assert "Aboveground_Total_Live" in list(stand.columns)
+    assert "Merch_Carbon_Removed" in list(harvest.columns)
+
+
 def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     """An ``IF`` block is written as a conditional, and FVS's report shows it read the condition."""
     pytest.importorskip(

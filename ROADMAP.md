@@ -28,6 +28,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P17 The fuels and potfire tables | #82 | `feature/p17-extension-tables` | complete |
 | P18 What the remaining tables need | #86 | `feature/p18-table-reachability` | complete |
 | P19 Release 0.6.0 | #90 | `feature/p19-release-0-6-0` | complete |
+| P20 The carbon tables | #95 | `feature/p20-carbon` | active |
 
 ## Lifecycle Map
 
@@ -577,6 +578,27 @@ Acceptance criteria:
 
 - The package reports `0.6.0`, the notes say what changed and what remains, and a clean checkout installs it and reads one of the new tables.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 20: The carbon tables
+
+Parent issue: #95
+Branch: `feature/p20-carbon`
+Status: active
+
+Goal: expose the two carbon tables, because the writer they need is one option away and no keyword
+reaches it.
+
+- [ ] P20.1 Write `CARBREPT` and expose the carbon tables (#96)
+  - [ ] Expose `FVS_Carbon_Metric` and `FVS_Hrv_Carbon`.
+  - [ ] A run with `CARBREPT` in an `FMIN` block writes both, and the first period carries a non-zero total.
+  - [ ] Document the NULL that FVS writes into `Total_Stand_Carbon` when a component is undefined.
+  - [ ] Correct the contract pages, the reachability record, and the module docstring.
+
+Acceptance criteria:
+
+- A run with `CARBREPT` in an `FMIN` block writes both carbon tables, with a non-zero total in the first period.
+- The reader exposes thirteen tables, and the NULL that FVS writes is documented rather than hidden.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

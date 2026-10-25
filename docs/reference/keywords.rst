@@ -68,8 +68,12 @@ Some keywords are the exception, because they read records of their own rather t
   swallows the rest of the file. **A ``DATABASE`` block must precede the stand setup**: FVS refuses it
   later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it
   first. The validator refuses a set that puts it after ``STDIDENT``, ``STDINFO`` or ``STANDSQL``.
-  **``FMIN`` is how a caller asks for the fuels and potfire tables**: ``FUELOUT``, ``FUELREPT`` and
-  ``POTFIRE`` are options inside it rather than keywords, which is why they are not in the table.
+  **``FMIN`` is how a caller asks for the fuels, potfire and carbon tables**: ``FUELOUT``,
+  ``FUELREPT``, ``POTFIRE`` and ``CARBREPT`` are options inside it rather than keywords, which is why
+  they are not in the table. Each writes its tables only when the ``DATABASE`` block names the matching
+  option — ``FuelsOut``, ``FuelReDB``, ``PotfirDB`` or ``CARBREDB`` — and ``CARBREDB`` alone writes
+  nothing: the carbon writer is reached by ``CARBREPT``, and its values are zero until a period has
+  something to report.
 - ``IF`` takes a block of **keywords** rather than lines: the condition record, ``THEN``, the body, and
   ``ENDIF``, with an optional ``ELSE`` branch. The official case's form is the one the run test checks.
   **``ALSOTRY`` is not modelled**, because no fixture here uses it.
