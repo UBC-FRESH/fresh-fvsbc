@@ -20,7 +20,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P9 The database block | #50 | `feature/p9-database-block` | complete |
 | P10 Release 0.3.0 | #55 | `feature/p10-release-0-3-0` | complete |
 | P11 The command's block form, and 0.3.1 | #58 | `feature/p11-block-form` | complete |
-| P12 The table names | #62 | `feature/p12-table-names` | active |
+| P12 The table names | #62 | `feature/p12-table-names` | complete |
 
 ## Lifecycle Map
 
@@ -411,7 +411,7 @@ Acceptance criteria:
 
 Parent issue: #62
 Branch: `feature/p12-table-names`
-Status: active
+Status: complete
 
 Goal: the contract's table list is the base schema's and BC builds the metric one, so twenty-four names
 are wrong for this variant. Record it, then correct it from the schema.
