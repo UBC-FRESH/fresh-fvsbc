@@ -16,6 +16,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P5 Release and deploy | #31 | `feature/p5-release` | complete |
 | P6 Operate and maintain | #37 | `feature/p6-operate` | complete |
 | P7 Keyword blocks and gate hygiene | #43 | `feature/p7-blocks-and-gates` | complete |
+| P8 Release 0.2.0 | #47 | `feature/p8-release-0-2-0` | complete |
 
 ## Lifecycle Map
 
@@ -307,6 +308,25 @@ Acceptance criteria:
 - The line blocks are written and FVS reads them, and ``IF`` is refused with a message that says why.
 - A POSIX temporary path in a tracked file fails the validator, and a placeholder or a repository-relative path does not.
 - ``python scripts/dashboard.py`` exits zero on the head commit of the phase branch.
+
+## Phase 8: Release 0.2.0
+
+Parent issue: #47
+Branch: `feature/p8-release-0-2-0`
+Status: complete
+
+Goal: release `0.2.0`, because `main` carries a correctness fix for a defect that is in `v0.1.0`.
+
+- [x] P8.1 Version and notes for 0.2.0 (#48)
+  - [x] Bump `pyproject.toml` and `__init__.py` to `0.2.0`, together, because a test asserts they agree.
+  - [x] Rewrite `RELEASE_NOTES.md` for 0.2.0: what changed since 0.1.0, the pins, and the gaps that remain with their limits.
+  - [x] Name the gaps that closed, and narrow the block-keyword gap to `IF`.
+
+Acceptance criteria:
+
+- The package reports `0.2.0`, the notes name the build it wraps and the gaps that remain, and a clean checkout installs the release and runs one case.
+- The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit of the phase branch.
 
 ## Open decisions and where the detail lives
 
