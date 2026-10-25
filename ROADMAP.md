@@ -32,7 +32,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P21 Release 0.7.0 | #99 | `feature/p21-release-0-7-0` | complete |
 | P22 The consumption table | #103 | `feature/p22-consumption` | complete |
 | P23 Release 0.8.0 | #107 | `feature/p23-release-0-8-0` | complete |
-| P24 The sweep over the remaining tables | #111 | `feature/p24-sweep` | active |
+| P24 The sweep over the remaining tables | #111 | `feature/p24-sweep` | complete |
 
 ## Lifecycle Map
 
@@ -674,16 +674,16 @@ Acceptance criteria:
 
 Parent issue: #111
 Branch: `feature/p24-sweep`
-Status: active
+Status: complete
 
 Goal: classify all 44 tables mechanically, so the table question closes with a record instead of an open
 invitation — and correct the claim the sweep disproves.
 
-- [ ] P24.1 Sweep the 44 tables and correct the record (#112)
-  - [ ] Sweep all 44: writer by source mention, call sites by `grep -rl "CALL <name>"`.
-  - [ ] Rewrite the reachability note as the definitive classification.
-  - [ ] Correct the "no writer" claim in every live document.
-  - [ ] Record the correction in the changelog.
+- [x] P24.1 Sweep the 44 tables and correct the record (#112)
+  - [x] Sweep all 44: writer by source mention, call sites by `grep -rl "CALL <name>"`.
+  - [x] Rewrite the reachability note as the definitive classification.
+  - [x] Correct the "no writer" claim in every live document.
+  - [x] Record the correction in the changelog.
 
 Acceptance criteria:
 
