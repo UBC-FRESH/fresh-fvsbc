@@ -14,7 +14,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P3 Build | #17 | `feature/p3-build` | complete |
 | P4 Verify | #25 | `feature/p4-verify` | complete |
 | P5 Release and deploy | #31 | `feature/p5-release` | complete |
-| P6 Operate and maintain | #37 | `feature/p6-operate` | active |
+| P6 Operate and maintain | #37 | `feature/p6-operate` | complete |
 
 ## Lifecycle Map
 
@@ -255,7 +255,7 @@ Acceptance criteria:
 
 Parent issue: #37
 Branch: `feature/p6-operate`
-Status: active
+Status: complete
 
 Goal: keep the project current: triage incoming ideas, review on a cadence, and close out cleanly.
 
