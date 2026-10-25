@@ -75,8 +75,9 @@ evidence, and says how strong that evidence is. A changed choice adds a row; an 
        ``P4``, ``P5`` and ``P6``, and per-task plan comments were posted from ``P3.5`` on, but
        ``P3.1`` to ``P3.4`` carry none. The plan of record went stale twice: ``P3``'s roadmap notes
        were four phases out of date and were found in ``P6``, and ``P4.4``'s premise was false when
-       the task opened. A conclusion in an approved report was wrong. The Verifier caught the last
-       two; the stale roadmap it did not.
+       the task opened. A conclusion in an approved report was wrong. **The Verifier caught the
+       conclusion and the release metadata; it did not catch the stale roadmap or ``P4.4``'s false
+       premise.**
      - ``2027-01-04``
    * - 2026-10-25
      - Verifier, re-check at the first quarterly review.
@@ -89,6 +90,11 @@ evidence, and says how strong that evidence is. A changed choice adds a row; an 
        that nothing asserted every name in ``__all__`` resolves, which had been false since ``P2``; it
        checks claims about the work and not every file the work cites.
      - ``2027-01-04``
+
+**An old row's choice and its evidence are not edited.** A pointer may be corrected when it names
+something that no longer exists, and the correction is recorded in the review that made it: the two
+2026-10-23 rows' Re-check cells named the seed workflow's ``P5.2``, and the 2026-10-25 review corrected
+them to this project's review dates.
 
 A model that misses the bar for a family is replaced for that family, and the replacement is logged
 with its reason. The workflow's seed project logs one further choice, ``claude-haiku-5-5`` as

@@ -48,8 +48,10 @@ Where the records live
 ----------------------
 
 One file per review, `notes/reviews/YYYY-MM-DD.md`, named for the date it was held. **A record is not
-edited after it is written**; a later review corrects an earlier one by saying so, which is the rule
-this project applies to its approved reports.
+edited after the maintainer approves it**; a later review corrects an earlier one by saying so, which is
+the rule this project applies to its approved reports. **Before approval it is a draft**, and a
+Verifier's findings correct it, exactly as `P2`'s close-out report was revised before it was approved.
+The record says when it was revised and why.
 
 The schedule
 ------------
