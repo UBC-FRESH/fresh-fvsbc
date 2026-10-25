@@ -272,7 +272,7 @@ the phase criteria, the order and its reason, and the open proposals.
   - [x] Bring the choice back as a decision with the evidence, before changing the API.
   - [x] Implement the chosen mechanism, with the docstrings and docs corrected to match.
   - [x] Add the test that shows the second run cannot silently disagree, and a mutation the harness catches.
-- [x] P6.3 Set the review cadence and record the first review (#40)
+- [x] P6.3 Set the review cadence and record the first review (#40) — **built, then reverted at the maintainer's direction**: a quarterly cadence, a due-date table and per-review records were 202 lines and five commits to schedule a review of a twelve-item list where nine items are "won't fix". The rule is one line, above.
   - [x] State the cadence, what it covers, and who holds it.
   - [x] Record the first review: the triaged backlog, the release's state, and the model log's re-checks.
   - [x] Say where the next review is recorded, so that a missed one is visible rather than silent.
@@ -296,9 +296,8 @@ The detail for each phase lives in its focused plan under `notes/`; the evidence
   maintainer's to set rather than the table's to assume.
 - **`run_case`'s non-re-entrancy and the thread-safety limit** are `P6.2`, and the mechanism is a
   decision rather than an assumption.
-- **The review cadence and its first review** are `P6.3`: quarterly, on the first Monday of January,
-  April, July and October, with the records in `notes/reviews/` and a due-date table that makes a missed
-  review visible.
+- **The triage is reviewed at each phase close-out**, in the phase's own report, and a disposition
+  changes only in a change set that names the review that changed it.
 
 **Every earlier open decision is closed, and an earlier revision of this section listed five of them as
 open for four phases.** The CI quality matrix was done in `P3.1` (#18); `ADR 0004` was accepted on

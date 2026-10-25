@@ -9,4 +9,3 @@ this project records only its own choices.
    :maxdepth: 1
 
    roles-and-models
-   reviews
