@@ -267,11 +267,11 @@ the phase criteria, the order and its reason, and the open proposals.
   - [x] Assign each a disposition: fix now, fix later with a named phase, or accepted with a reason.
   - [x] Record the table where a reader looks, and say what the disposition costs.
   - [x] Propose a phase for anything marked fix-later that no phase covers.
-- [ ] P6.2 Make two runs in one process safe (#39)
-  - [ ] Spike both mechanisms and record what each costs: a guard that refuses a second run, and a subprocess per run.
-  - [ ] Bring the choice back as a decision with the evidence, before changing the API.
-  - [ ] Implement the chosen mechanism, with the docstrings and docs corrected to match.
-  - [ ] Add the test that shows the second run cannot silently disagree, and a mutation the harness catches.
+- [x] P6.2 Make two runs in one process safe (#39)
+  - [x] Spike both mechanisms and record what each costs: a guard that refuses a second run, and a subprocess per run.
+  - [x] Bring the choice back as a decision with the evidence, before changing the API.
+  - [x] Implement the chosen mechanism, with the docstrings and docs corrected to match.
+  - [x] Add the test that shows the second run cannot silently disagree, and a mutation the harness catches.
 - [ ] P6.3 Set the review cadence and record the first review (#40)
   - [ ] State the cadence, what it covers, and who holds it.
   - [ ] Record the first review: the triaged backlog, the release's state, and the model log's re-checks.
