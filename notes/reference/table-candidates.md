@@ -4,11 +4,11 @@
 have a writer and a call site** — the candidates — five have a writer that nothing calls, and one has a
 gate no valid input satisfies.
 
-**Eleven are wired as of `P31`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
+**Fifteen are wired as of `P32`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
 `FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` in `P27`, `FVS_StrClass_Metric` and
 `FVS_ATRTList_Metric` in `P28`, `FVS_CanProfile` in `P30`, then `FVS_Stats_Stand`, `FVS_Mortality_Metric`,
-`FVS_DM_Spp_Sum_Metric` and `FVS_DM_Stnd_Sum_Metric` in `P31`. The reader went from fourteen tables to
-**twenty-five**.
+`FVS_DM_Spp_Sum_Metric` and `FVS_DM_Stnd_Sum_Metric` in `P31`, then the other two dwarf-mistletoe tables
+and the two root-disease summaries in `P32`. The reader went from fourteen tables to **twenty-nine**.
 
 **Every estimate on this page that said "needs an infection state" or "needs a stand the fixture cannot
 express" was wrong**, and `notes/reference/fixture-limits.md` records why: the three blockers were a
@@ -177,8 +177,8 @@ Effort is the work to wire one table, assuming the trigger is found on the first
 | `FVS_Regen_SitePrep` | M | medium | low | |
 | `FVS_CalibStats` | S | **high** — meaningless without calibration | low | |
 | `FVS_FIAVBC_*` (3) | M | **high** — probably behind a variant flag this build never sets | medium, to FIA users only | |
-| `FVS_DM_*` (4) | S | low — damage code 30 and a severity | **high** in BC | **two of four wired in `P31`** |
-| `FVS_RD_*` (3) | **L** | high — same, plus `RDIN`'s required parameters are undetermined | **high** in BC | |
+| `FVS_DM_*` (4) | S | low — damage code 30 and a severity | **high** in BC | **all four wired** |
+| `FVS_RD_*` (3) | S | low — `RRINIT` and `RRDOUT` inside the block | **high** in BC | **two of three wired in `P32`** |
 | `FVS_BurnReport_Metric` | — | **cannot be wired** — the gate needs an invalid input | none | |
 
 ## A proposed order

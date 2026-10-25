@@ -40,6 +40,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P29 Release 0.9.0 | #131 | `feature/p29-release-0-9-0` | complete |
 | P30 CanProfile and the fixture limits | #135 | `feature/p30-canprofile-fixture` | complete |
 | P31 The three questions, answered | #139 | `feature/p31-three-questions` | complete |
+| P32 The rest of the damage agents | #143 | `feature/p32-dm-rd-rest` | active |
 
 ## Lifecycle Map
 
@@ -841,6 +842,27 @@ Acceptance criteria:
 - A run writes all four tables, and the reader exposes twenty-five.
 - Each answer names the file and line it comes from.
 - The note that called the fixture the constraint is replaced by the answers.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 32: The rest of the damage agents
+
+Parent issue: #143
+Branch: `feature/p32-dm-rd-rest`
+Status: active
+
+Goal: finish the dwarf-mistletoe family and take the two root-disease tables that are reachable, by reading
+the gates first.
+
+- [ ] P32.1 The rest of the damage agents (#144)
+  - [ ] `RDIN` joins the line blocks.
+  - [ ] Expose the two remaining dwarf-mistletoe tables and the two root-disease tables.
+  - [ ] A run with `MISTPRT`/`NEWSPRED`, and one with `RRINIT`/`RRDOUT`, writes all four.
+  - [ ] Update the contract pages, the reachability note and the candidate note.
+
+Acceptance criteria:
+
+- A run writes all four tables, and the reader exposes twenty-nine.
+- Each recipe names the flag it sets and the line it is set on.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
