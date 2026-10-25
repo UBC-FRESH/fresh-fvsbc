@@ -32,6 +32,7 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -302,26 +303,36 @@ def dump_sections(text: str) -> dict[str, list[str]]:
     return sections
 
 
-def test_the_official_dump_names_the_tables_the_reader_exposes() -> None:
-    """The reader exposes a table only when the official case's dump has rows for it.
+def test_every_table_the_official_case_writes_is_exposed() -> None:
+    """The oracle run writes only tables the reader exposes, so nothing it produces is unreachable.
 
-    ``FVS_InvReference`` is the exception: it postdates the 2022 fixture, so the dump has no section
-    for it and its exposure rests on the schema rather than on the dump.
+    The reverse is not true: three tables need an ``FMIN`` block the official case's own key does
+    not produce through this route, and ``tests/test_run.py`` covers those.
     """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
     case = case_directory()
-    sections = dump_sections((case / f"{CASE}DBdump.txt.save").read_text(encoding="latin-1"))
-    named = {DUMP_NAMES.get(name, name) for name in EXPOSED_TABLES} - {
-        "FVS_InvReference",
-        "FVS_Error",
-    }
-    assert named <= set(sections)
+    workdir = Path(tempfile.mkdtemp()) / "official"
+    workdir.mkdir()
+    written = run_case_in_child(case, workdir)
+    assert len(written) == 1
+    connection = sqlite3.connect(written[0])
+    try:
+        tables = {
+            row[0]
+            for row in connection.execute("select name from sqlite_master where type='table'")
+        }
+    finally:
+        connection.close()
+    assert tables <= set(EXPOSED_TABLES), sorted(tables - set(EXPOSED_TABLES))
 
 
-def test_the_exposed_tables_match_the_dump_row_for_row(tmp_path: Path) -> None:
-    """Every exposed table with a dump section holds the same number of rows.
+def test_the_tables_the_case_writes_match_the_dump_row_for_row(tmp_path: Path) -> None:
+    """Every table the official case writes and the dump carries holds the dump's row count.
 
     The dump is FVS's own rendering of the same run, so a row count is the cheapest check that the
-    reader is returning the whole table rather than a slice of it.
+    reader returns the whole table rather than a slice of it.
     """
     pytest.importorskip(
         "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
@@ -334,16 +345,27 @@ def test_the_exposed_tables_match_the_dump_row_for_row(tmp_path: Path) -> None:
     assert len(written) == 1
     database = written[0]
 
+    connection = sqlite3.connect(database)
+    try:
+        present = {
+            row[0]
+            for row in connection.execute("select name from sqlite_master where type='table'")
+        }
+    finally:
+        connection.close()
+
     checked = 0
     for name in EXPOSED_TABLES:
-        # The summary's dump section is empty while the database holds its 164 rows, and the
-        # ``.sum`` comparison above already checks those. ``FVS_InvReference`` postdates the
-        # fixture.
-        if name in {"FVS_Cases", "FVS_Error", "FVS_InvReference", "FVS_Summary_Metric"}:
+        dump_name = DUMP_NAMES.get(name, name)
+        # The summary's dump section is empty while the database holds its rows, and the ``.sum``
+        # comparison covers those; ``FVS_InvReference`` postdates the fixture; and the fuels and
+        # potfire tables need an ``FMIN`` block this key does not produce through this route.
+        if dump_name not in sections or name not in present:
             continue
-        rows = sections[DUMP_NAMES.get(name, name)]
-        expected = len(rows) - 1  # the header
-        assert len(read_table(database, name)) == expected, name
+        if len(sections[dump_name]) <= 1:
+            # The dump has the section but no rows in it, so there is nothing to compare.
+            continue
+        assert len(read_table(database, name)) == len(sections[dump_name]) - 1, name
         checked += 1
     assert checked >= 3
 
