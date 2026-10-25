@@ -103,6 +103,12 @@ Some keywords are the exception, because they read records of their own rather t
   among sample points and is written only when that count is above one; a run that leaves it at 1 writes
   the species statistics and a message saying the distribution cannot be computed.
 
+  **``MISTOE`` and ``RDIN`` are blocks, and their sub-keywords are not keywords.** ``MISTPRT`` inside
+  ``MISTOE`` sets ``PRTMIS`` and ``NEWSPRED`` sets ``NEWMOD``; without them two of the four dwarf-mistletoe
+  tables are never written. ``RDIN`` needs ``RRINIT`` (or ``RRTREIN``) or it refuses the whole set at its
+  ``END`` with "NEITHER TREELIST OR MANUAL INITIALIZATION SPECIFIED", and ``RRDOUT`` adds the detail
+  table.
+
   **``MISTOE`` is a block, and its sub-keywords are not keywords either.** ``MISTPINF``, ``MISTGMOD``,
   ``DMAUTO`` and the rest are options inside it, read by ``MISIN``. A run with a ``MISTOE`` block is
   accepted and the report echoes the sub-keyword, but **the dwarf-mistletoe tables do not appear**: they

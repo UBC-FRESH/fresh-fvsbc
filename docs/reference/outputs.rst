@@ -86,12 +86,14 @@ Contract rules
    earlier revision returned records, because the project declared no dependencies at all; that was a
    narrowing of this rule and it is withdrawn.
 3. `fresh-fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
-   the database holds it. **Twenty-five are exposed**: `FVS_ATRTList_Metric`, `FVS_CanProfile`,
+   the database holds it. **Twenty-nine are exposed**: `FVS_ATRTList_Metric`, `FVS_CanProfile`,
    `FVS_Carbon_Metric`,
    `FVS_Cases`, `FVS_Compute`, `FVS_Consumption_Metric`, `FVS_CutList_Metric`,
-   `FVS_DM_Spp_Sum_Metric`, `FVS_DM_Stnd_Sum_Metric`, `FVS_Down_Wood_Cov_Metric`,
+   `FVS_DM_Spp_Sum_Metric`, `FVS_DM_Stnd_Sum_Metric`, `FVS_DM_Sz_Sum_Metric`,
+   `FVS_DM_TreeList_Metric`, `FVS_Down_Wood_Cov_Metric`,
    `FVS_Down_Wood_Vol_Metric`, `FVS_Error`, `FVS_Fuels_Metric`, `FVS_Hrv_Carbon`, `FVS_InvReference`,
-   `FVS_Mortality_Metric`, `FVS_PotFire_Cond_Metric`, `FVS_PotFire_Metric`,
+   `FVS_Mortality_Metric`, `FVS_PotFire_Cond_Metric`, `FVS_PotFire_Metric`, `FVS_RD_Det_Metric`,
+   `FVS_RD_Sum_Metric`,
    `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`, `FVS_Stats_Species_Metric`, `FVS_Stats_Stand`,
    `FVS_StrClass_Metric`,
    `FVS_Summary_Metric` and `FVS_TreeList_Metric`. Most are written only when a `DATABASE` block asks

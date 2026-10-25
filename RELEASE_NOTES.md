@@ -8,6 +8,16 @@ Pre-1.0, and the public API can change. The gaps that remain are listed at the e
 
 ## What changed since 0.8.0
 
+- **Four more tables, so the reader exposes twenty-nine of 44.** `FVS_DM_Sz_Sum_Metric`,
+  `FVS_DM_TreeList_Metric`, `FVS_RD_Sum_Metric` and `FVS_RD_Det_Metric`. **All four dwarf-mistletoe tables
+  and two of the three root-disease tables are now readable.**
+- **The two DM tables that stayed away were behind two sub-keywords of the `MISTOE` block.** `misprt.f`
+  calls `DBSMIS3` inside `IF (PRTMIS)` and `DBSMIS5`/`DBSMIS6` inside `IF (NEWMOD)`; `MISTPRT` sets the
+  first and `NEWSPRED` the second.
+- **`RDIN` is a block, and it refuses the whole set without an initialization.** `rdin.f` reports
+  "NEITHER TREELIST OR MANUAL INITIALIZATION SPECIFIED" at the block's `END` unless `RRTINV` or `RRMAN` was
+  seen; `RRINIT` sets `RRMAN`, and `RRDOUT` adds the detail table.
+
 - **Four more tables, and three questions answered by reading the source instead of guessing.**
   `FVS_Stats_Stand`, `FVS_Mortality_Metric`, `FVS_DM_Spp_Sum_Metric` and `FVS_DM_Stnd_Sum_Metric` join the
   twenty-one, so the reader exposes **twenty-five of 44**.
@@ -168,8 +178,8 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes twenty-five of 44 tables.** The other 19 are classified in
-   `notes/reference/table-reachability.md`: 14 have a writer and a call site and are candidates, five have
+1. **The reader exposes twenty-nine of 44 tables.** The other 15 are classified in
+   `notes/reference/table-reachability.md`: 10 have a writer and a call site and are candidates, five have
    a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. A call site
    is not a promise; each candidate needs its own case, and `notes/reference/table-candidates.md` gives
    each one a cost, a risk and a value.

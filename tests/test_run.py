@@ -828,6 +828,84 @@ def test_damage_code_thirty_is_the_mistletoe_rating(tmp_path: Path) -> None:
     assert {"Mean_DMR", "Inf_TPH"} <= set(species.columns)
 
 
+def test_mistprt_and_newspred_write_all_four_dm_tables(tmp_path: Path) -> None:
+    """The two DM tables that stayed away are behind two sub-keywords of the ``MISTOE`` block.
+
+    ``misprt.f`` calls ``DBSMIS3`` inside ``IF (PRTMIS)`` and ``DBSMIS5``/``DBSMIS6`` inside
+    ``IF (NEWMOD)``. ``MISTPRT`` sets ``PRTMIS`` and ``NEWSPRED`` sets ``NEWMOD``, both in
+    ``misin.f``. With both, all four dwarf-mistletoe tables are written from an infected stand.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    records = to_tree_list(synthetic_population(), species="FD", tree_age=60.0)
+    for record in records:
+        record["damage1"] = 30
+        record["severity1"] = 3
+    keywords = (
+        Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "MISRPTS", "ComputDB")),
+        Keyword("STDIDENT", ("MIST   four",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("MISTOE", (), ("MISTPRT", "NEWSPRED")),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_case(records, keywords, directory=tmp_path)
+    for name in (
+        "FVS_DM_Spp_Sum_Metric",
+        "FVS_DM_Stnd_Sum_Metric",
+        "FVS_DM_Sz_Sum_Metric",
+        "FVS_DM_TreeList_Metric",
+    ):
+        assert not read_table(result.database, name).empty, name
+
+
+def test_rrinit_and_rrdout_write_the_root_disease_tables(tmp_path: Path) -> None:
+    """``RDIN`` is a block, and it needs an initialization sub-keyword or it refuses the whole set.
+
+    ``rdin.f`` reports error 4 at the ``END`` when neither ``RRTINV`` nor ``RRMAN`` was seen,
+    and ``RRINIT`` is what sets ``RRMAN``. ``RRDOUT`` adds the detail table; the summary appears
+    without it.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword(
+            "DATABASE",
+            (),
+            ("DSNOut", "FVSOut.db", "Summary", "RDSUM", "RDDETAIL", "ComputDB"),
+        ),
+        Keyword("STDIDENT", ("ROOT   disease",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("RDIN", (), ("RRINIT", "RRDOUT")),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    summary = read_table(result.database, "FVS_RD_Sum_Metric")
+    detail = read_table(result.database, "FVS_RD_Det_Metric")
+    assert not summary.empty
+    assert not detail.empty
+    assert {"RD_Type", "Num_Centers"} <= set(summary.columns)
+
+
 def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     """An ``IF`` block is written as a conditional, and FVS's report shows it read the condition."""
     pytest.importorskip(

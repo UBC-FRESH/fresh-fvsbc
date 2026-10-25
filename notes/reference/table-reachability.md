@@ -5,7 +5,7 @@ looked for across `tmp/pyfvs/fvs` excluding the build directory, the `SUBROUTINE
 mentions it is the writer, and the writer's call sites are counted with `grep -rl "CALL <name>"` in
 `bin/FVSbc_buildDir`.
 
-**Counts, after `P31`: 25 exposed, 14 with a writer and a call site, 5 with a writer and no call site, and 0 without a writer.**
+**Counts, after `P32`: 29 exposed, 10 with a writer and a call site, 5 with a writer and no call site, and 0 without a writer.**
 
 ## The correction this sweep forced
 
@@ -33,8 +33,8 @@ claim was the one that needed the most evidence.
 | `FVS_CutList_Metric` | `DBSCUTS` | prtrls.f | exposed |
 | `FVS_DM_Spp_Sum_Metric` | `DBSMIS1` | misprt.f | exposed |
 | `FVS_DM_Stnd_Sum_Metric` | `DBSMIS1` | misprt.f | exposed |
-| `FVS_DM_Sz_Sum_Metric` | `DBSMIS1` | misprt.f | writer and call site |
-| `FVS_DM_TreeList_Metric` | `DBSMIS1` | misprt.f | writer and call site |
+| `FVS_DM_Sz_Sum_Metric` | `DBSMIS1` | misprt.f | exposed |
+| `FVS_DM_TreeList_Metric` | `DBSMIS1` | misprt.f | exposed |
 | `FVS_Down_Wood_Cov_Metric` | `DBSFMDWCOV` | fmdout.f | exposed |
 | `FVS_Down_Wood_Vol_Metric` | `DBSFMDWVOL` | fmdout.f | exposed |
 | `FVS_EconHarvestValue_Metric` | `DBSECHARV` | — | writer, no call site |
@@ -51,8 +51,8 @@ claim was the one that needed the most evidence.
 | `FVS_PotFire_Cond_Metric` | `DBSFMPFC` | fmpofl.f | exposed |
 | `FVS_PotFire_Metric` | `DBSFMPF` | fmpofl.f | exposed |
 | `FVS_RD_Beetle_Metric` | `DBSRD1` | rdpr.f | writer and call site |
-| `FVS_RD_Det_Metric` | `DBSRD1` | rdpr.f | writer and call site |
-| `FVS_RD_Sum_Metric` | `DBSRD1` | rdpr.f | writer and call site |
+| `FVS_RD_Det_Metric` | `DBSRD1` | rdpr.f | exposed |
+| `FVS_RD_Sum_Metric` | `DBSRD1` | rdpr.f | exposed |
 | `FVS_Regen_HabType` | `DBSPLOTHAB` | — | writer, no call site |
 | `FVS_Regen_Ingrow_Metric` | `DBSINGROW` | — | writer, no call site |
 | `FVS_Regen_SitePrep` | `DBSSITEPREP` | estab.f | writer and call site |
@@ -109,6 +109,9 @@ Each of these was found by running, not by reading:
 | `FVS_Stats_Stand` | `INVSTATS` + `STATS`, and `DESIGN`'s fourth field above 1 |
 | `FVS_Mortality_Metric` | `MORTREDB` + `MORTREPT` inside `FMIN` + a fire |
 | `FVS_DM_Spp_Sum_Metric`, `FVS_DM_Stnd_Sum_Metric` | `MISRPTS`, an `MISTOE` block, and damage code 30–34 with the severity as the rating |
+| `FVS_DM_Sz_Sum_Metric` | the same, plus `MISTPRT` inside `MISTOE` — it sets `PRTMIS`, which gates `DBSMIS3` |
+| `FVS_DM_TreeList_Metric` | the same, plus `NEWSPRED` — it sets `NEWMOD`, which gates `DBSMIS5`/`DBSMIS6` |
+| `FVS_RD_Sum_Metric`, `FVS_RD_Det_Metric` | `RDSUM`/`RDDETAIL`, an `RDIN` block with `RRINIT`, and `RRDOUT` for the detail |
 | `FVS_BurnReport_Metric` | **none**: the gate needs an invalid input |
 | `FVS_DM_*_Metric` (4) | **not found**: `MISTOE` is a block and its sub-keywords are accepted, but the tables need an infection state |
 | `FVS_RD_*_Metric` (3) | **not found**: `RDIN` starts the block, and its required parameters were not determined |
