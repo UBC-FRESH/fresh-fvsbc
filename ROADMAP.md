@@ -29,7 +29,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P18 What the remaining tables need | #86 | `feature/p18-table-reachability` | complete |
 | P19 Release 0.6.0 | #90 | `feature/p19-release-0-6-0` | complete |
 | P20 The carbon tables | #95 | `feature/p20-carbon` | complete |
-| P21 Release 0.7.0 | #99 | `feature/p21-release-0-7-0` | active |
+| P21 Release 0.7.0 | #99 | `feature/p21-release-0-7-0` | complete |
 
 ## Lifecycle Map
 
@@ -606,15 +606,15 @@ Acceptance criteria:
 
 Parent issue: #99
 Branch: `feature/p21-release-0-7-0`
-Status: active
+Status: complete
 
 Goal: release `0.7.0`, because `main` carries the two carbon tables and the trigger that reaches them.
 
-- [ ] P21.1 Version and notes for 0.7.0 (#100)
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.6.0".
-  - [ ] Replace the table gap with thirteen exposed.
-  - [ ] Add the carbon run to what is verified.
+- [x] P21.1 Version and notes for 0.7.0 (#100)
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.6.0".
+  - [x] Replace the table gap with thirteen exposed.
+  - [x] Add the carbon run to what is verified.
 
 Acceptance criteria:
 
