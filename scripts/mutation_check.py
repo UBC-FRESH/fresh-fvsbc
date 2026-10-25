@@ -157,6 +157,16 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_keywords.py::test_the_intended_spelling_is_refused_and_points_at_the_table",
     ),
     Mutation(
+        identifier="run-drives-in-this-process",
+        module="src/fresh_fvsbc/run.py",
+        find="    finished = subprocess.run(",
+        replace=(
+            "    return _Drive(*_drive_here(key_name, variant=variant, directory=directory))\n"
+            "    finished = subprocess.run("
+        ),
+        test="tests/test_run.py::test_a_run_drives_in_a_child_process",
+    ),
+    Mutation(
         identifier="package-exports-a-name-it-does-not-define",
         module="src/fresh_fvsbc/__init__.py",
         find='    "write_tree_record",',

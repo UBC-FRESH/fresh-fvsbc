@@ -19,11 +19,12 @@ Three facts about the run are not choices, and each of them is a way to get a ru
   given a keyword *set*, using a default format rather than BC's. A run here passes a keyword
   *file*, so nothing is injected and BC's format is the only one a run can get.
 
-Because the database's name is fixed, :func:`run_case` owns its working directory for the duration
-of the drive and restores it afterwards. That is process-global state: another thread that changes
-directory at the same moment will interfere, and a run is therefore not thread-safe. The alternative
-is a subprocess per run, which loses ``FVS.summary``, the summary the output contract names as the
-route to that table.
+Because the database's name is fixed, and because FVS keeps its state in the process, **a run
+drives the projection in a child process** (ADR 0010). The child owns the working directory and the
+Fortran state; this process shares nothing between runs, so two runs in one process are independent
+and a run is thread-safe. The child writes the summary to ``summary.csv`` and the build's variant
+list to ``variants.json``, and the parent reads them. The summary is still FVS's own frame rather
+than a re-derivation, and it is inspectable on disk.
 
 What the orchestration writes, and what it refuses
 --------------------------------------------------
@@ -49,9 +50,11 @@ identify a set no run ever saw.
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
-from collections.abc import Iterator, Mapping, Sequence
-from contextlib import contextmanager
+import subprocess
+import sys
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -67,7 +70,9 @@ __all__ = [
     "DATABASE_NAME",
     "KEYWORD_FILE_NAME",
     "PROVENANCE_FILE_NAME",
+    "SUMMARY_FILE_NAME",
     "TREEFMT_LINES",
+    "VARIANTS_FILE_NAME",
     "ExtensionUnavailableError",
     "KeywordConflictError",
     "RunError",
@@ -88,6 +93,19 @@ DATABASE_NAME: str = "FVSOut.db"
 
 #: The provenance record's name, which the provenance contract puts beside the outputs.
 PROVENANCE_FILE_NAME: str = "provenance.json"
+
+#: What the child writes for the parent: the summary FVS produced, and the build's variant list.
+SUMMARY_FILE_NAME: str = "summary.csv"
+VARIANTS_FILE_NAME: str = "variants.json"
+
+#: The exit code the child uses when PyFVS is not importable, so the parent re-raises the same type.
+EXTENSION_UNAVAILABLE_CODE: int = 3
+
+#: The child's module, run with ``python -m``.
+_CHILD_MODULE: str = "fresh_fvsbc._child"
+
+#: This package's parent directory, which the child needs on its path when it is not installed.
+_PACKAGE_ROOT: Path = Path(__file__).resolve().parents[1]
 
 #: The two keywords the orchestration writes, in the order FVS needs them.
 TREE_FORMAT_KEYWORD: str = "TREEFMT"
@@ -235,38 +253,34 @@ def _seed_of(keywords: Sequence[Keyword]) -> int | None:
     return None
 
 
-@contextmanager
-def _working_directory(directory: Path) -> Iterator[Path]:
-    """Change into ``directory`` for the duration of the block, and always restore."""
-    previous = Path.cwd()
-    os.chdir(directory)
-    try:
-        yield Path.cwd()
-    finally:
-        os.chdir(previous)
-
-
 @dataclass(frozen=True, slots=True)
 class _Drive:
-    """What driving a projection yields: the in-memory summary, and the build's variant list."""
+    """What driving a projection yields: the summary, and the build's variant list."""
 
     summary: pd.DataFrame
     variants: tuple[str, ...]
 
 
-def _drive(key_name: str, *, variant: str) -> _Drive:
-    """Drive one projection through PyFVS's step API, from inside the run's directory.
+def _drive_here(
+    key_name: str, *, variant: str, directory: Path
+) -> tuple[pd.DataFrame, tuple[str, ...]]:
+    """Drive one projection in **this** process, from inside ``directory``.
+
+    This is the child process's work (ADR 0010). It is not what :func:`run_case` calls, and it is
+    public to this module only so the child can reach it.
 
     Parameters
     ----------
     key_name : str
-        The keyword file's name, relative to the working directory.
+        The keyword file's name, relative to ``directory``.
     variant : str
         The variant to run, which for this project is ``bc``.
+    directory : Path
+        The run's directory, which this function changes into and always leaves.
 
     Returns
     -------
-    _Drive
+    tuple
         The summary the run produced in memory, and the build's variant list.
 
     Raises
@@ -288,13 +302,90 @@ def _drive(key_name: str, *, variant: str) -> _Drive:
         simulator = fvs.FVS(variant)
     except Exception as error:  # PyFVS raises its own types when a variant is absent
         raise ExtensionUnavailableError(f"the {variant} variant did not load: {error}") from error
-    simulator.init_projection(key_name)
-    for _ in range(int(simulator.globals.ncyc)):
-        simulator.grow()
-    code = int(simulator.end_projection())
+    previous = Path.cwd()
+    os.chdir(directory)
+    try:
+        simulator.init_projection(key_name)
+        for _ in range(int(simulator.globals.ncyc)):
+            simulator.grow()
+        code = int(simulator.end_projection())
+    finally:
+        os.chdir(previous)
     if code != 0:
         raise RunError(f"the projection ended with return code {code}")
-    return _Drive(summary=simulator.summary, variants=built_variants(pyfvs.list_variants()))
+    return simulator.summary, built_variants(pyfvs.list_variants())
+
+
+def _child_environment() -> dict[str, str]:
+    """Return the environment the child needs to import this package.
+
+    The parent may have been started with ``src`` on ``sys.path`` rather than with the package
+    installed, so the child is given the package's own location explicitly.
+
+    Returns
+    -------
+    dict
+        The current environment with ``PYTHONPATH`` naming this package's parent directory.
+    """
+    existing = os.environ.get("PYTHONPATH", "")
+    parts = [str(_PACKAGE_ROOT), *([existing] if existing else [])]
+    return {**os.environ, "PYTHONPATH": os.pathsep.join(parts)}
+
+
+def _drive(key_name: str, *, variant: str, directory: Path) -> _Drive:
+    """Drive one projection in a child process, and read what it wrote.
+
+    FVS keeps its state in the process, so a run after another projection produces different numbers
+    (ADR 0010). The child owns the projection and the working directory; this process shares nothing
+    with the next run.
+
+    Parameters
+    ----------
+    key_name : str
+        The keyword file's name, relative to ``directory``.
+    variant : str
+        The variant to run, which for this project is ``bc``.
+    directory : Path
+        The run's directory, which the child changes into.
+
+    Returns
+    -------
+    _Drive
+        The summary the child wrote, and the build's variant list.
+
+    Raises
+    ------
+    ExtensionUnavailableError
+        If the child reports that PyFVS is not importable, or the variant did not load.
+    RunError
+        If the child fails, or does not write what the parent needs.
+    """
+    finished = subprocess.run(
+        [sys.executable, "-m", _CHILD_MODULE, str(directory), key_name, variant],
+        capture_output=True,
+        text=True,
+        check=False,
+        env=_child_environment(),
+    )
+    if finished.returncode == EXTENSION_UNAVAILABLE_CODE:
+        raise ExtensionUnavailableError(
+            finished.stderr.strip() or "the child reported that the extension is unavailable"
+        )
+    if finished.returncode != 0:
+        detail = (finished.stderr or finished.stdout).strip()[-2000:]
+        raise RunError(f"the child process that drives the projection failed: {detail}")
+    summary_path = directory / SUMMARY_FILE_NAME
+    variants_path = directory / VARIANTS_FILE_NAME
+    if not summary_path.is_file() or not variants_path.is_file():
+        detail = (finished.stderr or finished.stdout).strip()[-2000:]
+        raise RunError(
+            "the child process exited cleanly but wrote no "
+            f"{SUMMARY_FILE_NAME} or {VARIANTS_FILE_NAME}: {detail}"
+        )
+    return _Drive(
+        summary=pd.read_csv(summary_path),
+        variants=tuple(json.loads(variants_path.read_text(encoding="utf-8"))),
+    )
 
 
 def _first_case(cases: pd.DataFrame) -> dict[str, object]:
@@ -321,8 +412,9 @@ class RunResult:
         The summary the run produced in memory, which the output contract names as the route to
         that table through this API.
     directory : Path
-        The run's directory, which holds the keyword file, the tree list, the database, the
-        reports, and the provenance record.
+        The run's directory, which holds the keyword file, the tree list, the database, the reports,
+        the provenance record, and the two files the child process wrote: ``summary.csv`` and
+        ``variants.json``.
     keyword_file : Path
         The keyword file written.
     database : Path
@@ -397,8 +489,7 @@ def run_case(
     keyword_file.write_text(keyword_set.render())
     tree_file_name(keyword_file).write_text(write_tree_file(records))
 
-    with _working_directory(target):
-        driven = _drive(keyword_file.name, variant=variant)
+    driven = _drive(keyword_file.name, variant=variant, directory=target)
 
     database = database_path(target)
     cases = read_cases(database)

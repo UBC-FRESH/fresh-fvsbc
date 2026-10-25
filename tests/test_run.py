@@ -11,6 +11,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import sqlite3
+import subprocess
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
@@ -121,8 +122,7 @@ def a_fake_drive(
 ) -> Callable[..., run._Drive]:
     """Return a drive that writes the database a real run would write, in the run directory."""
 
-    def drive(key_name: str, *, variant: str) -> run._Drive:
-        directory = Path.cwd()
+    def drive(key_name: str, *, variant: str, directory: Path) -> run._Drive:
         assert (directory / key_name).is_file()
         assert (directory / Path(key_name).with_suffix(".tre")).is_file()
         if database:
@@ -249,20 +249,22 @@ def test_the_run_writes_the_inputs_the_record_and_the_result(
     assert result.summary["Year"].tolist() == [0, 10]
 
 
-def test_the_working_directory_is_restored(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """The run owns its directory for the drive only; the caller's is theirs."""
+def test_the_callers_working_directory_is_never_changed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The run's directory belongs to the child, so the caller's is never touched (ADR 0010)."""
     monkeypatch.setattr(run, "_drive", a_fake_drive())
     before = Path.cwd()
     run.run_case([a_tree()], a_set("STDINFO"), directory=tmp_path / "run")
     assert Path.cwd() == before
 
 
-def test_the_working_directory_is_restored_when_the_drive_fails(
+def test_a_failed_drive_leaves_the_callers_directory_alone(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """A drive that raises must not leave the process in the run's directory."""
+    """A drive that raises must not leave the process anywhere but where it started."""
 
-    def explode(key_name: str, *, variant: str) -> run._Drive:
+    def explode(key_name: str, *, variant: str, directory: Path) -> run._Drive:
         raise run.RunError("the projection ended with return code 1")
 
     monkeypatch.setattr(run, "_drive", explode)
@@ -270,6 +272,49 @@ def test_the_working_directory_is_restored_when_the_drive_fails(
     with pytest.raises(run.RunError, match="return code 1"):
         run.run_case([a_tree()], a_set("STDINFO"), directory=tmp_path / "run")
     assert Path.cwd() == before
+
+
+def test_a_run_drives_in_a_child_process(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """FVS keeps its state in the process, so a run is a process of its own (ADR 0010)."""
+    captured: list[list[str]] = []
+
+    def fake_run(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+        captured.append(command)
+        return subprocess.CompletedProcess(command, 1, stdout="", stderr="the child said no")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    with pytest.raises(run.RunError, match="child process") as raised:
+        run.run_case([a_tree()], a_set("STDINFO"), directory=tmp_path / "run")
+    assert captured[0][1:3] == ["-m", "fresh_fvsbc._child"]
+    assert "the child said no" in str(raised.value)
+
+
+def test_a_child_that_writes_nothing_is_reported(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A child that exits cleanly without its files is a failure, not an empty result."""
+
+    def fake_run(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    with pytest.raises(run.RunError, match="wrote no"):
+        run.run_case([a_tree()], a_set("STDINFO"), directory=tmp_path / "run")
+
+
+def test_a_child_that_reports_no_extension_keeps_the_error_type(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The child's exit code maps back to the type a caller catches, not to a generic failure."""
+
+    def fake_run(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(
+            command, run.EXTENSION_UNAVAILABLE_CODE, stdout="", stderr="pyfvs is not importable"
+        )
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    with pytest.raises(run.ExtensionUnavailableError, match="pyfvs is not importable"):
+        run.run_case([a_tree()], a_set("STDINFO"), directory=tmp_path / "run")
 
 
 def test_a_run_with_an_error_row_raises_and_writes_no_record(
@@ -335,7 +380,7 @@ def test_the_extension_being_absent_is_reported_rather_than_crashing(tmp_path: P
     if importlib.util.find_spec("pyfvs") is not None:
         pytest.skip("the extension is present here, so its absence cannot be shown")
     with pytest.raises(run.ExtensionUnavailableError, match="pyfvs is not importable"):
-        run._drive("run.key", variant="bc")
+        run._drive("run.key", variant="bc", directory=tmp_path)
 
 
 def test_run_population_adapts_the_population_before_running(
