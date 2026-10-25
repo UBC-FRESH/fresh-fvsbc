@@ -1,10 +1,22 @@
-# fresh-fvsbc 0.5.0
+# fresh-fvsbc 0.6.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.5.0
+
+- **Three more tables are readable.** `FVS_Fuels_Metric`, `FVS_PotFire_Metric` and
+  `FVS_PotFire_Cond_Metric` join the eight, so the reader exposes **eleven**.
+- **`FMIN` is the fourth line block.** `POTFIRE`, `FUELOUT` and `FUELREPT` are **options inside it, not
+  keywords**, which is why the model could not express them: with `FMIN` written and a `DATABASE` block
+  asking for `FuelsOut`, `FuelReDB` and `PotfirDB`, one run writes all three tables.
+- **A record of which of the rest can be written at all**, in `notes/reference/table-reachability.md`.
+  It found that carbon's writer has one call site in the fire-carbon report path and the `DATABASE`
+  option alone does not reach it, and that the dwarf-mistletoe and root-disease writers **do not exist
+  in this source**.
 
 ## What changed since 0.4.0
 
@@ -62,8 +74,10 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes eight of 44 tables.** The other 36 need a case that triggers each one before
-   output contract rule 3 allows exposing it.
+1. **The reader exposes eleven of 44 tables, and the rest are not all reachable.** Four more take a
+   `DATABASE` option; carbon needs the fire-carbon report path, which no option reaches; dwarf mistletoe
+   and root disease have no writer in this source. `notes/reference/table-reachability.md` has the
+   evidence for each verdict.
 2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
