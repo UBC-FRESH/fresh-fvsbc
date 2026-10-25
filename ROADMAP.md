@@ -13,7 +13,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P2 Contracts and prototype | #10 | `feature/p2-contracts-prototype` | complete |
 | P3 Build | #17 | `feature/p3-build` | complete |
 | P4 Verify | #25 | `feature/p4-verify` | complete |
-| P5 Release and deploy | #31 | `feature/p5-release` | active |
+| P5 Release and deploy | #31 | `feature/p5-release` | complete |
 | P6 Operate and maintain | TBD | `feature/p6-operate` | planned |
 
 ## Lifecycle Map
@@ -224,7 +224,7 @@ Acceptance criteria:
 
 Parent issue: #31
 Branch: `feature/p5-release`
-Status: active
+Status: complete
 
 Goal: tag a release, publish the docs, and verify the published artifacts from a clean checkout.
 
@@ -236,12 +236,12 @@ the phase criteria, the order and its reason, and the open proposals.
   - [x] Write what the release is and what it does, in the README's terms rather than new ones.
   - [x] Write the known-gaps list from the `P2`, `P3` and `P4` reports, each item with the reason it is open.
   - [x] State what is verified and how, citing the commands and run ids rather than asserting.
-- [ ] P5.2 Tag, publish, and verify from a clean checkout (#33)
-  - [ ] Propose the tag name and the release body, and wait for approval before creating either.
-  - [ ] Propose the documentation publication and what it changes, and wait for approval.
-  - [ ] After approval, run each action and read it back.
-  - [ ] Verify from a clean checkout: install the release, run `python -m fresh_fvsbc --help`, and run one case.
-  - [ ] Check the published pages against the source at the tag.
+- [x] P5.2 Tag, publish, and verify from a clean checkout (#33) — tagged `v0.1.0` at `ef11f94`, released, and verified
+  - [x] Propose the tag name and the release body, and wait for approval before creating either.
+  - [x] Propose the documentation publication and what it changes, and wait for approval.
+  - [x] After approval, run each action and read it back.
+  - [x] Verify from a clean checkout: install the release, run `python -m fresh_fvsbc --help`, and run one case.
+  - [x] Check the published pages against the source at the tag.
 
 Acceptance criteria:
 
