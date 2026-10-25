@@ -70,7 +70,7 @@ Some keywords are the exception, because they read records of their own rather t
   later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it
   first. The validator refuses a set that puts it after ``STDIDENT``, ``STDINFO`` or ``STANDSQL``.
   **``FMIN`` is how a caller asks for the fuels, potfire, carbon and consumption tables**: ``FUELOUT``,
-  ``FUELREPT``, ``POTFIRE``, ``CARBREPT``, ``SIMFIRE``, ``DWDCVOUT`` and ``CANFPROF`` are options inside it rather
+  ``FUELREPT``, ``POTFIRE``, ``CARBREPT``, ``SIMFIRE``, ``DWDCVOUT``, ``CANFPROF`` and ``MORTREPT`` are options inside it rather
   than keywords, which is why they are not in the table. Each writes its tables only when the ``DATABASE`` block names
   the matching option — ``FuelsOut``, ``FuelReDB``, ``PotfirDB``, ``CARBREDB`` or ``BURNREDB`` — and the
   option alone is never enough for carbon or consumption: ``CARBREDB`` needs ``CARBREPT``, and
@@ -90,6 +90,18 @@ Some keywords are the exception, because they read records of their own rather t
   the ``DATABASE`` block *and* a ``TREELIST`` keyword; ``FVS_CutList_Metric`` needs ``CUTLIDB`` and
   ``CUTLIST``, and an actual removal; ``FVS_Stats_Species_Metric`` needs ``INVSTATS`` and ``STATS``.
   The option alone is accepted and writes nothing, which is the same trap ``CARBREDB`` sets.
+
+  **The mortality table needs ``MORTREPT``, which sets ``IFMMRB`` to -1**; ``MORTREDB`` alone is accepted
+  and writes nothing. That is the opposite of the burn report, whose ``BURNREPT`` sets ``IFMBRB`` to the
+  inventory year, which the gate rejects — two options that look identical and behave oppositely.
+
+  **A mistletoe rating enters through the damage columns**: damage codes **30 to 34** with the severity as
+  the Hawksworth rating, per ``misdam.f``. The adapter writes zero there, so an infected stand needs a
+  caller who supplies the damage fields.
+
+  **``DESIGN``'s fourth field is the inventory point count.** ``FVS_Stats_Stand`` is the distribution
+  among sample points and is written only when that count is above one; a run that leaves it at 1 writes
+  the species statistics and a message saying the distribution cannot be computed.
 
   **``MISTOE`` is a block, and its sub-keywords are not keywords either.** ``MISTPINF``, ``MISTGMOD``,
   ``DMAUTO`` and the rest are options inside it, read by ``MISIN``. A run with a ``MISTOE`` block is
