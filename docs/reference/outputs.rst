@@ -85,9 +85,11 @@ Contract rules
    earlier revision returned records, because the project declared no dependencies at all; that was a
    narrowing of this rule and it is withdrawn.
 3. `fresh-fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
-   the database holds it. **Four are exposed**: `FVS_Cases`, `FVS_Compute`, `FVS_Error` and
-   `FVS_Summary_Metric`. The last two are written only when a `DATABASE` block asks for them, and the
-   block must come before the stand setup — see :doc:`keywords`.
+   the database holds it. **Eight are exposed**: `FVS_Cases`, `FVS_Compute`, `FVS_Down_Wood_Vol_Metric`,
+   `FVS_Error`, `FVS_InvReference`, `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric` and `FVS_Summary_Metric`.
+   Six of them are written only when a `DATABASE` block asks for them, and the block must come before
+   the stand setup — see :doc:`keywords`. The row counts of the four the official dump carries are
+   checked against it in `tests/test_oracle.py`.
 4. Every parsed table carries its `CaseID`, so a table can be joined back to `FVS_Cases`.
 5. `FVS_Error` is read on every run, and it holds **warnings as well as errors**: a run whose site data is
    outside the model's range writes an `FVS03 WARNING` row, which is not a failure. So a run is reported as

@@ -128,7 +128,11 @@ IDENTITY_COLUMN: str = "CaseID"
 EXPOSED_TABLES: tuple[str, ...] = (
     "FVS_Cases",
     "FVS_Compute",
+    "FVS_Down_Wood_Vol_Metric",
     "FVS_Error",
+    "FVS_InvReference",
+    "FVS_SnagDet_Metric",
+    "FVS_SnagSum_Metric",
     "FVS_Summary_Metric",
 )
 
