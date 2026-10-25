@@ -62,6 +62,7 @@ def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) ->
         connection.execute("create table FVS_PotFire_Cond_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_Carbon_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_Hrv_Carbon (CaseID text, Year integer)")
+        connection.execute("create table FVS_Consumption_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagDet_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagSum_Metric (CaseID text, Year integer)")
         connection.commit()
@@ -107,6 +108,7 @@ def test_only_the_tested_tables_are_exposed() -> None:
         "FVS_Carbon_Metric",
         "FVS_Cases",
         "FVS_Compute",
+        "FVS_Consumption_Metric",
         "FVS_Down_Wood_Vol_Metric",
         "FVS_Error",
         "FVS_Fuels_Metric",

@@ -13,9 +13,10 @@ table it does not name is absent. An earlier revision of this docstring said a r
 wrong, and the run that reads thirteen tables disproved them.
 
 Some tables need more than a ``DATABASE`` option. ``FMIN`` is a block of options — ``FUELOUT``,
-``POTFIRE`` and ``CARBREPT`` live inside it, not in the keyword table — and it is how a caller
-reaches the fuels, potfire and carbon tables. ``notes/reference/table-reachability.md`` records
-which of the rest can be written at all, and why the others cannot.
+``POTFIRE``, ``CARBREPT`` and ``SIMFIRE`` live inside it, not in the keyword table — and it is how
+a caller reaches the fuels, potfire, carbon and consumption tables. ``SIMFIRE`` schedules a fire
+event, which is what makes a consumption row exist at all. ``notes/reference/table-reachability.md``
+records which of the rest can be written at all, and why the others cannot.
 
 The summary is also returned in memory by ``FVS.summary``, and the run writes a fixed-width ``.sum``
 report beside the database.
@@ -133,6 +134,7 @@ EXPOSED_TABLES: tuple[str, ...] = (
     "FVS_Carbon_Metric",
     "FVS_Cases",
     "FVS_Compute",
+    "FVS_Consumption_Metric",
     "FVS_Down_Wood_Vol_Metric",
     "FVS_Error",
     "FVS_Fuels_Metric",
