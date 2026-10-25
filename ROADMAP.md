@@ -18,6 +18,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P7 Keyword blocks and gate hygiene | #43 | `feature/p7-blocks-and-gates` | complete |
 | P8 Release 0.2.0 | #47 | `feature/p8-release-0-2-0` | complete |
 | P9 The database block | #50 | `feature/p9-database-block` | complete |
+| P10 Release 0.3.0 | #55 | `feature/p10-release-0-3-0` | active |
 
 ## Lifecycle Map
 
@@ -356,6 +357,25 @@ Acceptance criteria:
 - A set whose `DATABASE` block comes after the stand is refused with a message that says to put it first.
 - `FVS_Compute` and `FVS_Summary_Metric` are read from a real run through the public reader.
 - `fresh_fvsbc.cli` appears on the API page.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 10: Release 0.3.0
+
+Parent issue: #55
+Branch: `feature/p10-release-0-3-0`
+Status: active
+
+Goal: release `0.3.0`, because `main` carries four exposed tables instead of two and a corrected record.
+
+- [ ] P10.1 Version and notes for 0.3.0 (#56)
+  - [ ] Bump `pyproject.toml` and `__init__.py` to `0.3.0`, together.
+  - [ ] Rewrite `RELEASE_NOTES.md`: what changed since 0.2.0, the pins, and the gaps that remain.
+  - [ ] Drop the `FVS_Compute` gap, which is a documented requirement now, and name the 29 tables that still need tests.
+
+Acceptance criteria:
+
+- The package reports `0.3.0`, the notes say what changed and what remains, and a clean checkout installs the release and runs one case.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
