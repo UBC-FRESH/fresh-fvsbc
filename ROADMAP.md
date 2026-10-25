@@ -26,7 +26,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P15 The conditional | #75 | `feature/p15-if-blocks` | complete |
 | P16 Release 0.5.0 | #79 | `feature/p16-release-0-5-0` | complete |
 | P17 The fuels and potfire tables | #82 | `feature/p17-extension-tables` | complete |
-| P18 What the remaining tables need | #86 | `feature/p18-table-reachability` | active |
+| P18 What the remaining tables need | #86 | `feature/p18-table-reachability` | complete |
 
 ## Lifecycle Map
 
@@ -542,15 +542,15 @@ Acceptance criteria:
 
 Parent issue: #86
 Branch: `feature/p18-table-reachability`
-Status: active
+Status: complete
 
 Goal: record which of the 44 tables a run here can write, and why the rest cannot.
 
-- [ ] P18.1 Record which tables a run can write (#87)
-  - [ ] The four reachable with an option, and which option.
-  - [ ] Carbon: the writer's single call site, the accepted option, and the file `CALBSTAT` writes to.
-  - [ ] Dwarf mistletoe and root disease: the absence of a writer.
-  - [ ] The triage entry.
+- [x] P18.1 Record which tables a run can write (#87)
+  - [x] The four reachable with an option, and which option.
+  - [x] Carbon: the writer's single call site, the accepted option, and the file `CALBSTAT` writes to.
+  - [x] Dwarf mistletoe and root disease: the absence of a writer.
+  - [x] The triage entry.
 
 Acceptance criteria:
 
