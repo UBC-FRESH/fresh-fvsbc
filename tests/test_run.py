@@ -638,6 +638,51 @@ def test_a_treelist_request_writes_the_per_tree_tables(tmp_path: Path) -> None:
     assert "TreesPerHa" in list(stats.columns)
 
 
+def test_a_treatment_writes_the_attribute_list_and_the_structural_stage(tmp_path: Path) -> None:
+    """``FVS_ATRTList_Metric`` is the after-treatment listing, so it needs a removal leaving trees.
+
+    The writer returns unless ``IWHO`` is 3, which is the ``PRTRLS_WRAP (3)`` call in ``cuts.f``.
+    It runs when something is cut. A removal that takes everything creates the table and inserts
+    nothing, so the fixture stand needs a *partial* one: ``THINBBA`` with a residual of zero and
+    half the selected trees removed. ``FVS_StrClass_Metric`` needs ``STRCLSDB`` and the
+    ``STRCLASS`` keyword, and its rows carry the structural stage of each stratum.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword(
+            "DATABASE",
+            (),
+            ("DSNOut", "FVSOut.db", "Summary", "ATRTLIDB", "STRCLSDB", "ComputDB"),
+        ),
+        Keyword("STDIDENT", ("STAGE  atrtlist",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("STRCLASS"),
+        Keyword("ATRTLIST"),
+        Keyword("THINBBA", ("1", "0.0", "0.5")),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    stage = read_table(result.database, "FVS_StrClass_Metric")
+    attributes = read_table(result.database, "FVS_ATRTList_Metric")
+
+    assert not stage.empty
+    assert any(name.startswith("Stratum_1_") for name in stage.columns)
+    assert not attributes.empty
+    assert {"TreeId", "SpeciesFVS", "SpeciesPLANTS"} <= set(attributes.columns)
+
+
 def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     """An ``IF`` block is written as a conditional, and FVS's report shows it read the condition."""
     pytest.importorskip(

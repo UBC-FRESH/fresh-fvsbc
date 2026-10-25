@@ -5,7 +5,7 @@ looked for across `tmp/pyfvs/fvs` excluding the build directory, the `SUBROUTINE
 mentions it is the writer, and the writer's call sites are counted with `grep -rl "CALL <name>"` in
 `bin/FVSbc_buildDir`.
 
-**Counts, after `P27`: 18 exposed, 21 with a writer and a call site, 5 with a writer and no call site, and 0 without a writer.**
+**Counts, after `P28`: 20 exposed, 19 with a writer and a call site, 5 with a writer and no call site, and 0 without a writer.**
 
 ## The correction this sweep forced
 
@@ -21,7 +21,7 @@ claim was the one that needed the most evidence.
 
 | Table | Writer | Called from | Verdict |
 | --- | --- | --- | --- |
-| `FVS_ATRTList_Metric` | `DBSATRTLS` | prtrls.f | writer and call site |
+| `FVS_ATRTList_Metric` | `DBSATRTLS` | prtrls.f | exposed |
 | `FVS_BurnReport_Metric` | `DBSFMBURN` | fmfout.f | writer and call site |
 | `FVS_CalibStats` | `DBSCALIB` | dgdriv.f,regent.f | writer and call site |
 | `FVS_CanProfile` | `DBSFMCANPR` | fmpocr.f | writer and call site |
@@ -62,7 +62,7 @@ claim was the one that needed the most evidence.
 | `FVS_SnagSum_Metric` | `DBSFMSSNAG` | fmssum.f | exposed |
 | `FVS_Stats_Species_Metric` | `DBSSTATS` | stats.f | exposed |
 | `FVS_Stats_Stand` | `DBSSTATS` | stats.f | writer and call site |
-| `FVS_StrClass_Metric` | `DBSSTRCLASS` | sstage.f | writer and call site |
+| `FVS_StrClass_Metric` | `DBSSTRCLASS` | sstage.f | exposed |
 | `FVS_Summary_Metric` | `DBSSUMRY` | disply.f,sumout.f | exposed |
 | `FVS_TreeList_Metric` | `DBSTRLS` | prtrls.f | exposed |
 
@@ -103,6 +103,8 @@ Each of these was found by running, not by reading:
 | `FVS_TreeList_Metric`, `FVS_CutList_Metric` | `TREELIDB`/`CUTLIDB` plus a `TREELIST`/`CUTLIST` request, and for the cut list an actual removal |
 | `FVS_Stats_Species_Metric` | `INVSTATS` plus `STATS` |
 | `FVS_Down_Wood_Cov_Metric` | `DWDCVDB` plus `DWDCVOUT` inside `FMIN` |
+| `FVS_StrClass_Metric` | `STRCLSDB` plus the `STRCLASS` request |
+| `FVS_ATRTList_Metric` | `ATRTLIDB` plus `ATRTLIST` **and a treatment that leaves trees** |
 | `FVS_BurnReport_Metric` | **none**: the gate needs an invalid input |
 | `FVS_DM_*_Metric` (4) | **not found**: `MISTOE` is a block and its sub-keywords are accepted, but the tables need an infection state |
 | `FVS_RD_*_Metric` (3) | **not found**: `RDIN` starts the block, and its required parameters were not determined |

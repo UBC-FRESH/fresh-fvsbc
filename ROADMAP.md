@@ -36,6 +36,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P25 The notes describe the next release | #115 | `feature/p25-notes-for-the-next-release` | complete |
 | P26 The damage-agent blocks | #119 | `feature/p26-dm-rd` | complete |
 | P27 The cheap tables | #123 | `feature/p27-the-cheap-five` | complete |
+| P28 StrClass and ATRTList | #127 | `feature/p28-strclass-atrtlist` | active |
 
 ## Lifecycle Map
 
@@ -755,6 +756,25 @@ Acceptance criteria:
 - A run writes all four tables, and the reader exposes eighteen.
 - The per-tree test asserts the identity columns and the `CCum`/`CCuM` difference.
 - The two that resisted are recorded with what would close them.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 28: StrClass and ATRTList
+
+Parent issue: #127
+Branch: `feature/p28-strclass-atrtlist`
+Status: active
+
+Goal: take the two tables the candidate note put second, one of which is the BC-specific one.
+
+- [ ] P28.1 The structural stage and the attribute list (#128)
+  - [ ] Expose `FVS_StrClass_Metric` and `FVS_ATRTList_Metric`.
+  - [ ] A run writes both, and the attribute list needs a partial removal.
+  - [ ] Update the contract pages, the reachability note and the candidate note.
+
+Acceptance criteria:
+
+- A run writes both tables, and the reader exposes twenty.
+- The test records that a removal taking everything creates the attribute table and inserts nothing.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

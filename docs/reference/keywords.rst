@@ -81,6 +81,11 @@ Some keywords are the exception, because they read records of their own rather t
   by ``BURNREPT`` — never negative unless ``INVYEAR`` is given an invalid negative year, which shifts the
   whole simulation. It is not exposed.
 
+  **``ATRTLIST`` and ``STRCLASS`` are requests, and ``ATRTLIST`` needs a treatment.** The attribute
+  list is written after a cutting operation — its writer returns unless it is called from `cuts.f` —
+  so a run with no removal writes no rows even though the table exists. `STRCLASS` asks for the
+  structural stage of each stratum.
+
   **Some tables need a request as well as an option.** ``FVS_TreeList_Metric`` needs ``TREELIDB`` in
   the ``DATABASE`` block *and* a ``TREELIST`` keyword; ``FVS_CutList_Metric`` needs ``CUTLIDB`` and
   ``CUTLIST``, and an actual removal; ``FVS_Stats_Species_Metric`` needs ``INVSTATS`` and ``STATS``.

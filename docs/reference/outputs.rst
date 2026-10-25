@@ -86,16 +86,22 @@ Contract rules
    earlier revision returned records, because the project declared no dependencies at all; that was a
    narrowing of this rule and it is withdrawn.
 3. `fresh-fvsbc` exposes the tables it has tested. A table it has not tested is not in the public API, even if
-   the database holds it. **Eighteen are exposed**: `FVS_Carbon_Metric`, `FVS_Cases`, `FVS_Compute`,
-   `FVS_Consumption_Metric`, `FVS_CutList_Metric`, `FVS_Down_Wood_Cov_Metric`,
-   `FVS_Down_Wood_Vol_Metric`, `FVS_Error`, `FVS_Fuels_Metric`, `FVS_Hrv_Carbon`, `FVS_InvReference`,
-   `FVS_PotFire_Cond_Metric`, `FVS_PotFire_Metric`, `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`,
-   `FVS_Stats_Species_Metric`, `FVS_Summary_Metric` and `FVS_TreeList_Metric`. Most are written only
-   when a `DATABASE` block asks for them, and the block must come before the stand setup — see
-   :doc:`keywords`. Several need a second trigger: the fuels, potfire and carbon tables an `FMIN`
-   block, consumption a fire event (`SIMFIRE` schedules one), and the per-tree tables a `TREELIST` or
-   `CUTLIST` request. The row counts of the four the official dump carries are checked against it in
-   `tests/test_oracle.py`.
+   the database holds it. **Twenty are exposed**: `FVS_ATRTList_Metric`, `FVS_Carbon_Metric`,
+   `FVS_Cases`, `FVS_Compute`, `FVS_Consumption_Metric`, `FVS_CutList_Metric`,
+   `FVS_Down_Wood_Cov_Metric`, `FVS_Down_Wood_Vol_Metric`, `FVS_Error`, `FVS_Fuels_Metric`,
+   `FVS_Hrv_Carbon`, `FVS_InvReference`, `FVS_PotFire_Cond_Metric`, `FVS_PotFire_Metric`,
+   `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`, `FVS_Stats_Species_Metric`, `FVS_StrClass_Metric`,
+   `FVS_Summary_Metric` and `FVS_TreeList_Metric`. Most are written only when a `DATABASE` block asks
+   for them, and the block must come before the stand setup — see :doc:`keywords`. Several need a
+   second trigger: the fuels, potfire and carbon tables an `FMIN` block, consumption a fire event
+   (`SIMFIRE` schedules one), the per-tree tables a `TREELIST` or `CUTLIST` request, and
+   `FVS_ATRTList_Metric` a **treatment** — it is the after-treatment listing, and a removal that takes
+   everything creates the table and inserts nothing. The row counts of the four the official dump
+   carries are checked against it in `tests/test_oracle.py`.
+
+   **`FVS_StrClass_Metric` carries the structural stage**, which is the currency of old-growth and
+   habitat assessment in British Columbia: one row per stratum per period, with its diameter, heights,
+   crown base, crown cover and species.
 
    **`FVS_TreeList_Metric` and `FVS_CutList_Metric` are the per-tree tables**, one row per tree per
    period, with the FVS, PLANTS and FIA species codes so a result can be joined to anything else.

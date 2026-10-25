@@ -131,6 +131,7 @@ IDENTITY_COLUMN: str = "CaseID"
 #: The tables this reader exposes. Contract rule 3: a table it has not tested is not in the API, and
 #: these two are the ones a run through the FFI is known to write.
 EXPOSED_TABLES: tuple[str, ...] = (
+    "FVS_ATRTList_Metric",
     "FVS_Carbon_Metric",
     "FVS_Cases",
     "FVS_Compute",
@@ -147,6 +148,7 @@ EXPOSED_TABLES: tuple[str, ...] = (
     "FVS_SnagDet_Metric",
     "FVS_SnagSum_Metric",
     "FVS_Stats_Species_Metric",
+    "FVS_StrClass_Metric",
     "FVS_Summary_Metric",
     "FVS_TreeList_Metric",
 )
