@@ -23,7 +23,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P12 The table names | #62 | `feature/p12-table-names` | complete |
 | P13 The tables the official case writes | #67 | `feature/p13-tables` | complete |
 | P14 Release 0.4.0 | #71 | `feature/p14-release-0-4-0` | complete |
-| P15 The conditional | #75 | `feature/p15-if-blocks` | active |
+| P15 The conditional | #75 | `feature/p15-if-blocks` | complete |
 
 ## Lifecycle Map
 
@@ -478,16 +478,16 @@ Acceptance criteria:
 
 Parent issue: #75
 Branch: `feature/p15-if-blocks`
-Status: active
+Status: complete
 
 Goal: write `IF` blocks, the last keyword form the model could not express.
 
-- [ ] P15.1 Write the conditional (#76)
-  - [ ] The model holds `nested` and `otherwise` beside `lines`, and only `IF` may carry them.
-  - [ ] The writer emits the official case's form, and the `ELSE` branch.
-  - [ ] The validator recurses into a conditional's body.
-  - [ ] A run with an `IF` block succeeds and FVS's report carries the condition.
-  - [ ] Correct `docs/reference/keywords.rst`.
+- [x] P15.1 Write the conditional (#76)
+  - [x] The model holds `nested` and `otherwise` beside `lines`, and only `IF` may carry them.
+  - [x] The writer emits the official case's form, and the `ELSE` branch.
+  - [x] The validator recurses into a conditional's body.
+  - [x] A run with an `IF` block succeeds and FVS's report carries the condition.
+  - [x] Correct `docs/reference/keywords.rst`.
 
 Acceptance criteria:
 
