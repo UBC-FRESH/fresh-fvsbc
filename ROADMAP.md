@@ -15,7 +15,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P4 Verify | #25 | `feature/p4-verify` | complete |
 | P5 Release and deploy | #31 | `feature/p5-release` | complete |
 | P6 Operate and maintain | #37 | `feature/p6-operate` | complete |
-| P7 Keyword blocks and gate hygiene | #43 | `feature/p7-blocks-and-gates` | active |
+| P7 Keyword blocks and gate hygiene | #43 | `feature/p7-blocks-and-gates` | complete |
 
 ## Lifecycle Map
 
@@ -289,7 +289,7 @@ Acceptance criteria:
 
 Parent issue: #43
 Branch: `feature/p7-blocks-and-gates`
-Status: active
+Status: complete
 
 Goal: write the keyword blocks that were refused, and close the gate gap that let machine-specific
 paths into a tracked file.
@@ -298,9 +298,9 @@ paths into a tracked file.
   - [x] The model holds lines, and the writer supplies the ``END``, because a block without one swallows the rest of the file.
   - [x] ``COMMENT``, ``COMPUTE`` and ``DATABASE`` are accepted; ``IF`` is still refused by name, because it wraps keywords rather than lines.
   - [x] Demonstrated end to end: FVS's own report echoes a ``COMPUTE`` block as ``DEFINE THE FOLLOWING``.
-- [ ] P7.2 Catch a POSIX temporary path (#45)
-  - [ ] A pattern in ``scripts/check_workflow.py``, with the evidence that it does not false-positive on legitimate prose.
-  - [ ] A test that a machine-specific path in a tracked file is found, and one that a placeholder is not.
+- [x] P7.2 Catch a POSIX temporary path (#45)
+  - [x] A pattern in ``scripts/check_workflow.py``, with the evidence that it does not false-positive on legitimate prose.
+  - [x] A test that a machine-specific path in a tracked file is found, and one that a placeholder is not.
 
 Acceptance criteria:
 
