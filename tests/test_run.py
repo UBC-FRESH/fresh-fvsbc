@@ -412,6 +412,39 @@ def test_run_population_refuses_a_population_without_species(tmp_path: Path) -> 
         run.run_population(synthetic_population(), tree_age=60.0, directory=tmp_path / "run")
 
 
+def test_a_compute_block_reaches_fvs(tmp_path: Path) -> None:
+    """A ``COMPUTE`` block is written as a block, and FVS's own report shows it read one.
+
+    ``FVS_Compute`` is still not written through this route, because that needs a ``DATABASE``
+    block asking for ``ComputDB`` and PyFVS occupies that block. What this checks is the keyword
+    layer: the block reaches FVS, which echoes it as ``DEFINE THE FOLLOWING``.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    expression = "BigVol = spmcdbh(3,0,0, 20.0, 999.0, 0,999,0)"
+    keywords = (
+        Keyword("STDIDENT", ("BLOCK   compute",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("COMPUTE", ("0",), (expression,)),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    report = (result.directory / "run.out").read_text(encoding="latin-1")
+    assert "DEFINE THE FOLLOWING" in report
+    assert expression in report
+
+
 def test_a_synthetic_stand_runs_end_to_end(tmp_path: Path) -> None:
     """One call runs a synthetic stand and returns its tables with provenance.
 
