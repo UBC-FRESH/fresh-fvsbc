@@ -16,7 +16,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P5 Release and deploy | #31 | `feature/p5-release` | complete |
 | P6 Operate and maintain | #37 | `feature/p6-operate` | complete |
 | P7 Keyword blocks and gate hygiene | #43 | `feature/p7-blocks-and-gates` | complete |
-| P8 Release 0.2.0 | #47 | `feature/p8-release-0-2-0` | active |
+| P8 Release 0.2.0 | #47 | `feature/p8-release-0-2-0` | complete |
 
 ## Lifecycle Map
 
@@ -313,14 +313,14 @@ Acceptance criteria:
 
 Parent issue: #47
 Branch: `feature/p8-release-0-2-0`
-Status: active
+Status: complete
 
 Goal: release `0.2.0`, because `main` carries a correctness fix for a defect that is in `v0.1.0`.
 
-- [ ] P8.1 Version and notes for 0.2.0 (#48)
-  - [ ] Bump `pyproject.toml` and `__init__.py` to `0.2.0`, together, because a test asserts they agree.
-  - [ ] Rewrite `RELEASE_NOTES.md` for 0.2.0: what changed since 0.1.0, the pins, and the gaps that remain with their limits.
-  - [ ] Name the gaps that closed, and narrow the block-keyword gap to `IF`.
+- [x] P8.1 Version and notes for 0.2.0 (#48)
+  - [x] Bump `pyproject.toml` and `__init__.py` to `0.2.0`, together, because a test asserts they agree.
+  - [x] Rewrite `RELEASE_NOTES.md` for 0.2.0: what changed since 0.1.0, the pins, and the gaps that remain with their limits.
+  - [x] Name the gaps that closed, and narrow the block-keyword gap to `IF`.
 
 Acceptance criteria:
 
