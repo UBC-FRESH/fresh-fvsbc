@@ -1,10 +1,19 @@
-# fresh-fvsbc 0.4.0
+# fresh-fvsbc 0.5.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.4.0
+
+- **`IF` blocks can be written.** A caller can put keywords behind a condition — a thinning schedule, an
+  establishment rule, anything FVS reads conditionally:
+  `Keyword("IF", (), ("MOD(AGE,60) EQ 0",), (Keyword("THINBBA", ("0", "0.0")),))` renders as the
+  condition, `THEN`, the body and `ENDIF`, with an optional `ELSE`.
+- **The body is validated**, so an unknown keyword inside a conditional is refused like one outside it.
+- **`ALSOTRY` is not modelled**, because no fixture here uses it.
 
 ## What changed since 0.3.1
 
@@ -50,25 +59,23 @@ recipe.
 
 ## Known gaps
 
-Ten, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
+Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **`IF` blocks are refused, not written.** `IF` wraps keywords ended by `ENDIF`, which needs a nested
-   model; `COMMENT`, `COMPUTE` and `DATABASE` are supported.
-2. **The reader exposes eight of 44 tables.** The other 36 need a case that triggers each one before
+1. **The reader exposes eight of 44 tables.** The other 36 need a case that triggers each one before
    output contract rule 3 allows exposing it.
-3. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
+2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
-4. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
+3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
    evidence, not proof.
-5. **The residual on three dense stands** is attributed, not proven, to upstream changes.
-6. **`run.py`'s drive body is covered only where the extension is built**: 84 percent in the quality
+4. **The residual on three dense stands** is attributed, not proven, to upstream changes.
+5. **`run.py`'s drive body is covered only where the extension is built**: 84 percent in the quality
    job, which has no extension, and the gate is met at 97 percent overall because the build job covers
    the rest.
-7. **A parameter passed to the command cannot contain a comma.**
-8. **At `-O0` the variant writes no database at all**, so the optimiser is not optional.
-9. **The package needs a separately built extension.** Installing it does not build FVS.
-10. **The `nemora` adapter requires `species` and `tree_age`**, and species assignment is out of scope.
+6. **A parameter passed to the command cannot contain a comma.**
+7. **At `-O0` the variant writes no database at all**, so the optimiser is not optional.
+8. **The package needs a separately built extension.** Installing it does not build FVS.
+9. **The `nemora` adapter requires `species` and `tree_age`**, and species assignment is out of scope.
 
 ## What is not in this release
 
