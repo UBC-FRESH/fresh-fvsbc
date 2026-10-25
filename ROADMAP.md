@@ -14,7 +14,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P3 Build | #17 | `feature/p3-build` | complete |
 | P4 Verify | #25 | `feature/p4-verify` | complete |
 | P5 Release and deploy | #31 | `feature/p5-release` | complete |
-| P6 Operate and maintain | TBD | `feature/p6-operate` | planned |
+| P6 Operate and maintain | #37 | `feature/p6-operate` | active |
 
 ## Lifecycle Map
 
@@ -253,39 +253,51 @@ Acceptance criteria:
 
 ## Phase 6: Operate and maintain
 
-Parent issue: TBD
+Parent issue: #37
 Branch: `feature/p6-operate`
-Status: planned
+Status: active
 
 Goal: keep the project current: triage incoming ideas, review on a cadence, and close out cleanly.
 
-- [ ] P6.1 Set a review cadence and record the first review
+The detail for this phase is the focused plan `notes/p6-operate.md`, which carries each task's sections,
+the phase criteria, the order and its reason, and the open proposals.
+
+- [ ] P6.1 Triage the twelve known gaps (#38)
+  - [ ] Read the twelve gaps and, for each, the report that carries it.
+  - [ ] Assign each a disposition: fix now, fix later with a named phase, or accepted with a reason.
+  - [ ] Record the table where a reader looks, and say what the disposition costs.
+  - [ ] Propose a phase for anything marked fix-later that no phase covers.
+- [ ] P6.2 Make two runs in one process safe (#39)
+  - [ ] Spike both mechanisms and record what each costs: a guard that refuses a second run, and a subprocess per run.
+  - [ ] Bring the choice back as a decision with the evidence, before changing the API.
+  - [ ] Implement the chosen mechanism, with the docstrings and docs corrected to match.
+  - [ ] Add the test that shows the second run cannot silently disagree, and a mutation the harness catches.
+- [ ] P6.3 Set the review cadence and record the first review (#40)
+  - [ ] State the cadence, what it covers, and who holds it.
+  - [ ] Record the first review: the triaged backlog, the release's state, and the model log's re-checks.
+  - [ ] Say where the next review is recorded, so that a missed one is visible rather than silent.
 
 Acceptance criteria:
 
-- <State the criterion that shows this phase met its goal.>
+- Every item in `RELEASE_NOTES.md`'s known-gaps list carries a disposition: fix now, fix later with a named phase, or accepted with a reason.
+- Two runs in one process cannot silently disagree; the mechanism is recorded and tested.
+- A review cadence is stated, and the first review is recorded against the triaged backlog.
+- `python scripts/dashboard.py` exits zero on the head commit of the phase branch.
 
-## Detailed Next Steps Notes
+## Open decisions and where the detail lives
 
-The substance of these notes now lives in the focused plans under `notes/`, which is where the workflow
-model puts detail too long for this roadmap. What stays here is the ordering and the open decisions.
+The detail for each phase lives in its focused plan under `notes/`; the evidence lives in
+`notes/reports/`. What stays here is the ordering and the open decisions.
 
-1. The prototype's plan, and the phase's detail, are in `notes/p2-contracts-and-prototype.md`. It
-   carries each task's sections, the phase criteria with their evidence, the deviations, and four
-   proposals for the maintainer.
-2. **Open, and the maintainer's: the CI quality matrix.** `.github/workflows/ci.yml` runs one `quality`
-   job on Python 3.12, where `docs/reference/quality-gates.rst` in the workflow spec requires 3.11 and
-   3.12 and names the contexts `Quality gates, Python 3.11` and `Quality gates, Python 3.12`. Changing
-   CI or branch protection is a settings change. Recommendation in the plan, proposal 2.
-3. **Open, and the maintainer's: `ADR 0004` is still `Status: proposed`**, although its task is closed
-   and the phase's third acceptance criterion rests on it. It also contradicts itself and names the
-   wrong task issue. Recommendation in the plan, proposal 3.
-4. **Open: `FVS_Compute` and `FVS_Summary_Metric` are unreachable through PyFVS**, which occupies the
-   `DATABASE` output block. Recommendation in the plan, proposal 1.
-5. **Proposed adjacent work, not started: promote the oracle comparison into a repository test that can
-   fail.** Every comparison so far was an ad hoc script outside the repository, and three of them were
-   buggy in ways that produced false findings. A test that runs the first official case and asserts zero
-   differing lines would have caught them, and it needs a task of its own.
-6. **Proposed: pin the workflow revision in `AGENTS.md`.** It names the workflow spec with no path, URL,
-   or revision, and the project carries no local copy of the pages that govern it. Recommendation in the
-   plan, and the upstream gap is to be filed under `P2.5`.
+- **The current open items are the twelve known gaps in `RELEASE_NOTES.md`**, and `P6.1` gives each a
+  disposition rather than leaving it recorded and unowned.
+- **`run_case`'s non-re-entrancy and the thread-safety limit** are `P6.2`, and the mechanism is a
+  decision rather than an assumption.
+- **The review cadence and its first review** are `P6.3`.
+
+**Every earlier open decision is closed, and an earlier revision of this section listed five of them as
+open for four phases.** The CI quality matrix was done in `P3.1` (#18); `ADR 0004` was accepted on
+2026-10-23; `FVS_Compute` and `FVS_Summary_Metric` were resolved by explanation in `P3.2` (#19) with
+ADR 0009; the oracle comparison was promoted into a repository test in `P4.2` (#27); and `AGENTS.md`
+pins the workflow revision. The list is kept here as history rather than deleted, because a stale plan
+of record is a defect this project has now found twice.
