@@ -31,6 +31,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P20 The carbon tables | #95 | `feature/p20-carbon` | complete |
 | P21 Release 0.7.0 | #99 | `feature/p21-release-0-7-0` | complete |
 | P22 The consumption table | #103 | `feature/p22-consumption` | complete |
+| P23 Release 0.8.0 | #107 | `feature/p23-release-0-8-0` | active |
 
 ## Lifecycle Map
 
@@ -644,6 +645,28 @@ Acceptance criteria:
 - A run with `SIMFIRE` writes one consumption row with non-zero consumption.
 - The reader exposes fourteen tables.
 - The burn report's dead gate is recorded with the two assignments that prove it.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 23: Release 0.8.0
+
+Parent issue: #107
+Branch: `feature/p23-release-0-8-0`
+Status: active
+
+Goal: release `0.8.0`, because `main` carries the consumption table and the record of why the burn report
+cannot be exposed.
+
+- [ ] P23.1 Version and notes for 0.8.0 (#108)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.7.0".
+  - [ ] Replace the table gap with fourteen exposed.
+  - [ ] Add the consumption run to what is verified.
+
+Acceptance criteria:
+
+- The package reports `0.8.0`, and the notes say what changed and what remains.
+- A clean checkout installs it and reads a consumption row with a non-zero total.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
