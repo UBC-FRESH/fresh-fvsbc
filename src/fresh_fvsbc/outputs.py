@@ -132,6 +132,7 @@ IDENTITY_COLUMN: str = "CaseID"
 #: these two are the ones a run through the FFI is known to write.
 EXPOSED_TABLES: tuple[str, ...] = (
     "FVS_ATRTList_Metric",
+    "FVS_CanProfile",
     "FVS_Carbon_Metric",
     "FVS_Cases",
     "FVS_Compute",

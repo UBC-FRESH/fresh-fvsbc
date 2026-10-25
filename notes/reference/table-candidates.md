@@ -4,9 +4,15 @@
 have a writer and a call site** — the candidates — five have a writer that nothing calls, and one has a
 gate no valid input satisfies.
 
-**Six are wired as of `P28`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
-`FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` in `P27`, then `FVS_StrClass_Metric` and
-`FVS_ATRTList_Metric` in `P28` — which took the reader from fourteen tables to twenty. They stay in place below, marked **wired**, because their estimates are the record of what they
+**Seven are wired as of `P30`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
+`FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` in `P27`, `FVS_StrClass_Metric` and
+`FVS_ATRTList_Metric` in `P28`, then `FVS_CanProfile` in `P30` — which took the reader from fourteen
+tables to twenty-one.
+
+**The "fixture is the constraint" claim was tested and is mostly wrong.** `notes/reference/fixture-limits.md`
+records it: `FVS_Stats_Stand` reports "one sample point" although the tree list carries five plot ids, and
+`FVS_Mortality_Metric` still does not appear with 200 trees under a 100 percent burn. Both are questions
+about FVS, not about the fixture. They stay in place below, marked **wired**, because their estimates are the record of what they
 cost and the evidence for the estimates on the rest.
 
 This note exists so the remaining work can be planned rather than apologised for. It gives each candidate
@@ -164,7 +170,7 @@ Effort is the work to wire one table, assuming the trigger is found on the first
 | `FVS_Stats_Species_Metric` | S | medium — same | medium | **wired in `P27`** |
 | `FVS_StrClass_Metric` | S | medium — the class boundaries are a model choice, not a fact | **high** for BC old-growth work | **wired in `P28`** |
 | `FVS_Climate_Metric` | S | **high** — no way to check the indices without a second source | medium | |
-| `FVS_CanProfile` | M | medium — the trigger is a guess (`CANFPROF`) | medium | |
+| `FVS_CanProfile` | S | low — `CANFPROF` was the guess and it worked | medium | **wired in `P30`** |
 | `FVS_Regen_Tally_Metric` | M | medium — needs an establishment model active | **high** for BC silviculture | |
 | `FVS_Regen_Sprouts_Metric` | M | medium | medium | |
 | `FVS_Regen_SitePrep` | M | medium | low | |
@@ -185,7 +191,8 @@ Cheapest first, and each step leaves the dashboard green:
 2. **Done in `P28`** — `FVS_StrClass_Metric` and `FVS_ATRTList_Metric`. The attribute list needed
    more than the note predicted: it is the *after-treatment* listing, so it needs a removal that leaves
    trees, and a removal that takes everything creates the table and inserts nothing.
-3. **`FVS_Regen_*` (3)** and **`FVS_CanProfile`** — the `M` group, one phase each.
+3. **`FVS_CanProfile` done in `P30`**, and it took an hour rather than the day the `M` estimate gave:
+   the guess was right. **The `FVS_Regen_*` three** remain, and they need an establishment model active.
 4. **`FVS_Stats_Species_Metric`, `FVS_Climate_Metric`, `FVS_CalibStats`** — the low-value tail.
 5. **The damage agents (7)** — a phase of its own, and it needs a fixture change first, so it should be
    planned as two: the bridge expresses an infected stand, then the tables follow.

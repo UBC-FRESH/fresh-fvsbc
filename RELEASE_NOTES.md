@@ -8,6 +8,17 @@ Pre-1.0, and the public API can change. The gaps that remain are listed at the e
 
 ## What changed since 0.8.0
 
+- **One more table, and a claim withdrawn.** `FVS_CanProfile` joins the twenty — the canopy fuels profile by
+  height layer, which is the vertical structure a fuel or wildlife model wants — so the reader exposes
+  **twenty-one of 44**. Its trigger, `CANFPROF` inside `FMIN`, was a guess in the candidate note and the
+  guess was right.
+- **"The fixture is the binding constraint" was tested and is mostly wrong.** Three experiments, in
+  `notes/reference/fixture-limits.md`: the fixture **already** produces five plots (the tree list carries
+  plot ids 1 to 5), yet FVS reports `DISTRIBUTION OF ATTRIBUTES AMONG SAMPLE POINTS CANNOT BE COMPUTED WITH
+  ONE SAMPLE POINT`; a five-plot population with **200 trees** under a 100 percent burn still writes no
+  mortality table; and `damage1 = 21` does not register as dwarf mistletoe at all. **Nothing was added to
+  the fixture**, because nothing was shown to be missing.
+
 - **Six more tables are readable, and the reader exposes twenty of 44.** Two of them close the biggest
   hole the package had: `FVS_TreeList_Metric` and `FVS_CutList_Metric` are its **first per-tree output
   ever** — one row per tree per period, with the FVS, PLANTS and FIA species codes, so a result can be
@@ -141,8 +152,8 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes twenty of 44 tables.** The other 24 are classified in
-   `notes/reference/table-reachability.md`: 19 have a writer and a call site and are candidates, five have
+1. **The reader exposes twenty-one of 44 tables.** The other 23 are classified in
+   `notes/reference/table-reachability.md`: 18 have a writer and a call site and are candidates, five have
    a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. A call site
    is not a promise; each candidate needs its own case, and `notes/reference/table-candidates.md` gives
    each one a cost, a risk and a value.

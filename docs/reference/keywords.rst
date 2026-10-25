@@ -70,7 +70,7 @@ Some keywords are the exception, because they read records of their own rather t
   later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it
   first. The validator refuses a set that puts it after ``STDIDENT``, ``STDINFO`` or ``STANDSQL``.
   **``FMIN`` is how a caller asks for the fuels, potfire, carbon and consumption tables**: ``FUELOUT``,
-  ``FUELREPT``, ``POTFIRE``, ``CARBREPT``, ``SIMFIRE`` and ``DWDCVOUT`` are options inside it rather
+  ``FUELREPT``, ``POTFIRE``, ``CARBREPT``, ``SIMFIRE``, ``DWDCVOUT`` and ``CANFPROF`` are options inside it rather
   than keywords, which is why they are not in the table. Each writes its tables only when the ``DATABASE`` block names
   the matching option — ``FuelsOut``, ``FuelReDB``, ``PotfirDB``, ``CARBREDB`` or ``BURNREDB`` — and the
   option alone is never enough for carbon or consumption: ``CARBREDB`` needs ``CARBREPT``, and
