@@ -21,7 +21,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P10 Release 0.3.0 | #55 | `feature/p10-release-0-3-0` | complete |
 | P11 The command's block form, and 0.3.1 | #58 | `feature/p11-block-form` | complete |
 | P12 The table names | #62 | `feature/p12-table-names` | complete |
-| P13 The tables the official case writes | #67 | `feature/p13-tables` | active |
+| P13 The tables the official case writes | #67 | `feature/p13-tables` | complete |
 
 ## Lifecycle Map
 
@@ -435,16 +435,16 @@ Acceptance criteria:
 
 Parent issue: #67
 Branch: `feature/p13-tables`
-Status: active
+Status: complete
 
 Goal: expose the four tables the official case writes that the reader did not, and check them against
 FVS's own database dump.
 
-- [ ] P13.1 Expose the four tables and check them against the dump (#68)
-  - [ ] Expose `FVS_Down_Wood_Vol_Metric`, `FVS_InvReference`, `FVS_SnagDet_Metric` and `FVS_SnagSum_Metric`.
-  - [ ] Parse the dump's per-table CSV sections, mapping the two names it writes differently.
-  - [ ] A test that every exposed table the dump carries holds the dump's row count.
-  - [ ] Correct the contract page's exposed list.
+- [x] P13.1 Expose the four tables and check them against the dump (#68)
+  - [x] Expose `FVS_Down_Wood_Vol_Metric`, `FVS_InvReference`, `FVS_SnagDet_Metric` and `FVS_SnagSum_Metric`.
+  - [x] Parse the dump's per-table CSV sections, mapping the two names it writes differently.
+  - [x] A test that every exposed table the dump carries holds the dump's row count.
+  - [x] Correct the contract page's exposed list.
 
 Acceptance criteria:
 
