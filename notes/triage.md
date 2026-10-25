@@ -29,6 +29,13 @@ says which review changed it.
 | 11 | The reader exposes four of the database's 33 tables | **accepted** | Testing a table, then exposing it | Output contract rule 3 keeps an untested table out of the public API. `FVS_Compute` and `FVS_Summary_Metric` were added in `P9` once a `DATABASE` block could ask for them; **the other 29 need their own tests**. Reopened by a caller who needs one of them |
 | 12 | The `nemora` adapter requires `species` and `tree_age` from the caller | **accepted** | A species-assignment capability | `nemora` emits neither, and assigning a species is a modelling question with a research burden. The adapter fails rather than defaulting, which is the honest behaviour. **Reopened by a caller who asks for species assignment**, not by one who has populations without species: every `nemora` population has none, so that condition would fire on the normal case and would make the row unowned |
 
+## Found, and not yet fixed
+
+- **The contract's table list is the base schema's, and BC builds the metric one.** Twenty-four names are
+  wrong for this variant and at least two real tables are missing. Evidence and scope in
+  `notes/reference/table-names.md`; the correction needs the metric schema read in full, because part of
+  it is created through a dynamic statement.
+
 ## Closed in `P11`
 
 - **The command could not write a keyword block.** `--keyword NAME=FIELD,...` sets fields and a block

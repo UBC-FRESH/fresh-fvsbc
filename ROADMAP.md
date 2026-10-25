@@ -20,6 +20,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P9 The database block | #50 | `feature/p9-database-block` | complete |
 | P10 Release 0.3.0 | #55 | `feature/p10-release-0-3-0` | complete |
 | P11 The command's block form, and 0.3.1 | #58 | `feature/p11-block-form` | complete |
+| P12 The table names | #62 | `feature/p12-table-names` | active |
 
 ## Lifecycle Map
 
@@ -404,6 +405,29 @@ Acceptance criteria:
 - `--block` writes a block, and the two options keep their relative order.
 - A run through the command with a `DATABASE` block first writes `FVS_Compute`.
 - The package reports `0.3.1` and a clean checkout installs it.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 12: The table names
+
+Parent issue: #62
+Branch: `feature/p12-table-names`
+Status: active
+
+Goal: the contract's table list is the base schema's and BC builds the metric one, so twenty-four names
+are wrong for this variant. Record it, then correct it from the schema.
+
+- [x] P12.1 Record that the list names the wrong schema (#63)
+  - [x] Read the schema the variant actually builds.
+  - [x] Record the evidence in `notes/reference/table-names.md`.
+- [ ] P12.2 Correct the list from the metric schema (#64)
+  - [ ] Read the metric schema in full, including the dynamic statement.
+  - [ ] Correct the list, the page and the tests.
+  - [ ] Confirm the official case's database names only tables in the corrected list.
+
+Acceptance criteria:
+
+- The evidence is recorded, with the file that shows it.
+- The list, the page and the tests name the metric schema's tables, and every exposed table is in the list.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
