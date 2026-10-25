@@ -24,7 +24,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P13 The tables the official case writes | #67 | `feature/p13-tables` | complete |
 | P14 Release 0.4.0 | #71 | `feature/p14-release-0-4-0` | complete |
 | P15 The conditional | #75 | `feature/p15-if-blocks` | complete |
-| P16 Release 0.5.0 | #79 | `feature/p16-release-0-5-0` | active |
+| P16 Release 0.5.0 | #79 | `feature/p16-release-0-5-0` | complete |
 
 ## Lifecycle Map
 
@@ -501,14 +501,14 @@ Acceptance criteria:
 
 Parent issue: #79
 Branch: `feature/p16-release-0-5-0`
-Status: active
+Status: complete
 
 Goal: release `0.5.0`, because `main` carries `IF` blocks and nobody can use them from a release.
 
-- [ ] P16.1 Version and notes for 0.5.0 (#80)
-  - [ ] Bump the version in two files.
-  - [ ] Rewrite the notes.
-  - [ ] Drop the `IF` gap.
+- [x] P16.1 Version and notes for 0.5.0 (#80)
+  - [x] Bump the version in two files.
+  - [x] Rewrite the notes.
+  - [x] Drop the `IF` gap.
 
 Acceptance criteria:
 
