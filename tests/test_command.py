@@ -65,8 +65,8 @@ def a_database(path: Path, *, messages: tuple[str, ...] = ()) -> Path:
 def a_fake_drive(*, messages: tuple[str, ...] = ()) -> Callable[..., run._Drive]:
     """Return a drive that writes the database a real run would write, in the run directory."""
 
-    def drive(key_name: str, *, variant: str) -> run._Drive:
-        a_database(Path.cwd() / run.DATABASE_NAME, messages=messages)
+    def drive(key_name: str, *, variant: str, directory: Path) -> run._Drive:
+        a_database(directory / run.DATABASE_NAME, messages=messages)
         return run._Drive(summary=pd.DataFrame({"Year": [0, 10]}), variants=("BC",))
 
     return drive

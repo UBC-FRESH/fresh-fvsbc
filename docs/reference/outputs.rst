@@ -66,10 +66,11 @@ Contract rules
    ``FVS-BC.Stand.Structure.Out.db``. So the name is a property of the keyword set. A run that does
    not name one gets ``FVSOut.db`` in its working directory, whatever the keyword file is called, and
    two such runs in one directory overwrite each other's database. A run therefore owns its
-   directory: the orchestration changes into it for the projection and restores the caller's
-   directory afterwards, which makes a run process-global rather than thread-safe. **An earlier
+   directory: the projection is driven in a child process that changes into it, so the caller's
+   directory is never touched and two runs in one process are independent (ADR 0010). **An earlier
    revision of this page said the name was fixed**, which the oracle test disproved the first time it
-   ran.
+   ran, and an earlier revision of the orchestration ran in the caller's process, which made a run
+   neither re-entrant nor thread-safe.
 2. A parsed table is returned as a dataframe whose column names are the database's column names.
    `fresh-fvsbc` does not rename a column to something friendlier, because a rename breaks the trace back to
    the FVS schema. `pandas` is a dependency for this reason, and it is the project's only runtime one. An

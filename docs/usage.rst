@@ -84,8 +84,11 @@ The directory named by ``--directory``, created if absent, holds:
 - ``run.tre``, the tree list, ending with the ``-999`` line FVS reads to;
 - ``FVSOut.db``, the database, under the fixed name ``dbsblkd.f`` declares;
 - ``run.out`` and ``run.sum``, FVS's own report and summary;
-- ``provenance.json``, the record described in :doc:`reference/provenance`.
+- ``provenance.json``, the record described in :doc:`reference/provenance`;
+- ``summary.csv`` and ``variants.json``, what the child process that drove the projection wrote for the
+  parent: the summary FVS produced, and the build's variant list.
 
 A run owns its directory. The database's name is fixed, so two runs in one directory overwrite each
-other's database. The command changes into the directory for the projection and restores the caller's
-afterwards, which makes a run process-global rather than thread-safe.
+other's database. **Each run drives its projection in a child process** (ADR 0010), so the child owns
+the working directory and the Fortran state, and two runs in one process are independent: a run is
+thread-safe, and a second run cannot inherit the first one's state.

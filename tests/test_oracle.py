@@ -36,7 +36,10 @@ from pathlib import Path
 
 import pytest
 
+from fresh_fvsbc.keywords import Keyword
 from fresh_fvsbc.outputs import errors_in, read_errors
+from fresh_fvsbc.run import run_population
+from nemora_fixtures import synthetic_population
 
 #: This file's directory, which the child process needs on its path.
 TESTS: Path = Path(__file__).resolve().parent
@@ -260,6 +263,49 @@ def test_a_directory_without_the_case_skips(
     monkeypatch.setenv(CASE_DIR_ENV, str(tmp_path))
     with pytest.raises(pytest.skip.Exception, match="holds no"):
         case_directory()
+
+
+def test_a_run_after_another_case_is_not_contaminated(tmp_path: Path) -> None:
+    """Two runs in one process must not share FVS's state (ADR 0010).
+
+    Before the child process, this case differed from the oracle on **104 of 164 rows** when a
+    synthetic run came first in the same process, and matched when it did not. So the assertion is
+    not that the run works, it is that the parent process is clean after a run.
+
+    **This is the only test that drives the official case in the parent process**, and it does so
+    deliberately: running it in a child would test nothing, because the child is the isolation.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    case = case_directory()
+    keywords = (
+        Keyword("STDIDENT", ("CONTAMINATION   first",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("4",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    run_population(
+        synthetic_population(),
+        species="FD",
+        tree_age=60.0,
+        keywords=keywords,
+        directory=tmp_path / "synthetic",
+    )
+
+    workdir = tmp_path / "official"
+    workdir.mkdir()
+    run_case(case, workdir)
+    produced = (workdir / f"{CASE}.sum").read_text(encoding="latin-1")
+    expected = (case / f"{CASE}.sum.save").read_text(encoding="latin-1")
+    assert differing_lines(produced, expected) == []
 
 
 def test_the_official_case_matches_its_oracle(tmp_path: Path) -> None:
