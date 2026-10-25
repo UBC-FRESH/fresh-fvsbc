@@ -37,6 +37,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P26 The damage-agent blocks | #119 | `feature/p26-dm-rd` | complete |
 | P27 The cheap tables | #123 | `feature/p27-the-cheap-five` | complete |
 | P28 StrClass and ATRTList | #127 | `feature/p28-strclass-atrtlist` | complete |
+| P29 Release 0.9.0 | #131 | `feature/p29-release-0-9-0` | active |
 
 ## Lifecycle Map
 
@@ -775,6 +776,28 @@ Acceptance criteria:
 
 - A run writes both tables, and the reader exposes twenty.
 - The test records that a removal taking everything creates the attribute table and inserts nothing.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 29: Release 0.9.0
+
+Parent issue: #131
+Branch: `feature/p29-release-0-9-0`
+Status: active
+
+Goal: release `0.9.0`, because `main` carries six more tables — including the first per-tree output the
+package has had, and the BC-specific structural stage.
+
+- [ ] P29.1 Version and notes for 0.9.0 (#132)
+  - [ ] Bump the version in two files.
+  - [ ] Reorder "What changed since 0.8.0" into one account, with the six tables and the correct counts.
+  - [ ] Add the per-tree and stage runs to what is verified.
+  - [ ] Check that no bullet still says eighteen or fourteen exposed.
+
+Acceptance criteria:
+
+- The package reports `0.9.0`, and the notes say what changed and what remains.
+- A clean checkout installs it and reads a per-tree table and the structural stage.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

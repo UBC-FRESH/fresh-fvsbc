@@ -8,37 +8,37 @@ Pre-1.0, and the public API can change. The gaps that remain are listed at the e
 
 ## What changed since 0.8.0
 
-- **Two more tables, and one of them is the BC-specific one.** `FVS_StrClass_Metric` carries the
-  **structural stage** — the class BC uses for old-growth and habitat assessment — and
-  `FVS_ATRTList_Metric` the after-treatment attribute list. The reader exposes **twenty of 44**.
-- **The attribute list is the sharpest case yet of a table that needs more than a request.** Its writer
-  returns unless it is called from `cuts.f`, so it is written only after a cutting operation, and a
-  removal that takes everything creates the table and inserts **nothing**. A partial removal — a residual
-  of zero with half the selected trees taken — is what produces rows.
-
-- **Four more tables are readable, and they close the per-tree hole.** `FVS_TreeList_Metric`,
-  `FVS_CutList_Metric`, `FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` join the fourteen, so
-  the reader exposes **eighteen**. Before this release the package had **no per-tree output at all**: a
-  caller who wanted to know what happened to individual trees had to parse a fixed-width report.
-- **An option alone is not enough, and that is now the pattern rather than the exception.** `TREELIDB`
-  without a `TREELIST` request writes nothing, `CUTLIDB` without a `CUTLIST` request and an actual removal
-  writes nothing, and `INVSTATS` without `STATS` writes nothing. The `DATABASE` block names the table; a
-  second keyword asks FVS to produce the rows.
+- **Six more tables are readable, and the reader exposes twenty of 44.** Two of them close the biggest
+  hole the package had: `FVS_TreeList_Metric` and `FVS_CutList_Metric` are its **first per-tree output
+  ever** — one row per tree per period, with the FVS, PLANTS and FIA species codes, so a result can be
+  joined to anything else. The other four are `FVS_Down_Wood_Cov_Metric`, `FVS_Stats_Species_Metric`,
+  `FVS_StrClass_Metric` and `FVS_ATRTList_Metric`.
+- **`FVS_StrClass_Metric` carries the structural stage** — the class British Columbia uses for old-growth
+  and habitat assessment, and nothing else in the package carried it.
+- **An option alone is not enough, and that is now the rule rather than the exception.** The `DATABASE`
+  block names the table; a second keyword asks FVS to produce the rows. `TREELIDB` needs `TREELIST`,
+  `CUTLIDB` needs `CUTLIST`, `INVSTATS` needs `STATS`, `DWDCVDB` needs `DWDCVOUT`, `STRCLSDB` needs
+  `STRCLASS`, `ATRTLIDB` needs `ATRTLIST`. Without the second keyword the option is accepted and writes
+  nothing.
+- **The attribute list has three failure modes, and all three were hit.** Its writer returns unless it is
+  called from `cuts.f`, so it is written only after a cutting operation. A residual above the stand's
+  basal area cancels the thinning and writes no table; a removal that takes everything creates the table
+  and inserts **nothing**; a **partial** removal — residual zero with half the selected trees taken — is
+  what produces rows.
 - **FVS spells one column differently in the two per-tree tables**: `CCum` in the tree list and `CCuM` in
   the cut list. The reader does not rename it, and the output contract says so.
-- **Two of the five attempted tables resisted, and the reasons are recorded**: `FVS_Mortality_Metric` needs
-  a fire that kills trees, and `FVS_Stats_Stand` needs a stand with more than one sample point.
-
-- **The table gap is corrected, and the correction is the sweep's.** `notes/reference/table-reachability.md`
-  now classifies all 44 tables mechanically: **fourteen exposed, 25 with a writer and a call site, five
-  with a writer that nothing calls, none without a writer.** The five this build cannot write are
-  `FVS_EconHarvestValue_Metric`, `FVS_EconSummary_Metric`, `FVS_FIAVBC_Summary`, `FVS_Regen_HabType` and
-  `FVS_Regen_Ingrow_Metric`.
-- **An earlier note was wrong.** `0.8.0`'s gap list said the dwarf-mistletoe and root-disease writers do
-  not exist in this source. They do — `DBSMIS1`, called from `misprt.f`, and `DBSRD1`, called from
-  `rdpr.f` — and the grep that "proved" otherwise searched for symbol names that are not in the source.
-  **The published `0.8.0` release body keeps the original text**, because a release body is immutable;
-  this file is the working copy for `0.9.0` and says what is true now.
+- **Two of the six attempted tables resisted, and the reasons are recorded**: `FVS_Mortality_Metric` needs
+  a fire that kills trees, and `FVS_Stats_Stand` is the distribution of attributes among sample points and
+  the fixture has one.
+- **The table classification is mechanical now, and it corrected an earlier note.** A sweep finds each
+  table's writer by source mention and counts its call sites: **twenty exposed, 19 with a writer and a
+  call site, five with a writer that nothing calls, and none without a writer.** It also showed that
+  `0.8.0`'s gap list was wrong to say the dwarf-mistletoe and root-disease writers do not exist — they do,
+  as `DBSMIS1` (called from `misprt.f`) and `DBSRD1` (called from `rdpr.f`), and the grep that "proved"
+  otherwise searched for names that are not in the source. **The published `0.8.0` body keeps the original
+  text**, because a release body is immutable.
+- **`notes/reference/table-candidates.md` gives every remaining candidate a cost, a risk and a value**,
+  with a proposed order. It is the plan for the other 24 tables, and it is written so it can be checked.
 
 ## What changed since 0.7.0
 
@@ -128,6 +128,9 @@ recipe.
   tonnes of carbon per hectare on the synthetic stand.
 - A run with `SIMFIRE` writes one consumption row, and it carries a non-zero consumption — 22.569 tonnes
   per hectare on the same stand.
+- A run with a `TREELIST` request writes the per-tree tables, and the cut list carries the same identity
+  columns as the tree list; a run with `STRCLASS` writes the structural stage; a run with `ATRTLIST` and a
+  **partial** removal writes the attribute list, and one with no removal writes it empty.
 - The command runs a case end to end and exits `0`; `1` and `2` are tested with a faked drive and in a
   subprocess, not by a real failing run.
 - The dashboard passes on Python 3.11 and 3.12 in CI.
