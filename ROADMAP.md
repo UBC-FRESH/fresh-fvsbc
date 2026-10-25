@@ -36,7 +36,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P25 The notes describe the next release | #115 | `feature/p25-notes-for-the-next-release` | complete |
 | P26 The damage-agent blocks | #119 | `feature/p26-dm-rd` | complete |
 | P27 The cheap tables | #123 | `feature/p27-the-cheap-five` | complete |
-| P28 StrClass and ATRTList | #127 | `feature/p28-strclass-atrtlist` | active |
+| P28 StrClass and ATRTList | #127 | `feature/p28-strclass-atrtlist` | complete |
 
 ## Lifecycle Map
 
@@ -762,14 +762,14 @@ Acceptance criteria:
 
 Parent issue: #127
 Branch: `feature/p28-strclass-atrtlist`
-Status: active
+Status: complete
 
 Goal: take the two tables the candidate note put second, one of which is the BC-specific one.
 
-- [ ] P28.1 The structural stage and the attribute list (#128)
-  - [ ] Expose `FVS_StrClass_Metric` and `FVS_ATRTList_Metric`.
-  - [ ] A run writes both, and the attribute list needs a partial removal.
-  - [ ] Update the contract pages, the reachability note and the candidate note.
+- [x] P28.1 The structural stage and the attribute list (#128)
+  - [x] Expose `FVS_StrClass_Metric` and `FVS_ATRTList_Metric`.
+  - [x] A run writes both, and the attribute list needs a partial removal.
+  - [x] Update the contract pages, the reachability note and the candidate note.
 
 Acceptance criteria:
 
