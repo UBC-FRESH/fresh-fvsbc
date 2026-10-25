@@ -106,6 +106,14 @@ PERSONAL_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"/home/(?![<${])[A-Za-z0-9._-]+/"), "Linux home directory path"),
     (re.compile(r"/Users/(?![<${])[A-Za-z0-9._-]+/"), "macOS home directory path"),
     (re.compile(r"[A-Za-z]:\\Users\\(?![<${])"), "Windows user profile path"),
+    # A temporary directory with a concrete name under it. The lookbehind keeps a
+    # repository-relative path such as ``$PWD/tmp/build`` out, and the lookahead keeps a
+    # placeholder such as ``/tmp/<dir>/`` out. A bare ``/tmp/file.patch`` is a generic temp
+    # file rather than a machine-specific directory, so the pattern requires a slash.
+    (
+        re.compile(r"(?<![A-Za-z0-9_$}])/(?:var/)?tmp/(?![<${*])[A-Za-z0-9._-]+/"),
+        "POSIX temporary directory path",
+    ),
 )
 SECRET_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\bgh[pousr]_[A-Za-z0-9]{30,}\b"), "GitHub token"),

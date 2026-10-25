@@ -455,6 +455,34 @@ def test_placeholder_paths_pass(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
+    "text",
+    ["/tmp/opencode/cli-run", "--directory /tmp/opencode/e2e", "/var/tmp/scratch/x"],
+)
+def test_a_temporary_directory_with_a_concrete_name_is_rejected(tmp_path: Path, text: str) -> None:
+    """A machine-specific temporary directory is a machine-specific path, like a home directory."""
+    root = make_repo(tmp_path)
+    write(root, "README.md", f"The run wrote to {text}\n")
+    assert "PATH-PERSONAL" in error_codes(root)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "/tmp/<dir>/x",
+        "$PWD/tmp/build-venv",
+        "tmp/build-venv",
+        "/tmp/fvsbc.patch",
+        "written to /tmp and removed",
+    ],
+)
+def test_a_temporary_path_that_is_not_machine_specific_passes(tmp_path: Path, text: str) -> None:
+    """A placeholder, a repository-relative path, and a generic temp file are all allowed."""
+    root = make_repo(tmp_path)
+    write(root, "README.md", f"The run wrote to {text}\n")
+    assert "PATH-PERSONAL" not in error_codes(root)
+
+
+@pytest.mark.parametrize(
     "secret",
     [GITHUB_TOKEN, FINE_GRAINED_TOKEN, PYPI_TOKEN, AWS_KEY, PRIVATE_KEY, CREDENTIAL],
 )

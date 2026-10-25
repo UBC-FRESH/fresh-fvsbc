@@ -157,6 +157,13 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_keywords.py::test_the_intended_spelling_is_refused_and_points_at_the_table",
     ),
     Mutation(
+        identifier="keywords-drops-the-block-terminator",
+        module="src/fresh_fvsbc/keywords.py",
+        find='        return head + "".join(f"{line}\\n" for line in keyword.lines) + "END\\n"',
+        replace='        return head + "".join(f"{line}\\n" for line in keyword.lines)',
+        test="tests/test_keywords.py::test_a_block_of_lines_renders_its_lines_and_its_terminator",
+    ),
+    Mutation(
         identifier="run-drives-in-this-process",
         module="src/fresh_fvsbc/run.py",
         find="    finished = subprocess.run(",

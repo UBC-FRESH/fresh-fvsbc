@@ -53,7 +53,9 @@ __all__ = [
     "FIELD_WIDTH",
     "KEYWORDS",
     "KEYWORD_TABLE",
+    "LINES_KEYWORDS",
     "MISSPELLED_KEYWORD",
+    "NESTED_KEYWORDS",
     "RECORD_KEYWORDS",
     "SPECIAL_KEYWORDS",
     "Keyword",
@@ -244,7 +246,7 @@ BLANK_SLOTS: tuple[int, ...] = tuple(
 #: first eight characters with ``STOP`` and returns code 3, which ends the keyword file, so ``STOP``
 #: is a keyword that ``base/keywds.f`` does not hold. A validator that refused it would refuse every
 #: real key file, which is what the run orchestration found the first time it wrote one.
-SPECIAL_KEYWORDS: frozenset[str] = frozenset({"STOP"})
+SPECIAL_KEYWORDS: frozenset[str] = frozenset({"STOP", "COMMENT"})
 
 #: The width of a parameter field. ``base/keyrdr.f`` reads ``KARD(I)=RECORD(J:J+9)`` with ``J``
 #: stepping by ten from eleven, so every parameter is a ten-column field of the keyword's own record
@@ -256,10 +258,18 @@ FIELD_WIDTH: int = 10
 #: ``intree.f`` reads the two after ``TREEFMT`` as the format.
 RECORD_KEYWORDS: frozenset[str] = frozenset({"STDIDENT", "TREEFMT"})
 
-#: The keywords whose content is a block of records ended by ``END``. This module does not write
-#: them: the keyword model has no room for a block, and a caller who wrote one as a single record
-#: would get something FVS reads as the start of a block and then swallows the rest of the file.
-BLOCK_KEYWORDS: frozenset[str] = frozenset({"COMMENT", "COMPUTE", "IF", "DATABASE"})
+#: The keywords whose content is a block of **text lines** ended by ``END``. A caller supplies the
+#: lines, and the writer supplies the terminator, because a block without one swallows the rest of
+#: the file.
+LINES_KEYWORDS: frozenset[str] = frozenset({"COMMENT", "COMPUTE", "DATABASE"})
+
+#: The keywords whose block holds **other keywords** rather than lines: ``IF`` opens a conditional
+#: whose body is a sequence of keywords and whose terminator is ``ENDIF``. That is a nested
+#: structure this model does not have, so it is refused by name rather than written wrongly.
+NESTED_KEYWORDS: frozenset[str] = frozenset({"IF"})
+
+#: Every keyword that takes a block of some kind.
+BLOCK_KEYWORDS: frozenset[str] = LINES_KEYWORDS | NESTED_KEYWORDS
 
 #: The keyword whose spelling is defective in FVS, at slot 30.
 MISSPELLED_KEYWORD: str = "xSALVAGE"
@@ -314,10 +324,14 @@ class Keyword:
     parameters : tuple of str, optional
         The values that follow the keyword. FVS reads them as separate tokens, so a parameter may
         contain spaces.
+    lines : tuple of str, optional
+        The body of a block keyword, one record per entry. Only :data:`LINES_KEYWORDS` take lines,
+        and the writer adds the ``END`` that closes them.
     """
 
     name: str
     parameters: tuple[str, ...] = ()
+    lines: tuple[str, ...] = ()
 
 
 def validate_keyword(keyword: Keyword) -> list[str]:
@@ -339,10 +353,14 @@ def validate_keyword(keyword: Keyword) -> list[str]:
         If the name is not in the table. The message names the keyword, and names the table's
         spelling when the name is a near miss.
     """
-    if keyword.name in BLOCK_KEYWORDS:
+    if keyword.name in NESTED_KEYWORDS:
         raise UnsupportedKeywordError(
-            f'"{keyword.name}" takes a block of records ended by END, and this module writes '
-            "single records only; writing it here would start a block FVS reads to the end"
+            f'"{keyword.name}" opens a block of keywords ended by ENDIF, and this model holds '
+            "lines rather than nested keywords; writing it would start a block FVS reads to the end"
+        )
+    if keyword.lines and keyword.name not in LINES_KEYWORDS:
+        raise UnsupportedKeywordError(
+            f'"{keyword.name}" does not take lines; only {", ".join(sorted(LINES_KEYWORDS))} do'
         )
     if keyword.name not in KEYWORDS and keyword.name not in SPECIAL_KEYWORDS:
         near = _near_miss(keyword.name)
@@ -433,7 +451,10 @@ def render_keyword(keyword: Keyword) -> str:
     for parameter in keyword.parameters:
         _check_width(keyword.name, parameter)
         fields.append(f"{parameter:<{FIELD_WIDTH}}")
-    return f"{keyword.name:<{FIELD_WIDTH}}{''.join(fields)}".rstrip() + "\n"
+    head = f"{keyword.name:<{FIELD_WIDTH}}{''.join(fields)}".rstrip() + "\n"
+    if keyword.name in LINES_KEYWORDS:
+        return head + "".join(f"{line}\n" for line in keyword.lines) + "END\n"
+    return head
 
 
 def render_keywords(keywords: Sequence[Keyword]) -> str:

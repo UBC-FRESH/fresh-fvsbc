@@ -15,6 +15,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P4 Verify | #25 | `feature/p4-verify` | complete |
 | P5 Release and deploy | #31 | `feature/p5-release` | complete |
 | P6 Operate and maintain | #37 | `feature/p6-operate` | complete |
+| P7 Keyword blocks and gate hygiene | #43 | `feature/p7-blocks-and-gates` | complete |
 
 ## Lifecycle Map
 
@@ -283,6 +284,29 @@ Acceptance criteria:
 - Two runs in one process cannot silently disagree; the mechanism is recorded and tested.
 - A review cadence is stated, and the first review is recorded against the triaged backlog.
 - `python scripts/dashboard.py` exits zero on the head commit of the phase branch.
+
+## Phase 7: Keyword blocks and gate hygiene
+
+Parent issue: #43
+Branch: `feature/p7-blocks-and-gates`
+Status: complete
+
+Goal: write the keyword blocks that were refused, and close the gate gap that let machine-specific
+paths into a tracked file.
+
+- [x] P7.1 Write the line blocks (#44)
+  - [x] The model holds lines, and the writer supplies the ``END``, because a block without one swallows the rest of the file.
+  - [x] ``COMMENT``, ``COMPUTE`` and ``DATABASE`` are accepted; ``IF`` is still refused by name, because it wraps keywords rather than lines.
+  - [x] Demonstrated end to end: FVS's own report echoes a ``COMPUTE`` block as ``DEFINE THE FOLLOWING``.
+- [x] P7.2 Catch a POSIX temporary path (#45)
+  - [x] A pattern in ``scripts/check_workflow.py``, with the evidence that it does not false-positive on legitimate prose.
+  - [x] A test that a machine-specific path in a tracked file is found, and one that a placeholder is not.
+
+Acceptance criteria:
+
+- The line blocks are written and FVS reads them, and ``IF`` is refused with a message that says why.
+- A POSIX temporary path in a tracked file fails the validator, and a placeholder or a repository-relative path does not.
+- ``python scripts/dashboard.py`` exits zero on the head commit of the phase branch.
 
 ## Open decisions and where the detail lives
 

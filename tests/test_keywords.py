@@ -222,10 +222,42 @@ def test_the_two_record_keywords_are_the_ones_the_reader_reads() -> None:
     assert frozenset({"STDIDENT", "TREEFMT"}) == RECORD_KEYWORDS
 
 
-def test_a_block_keyword_is_refused_rather_than_written_as_one_record() -> None:
-    """A block written as a single record would start a block FVS reads to the end of the file."""
-    with pytest.raises(UnsupportedKeywordError, match="block of records ended by END"):
-        validate_keyword(Keyword("COMPUTE", ("0",)))
+def test_a_block_of_lines_renders_its_lines_and_its_terminator() -> None:
+    """``COMPUTE`` takes a block ended by ``END``, and a block without one swallows the rest."""
+    keyword = Keyword("COMPUTE", ("0",), ("SmVol = spmcdbh(3,0,0, 10.0, 16.7, 0,999,0)",))
+    assert render_keyword(keyword) == (
+        "COMPUTE   0\nSmVol = spmcdbh(3,0,0, 10.0, 16.7, 0,999,0)\nEND\n"
+    )
+
+
+def test_a_block_line_is_written_whole_rather_than_as_a_field() -> None:
+    """A line is a record, not a ten-column field, so a long expression survives intact."""
+    expression = "SmVol = spmcdbh(3,0,0, 10.0, 16.7, 0,999,0)"
+    assert expression in render_keyword(Keyword("COMPUTE", (), (expression,)))
+
+
+def test_the_three_line_blocks_are_accepted() -> None:
+    """``COMMENT``, ``COMPUTE`` and ``DATABASE`` take lines, and each is a keyword FVS reads."""
+    for name in ("COMMENT", "COMPUTE", "DATABASE"):
+        assert validate_keyword(Keyword(name, lines=("x",))) == []
+
+
+def test_a_nested_block_is_refused_by_name() -> None:
+    """``IF`` holds keywords rather than lines, and this model has no room for that."""
+    with pytest.raises(UnsupportedKeywordError, match="block of keywords ended by ENDIF"):
+        validate_keyword(Keyword("IF", lines=("MOD(AGE,60) EQ 0",)))
+
+
+def test_lines_on_a_keyword_that_takes_none_are_refused() -> None:
+    """A block written under a keyword that does not take one would swallow the rest of the file."""
+    with pytest.raises(UnsupportedKeywordError, match="does not take lines"):
+        validate_keyword(Keyword("ECHOSUM", lines=("x",)))
+
+
+def test_a_set_with_a_compute_block_renders_the_block() -> None:
+    """The set's text is what FVS reads, so the block has to survive the set."""
+    rendered = KeywordSet((Keyword("COMPUTE", ("0",), ("MdVol = 1",)), Keyword("STOP"))).render()
+    assert rendered == "COMPUTE   0\nMdVol = 1\nEND\nSTOP\n"
 
 
 def test_stop_is_a_keyword_although_the_table_does_not_hold_it() -> None:
