@@ -34,7 +34,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P23 Release 0.8.0 | #107 | `feature/p23-release-0-8-0` | complete |
 | P24 The sweep over the remaining tables | #111 | `feature/p24-sweep` | complete |
 | P25 The notes describe the next release | #115 | `feature/p25-notes-for-the-next-release` | complete |
-| P26 The damage-agent blocks | #119 | `feature/p26-dm-rd` | active |
+| P26 The damage-agent blocks | #119 | `feature/p26-dm-rd` | complete |
 
 ## Lifecycle Map
 
@@ -716,16 +716,16 @@ Acceptance criteria:
 
 Parent issue: #119
 Branch: `feature/p26-dm-rd`
-Status: active
+Status: complete
 
 Goal: take the dwarf-mistletoe and root-disease tables the sweep re-opened, and find out whether the block
 keywords that start them are enough.
 
-- [ ] P26.1 The damage-agent blocks, and what they do not reach (#120)
-  - [ ] `MISTOE` joins the line blocks.
-  - [ ] A run with a `MISTOE` block is accepted and echoes its sub-keyword.
-  - [ ] Record what was tried and what would close the gap.
-  - [ ] Write `notes/reference/table-candidates.md`.
+- [x] P26.1 The damage-agent blocks, and what they do not reach (#120)
+  - [x] `MISTOE` joins the line blocks.
+  - [x] A run with a `MISTOE` block is accepted and echoes its sub-keyword.
+  - [x] Record what was tried and what would close the gap.
+  - [x] Write `notes/reference/table-candidates.md`.
 
 Acceptance criteria:
 
