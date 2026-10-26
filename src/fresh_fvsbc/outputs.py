@@ -44,6 +44,7 @@ __all__ = [
     "DATABASE_TABLES",
     "EXPOSED_TABLES",
     "IDENTITY_COLUMN",
+    "ORACLE_TABLES",
     "MissingOutputError",
     "OutputError",
     "RunFailedError",
@@ -130,6 +131,20 @@ IDENTITY_COLUMN: str = "CaseID"
 
 #: The tables this reader exposes. Contract rule 3: a table it has not tested is not in the API, and
 #: these two are the ones a run through the FFI is known to write.
+# #: The exposed tables checked against FVS's own database dump, as ``tests/test_oracle.py``
+# compares it.
+# #: **Everything else is not checked against an independent source**: the reader proves the table
+# exists
+# #: and its columns match the schema, and nothing more. A caller — or a web surface — that shows a
+# number
+#: from a table outside this set must not present it as verified.
+ORACLE_TABLES: tuple[str, ...] = (
+    "FVS_Down_Wood_Vol_Metric",
+    "FVS_SnagDet_Metric",
+    "FVS_SnagSum_Metric",
+    "FVS_Summary_Metric",
+)
+
 EXPOSED_TABLES: tuple[str, ...] = (
     "FVS_ATRTList_Metric",
     "FVS_CanProfile",

@@ -1,0 +1,7 @@
+{
+  "id": "tables",
+  "title": "Table browser",
+  "panels": ["tables"],
+  "actions": ["export"],
+  "read_only": false
+}

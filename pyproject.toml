@@ -15,9 +15,23 @@ dependencies = ["pandas>=2.0"]
 [project.scripts]
 fresh-fvsbc = "fresh_fvsbc.cli:main"
 
+[project.optional-dependencies]
+# The browser surface. The core install stays pandas-only; `fresh-fvsbc web` needs this extra.
+web = ["fastapi>=0.110", "uvicorn>=0.29"]
+
 [project.urls]
 Repository = "https://github.com/UBC-FRESH/fresh-fvsbc"
 Documentation = "https://ubc-fresh.github.io/fresh-fvsbc/"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"fresh_fvsbc.web" = ["skins/*.json", "static/*"]
 
 [tool.ruff]
 line-length = 100

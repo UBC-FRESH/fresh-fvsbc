@@ -46,6 +46,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P35 Release 0.11.0 | #155 | `feature/p35-release-0-11-0` | complete |
 | P36 Banking it for real use | #159 | `feature/p36-bank-for-deployment` | complete |
 | P37 The web front end | #163 | `feature/p37-web-design` | complete |
+| P38 The web surface, first cut | #167 | `feature/p38-web-first-cut` | active |
 
 ## Lifecycle Map
 
@@ -974,6 +975,30 @@ Acceptance criteria:
 
 - The note names the artefact contract, the service surface, the skins, the stack decisions and the tests.
 - The prior art is recorded from the workshop bundle, with the source location it points to.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 38: The web surface, first cut
+
+Parent issue: #167
+Branch: `feature/p38-web-first-cut`
+Status: active
+
+Goal: build the surface the design note specifies — the artefact readers, the skin loader, the FastAPI
+service, the static shell, and the contract tests.
+
+- [ ] P38.1 The readers, the skins, the service and the shell (#168)
+  - [ ] `web/runs.py`: discovery and the artefact readers, with no web dependency.
+  - [ ] `web/skins.py` and the four manifests, with unknown names refused.
+  - [ ] `web/app.py`: the endpoints, the oracle flag, SSE and the local-only bind refusal.
+  - [ ] `web/static/`: the shell, with no build step.
+  - [ ] `fresh-fvsbc web` dispatched before the run parser, and the `web` extra with package data.
+
+Acceptance criteria:
+
+- `fresh-fvsbc web --runs DIR` serves a real run directory, and every endpoint returns what the files hold.
+- An unexposed table, a missing table and a missing run are each refused by name.
+- The oracle flag is asserted against `EXPOSED_TABLES` and `ORACLE_TABLES`.
+- The core install is unchanged: `pip install fresh-fvsbc` still pulls pandas only.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

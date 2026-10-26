@@ -30,3 +30,4 @@ Three names are easy to confuse, so this project uses them distinctly.
    outputs
    provenance
    nemora-ingest
+   web

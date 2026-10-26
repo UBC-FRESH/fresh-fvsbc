@@ -298,6 +298,34 @@ def _report(result: RunResult) -> str:
     return "\n".join(lines)
 
 
+def _web_main(argv: Sequence[str]) -> int:
+    """Hand a ``web`` invocation to the optional service.
+
+    The import is lazy so the core install never needs FastAPI, and a missing extra is reported as
+    input
+    the command cannot use rather than a traceback.
+
+    Parameters
+    ----------
+    argv : sequence of str
+        The arguments after ``web``.
+
+    Returns
+    -------
+    int
+        The service's exit code, or ``2`` when the web extra is not installed.
+    """
+    try:
+        from fresh_fvsbc.web.app import main as web_main
+    except ImportError:
+        print(
+            "fresh-fvsbc: the web extra is not installed; run `pip install 'fresh-fvsbc[web]'`",
+            file=sys.stderr,
+        )
+        return EXIT_BAD_INPUT
+    return web_main(argv)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run one case from the command line.
 
@@ -311,8 +339,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     int
         ``0`` for a completed run, ``1`` for a run that failed, and ``2`` for input the command
         cannot use.
+
+    Notes
+    -----
+    ``fresh-fvsbc web ...`` is dispatched to :func:`fresh_fvsbc.web.app.main` before the run parser
+    sees the arguments, so the optional service never changes how a run is invoked.
     """
-    args = _parser().parse_args(argv)
+    arguments = list(argv) if argv is not None else sys.argv[1:]
+    if arguments[:1] == ["web"]:
+        return _web_main(arguments[1:])
+    args = _parser().parse_args(arguments)
     try:
         keywords = tuple(
             _parse_block(text) if kind == "block" else _parse_keyword(text)

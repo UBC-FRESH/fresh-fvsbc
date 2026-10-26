@@ -1,0 +1,147 @@
+/* fresh-fvsbc web shell. Same look as the ws4 and fhops front ends: one dark shell, one accent, no
+   framework and no build step. */
+
+:root {
+  --bg: #12161a;
+  --panel: #1a2026;
+  --panel-2: #212a31;
+  --line: #2c363f;
+  --ink: #dfe6ec;
+  --muted: #8d9aa5;
+  --accent: #6fd3a8;
+  --warn: #e0a458;
+  --bad: #e06c75;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand strong { font-size: 15px; letter-spacing: 0.02em; }
+
+.controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.controls label { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+
+select, button, input {
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font: inherit;
+}
+
+button { cursor: pointer; }
+button:hover { border-color: var(--accent); }
+
+.shell { display: flex; flex: 1; min-height: 0; }
+
+.panels {
+  width: 172px;
+  flex: 0 0 auto;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.panels button {
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 7px 9px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+.panels button.active { background: var(--panel-2); color: var(--ink); border-color: var(--line); }
+
+.panel-body { flex: 1; padding: 16px 20px; overflow: auto; min-width: 0; }
+
+h2 { font-size: 15px; margin: 0 0 4px; font-weight: 600; }
+h3 { font-size: 13px; margin: 18px 0 6px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+.muted { color: var(--muted); }
+.badge {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.badge.ok { color: var(--accent); border-color: var(--accent); }
+.badge.warn { color: var(--warn); border-color: var(--warn); }
+
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 5px 9px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--bg); }
+tbody tr:hover { background: var(--panel); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.table-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.table-list button { font-size: 12px; }
+.table-list button.active { border-color: var(--accent); color: var(--accent); }
+.oracle-tick { color: var(--accent); }
+.no-oracle { color: var(--warn); }
+
+pre {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.scroll { overflow: auto; max-height: calc(100vh - 260px); border: 1px solid var(--line); border-radius: 8px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.card h3 { margin-top: 0; }
+
+.footer { border-top: 1px solid var(--line); padding: 7px 16px; background: var(--panel); font-size: 12px; }
+
+svg.chart { width: 100%; height: 240px; display: block; }
+svg.chart .axis { stroke: var(--line); }
+svg.chart .line { fill: none; stroke: var(--accent); stroke-width: 2; }
+svg.chart .grid { stroke: var(--line); stroke-dasharray: 2 4; }
+svg.chart text { fill: var(--muted); font-size: 11px; }
+
+.notice {
+  border-left: 3px solid var(--warn);
+  background: var(--panel);
+  padding: 9px 12px;
+  margin: 10px 0 16px;
+  border-radius: 0 6px 6px 0;
+  color: var(--ink);
+  font-size: 13px;
+}
