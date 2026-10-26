@@ -42,7 +42,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P31 The three questions, answered | #139 | `feature/p31-three-questions` | complete |
 | P32 The rest of the damage agents | #143 | `feature/p32-dm-rd-rest` | complete |
 | P33 Release 0.10.0 | #147 | `feature/p33-release-0-10-0` | complete |
-| P34 The regeneration tables | #151 | `feature/p34-regen` | active |
+| P34 The regeneration tables | #151 | `feature/p34-regen` | complete |
 
 ## Lifecycle Map
 
@@ -893,15 +893,15 @@ Acceptance criteria:
 
 Parent issue: #151
 Branch: `feature/p34-regen`
-Status: active
+Status: complete
 
 Goal: take the regeneration tables, and settle the tables that cannot be taken at all.
 
-- [ ] P34.1 The regeneration tables, and the ones that stay out (#152)
-  - [ ] `ESTAB` joins the line blocks.
-  - [ ] Expose `FVS_Regen_Tally_Metric` and `FVS_Regen_SitePrep`.
-  - [ ] Record why the other tables stay out.
-  - [ ] Update the contract pages, the reachability note and the candidate note.
+- [x] P34.1 The regeneration tables, and the ones that stay out (#152)
+  - [x] `ESTAB` joins the line blocks.
+  - [x] Expose `FVS_Regen_Tally_Metric` and `FVS_Regen_SitePrep`.
+  - [x] Record why the other tables stay out.
+  - [x] Update the contract pages, the reachability note and the candidate note.
 
 Acceptance criteria:
 
