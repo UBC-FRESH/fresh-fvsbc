@@ -45,6 +45,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P34 The regeneration tables | #151 | `feature/p34-regen` | complete |
 | P35 Release 0.11.0 | #155 | `feature/p35-release-0-11-0` | complete |
 | P36 Banking it for real use | #159 | `feature/p36-bank-for-deployment` | complete |
+| P37 The web front end | #163 | `feature/p37-web-design` | active |
 
 ## Lifecycle Map
 
@@ -951,6 +952,28 @@ Acceptance criteria:
 
 - `notes/reference/deployment-readiness.md` carries the recipe, the gotchas, and what to watch.
 - No build artefact is tracked, and `*.log` is ignored.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 37: The web front end
+
+Parent issue: #163
+Branch: `feature/p37-web-design`
+Status: active
+
+Goal: give `fresh-fvsbc` a browser surface over the artefacts a run already writes, on the same front-end
+architecture as ws4 and fhops — and record what FVS Online is, since that is the prior art.
+
+- [ ] P37.1 The web front end design note (#164)
+  - [ ] The artefact contract.
+  - [ ] The service surface, including the oracle flag per table.
+  - [ ] The skins, checked against a registry.
+  - [ ] The stack decisions and the tests.
+  - [ ] The prior-art record.
+
+Acceptance criteria:
+
+- The note names the artefact contract, the service surface, the skins, the stack decisions and the tests.
+- The prior art is recorded from the workshop bundle, with the source location it points to.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
