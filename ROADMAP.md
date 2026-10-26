@@ -45,7 +45,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P34 The regeneration tables | #151 | `feature/p34-regen` | complete |
 | P35 Release 0.11.0 | #155 | `feature/p35-release-0-11-0` | complete |
 | P36 Banking it for real use | #159 | `feature/p36-bank-for-deployment` | complete |
-| P37 The web front end | #163 | `feature/p37-web-design` | active |
+| P37 The web front end | #163 | `feature/p37-web-design` | complete |
 
 ## Lifecycle Map
 
@@ -958,17 +958,17 @@ Acceptance criteria:
 
 Parent issue: #163
 Branch: `feature/p37-web-design`
-Status: active
+Status: complete
 
 Goal: give `fresh-fvsbc` a browser surface over the artefacts a run already writes, on the same front-end
 architecture as ws4 and fhops — and record what FVS Online is, since that is the prior art.
 
-- [ ] P37.1 The web front end design note (#164)
-  - [ ] The artefact contract.
-  - [ ] The service surface, including the oracle flag per table.
-  - [ ] The skins, checked against a registry.
-  - [ ] The stack decisions and the tests.
-  - [ ] The prior-art record.
+- [x] P37.1 The web front end design note (#164)
+  - [x] The artefact contract.
+  - [x] The service surface, including the oracle flag per table.
+  - [x] The skins, checked against a registry.
+  - [x] The stack decisions and the tests.
+  - [x] The prior-art record.
 
 Acceptance criteria:
 
