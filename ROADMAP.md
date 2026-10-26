@@ -46,7 +46,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P35 Release 0.11.0 | #155 | `feature/p35-release-0-11-0` | complete |
 | P36 Banking it for real use | #159 | `feature/p36-bank-for-deployment` | complete |
 | P37 The web front end | #163 | `feature/p37-web-design` | complete |
-| P38 The web surface, first cut | #167 | `feature/p38-web-first-cut` | active |
+| P38 The web surface, first cut | #167 | `feature/p38-web-first-cut` | complete |
 
 ## Lifecycle Map
 
@@ -981,17 +981,17 @@ Acceptance criteria:
 
 Parent issue: #167
 Branch: `feature/p38-web-first-cut`
-Status: active
+Status: complete
 
 Goal: build the surface the design note specifies — the artefact readers, the skin loader, the FastAPI
 service, the static shell, and the contract tests.
 
-- [ ] P38.1 The readers, the skins, the service and the shell (#168)
-  - [ ] `web/runs.py`: discovery and the artefact readers, with no web dependency.
-  - [ ] `web/skins.py` and the four manifests, with unknown names refused.
-  - [ ] `web/app.py`: the endpoints, the oracle flag, SSE and the local-only bind refusal.
-  - [ ] `web/static/`: the shell, with no build step.
-  - [ ] `fresh-fvsbc web` dispatched before the run parser, and the `web` extra with package data.
+- [x] P38.1 The readers, the skins, the service and the shell (#168)
+  - [x] `web/runs.py`: discovery and the artefact readers, with no web dependency.
+  - [x] `web/skins.py` and the four manifests, with unknown names refused.
+  - [x] `web/app.py`: the endpoints, the oracle flag, SSE and the local-only bind refusal.
+  - [x] `web/static/`: the shell, with no build step.
+  - [x] `fresh-fvsbc web` dispatched before the run parser, and the `web` extra with package data.
 
 Acceptance criteria:
 
