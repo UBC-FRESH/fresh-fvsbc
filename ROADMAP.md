@@ -41,6 +41,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P30 CanProfile and the fixture limits | #135 | `feature/p30-canprofile-fixture` | complete |
 | P31 The three questions, answered | #139 | `feature/p31-three-questions` | complete |
 | P32 The rest of the damage agents | #143 | `feature/p32-dm-rd-rest` | complete |
+| P33 Release 0.10.0 | #147 | `feature/p33-release-0-10-0` | active |
 
 ## Lifecycle Map
 
@@ -863,6 +864,28 @@ Acceptance criteria:
 
 - A run writes all four tables, and the reader exposes twenty-nine.
 - Each recipe names the flag it sets and the line it is set on.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 33: Release 0.10.0
+
+Parent issue: #147
+Branch: `feature/p33-release-0-10-0`
+Status: active
+
+Goal: release `0.10.0`, because `main` carries eight more tables and the correction of a method that had
+been treating source-readable behaviour as unknown.
+
+- [ ] P33.1 Version and notes for 0.10.0 (#148)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.9.0": the eight tables, and the four answers with their lines.
+  - [ ] Replace the table gap with twenty-nine exposed and the ten named candidates.
+  - [ ] Add the four new runs to what is verified.
+
+Acceptance criteria:
+
+- The package reports `0.10.0`, and the notes say what changed and what remains.
+- A clean checkout installs it and reads a statistics table, a mortality table, a damage-agent table and a root-disease table.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

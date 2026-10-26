@@ -1,10 +1,34 @@
-# fresh-fvsbc 0.9.0
+# fresh-fvsbc 0.10.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.9.0
+
+- **Eight more tables are readable, and the reader exposes twenty-nine of 44.** In order: `FVS_Stats_Stand`,
+  `FVS_Mortality_Metric`, the four dwarf-mistletoe tables, two of the three root-disease tables, and
+  `FVS_CanProfile`.
+- **Four behaviours this project had called unknown were each one line of the source.** `P30` ran
+  experiments, they did not fire, and it recorded a conclusion about FVS. That was wrong, and the
+  correction is the substance of this release:
+  - **`DESIGN`'s fourth field is the inventory point count** (`initre.f:798`). Every run here passed `1`,
+    which is why `FVS_Stats_Stand` — the distribution among sample points — could never be computed.
+  - **`MORTREPT` sets `IFMMRB = -1`** (`fmin.f:1372`), which is what `fmfout.f:294` gates on. `MORTREDB`
+    alone writes nothing. The burn report's `BURNREPT` sets its equivalent to the inventory year, which the
+    same gate rejects — two options that look identical and behave oppositely.
+  - **Damage codes 30 to 34 are the mistletoe rating** (`misdam.f:76`), with the severity as the Hawksworth
+    rating. Code 21, an earlier guess, registers as no mistletoe at all.
+  - **`MISTPRT` and `NEWSPRED` gate the last two DM tables** (`misprt.f` calls `DBSMIS3` inside
+    `IF (PRTMIS)` and `DBSMIS5`/`DBSMIS6` inside `IF (NEWMOD)`), and **`RDIN` refuses the whole set**
+    without `RRTINV` or `RRMAN`.
+- **`RDIN` is a block**, and it joins the five the model already writes, so a caller can express root
+  disease.
+- **The fixture was never the constraint.** The adapter already maps one plot per stand, and the tree list
+  carries five plot ids when given five stands. Nothing was added to the fixture, because nothing was shown
+  to be missing.
 
 ## What changed since 0.8.0
 
@@ -165,6 +189,9 @@ recipe.
   tonnes of carbon per hectare on the synthetic stand.
 - A run with `SIMFIRE` writes one consumption row, and it carries a non-zero consumption — 22.569 tonnes
   per hectare on the same stand.
+- A run with `DESIGN`'s fourth field above one writes `FVS_Stats_Stand`; one with `MORTREPT` and a fire
+  writes `FVS_Mortality_Metric`; an infected stand writes all four dwarf-mistletoe tables; and an `RDIN`
+  block with `RRINIT` writes the root-disease summary and, with `RRDOUT`, the detail.
 - A run with a `TREELIST` request writes the per-tree tables, and the cut list carries the same identity
   columns as the tree list; a run with `STRCLASS` writes the structural stage; a run with `ATRTLIST` and a
   **partial** removal writes the attribute list, and one with no removal writes it empty.
@@ -180,9 +207,9 @@ it.
 
 1. **The reader exposes twenty-nine of 44 tables.** The other 15 are classified in
    `notes/reference/table-reachability.md`: 10 have a writer and a call site and are candidates, five have
-   a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. A call site
-   is not a promise; each candidate needs its own case, and `notes/reference/table-candidates.md` gives
-   each one a cost, a risk and a value.
+   a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. The ten are
+   named there with the gate each one still needs, and `notes/reference/table-candidates.md` keeps the cost,
+   risk and value estimate for each.
 2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
