@@ -55,6 +55,10 @@ python scripts/dashboard.py
 `scripts/dashboard.py` runs every quality gate: lint, format, strict types, tests with the coverage
 gate, the workflow validator, and the docs build with warnings as errors.
 
+**Before the first real modelling case**, read `notes/reference/deployment-readiness.md`. It has the install
+recipe that works — including the two steps that cost an hour each the first time — what real use will
+exercise that the tests do not, and where the known blind spots are.
+
 ## Running a case
 
 The command reads a population file and a keyword set, runs one FVS-BC case, and reports where its
