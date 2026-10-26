@@ -8,6 +8,15 @@ Pre-1.0, and the public API can change. The gaps that remain are listed at the e
 
 ## What changed since 0.9.0
 
+- **Two more tables, so the reader exposes thirty-one of 44.** `FVS_Regen_Tally_Metric` and
+  `FVS_Regen_SitePrep`, from an `ESTAB` block.
+- **`ESTAB` is a block, and its `NATURAL` line needs the stems per acre.** `esin.f` refuses the line —
+  and the whole keyword set with it — when that field is zero, which is why a bare `ESTAB` was refused in
+  every earlier attempt.
+- **`FVS_CalibStats` is deliberately not exposed.** The table is created on every run and carries **nothing**
+  unless the run is calibrated, and this package does not calibrate. Exposing it would put an always-empty
+  table in the public API.
+
 - **Eight more tables are readable, and the reader exposes twenty-nine of 44.** In order: `FVS_Stats_Stand`,
   `FVS_Mortality_Metric`, the four dwarf-mistletoe tables, two of the three root-disease tables, and
   `FVS_CanProfile`.
@@ -205,11 +214,11 @@ recipe.
 Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
-1. **The reader exposes twenty-nine of 44 tables.** The other 15 are classified in
-   `notes/reference/table-reachability.md`: 10 have a writer and a call site and are candidates, five have
-   a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. The ten are
-   named there with the gate each one still needs, and `notes/reference/table-candidates.md` keeps the cost,
-   risk and value estimate for each.
+1. **The reader exposes thirty-one of 44 tables.** The other 13 are classified in
+   `notes/reference/table-reachability.md`: 8 have a writer and a call site and are candidates, five have
+   a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. Of the eight,
+   **two need external data this project does not have** (the climate extension's attribute file and the
+   FIA reporting variant) and **`FVS_CalibStats` needs a calibrated run**.
 2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is

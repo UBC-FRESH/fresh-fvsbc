@@ -42,6 +42,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P31 The three questions, answered | #139 | `feature/p31-three-questions` | complete |
 | P32 The rest of the damage agents | #143 | `feature/p32-dm-rd-rest` | complete |
 | P33 Release 0.10.0 | #147 | `feature/p33-release-0-10-0` | complete |
+| P34 The regeneration tables | #151 | `feature/p34-regen` | active |
 
 ## Lifecycle Map
 
@@ -886,6 +887,26 @@ Acceptance criteria:
 - The package reports `0.10.0`, and the notes say what changed and what remains.
 - A clean checkout installs it and reads a statistics table, a mortality table, a damage-agent table and a root-disease table.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 34: The regeneration tables
+
+Parent issue: #151
+Branch: `feature/p34-regen`
+Status: active
+
+Goal: take the regeneration tables, and settle the tables that cannot be taken at all.
+
+- [ ] P34.1 The regeneration tables, and the ones that stay out (#152)
+  - [ ] `ESTAB` joins the line blocks.
+  - [ ] Expose `FVS_Regen_Tally_Metric` and `FVS_Regen_SitePrep`.
+  - [ ] Record why the other tables stay out.
+  - [ ] Update the contract pages, the reachability note and the candidate note.
+
+Acceptance criteria:
+
+- A run with an `ESTAB` block writes both tables, and the reader exposes thirty-one.
+- Each table that stays out has a recorded reason, not a guess.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

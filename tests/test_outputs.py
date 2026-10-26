@@ -78,6 +78,8 @@ def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) ->
         connection.execute("create table FVS_DM_TreeList_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_RD_Sum_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_RD_Det_Metric (CaseID text, Year integer)")
+        connection.execute("create table FVS_Regen_SitePrep (CaseID text, Year integer)")
+        connection.execute("create table FVS_Regen_Tally_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagDet_Metric (CaseID text, Year integer)")
         connection.execute("create table FVS_SnagSum_Metric (CaseID text, Year integer)")
         connection.commit()
@@ -141,6 +143,8 @@ def test_only_the_tested_tables_are_exposed() -> None:
         "FVS_PotFire_Cond_Metric",
         "FVS_PotFire_Metric",
         "FVS_RD_Det_Metric",
+        "FVS_Regen_SitePrep",
+        "FVS_Regen_Tally_Metric",
         "FVS_RD_Sum_Metric",
         "FVS_SnagDet_Metric",
         "FVS_SnagSum_Metric",

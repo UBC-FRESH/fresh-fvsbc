@@ -906,6 +906,42 @@ def test_rrinit_and_rrdout_write_the_root_disease_tables(tmp_path: Path) -> None
     assert {"RD_Type", "Num_Centers"} <= set(summary.columns)
 
 
+def test_an_estab_block_writes_the_regeneration_tables(tmp_path: Path) -> None:
+    """``ESTAB`` is a block, and its ``NATURAL`` line needs the stems per acre or FVS refuses it.
+
+    ``esin.f`` reads the block's sub-keywords; ``NATURAL`` jumps to the shared handler, which
+    reports error 4 unless ``ARRAY(3)`` — the stems per acre — is above zero. A line carrying only
+    the species is refused, and the whole set with it. With the count, the tally and the
+    site-preparation tables are written.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    keywords = (
+        Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "REGREPTS", "ComputDB")),
+        Keyword("STDIDENT", ("REGEN  estab",)),
+        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("MANAGED", ("0", "1")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("NUMCYCLE", ("2",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("ESTAB", (), ("NATURAL         1        FD      200.0    50.0",)),
+        Keyword("ECHOSUM"),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_population(
+        synthetic_population(), species="FD", tree_age=60.0, keywords=keywords, directory=tmp_path
+    )
+    tally = read_table(result.database, "FVS_Regen_Tally_Metric")
+    prep = read_table(result.database, "FVS_Regen_SitePrep")
+    assert not tally.empty
+    assert not prep.empty
+    assert {"TallyNumber", "SpeciesFVS", "TphAll"} <= set(tally.columns)
+
+
 def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     """An ``IF`` block is written as a conditional, and FVS's report shows it read the condition."""
     pytest.importorskip(

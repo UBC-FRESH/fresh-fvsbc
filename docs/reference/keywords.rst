@@ -103,6 +103,11 @@ Some keywords are the exception, because they read records of their own rather t
   among sample points and is written only when that count is above one; a run that leaves it at 1 writes
   the species statistics and a message saying the distribution cannot be computed.
 
+  **``ESTAB`` is a block, and its ``NATURAL`` and ``PLANT`` lines need the stems per acre.** ``esin.f``
+  refuses the line — and the whole set with it — when that field is zero. With it, the regeneration tally
+  and the site-preparation table are written. **``FVS_CalibStats`` is not exposed**: the table is created
+  but carries nothing unless the run is calibrated, and this package does not calibrate.
+
   **``MISTOE`` and ``RDIN`` are blocks, and their sub-keywords are not keywords.** ``MISTPRT`` inside
   ``MISTOE`` sets ``PRTMIS`` and ``NEWSPRED`` sets ``NEWMOD``; without them two of the four dwarf-mistletoe
   tables are never written. ``RDIN`` needs ``RRINIT`` (or ``RRTREIN``) or it refuses the whole set at its
