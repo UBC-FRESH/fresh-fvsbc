@@ -41,7 +41,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P30 CanProfile and the fixture limits | #135 | `feature/p30-canprofile-fixture` | complete |
 | P31 The three questions, answered | #139 | `feature/p31-three-questions` | complete |
 | P32 The rest of the damage agents | #143 | `feature/p32-dm-rd-rest` | complete |
-| P33 Release 0.10.0 | #147 | `feature/p33-release-0-10-0` | active |
+| P33 Release 0.10.0 | #147 | `feature/p33-release-0-10-0` | complete |
 
 ## Lifecycle Map
 
@@ -870,16 +870,16 @@ Acceptance criteria:
 
 Parent issue: #147
 Branch: `feature/p33-release-0-10-0`
-Status: active
+Status: complete
 
 Goal: release `0.10.0`, because `main` carries eight more tables and the correction of a method that had
 been treating source-readable behaviour as unknown.
 
-- [ ] P33.1 Version and notes for 0.10.0 (#148)
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.9.0": the eight tables, and the four answers with their lines.
-  - [ ] Replace the table gap with twenty-nine exposed and the ten named candidates.
-  - [ ] Add the four new runs to what is verified.
+- [x] P33.1 Version and notes for 0.10.0 (#148)
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.9.0": the eight tables, and the four answers with their lines.
+  - [x] Replace the table gap with twenty-nine exposed and the ten named candidates.
+  - [x] Add the four new runs to what is verified.
 
 Acceptance criteria:
 
