@@ -44,6 +44,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P33 Release 0.10.0 | #147 | `feature/p33-release-0-10-0` | complete |
 | P34 The regeneration tables | #151 | `feature/p34-regen` | complete |
 | P35 Release 0.11.0 | #155 | `feature/p35-release-0-11-0` | complete |
+| P36 Banking it for real use | #159 | `feature/p36-bank-for-deployment` | active |
 
 ## Lifecycle Map
 
@@ -930,6 +931,26 @@ Acceptance criteria:
 - The package reports `0.11.0`, and the notes say what changed and what is settled.
 - A clean checkout installs it and reads both regeneration tables.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 36: Banking it for real use
+
+Parent issue: #159
+Branch: `feature/p36-bank-for-deployment`
+Status: active
+
+Goal: bank the project in the state a lab member can deploy it from, and record what real use should watch
+for.
+
+- [ ] P36.1 The deployment note, and the stray artefact (#160)
+  - [ ] Write `notes/reference/deployment-readiness.md`.
+  - [ ] Remove the tracked `pyfvs.log` and ignore `*.log`.
+  - [ ] Point the README at the note.
+
+Acceptance criteria:
+
+- `notes/reference/deployment-readiness.md` carries the recipe, the gotchas, and what to watch.
+- No build artefact is tracked, and `*.log` is ignored.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
