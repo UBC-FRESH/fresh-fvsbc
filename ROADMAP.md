@@ -44,7 +44,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P33 Release 0.10.0 | #147 | `feature/p33-release-0-10-0` | complete |
 | P34 The regeneration tables | #151 | `feature/p34-regen` | complete |
 | P35 Release 0.11.0 | #155 | `feature/p35-release-0-11-0` | complete |
-| P36 Banking it for real use | #159 | `feature/p36-bank-for-deployment` | active |
+| P36 Banking it for real use | #159 | `feature/p36-bank-for-deployment` | complete |
 
 ## Lifecycle Map
 
@@ -937,15 +937,15 @@ Acceptance criteria:
 
 Parent issue: #159
 Branch: `feature/p36-bank-for-deployment`
-Status: active
+Status: complete
 
 Goal: bank the project in the state a lab member can deploy it from, and record what real use should watch
 for.
 
-- [ ] P36.1 The deployment note, and the stray artefact (#160)
-  - [ ] Write `notes/reference/deployment-readiness.md`.
-  - [ ] Remove the tracked `pyfvs.log` and ignore `*.log`.
-  - [ ] Point the README at the note.
+- [x] P36.1 The deployment note, and the stray artefact (#160)
+  - [x] Write `notes/reference/deployment-readiness.md`.
+  - [x] Remove the tracked `pyfvs.log` and ignore `*.log`.
+  - [x] Point the README at the note.
 
 Acceptance criteria:
 
