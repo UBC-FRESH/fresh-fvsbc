@@ -43,6 +43,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P32 The rest of the damage agents | #143 | `feature/p32-dm-rd-rest` | complete |
 | P33 Release 0.10.0 | #147 | `feature/p33-release-0-10-0` | complete |
 | P34 The regeneration tables | #151 | `feature/p34-regen` | complete |
+| P35 Release 0.11.0 | #155 | `feature/p35-release-0-11-0` | active |
 
 ## Lifecycle Map
 
@@ -907,6 +908,28 @@ Acceptance criteria:
 
 - A run with an `ESTAB` block writes both tables, and the reader exposes thirty-one.
 - Each table that stays out has a recorded reason, not a guess.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 35: Release 0.11.0
+
+Parent issue: #155
+Branch: `feature/p35-release-0-11-0`
+Status: active
+
+Goal: release `0.11.0`, because `main` carries the regeneration tables and the classification that closes
+the table work.
+
+- [ ] P35.1 Version and notes for 0.11.0 (#156)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.10.0".
+  - [ ] Say that the table work is finished and why the rest is not effort.
+  - [ ] Add the regeneration run to what is verified.
+
+Acceptance criteria:
+
+- The package reports `0.11.0`, and the notes say what changed and what is settled.
+- A clean checkout installs it and reads both regeneration tables.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

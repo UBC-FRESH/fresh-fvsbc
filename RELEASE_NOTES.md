@@ -1,10 +1,26 @@
-# fresh-fvsbc 0.10.0
+# fresh-fvsbc 0.11.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.10.0
+
+- **Two more tables, so the reader exposes thirty-one of 44.** `FVS_Regen_Tally_Metric` and
+  `FVS_Regen_SitePrep`, from an `ESTAB` block.
+- **`ESTAB` is a block, and its `NATURAL` line needs the stems per acre.** `esin.f` reports error 4 and
+  drops the **whole keyword set** when that field is zero — which is why a bare `ESTAB` was refused in every
+  earlier attempt.
+- **`FVS_CalibStats` is deliberately not exposed.** `CALBSTDB` creates the table on every run and it carries
+  **nothing** unless the run is calibrated. A table that is always empty does not belong in the public API,
+  and `keywords.rst` says so.
+- **The table work is finished, and the record says why.** `notes/reference/table-reachability.md` classifies
+  all 44 with a verdict each: thirty-one exposed, and thirteen that are not, of which eight are candidates
+  and five have no call site at all. Of the eight, six are blocked by something this project does not have —
+  an external climate attribute file, the FIA variant, a calibrated run, a bark-beetle specification, or the
+  sprout model — and one has a gate no valid input can satisfy.
 
 ## What changed since 0.9.0
 
@@ -215,10 +231,10 @@ Nine, each with the reason it is open. `notes/triage.md` gives each a dispositio
 it.
 
 1. **The reader exposes thirty-one of 44 tables.** The other 13 are classified in
-   `notes/reference/table-reachability.md`: 8 have a writer and a call site and are candidates, five have
-   a writer that nothing calls, and the burn report's gate cannot be satisfied by valid input. Of the eight,
-   **two need external data this project does not have** (the climate extension's attribute file and the
-   FIA reporting variant) and **`FVS_CalibStats` needs a calibrated run**.
+   `notes/reference/table-reachability.md` with a verdict each: eight are candidates, five have a writer that
+   nothing calls, and the burn report's gate cannot be satisfied by valid input. **Of the eight candidates,
+   six are blocked by something this project does not have** — an external climate attribute file, the FIA
+   variant, a calibrated run, a bark-beetle specification, the sprout model — and none is blocked by effort.
 2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
