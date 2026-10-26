@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>fresh-fvsbc</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <strong>fresh-fvsbc</strong>
+        <span class="muted" id="oracle-badge"></span>
+      </div>
+      <div class="controls">
+        <label>Skin <select id="skin-select"></select></label>
+        <label>Run <select id="run-select"></select></label>
+        <span class="badge" id="run-state"></span>
+      </div>
+    </header>
+
+    <div class="shell">
+      <nav class="panels" id="panel-nav"></nav>
+      <main id="panel-body" class="panel-body">
+        <p class="muted">Choose a run.</p>
+      </main>
+    </div>
+
+    <footer class="footer">
+      <span class="muted" id="footer-note"></span>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

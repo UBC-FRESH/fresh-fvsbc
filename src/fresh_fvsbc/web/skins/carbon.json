@@ -1,0 +1,7 @@
+{
+  "id": "carbon",
+  "title": "Carbon analyst",
+  "panels": ["summary", "tables", "provenance"],
+  "actions": ["export"],
+  "read_only": false
+}

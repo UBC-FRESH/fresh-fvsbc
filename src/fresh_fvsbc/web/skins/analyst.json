@@ -1,0 +1,7 @@
+{
+  "id": "analyst",
+  "title": "Analyst",
+  "panels": ["tables", "summary", "trees", "keywords", "provenance", "compare"],
+  "actions": ["start_run", "export"],
+  "read_only": false
+}

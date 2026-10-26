@@ -1,0 +1,7 @@
+{
+  "id": "reviewer",
+  "title": "Reviewer",
+  "panels": ["tables", "summary", "provenance"],
+  "actions": [],
+  "read_only": true
+}
