@@ -43,7 +43,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P32 The rest of the damage agents | #143 | `feature/p32-dm-rd-rest` | complete |
 | P33 Release 0.10.0 | #147 | `feature/p33-release-0-10-0` | complete |
 | P34 The regeneration tables | #151 | `feature/p34-regen` | complete |
-| P35 Release 0.11.0 | #155 | `feature/p35-release-0-11-0` | active |
+| P35 Release 0.11.0 | #155 | `feature/p35-release-0-11-0` | complete |
 
 ## Lifecycle Map
 
@@ -914,16 +914,16 @@ Acceptance criteria:
 
 Parent issue: #155
 Branch: `feature/p35-release-0-11-0`
-Status: active
+Status: complete
 
 Goal: release `0.11.0`, because `main` carries the regeneration tables and the classification that closes
 the table work.
 
-- [ ] P35.1 Version and notes for 0.11.0 (#156)
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.10.0".
-  - [ ] Say that the table work is finished and why the rest is not effort.
-  - [ ] Add the regeneration run to what is verified.
+- [x] P35.1 Version and notes for 0.11.0 (#156)
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.10.0".
+  - [x] Say that the table work is finished and why the rest is not effort.
+  - [x] Add the regeneration run to what is verified.
 
 Acceptance criteria:
 
