@@ -264,7 +264,7 @@ RECORD_KEYWORDS: frozenset[str] = frozenset({"STDIDENT", "TREEFMT"})
 #: lines, and the writer supplies the terminator, because a block without one swallows the rest of
 #: the file.
 LINES_KEYWORDS: frozenset[str] = frozenset(
-    {"COMMENT", "COMPUTE", "DATABASE", "FMIN", "MISTOE", "RDIN"}
+    {"COMMENT", "COMPUTE", "DATABASE", "ESTAB", "FMIN", "MISTOE", "RDIN"}
 )
 
 #: The keywords whose block holds **other keywords** rather than lines: ``IF`` opens a conditional

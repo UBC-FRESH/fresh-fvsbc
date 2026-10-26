@@ -4,11 +4,12 @@
 have a writer and a call site** — the candidates — five have a writer that nothing calls, and one has a
 gate no valid input satisfies.
 
-**Fifteen are wired as of `P32`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
+**Seventeen are wired as of `P34`** — `FVS_TreeList_Metric`, `FVS_CutList_Metric`,
 `FVS_Down_Wood_Cov_Metric` and `FVS_Stats_Species_Metric` in `P27`, `FVS_StrClass_Metric` and
 `FVS_ATRTList_Metric` in `P28`, `FVS_CanProfile` in `P30`, then `FVS_Stats_Stand`, `FVS_Mortality_Metric`,
 `FVS_DM_Spp_Sum_Metric` and `FVS_DM_Stnd_Sum_Metric` in `P31`, then the other two dwarf-mistletoe tables
-and the two root-disease summaries in `P32`. The reader went from fourteen tables to **twenty-nine**.
+and the two root-disease summaries in `P32`, then the two regeneration tables in `P34`. The reader went
+from fourteen tables to **thirty-one**.
 
 **Every estimate on this page that said "needs an infection state" or "needs a stand the fixture cannot
 express" was wrong**, and `notes/reference/fixture-limits.md` records why: the three blockers were a
@@ -172,10 +173,10 @@ Effort is the work to wire one table, assuming the trigger is found on the first
 | `FVS_StrClass_Metric` | S | medium — the class boundaries are a model choice, not a fact | **high** for BC old-growth work | **wired in `P28`** |
 | `FVS_Climate_Metric` | S | **high** — no way to check the indices without a second source | medium | |
 | `FVS_CanProfile` | S | low — `CANFPROF` was the guess and it worked | medium | **wired in `P30`** |
-| `FVS_Regen_Tally_Metric` | M | medium — needs an establishment model active | **high** for BC silviculture | |
+| `FVS_Regen_Tally_Metric` | M | medium — needs an establishment model active | **high** for BC silviculture | **wired in `P34`** |
 | `FVS_Regen_Sprouts_Metric` | M | medium | medium | |
-| `FVS_Regen_SitePrep` | M | medium | low | |
-| `FVS_CalibStats` | S | **high** — meaningless without calibration | low | |
+| `FVS_Regen_SitePrep` | M | medium | low | **wired in `P34`** |
+| `FVS_CalibStats` | S | **high** — the table is created **empty** without calibration | low | **not exposed, and why** |
 | `FVS_FIAVBC_*` (3) | M | **high** — probably behind a variant flag this build never sets | medium, to FIA users only | |
 | `FVS_DM_*` (4) | S | low — damage code 30 and a severity | **high** in BC | **all four wired** |
 | `FVS_RD_*` (3) | S | low — `RRINIT` and `RRDOUT` inside the block | **high** in BC | **two of three wired in `P32`** |

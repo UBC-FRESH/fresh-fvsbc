@@ -152,6 +152,8 @@ EXPOSED_TABLES: tuple[str, ...] = (
     "FVS_PotFire_Cond_Metric",
     "FVS_PotFire_Metric",
     "FVS_RD_Det_Metric",
+    "FVS_Regen_SitePrep",
+    "FVS_Regen_Tally_Metric",
     "FVS_RD_Sum_Metric",
     "FVS_SnagDet_Metric",
     "FVS_SnagSum_Metric",
