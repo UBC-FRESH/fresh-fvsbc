@@ -39,6 +39,9 @@ from fresh_fvsbc.treelist import FIELD_DESCRIPTORS, READ_COLUMNS
 
 __all__ = [
     "ENV_BINARY",
+    "EXPLAINED_COLUMNS",
+    "NOT_COMPARABLE",
+    "RUN_COLUMNS",
     "Comparison",
     "compare",
     "database_key",
@@ -65,6 +68,37 @@ INPUT_DATABASE: str = "input.db"
 #: The keyword file name the standalone is given.
 STANDALONE_KEY: str = "case.key"
 
+#: The columns that name the **run** rather than the stand: FVS mints a fresh case identifier and a
+#: timestamp every time it runs, records the keyword file's own name, and stamps the build's version
+#: and revision. Two builds cannot agree on any of them, and none of them is a model result.
+RUN_COLUMNS: tuple[str, ...] = ("CaseID", "RunDateTime", "KeywordFile", "Version", "RV")
+
+#: Tables one side writes and the other does not, with the reason. A table here is **not compared**,
+#: which is different from agreeing; the summary counts them apart for that reason.
+NOT_COMPARABLE: dict[str, str] = {
+    "FVS_Error": (
+        "FVS writes it only when it logs something. The input-database path calls FORKOD with no "
+        "location code and logs FVS03, which the keyword path never does, so the standalone writes "
+        "the table and this package's run does not"
+    ),
+    "FVS_InvReference": (
+        "the standalone writes it on every run and this package's build never does, even with a "
+        "minimal DATABASE block; notes/triage.md carries the evidence and the open question"
+    ),
+}
+
+#: Columns whose disagreement is explained, with the reason. Anything not named here is a
+#: difference the comparison fails on.
+EXPLAINED_COLUMNS: dict[str, dict[str, str]] = {
+    "FVS_Cases": {
+        "SamplingWt": (
+            "FVS copies the sampling weight into the case row from DBSCASE(2), which only "
+            "updates a row that already exists; the two drivers create that row at different "
+            "points"
+        ),
+    },
+}
+
 
 @dataclass(frozen=True)
 class Comparison:
@@ -75,9 +109,10 @@ class Comparison:
     table : str
         The table's name.
     status : str
-        ``match``, ``differ``, ``missing`` (absent from the standalone's database) or ``extra``
-        (present
-        there and not in ours).
+        ``match`` when every comparable value agrees, ``explained`` when the only disagreements are
+        named in :data:`EXPLAINED_COLUMNS`, ``not comparable`` when only one side wrote the table
+        and :data:`NOT_COMPARABLE` says why, ``differ`` when something is unexplained, and
+        ``stale`` when an explanation no longer applies.
     detail : str
         A short explanation, empty for a match.
     """
@@ -146,7 +181,7 @@ def _canonical(frame: pd.DataFrame) -> pd.DataFrame:
     pandas.DataFrame
         The same values as strings, sorted by every column, with a fresh index.
     """
-    text = frame.astype(str)
+    text = frame.drop(columns=[name for name in RUN_COLUMNS if name in frame.columns]).astype(str)
     return text.sort_values(by=list(text.columns)).reset_index(drop=True)
 
 
@@ -163,17 +198,20 @@ def compare(ours: Path, theirs: Path) -> tuple[Comparison, ...]:
     Returns
     -------
     tuple of Comparison
-        One record per table either database holds, ordered by table name.
+        One record per table either database holds, ordered by table name, followed by a ``stale``
+        record for every explanation that no longer applies.
     """
     mine = {name for name in EXPOSED_TABLES if _has_table(ours, name)}
     other = {name for name in EXPOSED_TABLES if _has_table(theirs, name)}
     results: list[Comparison] = []
+    applicable: set[str] = set()
     for name in sorted(mine | other):
-        if name not in other:
-            results.append(Comparison(name, "missing", "the standalone wrote no such table"))
-            continue
-        if name not in mine:
-            results.append(Comparison(name, "extra", "only the standalone wrote it"))
+        if name not in other or name not in mine:
+            side = "the standalone" if name in other else "this package"
+            if name in NOT_COMPARABLE:
+                results.append(Comparison(name, "not comparable", NOT_COMPARABLE[name]))
+            else:
+                results.append(Comparison(name, "differ", f"only {side} wrote it"))
             continue
         left = _canonical(read_table(ours, name))
         right = _canonical(read_table(theirs, name))
@@ -185,12 +223,76 @@ def compare(ours: Path, theirs: Path) -> tuple[Comparison, ...]:
                 Comparison(name, "differ", f"{left.shape[0]} rows here, {right.shape[0]} there")
             )
             continue
+        explained = EXPLAINED_COLUMNS.get(name, {})
+        if explained and all(column in left.columns for column in explained):
+            applicable.add(name)
         if left.equals(right):
             results.append(Comparison(name, "match", ""))
             continue
-        differing = int((left != right).any(axis=1).sum())
-        results.append(Comparison(name, "differ", f"{differing} row(s) differ"))
-    return tuple(results)
+        results.append(_difference(name, left, right))
+    return tuple(results + _stale(results, applicable))
+
+
+def _difference(name: str, left: pd.DataFrame, right: pd.DataFrame) -> Comparison:
+    """Classify a table whose values disagree.
+
+    Parameters
+    ----------
+    name : str
+        The table's name.
+    left : pandas.DataFrame
+        This package's table, canonicalised.
+    right : pandas.DataFrame
+        The standalone's table, canonicalised.
+
+    Returns
+    -------
+    Comparison
+        ``explained`` when every differing column is named in :data:`EXPLAINED_COLUMNS`, and
+        ``differ`` naming the columns otherwise, because a row count tells a reader nothing about
+        which number moved.
+    """
+    differing = [column for column in left.columns if bool((left[column] != right[column]).any())]
+    explained = EXPLAINED_COLUMNS.get(name, {})
+    if differing and all(column in explained for column in differing):
+        reasons = "; ".join(f"{column}: {explained[column]}" for column in differing)
+        return Comparison(name, "explained", reasons)
+    rows = int((left != right).any(axis=1).sum())
+    return Comparison(name, "differ", f"{rows} row(s) differ in {', '.join(differing)}")
+
+
+def _stale(results: list[Comparison], applicable: set[str]) -> list[Comparison]:
+    """Return a record for every explanation that no longer applies.
+
+    An explanation that has stopped being needed is a claim about the code that is no longer true,
+    and leaving it in place would hide the next difference of the same kind. It is reported as an
+    error rather than dropped, the rule the mutation harness follows for its anchors.
+
+    Parameters
+    ----------
+    results : list of Comparison
+        The comparisons made so far.
+    applicable : set of str
+        The tables whose explained columns both databases carry, so an explanation was in scope.
+
+    Returns
+    -------
+    list of Comparison
+        One ``stale`` record per explanation that was not needed.
+    """
+    stale: list[Comparison] = []
+    seen = {result.table: result.status for result in results}
+    for table in applicable:
+        if seen[table] != "explained":
+            stale.append(
+                Comparison(table, "stale", "the explained columns now agree; drop the explanation")
+            )
+    for table in NOT_COMPARABLE:
+        if seen.get(table) in {"match", "explained"}:
+            stale.append(
+                Comparison(table, "stale", "both sides now write it; drop the not-comparable entry")
+            )
+    return stale
 
 
 def _has_table(database: Path, name: str) -> bool:
@@ -260,7 +362,15 @@ def database_key(run_key: str, database_name: str, stand_id: str) -> str:
     Returns
     -------
     str
-        The keyword file, with the ``DSNin`` block first.
+        The keyword file, with the ``DSNin`` block placed after the run's own ``DATABASE`` block.
+
+    Notes
+    -----
+    The order is not cosmetic. A ``DATABASE`` block naming ``DSNOut`` is rejected once a case has
+    begun, and reading a stand from an input database calls ``FORKOD`` with no location code, which
+    logs a warning — and logging a warning writes to the output database, which starts the case. Put
+    the output block first and it is opened while the case is still empty; put it second and FVS
+    answers ``FVS16``, ignores it, and writes the default tables instead.
     """
     kept: list[str] = []
     in_format = False
@@ -275,7 +385,41 @@ def database_key(run_key: str, database_name: str, stand_id: str) -> str:
         if in_format:
             continue
         kept.append(line)
-    return input_block(database_name, stand_id) + "\n".join(kept) + "\n"
+    start = next(
+        (index for index, line in enumerate(kept) if line.strip().upper() == "DATABASE"), None
+    )
+    if start is None:
+        return input_block(database_name, stand_id) + "\n".join(kept) + "\n"
+    end = _database_block_end(kept, start)
+    return (
+        "\n".join(kept[: end + 1])
+        + "\n"
+        + input_block(database_name, stand_id)
+        + "\n".join(kept[end + 1 :])
+        + "\n"
+    )
+
+
+def _database_block_end(lines: list[str], start: int) -> int:
+    """Return the index of the line that ends the ``DATABASE`` block beginning at ``start``.
+
+    Parameters
+    ----------
+    lines : list of str
+        The keyword file's lines.
+    start : int
+        The index of the line holding ``DATABASE``.
+
+    Returns
+    -------
+    int
+        The index of the block's terminator, or ``start`` when the file has none, which leaves the
+        input block where it was rather than dropping the run's own block.
+    """
+    for index in range(start + 1, len(lines)):
+        if lines[index].strip().upper() == "END":
+            return index
+    return start
 
 
 def stand_record(key_text: str, stand_id: str, trees: list[dict[str, object]]) -> dict[str, object]:
@@ -449,10 +593,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         for result in results:
             line = f"  {result.table:<{width}}  {result.status}"
             print(line + (f"  ({result.detail})" if result.detail else ""))
-        differing = [result for result in results if result.status != "match"]
-        agreed = len(results) - len(differing)
-        print(f"\n  {agreed} of {len(results)} tables agree; {len(differing)} do not.")
-        return 0 if not differing else 1
+        counts: dict[str, int] = {}
+        for result in results:
+            counts[result.status] = counts.get(result.status, 0) + 1
+        comparable = counts.get("match", 0) + counts.get("explained", 0) + counts.get("differ", 0)
+        parts = [f"{counts.get('match', 0)} of {comparable} comparable tables agree"]
+        if counts.get("explained"):
+            parts.append(f"{counts['explained']} explained")
+        if counts.get("not comparable"):
+            parts.append(f"{counts['not comparable']} not comparable")
+        print("\n  " + "; ".join(parts) + ".")
+        failed = counts.get("differ", 0) + counts.get("stale", 0)
+        return 0 if not failed else 1
     finally:
         shutil.rmtree(workdir, ignore_errors=True)
 
@@ -613,10 +765,12 @@ def parse_trees(tree_text: str) -> list[dict[str, object]]:
             kind = edit[0]
             try:
                 if kind == "I":
-                    # ``tree_num`` shares its columns with ``plot_id``, so the field carries
-                    # both, and FVS reads the embedded blanks as zeros: "   1  1" is tree 1001.
-                    # The parse has to agree with the reader, or the two databases' ids differ.
-                    record[field] = int(raw.replace(" ", "0") if field == "tree_num" else raw)
+                    # ``tree_num`` shares its columns with ``plot_id``: the format reads ``I4``
+                    # for the plot, tabs back to column 1, and reads ``I7`` for the tree. Fortran
+                    # ignores embedded blanks in a numeric field, so "   1  1" is tree **11**, not
+                    # 1001. An earlier revision zero-filled them, which put a different tree id in
+                    # the database than FVS put in its own table.
+                    record[field] = int(raw.replace(" ", "") if field == "tree_num" else raw)
                 elif kind == "F":
                     record[field] = float(raw)
                 else:
