@@ -65,7 +65,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P54 The fire tables | #232 | `feature/p54-fire-tables` | complete |
 | P55 Release 0.16.0 | #236 | `feature/p55-release-0-16-0` | complete |
 | P56 Warnings are delivered | #239 | `feature/p56-warnings-are-delivered` | complete |
-| P57 Release 0.16.1 | #244 | `feature/p57-release-0-16-1` | active |
+| P57 Release 0.16.1 | #244 | `feature/p57-release-0-16-1` | complete |
 
 ## Lifecycle Map
 
@@ -1392,14 +1392,14 @@ Acceptance criteria:
 
 Parent issue: #244
 Branch: `feature/p57-release-0-16-1`
-Status: active
+Status: complete
 
 Goal: release `0.16.1`, because `0.16.0`'s headline warning reaches nobody who uses the command.
 
-- [ ] P57.1 Version and notes for 0.16.1 (#245)
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.16.0", leading with the delivery.
-  - [ ] Verify the warning on standard error from a clean checkout.
+- [x] P57.1 Version and notes for 0.16.1 (#245)
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.16.0", leading with the delivery.
+  - [x] Verify the warning on standard error from a clean checkout.
 
 Acceptance criteria:
 
