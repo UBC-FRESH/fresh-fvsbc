@@ -35,6 +35,7 @@ from fresh_fvsbc.keywords import (
     KeywordWidthError,
     UnknownKeywordError,
     UnsupportedKeywordError,
+    validate_keywords,
 )
 from fresh_fvsbc.nemora import MissingAssignmentError, PopulationError
 from fresh_fvsbc.outputs import MissingOutputError, OutputError, RunFailedError
@@ -372,6 +373,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             _parse_block(text) if kind == "block" else _parse_keyword(text)
             for kind, text in (args.entries or ())
         )
+        # The validator's warnings are about the set as a whole — an order FVS silently punishes,
+        # a spelling the table does not hold — and the run's own result carries FVS's warnings, not
+        # these. Without this they are computed and dropped, which is not a warning.
+        for warning in validate_keywords(keywords):
+            print(f"fresh-fvsbc: warning: {warning}", file=sys.stderr)
         population = _read_population(args.population)
         result = run_population(
             population,
