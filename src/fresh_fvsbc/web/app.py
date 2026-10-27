@@ -54,8 +54,10 @@ def create_app(
     roots : sequence of Path
         The directories searched for run directories, one level deep.
     allow_remote : bool, optional
-        Whether the caller has accepted a non-loopback bind. The flag is carried into the app so the
-        decision is recorded where it is used.
+        Whether the caller has accepted a non-loopback bind. The flag is carried into the app so
+        the decision is recorded where it is used. Behind the JupyterHub port proxy this is the
+        normal case: the proxy authenticates the request, and the service has to listen off
+        loopback for it.
     root_path : str, optional
         The prefix the app is served under, for a notebook proxy.
 
