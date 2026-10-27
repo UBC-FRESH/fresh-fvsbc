@@ -293,6 +293,78 @@ def test_a_keyword_keeps_its_blank_fields() -> None:
     assert cli._parse_keyword("TIMEINT=,5") == Keyword("TIMEINT", ("", "5"))
 
 
+def test_a_supplemental_record_follows_a_semicolon() -> None:
+    """THINQFA's unit record is not a field; the semicolon keeps it beside its keyword."""
+    keyword = cli._parse_keyword("THINQFA=1,0.0,23.62,0,1.25,1.97,126.32;0")
+    assert keyword.name == "THINQFA"
+    assert keyword.supplemental == ("0",)
+    assert keyword.parameters[-1] == "126.32"
+
+
+def test_an_empty_supplemental_record_is_refused() -> None:
+    """A trailing semicolon names no unit, which is input the command cannot use."""
+    with pytest.raises(cli.CommandInputError, match="empty supplemental record"):
+        cli._parse_keyword("THINQFA=1,0.0;")
+
+
+def test_the_command_carries_a_thinqfa_supplemental_record(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The unit record survives the command's parser and reaches the orchestration."""
+    captured: list[Sequence[Keyword]] = []
+
+    def stub(
+        population: Sequence[dict[str, object]],
+        *,
+        directory: str | Path,
+        species: str | None = None,
+        tree_age: float | None = None,
+        keywords: Sequence[Keyword] = (),
+        variant: str = "bc",
+        plot_fields: object = None,
+        key_name: str = KEYWORD_FILE_NAME,
+    ) -> run.RunResult:
+        captured.append(keywords)
+        raise run.RunError("stub")
+
+    monkeypatch.setattr(cli, "run_population", stub)
+    cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--keyword",
+            "THINQFA=1,0.0,23.62,0,1.25,1.97,126.32;0",
+        ]
+    )
+    assert next(iter(captured[0])).supplemental == ("0",)
+
+
+def test_a_thinqfa_without_a_supplemental_record_exits_two(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A missing unit would make FVS read the next keyword as the record."""
+    code = cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--keyword",
+            "THINQFA=1",
+        ]
+    )
+    assert code == cli.EXIT_BAD_INPUT
+    assert "supplemental record" in capsys.readouterr().err
+
+
 def test_the_command_passes_the_callers_keywords_through(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

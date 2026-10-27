@@ -59,6 +59,7 @@ __all__ = [
     "RECORD_KEYWORDS",
     "SPECIAL_KEYWORDS",
     "STAND_KEYWORDS",
+    "SUPPLEMENTAL_KEYWORDS",
     "Keyword",
     "KeywordOrderError",
     "KeywordSet",
@@ -267,6 +268,22 @@ LINES_KEYWORDS: frozenset[str] = frozenset(
     {"COMMENT", "COMPUTE", "DATABASE", "ESTAB", "FMIN", "MISTOE", "RDIN"}
 )
 
+#: The keywords that read one or more **supplemental records** after their own record, with no
+#: terminator. ``THINQFA`` is the first: ``canada/bc/initre.f`` option 141 reads its seventh field,
+#: then reads the next record as ``I1`` to choose the residual-density unit. A missing record would
+#: make FVS consume the next keyword as the unit, so the validator requires it rather than leaving
+#: the field to the caller's memory.
+SUPPLEMENTAL_KEYWORDS: frozenset[str] = frozenset({"THINQFA"})
+
+#: The unit values FVS reads from the ``THINQFA`` supplemental record, and what each means. The
+#: source maps ``<=0`` to basal area, ``<=1`` to trees per acre and ``>1`` to SDI; the documented
+#: values are 0, 1 and 2.
+_THINQFA_UNITS: dict[str, str] = {
+    "0": "basal area per acre",
+    "1": "trees per acre",
+    "2": "stand density index",
+}
+
 #: The keywords whose block holds **other keywords** rather than lines: ``IF`` opens a conditional
 #: whose body is a sequence of keywords and whose terminator is ``ENDIF``. That is a nested
 #: structure this model does not have, so it is refused by name rather than written wrongly.
@@ -345,6 +362,10 @@ class Keyword:
         one, and the writer adds the ``ENDIF`` that closes it.
     otherwise : tuple of Keyword, optional
         The ``ELSE`` branch of a conditional.
+    supplemental : tuple of str, optional
+        The records that follow a keyword's own record with no terminator. Only
+        :data:`SUPPLEMENTAL_KEYWORDS` take them. ``THINQFA`` takes exactly one, holding ``0`` for
+        basal area per acre, ``1`` for trees per acre, or ``2`` for stand density index.
     """
 
     name: str
@@ -352,6 +373,7 @@ class Keyword:
     lines: tuple[str, ...] = ()
     nested: tuple[Keyword, ...] = ()
     otherwise: tuple[Keyword, ...] = ()
+    supplemental: tuple[str, ...] = ()
 
 
 def validate_keyword(keyword: Keyword) -> list[str]:
@@ -387,6 +409,13 @@ def validate_keyword(keyword: Keyword) -> list[str]:
         near = _near_miss(keyword.name)
         hint = f' The table spells it "{near}".' if near is not None else ""
         raise UnknownKeywordError(f'"{keyword.name}" is not a keyword.{hint}')
+    if keyword.name in SUPPLEMENTAL_KEYWORDS:
+        _validate_supplemental(keyword)
+    elif keyword.supplemental:
+        raise UnsupportedKeywordError(
+            f'"{keyword.name}" does not take a supplemental record; only '
+            f"{', '.join(sorted(SUPPLEMENTAL_KEYWORDS))} does"
+        )
     if keyword.name not in RECORD_KEYWORDS:
         for parameter in keyword.parameters:
             _check_width(keyword.name, parameter)
@@ -397,6 +426,38 @@ def validate_keyword(keyword: Keyword) -> list[str]:
     if keyword.name == MISSPELLED_KEYWORD:
         warnings.append(MISSPELLING_WARNING)
     return warnings
+
+
+def _validate_supplemental(keyword: Keyword) -> None:
+    """Validate the one supplemental record ``THINQFA`` reads.
+
+    Parameters
+    ----------
+    keyword : Keyword
+        The keyword, which is already known to be in :data:`SUPPLEMENTAL_KEYWORDS`.
+
+    Raises
+    ------
+    UnsupportedKeywordError
+        If the record is missing, repeated, or does not hold ``0``, ``1`` or ``2``.
+    """
+    if not keyword.supplemental:
+        choices = "; ".join(f"{unit} for {label}" for unit, label in _THINQFA_UNITS.items())
+        raise UnsupportedKeywordError(
+            f'"{keyword.name}" requires one supplemental record with the residual-density '
+            f"unit: {choices}"
+        )
+    if len(keyword.supplemental) != 1:
+        raise UnsupportedKeywordError(
+            f'"{keyword.name}" takes exactly one supplemental record, not '
+            f"{len(keyword.supplemental)}"
+        )
+    units = keyword.supplemental[0]
+    if units not in _THINQFA_UNITS:
+        choices = ", ".join(f"{unit} ({label})" for unit, label in _THINQFA_UNITS.items())
+        raise UnsupportedKeywordError(
+            f'"{keyword.name}" supplemental record must be {choices}, not {units!r}'
+        )
 
 
 def validate_keywords(keywords: Sequence[Keyword]) -> list[str]:
@@ -486,6 +547,8 @@ def render_keyword(keyword: Keyword) -> str:
         _check_width(keyword.name, parameter)
         fields.append(f"{parameter:<{FIELD_WIDTH}}")
     head = f"{keyword.name:<{FIELD_WIDTH}}{''.join(fields)}".rstrip() + "\n"
+    if keyword.name in SUPPLEMENTAL_KEYWORDS:
+        return head + "".join(f"{record}\n" for record in keyword.supplemental)
     if keyword.name in NESTED_KEYWORDS:
         body = "".join(render_keyword(entry) for entry in keyword.nested)
         otherwise = ""

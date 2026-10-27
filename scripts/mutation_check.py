@@ -171,6 +171,13 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_keywords.py::test_a_block_of_lines_renders_its_lines_and_its_terminator",
     ),
     Mutation(
+        identifier="keywords-renders-thinqfa-without-its-unit",
+        module="src/fresh_fvsbc/keywords.py",
+        find='        return head + "".join(f"{record}\\n" for record in keyword.supplemental)',
+        replace="        return head",
+        test="tests/test_keywords.py::test_thinqfa_renders_its_supplemental_record_without_end",
+    ),
+    Mutation(
         identifier="run-drives-in-this-process",
         module="src/fresh_fvsbc/run.py",
         find="    finished = subprocess.run(",
@@ -197,8 +204,14 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         identifier="command-drops-a-blank-field",
         module="src/fresh_fvsbc/cli.py",
-        find='    return Keyword(name, tuple(fields.split(",")))',
-        replace='    return Keyword(name, tuple(field for field in fields.split(",") if field))',
+        find=(
+            "    keyword = Keyword(name) if not separator else "
+            'Keyword(name, tuple(fields.split(",")))'
+        ),
+        replace=(
+            "    keyword = Keyword(name) if not separator else "
+            'Keyword(name, tuple(field for field in fields.split(",") if field))'
+        ),
         test="tests/test_command.py::test_a_keyword_keeps_its_blank_fields",
     ),
     Mutation(

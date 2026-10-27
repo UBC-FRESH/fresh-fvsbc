@@ -14,8 +14,8 @@ actions:
 ``argparse`` already exits 2 for a usage error, so the third code is the convention rather than an
 invention.
 
-The command's one limit is that a parameter cannot contain a comma, because the comma separates the
-fields of a keyword. The API has no such limit, and a caller who needs one uses the API.
+A parameter cannot contain a comma or semicolon: the comma separates keyword fields, and the
+semicolon starts a supplemental record. The API has no such limit.
 """
 
 from __future__ import annotations
@@ -142,7 +142,8 @@ def _parser() -> argparse.ArgumentParser:
         metavar="NAME[=FIELD,...]",
         help=(
             "one keyword, in the order given; the fields are FVS's own parameter fields, and "
-            "a blank one is written as a gap, as in --keyword TIMEINT=,5"
+            "a blank one is written as a gap, as in --keyword TIMEINT=,5. A THINQFA "
+            "supplemental record follows a semicolon, as in --keyword THINQFA=...;0"
         ),
     )
     parser.add_argument(
@@ -192,25 +193,35 @@ def _parse_keyword(text: str) -> Keyword:
     Parameters
     ----------
     text : str
-        The argument, as ``NAME`` or ``NAME=FIELD,...``.
+        The argument, as ``NAME``, ``NAME=FIELD,...``, or
+        ``NAME=FIELD,...;SUPPLEMENTAL``. The part after the semicolon is the one supplemental
+        record a keyword such as ``THINQFA`` reads.
 
     Returns
     -------
     Keyword
-        The keyword and its fields, in order.
+        The keyword, its fields in order, and its supplemental record when one is given.
 
     Raises
     ------
     CommandInputError
-        If the argument names no keyword.
+        If the argument names no keyword, or has an empty supplemental record.
     """
-    name, separator, fields = text.partition("=")
+    head, semicolon, supplemental = text.partition(";")
+    if semicolon and not supplemental:
+        raise CommandInputError(f"--keyword has an empty supplemental record: {text!r}")
+    name, separator, fields = head.partition("=")
     name = name.strip()
     if not name:
         raise CommandInputError(f"--keyword needs a name, and got {text!r}")
-    if not separator:
-        return Keyword(name)
-    return Keyword(name, tuple(fields.split(",")))
+    keyword = Keyword(name) if not separator else Keyword(name, tuple(fields.split(",")))
+    if semicolon:
+        return Keyword(
+            keyword.name,
+            keyword.parameters,
+            supplemental=(supplemental,),
+        )
+    return keyword
 
 
 def _parse_block(text: str) -> Keyword:
@@ -233,6 +244,11 @@ def _parse_block(text: str) -> Keyword:
     """
     head, *lines = text.split("|")
     keyword = _parse_keyword(head)
+    if keyword.supplemental:
+        raise CommandInputError(
+            "--block does not take a supplemental record; "
+            "use --keyword NAME=FIELD,...;UNIT for THINQFA"
+        )
     if keyword.name not in LINES_KEYWORDS:
         raise CommandInputError(
             f"--block names {keyword.name!r}, which does not take a block of lines; "

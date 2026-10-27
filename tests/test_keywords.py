@@ -18,6 +18,7 @@ from fresh_fvsbc.keywords import (
     MISSPELLING_WARNING,
     RECORD_KEYWORDS,
     SPECIAL_KEYWORDS,
+    SUPPLEMENTAL_KEYWORDS,
     Keyword,
     KeywordOrderError,
     KeywordSet,
@@ -253,6 +254,60 @@ def test_a_mistoe_block_renders_its_lines_and_its_terminator() -> None:
     """``MISTOE`` is a block whose sub-keywords are not keywords, so a caller supplies the lines."""
     keyword = Keyword("MISTOE", (), ("MISTPINF        0        1       0.5",))
     assert render_keyword(keyword) == "MISTOE\nMISTPINF        0        1       0.5\nEND\n"
+
+
+def test_thinqfa_is_the_supplemental_keyword() -> None:
+    """``THINQFA`` is the only keyword with a one-record supplemental input."""
+    assert frozenset({"THINQFA"}) == SUPPLEMENTAL_KEYWORDS
+
+
+def test_thinqfa_renders_its_supplemental_record_without_end() -> None:
+    """The source reads the next record with ``I1``; no ``END`` belongs there."""
+    keyword = Keyword(
+        "THINQFA",
+        ("1", "0.0", "23.62", "0", "1.25", "1.97", "126.32"),
+        supplemental=("0",),
+    )
+    rendered = render_keyword(keyword)
+    assert rendered.startswith("THINQFA   1         0.0")
+    assert rendered.endswith("126.32\n0\n")
+    assert "END" not in rendered
+
+
+def test_a_valid_thinqfa_passes_validation() -> None:
+    """A record with a documented unit is accepted silently."""
+    assert validate_keyword(Keyword("THINQFA", ("1",), supplemental=("0",))) == []
+
+
+def test_thinqfa_requires_a_supplemental_record() -> None:
+    """A missing record would make FVS consume the next keyword as the unit."""
+    with pytest.raises(UnsupportedKeywordError, match="requires one supplemental record"):
+        KeywordSet((Keyword("THINQFA", ("1",)),))
+
+
+def test_thinqfa_takes_exactly_one_supplemental_record() -> None:
+    """The reader consumes one record; a second would be left in the keyword stream."""
+    with pytest.raises(UnsupportedKeywordError, match="exactly one"):
+        KeywordSet((Keyword("THINQFA", ("1",), supplemental=("0", "1")),))
+
+
+def test_thinqfa_rejects_an_unknown_unit() -> None:
+    """Only 0, 1 and 2 are units; a typo must not reach Fortran."""
+    with pytest.raises(UnsupportedKeywordError, match="must be 0"):
+        KeywordSet((Keyword("THINQFA", ("1",), supplemental=("3",)),))
+
+
+def test_a_supplemental_record_on_another_keyword_is_refused() -> None:
+    """A record under a keyword that takes none would be read as the next keyword."""
+    with pytest.raises(UnsupportedKeywordError, match="does not take a supplemental record"):
+        KeywordSet((Keyword("ECHOSUM", supplemental=("0",)),))
+
+
+def test_the_hash_includes_the_supplemental_record() -> None:
+    """The unit is part of the bytes FVS reads, so it is part of the provenance hash."""
+    ba = Keyword("THINQFA", ("1",), supplemental=("0",))
+    tpa = Keyword("THINQFA", ("1",), supplemental=("1",))
+    assert keyword_set_hash([ba]) != keyword_set_hash([tpa])
 
 
 def test_a_database_block_must_precede_the_stand() -> None:

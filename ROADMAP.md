@@ -49,6 +49,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P38 The web surface, first cut | #167 | `feature/p38-web-first-cut` | complete |
 | P39 A real BC case, and what it broke | #171 | `feature/p39-real-case` | complete |
 | P40 Release 0.12.0 | #175 | `feature/p40-release-0-12-0` | complete |
+| P41 The THINQFA supplemental record | #179 | `feature/p41-thinqfa` | active |
 
 ## Lifecycle Map
 
@@ -1044,6 +1045,30 @@ Acceptance criteria:
 - The package reports `0.12.0`, and the notes say what changed and what remains.
 - A clean checkout installs the web extra, serves a run, and reads its tables through the API.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 41: The THINQFA supplemental record
+
+Parent issue: #179
+Branch: `feature/p41-thinqfa`
+Status: active
+
+Goal: make `THINQFA` usable by writing the one supplemental record FVS reads after it, and by
+refusing a set that omits or misstates that record.
+
+- [x] P41.1 Add the THINQFA supplemental record (#180)
+  - [x] Add `SUPPLEMENTAL_KEYWORDS`, the `Keyword.supplemental` field, validation and rendering.
+  - [x] Extend the command with `--keyword THINQFA=...;0`.
+  - [x] Document the 0/1/2 unit mapping and the source behaviour.
+  - [x] Add unit, contract and command tests.
+  - [x] Run the dashboard.
+
+Acceptance criteria:
+
+- A `THINQFA` set renders its keyword record, then exactly one unit record, with no `END`.
+- A missing, repeated or unknown unit is refused before a run.
+- A supplemental record on another keyword is refused by name.
+- The CLI and the web API can express the record, and the keyword hash includes it.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

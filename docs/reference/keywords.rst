@@ -120,6 +120,12 @@ Some keywords are the exception, because they read records of their own rather t
   need an infection state, and a block alone does not create one. ``RDIN`` starts the equivalent block for
   root disease; its required parameters were not determined, so it is not modelled, and the root-disease
   tables are likewise unexposed.
+- ``THINQFA`` carries one **supplemental record** after its keyword record. ``canada/bc/initre.f``
+  option 141 reads fields 1–7 as the BDq request, then reads the next record with
+  ``READ(IREAD,'(I1)')ISETQFA``. The first column selects the residual-density unit: ``0`` basal
+  area per acre, ``1`` trees per acre, ``2`` stand density index. There is no ``END`` terminator.
+  ``fresh-fvsbc`` takes the record as ``supplemental`` and requires exactly one of ``0``, ``1`` or
+  ``2``; a missing record is refused because FVS would consume the next keyword as the unit.
 - ``IF`` takes a block of **keywords** rather than lines: the condition record, ``THEN``, the body, and
   ``ENDIF``, with an optional ``ELSE`` branch. The official case's form is the one the run test checks.
   **``ALSOTRY`` is not modelled**, because no fixture here uses it.
@@ -191,6 +197,10 @@ Contract rules
    structure, so that it identifies exactly what FVS read, and it is written with its algorithm named,
    as ``sha256:`` followed by the digest. Order is part of the identity, because FVS processes a set in
    order.
+6. A keyword that reads a **supplemental record** carries it on ``Keyword.supplemental``, and the
+   writer emits it after the keyword record with no terminator. The record is validated before a run:
+   a missing or repeated record is refused, and a unit outside the documented set is refused. The rule
+   exists because a missing record is not harmless; FVS would read the next keyword as the unit.
 
 The open hazard
 ---------------

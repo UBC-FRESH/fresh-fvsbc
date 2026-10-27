@@ -62,14 +62,24 @@ before the first ``|`` and each ``|`` starts a line. This is how a caller asks f
 stand setup — see :doc:`reference/keywords`. A ``--block`` for a keyword that takes no lines is refused
 with exit ``2``.
 
+``THINQFA`` reads one **supplemental record** after its own record to choose the residual-density
+unit. Put it after a semicolon in the same ``--keyword`` argument:
+
+.. code-block:: bash
+
+   --keyword 'THINQFA=1,0.0,23.62,0,1.25,1.97,126.32;0'
+
+The unit is ``0`` for basal area per acre, ``1`` for trees per acre, or ``2`` for stand density index.
+The record is required; the run refuses a THINQFA without one rather than letting FVS read the next
+keyword as the unit.
+
 The names are validated against FVS's table, so a typo is refused rather than passed to Fortran. Two
 limits are worth knowing:
 
-- A parameter cannot contain a comma, because the comma separates the fields. The API has no such
-  limit.
-- ``TREEFMT`` and ``TREEDATA`` are refused, because the run writes them. So are the block keywords
-  (``COMMENT``, ``COMPUTE``, ``IF``, ``DATABASE``), because the keyword model has no room for a block
-  yet. See :doc:`reference/keywords`.
+- A parameter cannot contain a comma, because the comma separates the fields. A parameter also cannot
+  contain a semicolon, because the semicolon starts a supplemental record. The API has no such limit.
+- ``TREEFMT`` and ``TREEDATA`` are refused, because the run writes them. A ``--block`` for a keyword
+  that takes no lines is refused; see :doc:`reference/keywords` for the forms each keyword takes.
 
 Exit codes
 ----------
