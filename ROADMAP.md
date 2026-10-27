@@ -59,7 +59,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P48 Release 0.14.0 | #208 | `feature/p48-release-0-14-0` | complete |
 | P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | complete |
 | P50 The fire-model block | #216 | `feature/p50-fire-model-block` | complete |
-| P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | complete |
+| P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | active |
 | P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | active |
 
 ## Lifecycle Map
