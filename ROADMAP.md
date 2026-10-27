@@ -63,6 +63,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | complete |
 | P53 Release 0.15.1 | #228 | `feature/p53-release-0-15-1` | complete |
 | P54 The fire tables | #232 | `feature/p54-fire-tables` | complete |
+| P55 Release 0.16.0 | #236 | `feature/p55-release-0-16-0` | active |
 
 ## Lifecycle Map
 
@@ -1344,6 +1345,26 @@ Acceptance criteria:
 - A block that asks for `FUELOUT` or `POTFIRE` after `INVYEAR` warns, naming both keywords.
 - A block before `INVYEAR` writes all four fire tables.
 - The oracle agrees with all four, value for value.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 55: Release 0.16.0
+
+Parent issue: #236
+Branch: `feature/p55-release-0-16-0`
+Status: active
+
+Goal: release `0.16.0`, because the validator returns a new warning and thirteen tables now have a
+check.
+
+- [ ] P55.1 Version and notes for 0.16.0 (#237)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.15.1", leading with the silently missing fire tables.
+  - [ ] Verify a fire from a clean checkout and the oracle on the four fire tables.
+
+Acceptance criteria:
+
+- The package reports `0.16.0`, and the notes lead with the defect.
+- A clean checkout writes all four fire tables and the oracle agrees with all four.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

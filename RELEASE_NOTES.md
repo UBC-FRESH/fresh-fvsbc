@@ -1,10 +1,38 @@
-# fresh-fvsbc 0.15.1
+# fresh-fvsbc 0.16.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.15.1
+
+- **The fuels and potfire tables were silently not written, and now they are.** `FUELOUT` and
+  `POTFIRE` set `IFLALB` and `IPFLMB` to the inventory year when they are read, and `fmdout.f` and
+  `fmpofl.f` treat **any positive value as "suppress this report"**. An `FMIN` block read after
+  `INVYEAR` therefore switched its own reports off: the run succeeded and `FVS_Fuels_Metric`,
+  `FVS_PotFire_Metric` and `FVS_PotFire_Cond_Metric` were simply absent.
+
+  **The official case never hits it** — its inventory year arrives from the input database, so the year
+  is still zero when the block is read — which is why it has gone unnoticed upstream and would have hit
+  every user of this package, which writes the year as a keyword.
+
+  The validator now **warns**, naming both keywords. This is a change to what `validate_keywords`
+  returns: a set that puts the block after `INVYEAR` now carries a warning where it carried none.
+
+- **Thirteen exposed tables are checked against FVS's own writer**, up from nine:
+  `FVS_Carbon_Metric`, `FVS_Consumption_Metric`, `FVS_Down_Wood_Cov_Metric`,
+  `FVS_Down_Wood_Vol_Metric`, `FVS_Fuels_Metric`, `FVS_Hrv_Carbon`, `FVS_PotFire_Cond_Metric`,
+  `FVS_PotFire_Metric`, `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`, `FVS_StrClass_Metric`,
+  `FVS_Summary_Metric` and `FVS_TreeList_Metric` all match a standalone `FVSbc` **value for value**.
+  To use them, put the fire-model block before `INVYEAR`:
+
+  ```console
+  $ fresh-fvsbc population.json --directory run \
+      --block "FMIN|FUELOUT=2|POTFIRE=2|CARBREPT=2" \
+      --keyword INVYEAR=2020 ...
+  ```
 
 ## What changed since 0.15.0
 
