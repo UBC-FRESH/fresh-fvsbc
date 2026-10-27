@@ -74,9 +74,14 @@ list appear. Without it three of the four are written and the fourth is not.
 `.out` prints `PCT: 74 20 6` for this package's run and `PCT: 100 0 0` for the standalone's, in the same
 `SITE PREP SUMMARY` block.
 
-Both runs have no site-preparation keyword, so `estab.f` calls `ESPREP` for the **default** probabilities,
-and `ESPREP` predicts them from stand variables. The next step is to compare the variables the two runs
-handed it, not the table. `notes/triage.md` carries the finding.
+**`P59` ruled out every observable input**: both runs have one plot, 4,146 tree rows, the same aspect,
+slope, elevation and basal area, and this package's run is deterministic across seeds. What is left is
+`estab.f`'s site-prep selection, which fills `SUMPRE` from draws out of the pre-generated uniform array
+`WK6`; the likeliest cause is that the two drivers consume different numbers of draws before it runs.
+That is a hypothesis — the draws were not compared.
+
+The three columns that move are integers describing a random allocation, and every other table in the
+same run matches. `notes/triage.md` carries the evidence and what would reopen it.
 
 ## What this cost, and what it taught
 
