@@ -59,6 +59,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P48 Release 0.14.0 | #208 | `feature/p48-release-0-14-0` | complete |
 | P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | complete |
 | P50 The fire-model block | #216 | `feature/p50-fire-model-block` | complete |
+| P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | active |
 
 ## Lifecycle Map
 
@@ -1262,6 +1263,27 @@ Acceptance criteria:
 - A name outside `fmin.f`'s table is refused, and so is a fire-model keyword outside the block.
 - `--block "FMIN|SNAGOUT=1|SNAGSUM=2"` builds the block.
 - The snag, down-wood and carbon tables are written, and the oracle agrees with them.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 51: Release 0.15.0
+
+Parent issue: #220
+Branch: `feature/p51-release-0-15-0`
+Status: active
+
+Goal: release `0.15.0`, because `main` carries a breaking change to the fire-model block and nine
+tables now have a check where four did.
+
+- [ ] P51.1 Version and notes for 0.15.0 (#221)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.14.0", leading with the breaking change.
+  - [ ] Say which nine tables are checked and which two are out of reach.
+
+Acceptance criteria:
+
+- The package reports `0.15.0`, and the notes lead with the breaking change.
+- A clean checkout builds an `FMIN` block from keywords and the snag, down-wood and carbon tables appear.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

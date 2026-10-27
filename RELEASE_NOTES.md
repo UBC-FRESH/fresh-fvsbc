@@ -1,10 +1,32 @@
-# fresh-fvsbc 0.14.0
+# fresh-fvsbc 0.15.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.14.0
+
+- **`FMIN` holds keywords, not raw lines.** This is a **breaking change** for anyone who built the
+  fire-model block with `lines=`. A raw line let the caller space FVS's ten-column fields by hand,
+  and a mis-spaced field is **not refused — it is read as a different number**:
+  `SNAGCLAS  0.0   10.0  20.0  40.0` reaches FVS as class 2 `20.0` and class 3 `0.0`, with no error.
+  The block now takes `Keyword` values and the shared writer spaces them, the body is checked against
+  `fmin.f`'s own **fifty-five** keywords, a fire-model keyword outside the block is refused because
+  FVS would ignore it, and `FUELMODL` and `DEFULMOD` take their one supplemental record. From the
+  shell: `--block "FMIN|SNAGOUT=1|SNAGSUM=2|CARBREPT=2"`.
+- **Nine tables are now checked against FVS's own writer.** The oracle comparison is attributed — the
+  `0 of 5` was never source drift — and it reports what it can prove:
+  `FVS_Carbon_Metric`, `FVS_Down_Wood_Cov_Metric`, `FVS_Down_Wood_Vol_Metric`, `FVS_Hrv_Carbon`,
+  `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`, `FVS_StrClass_Metric`, `FVS_Summary_Metric` and
+  `FVS_TreeList_Metric` all match a standalone `FVSbc` **value for value**, including all 3,996
+  per-tree rows. Before this release, four tables had a check.
+- **The comparison reports what it cannot compare, and why.** It counts matches, explained differences
+  and out-of-reach tables apart, so a table only one side writes is never read as agreement. Two are
+  out of reach and named: `FVS_Error` is written only when FVS logs something, and `FVS_InvReference`
+  is written by the standalone on every run and never by this package's build, for a cause that is not
+  established.
 
 ## What changed since 0.13.0
 

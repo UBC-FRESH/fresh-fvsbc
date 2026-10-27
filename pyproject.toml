@@ -3,7 +3,7 @@
 
 [project]
 name = "fresh-fvsbc"
-version = "0.14.0"
+version = "0.15.0"
 description = "A Python wrapper for the BC variant of the Forest Vegetation Simulator."
 readme = "README.md"
 license = "MIT"
