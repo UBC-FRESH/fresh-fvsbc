@@ -49,7 +49,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P38 The web surface, first cut | #167 | `feature/p38-web-first-cut` | complete |
 | P39 A real BC case, and what it broke | #171 | `feature/p39-real-case` | complete |
 | P40 Release 0.12.0 | #175 | `feature/p40-release-0-12-0` | complete |
-| P41 The container deployment and the oracle harness | #181 | `feature/p41-container-and-oracle` | active |
+| P41 The container deployment and the oracle harness | #181 | `feature/p41-container-and-oracle` | complete |
 
 ## Lifecycle Map
 
@@ -1051,18 +1051,18 @@ Acceptance criteria:
 
 Parent issue: #181
 Branch: `feature/p41-container-and-oracle`
-Status: active
+Status: complete
 
 Goal: record the deployment the dev container actually has, and make a first cut of the oracle harness.
 
-- [ ] P41.1 The container deployment, recorded (#182)
-  - [ ] The reference page and the deployment note give the proxied command.
-  - [ ] The refusal message names the proxy rather than only the risk.
-  - [ ] A test asserts the service answers with and without its root path.
-- [ ] P41.2 The oracle harness, first cut (#183)
-  - [ ] `scripts/oracle_compare.py` renders, runs and compares.
-  - [ ] Tests cover the rendering, the comparison and the exit paths without the binary.
-  - [ ] The triage records the tree handoff the harness still needs.
+- [x] P41.1 The container deployment, recorded (#182)
+  - [x] The reference page and the deployment note give the proxied command.
+  - [x] The refusal message names the proxy rather than only the risk.
+  - [x] A test asserts the service answers with and without its root path.
+- [x] P41.2 The oracle harness, first cut (#183)
+  - [x] `scripts/oracle_compare.py` renders, runs and compares.
+  - [x] Tests cover the rendering, the comparison and the exit paths without the binary.
+  - [x] The triage records the tree handoff the harness still needs.
 
 Acceptance criteria:
 
