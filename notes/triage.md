@@ -49,6 +49,13 @@ says which review changed it.
     (`DBSCASE(2)` only updates a case row that already exists, and the two drivers create it at
     different points); every other difference is reported by column and fails the run, and an
     explanation that stops applying is reported as `stale` rather than silently dropped.
+- **`FVS_Regen_SitePrep` differs from the standalone, and it is the model rather than the writer.**
+  The oracle's first genuine difference, found by `P58`. The same case prints `PCT: 74 20 6` in this
+  package's `.out` and `PCT: 100 0 0` in the standalone's, in the same `SITE PREP SUMMARY` block — so the
+  table is reporting a divergence that is already in the model. Neither run supplies a site-preparation
+  keyword, so `estab.f` calls `ESPREP` for the **default** probabilities and `ESPREP` predicts them from
+  stand variables; the two runs must be handing it different ones. **The next step is to compare those
+  variables, not the table.** Reopened by attributing it.
 - **The fire-model keywords were unvalidated, and that is fixed.** `P50` found that `FMIN`'s body was
   written as **raw lines**, so a caller spaced the fields by hand. A mis-spaced line is not refused —
   `SNAGCLAS  0.0   10.0  20.0  40.0` reaches FVS as class 2 `20.0` and class 3 `0.0`, with no error.
