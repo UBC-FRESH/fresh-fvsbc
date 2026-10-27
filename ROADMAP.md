@@ -53,7 +53,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P43 The proxy prefix | #186 | `feature/p43-proxy-prefix` | complete |
 | P42 The THINQFA supplemental record | #179 | `feature/p42-thinqfa` | complete |
 | P44 Release 0.13.0 | #192 | `feature/p44-release-0-13-0` | complete |
-| P45 The tree handoff, mapped | #196 | `feature/p45-tree-handoff` | active |
+| P45 The tree handoff, mapped | #196 | `feature/p45-tree-handoff` | complete |
 
 ## Lifecycle Map
 
@@ -1140,14 +1140,14 @@ Acceptance criteria:
 
 Parent issue: #196
 Branch: `feature/p45-tree-handoff`
-Status: active
+Status: complete
 
 Goal: find the mechanism by which the standalone reads tree records, and record it.
 
-- [ ] P45.1 Map the tree handoff and record it (#197)
-  - [ ] `TREEDATA`'s field 1 and what each value means.
-  - [ ] The two routes tried and how each failed, with FVS's own messages.
-  - [ ] The route that is known to work, named.
+- [x] P45.1 Map the tree handoff and record it (#197)
+  - [x] `TREEDATA`'s field 1 and what each value means.
+  - [x] The two routes tried and how each failed, with FVS's own messages.
+  - [x] The route that is known to work, named.
 
 Acceptance criteria:
 
