@@ -568,3 +568,32 @@ def test_a_fire_model_keyword_outside_its_block_is_reported_not_raised(
     )
     assert code == cli.EXIT_BAD_INPUT
     assert "only between FMIN" in capsys.readouterr().err
+
+
+def test_the_command_delivers_the_validators_warnings(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A warning the set carries has to reach the caller, or it is a warning nobody sees.
+
+    The run's own result carries FVS's warnings, not the validator's, so the command prints these
+    itself. The assertion is on stderr alone, because whether the projection then runs depends on
+    whether the extension is installed.
+    """
+    cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--keyword",
+            "STDIDENT=Late",
+            "--keyword",
+            "INVYEAR=2020",
+            "--block",
+            "FMIN|FUELOUT=2",
+        ]
+    )
+    assert "must precede INVYEAR" in capsys.readouterr().err
