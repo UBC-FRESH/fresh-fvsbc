@@ -55,7 +55,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P44 Release 0.13.0 | #192 | `feature/p44-release-0-13-0` | complete |
 | P45 The tree handoff, mapped | #196 | `feature/p45-tree-handoff` | complete |
 | P46 The DSNin tree handoff | #200 | `feature/p46-dsnin` | complete |
-| P47 A quiet run | #204 | `feature/p47-quiet-run` | active |
+| P47 A quiet run | #204 | `feature/p47-quiet-run` | complete |
 
 ## Lifecycle Map
 
@@ -1181,14 +1181,14 @@ Acceptance criteria:
 
 Parent issue: #204
 Branch: `feature/p47-quiet-run`
-Status: active
+Status: complete
 
 Goal: stop reporting a run as failed when FVS simply had nothing to log.
 
-- [ ] P47.1 A run that logs nothing is not a failed run (#205)
-  - [ ] `read_errors` answers an absent `FVS_Error` with an empty frame.
-  - [ ] `ERROR_COLUMNS` names its columns.
-  - [ ] The contract page stops claiming the table is written on every run.
+- [x] P47.1 A run that logs nothing is not a failed run (#205)
+  - [x] `read_errors` answers an absent `FVS_Error` with an empty frame.
+  - [x] `ERROR_COLUMNS` names its columns.
+  - [x] The contract page stops claiming the table is written on every run.
 
 Acceptance criteria:
 
