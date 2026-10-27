@@ -1,10 +1,23 @@
-# fresh-fvsbc 0.16.0
+# fresh-fvsbc 0.16.1
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.16.0
+
+- **The command prints the keyword set's warnings.** `0.16.0` added a warning about the fire-model
+  block ordering, and **nothing printed it**: the run's result carries FVS's warnings from `FVS_Error`,
+  and the validator's warnings had no route out of the run. The fix shipped and reached nobody who uses
+  the command — which is how most people use it.
+
+  ```text
+  fresh-fvsbc: warning: an FMIN block that asks for FUELOUT or POTFIRE must precede INVYEAR: ...
+  ```
+
+  Found by verifying `0.16.0` from a clean checkout, running the case its own notes describe.
 
 ## What changed since 0.15.1
 

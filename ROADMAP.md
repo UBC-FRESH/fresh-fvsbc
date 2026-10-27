@@ -65,6 +65,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P54 The fire tables | #232 | `feature/p54-fire-tables` | complete |
 | P55 Release 0.16.0 | #236 | `feature/p55-release-0-16-0` | complete |
 | P56 Warnings are delivered | #239 | `feature/p56-warnings-are-delivered` | complete |
+| P57 Release 0.16.1 | #244 | `feature/p57-release-0-16-1` | active |
 
 ## Lifecycle Map
 
@@ -1385,6 +1386,25 @@ Acceptance criteria:
 
 - A set that carries a warning prints it to standard error.
 - A set that carries none prints nothing.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 57: Release 0.16.1
+
+Parent issue: #244
+Branch: `feature/p57-release-0-16-1`
+Status: active
+
+Goal: release `0.16.1`, because `0.16.0`'s headline warning reaches nobody who uses the command.
+
+- [ ] P57.1 Version and notes for 0.16.1 (#245)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.16.0", leading with the delivery.
+  - [ ] Verify the warning on standard error from a clean checkout.
+
+Acceptance criteria:
+
+- The package reports `0.16.1`, and the notes lead with the delivery.
+- A clean checkout prints the warning on standard error.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
