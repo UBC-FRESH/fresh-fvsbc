@@ -26,7 +26,7 @@ says which review changed it.
 | 8 | A parameter passed to the command cannot contain a comma | **accepted** | A different argument syntax | It is documented, and the API has no such limit. **Reopened by a caller who needs a comma**, because the workaround is to use the API |
 | 9 | At `-O0` the variant writes no database at all | **accepted** | Nothing: it is a build requirement | The optimiser is not optional, and ADR 0008 records it for the standalone and `P4`'s report for the extension. **Reopened if a build at `-O0` ever works**, which would mean the requirement was a different flag |
 | 10 | The package needs a separately built extension | **accepted** | A build integration, which is a different project | This package wraps a pinned build of one variant; building FVS is PyFVS's and ADR 0004's concern. **Reopened if the project ever distributes a wheel**, where the dependency has to be expressed |
-| 11 | The reader exposes fourteen of the database's 44 tables | **accepted** | Testing a table, then exposing it | Output contract rule 3 keeps an untested table out of the public API. Fourteen are exposed, and the rest are not all reachable: some take a `DATABASE` option, carbon takes `CARBREPT` and consumption `SIMFIRE` inside an `FMIN` block, the burn report's gate cannot be satisfied by valid input, five tables have a writer nothing calls, and the rest are candidates that each need a case (`notes/reference/table-reachability.md`). **What is left is a decision about which tables are worth a case, not 30 tests.** Reopened by a caller who needs one of them |
+| 11 | The reader exposes thirty-one of the database's 44 tables | **accepted** | Testing a table, then exposing it | Output contract rule 3 keeps an untested table out of the public API. Fourteen are exposed, and the rest are not all reachable: some take a `DATABASE` option, carbon takes `CARBREPT` and consumption `SIMFIRE` inside an `FMIN` block, the burn report's gate cannot be satisfied by valid input, five tables have a writer nothing calls, and the rest are candidates that each need a case (`notes/reference/table-reachability.md`). **What is left is a decision about which tables are worth a case, not 30 tests.** Reopened by a caller who needs one of them |
 | 12 | The `nemora` adapter requires `species` and `tree_age` from the caller | **accepted** | A species-assignment capability | `nemora` emits neither, and assigning a species is a modelling question with a research burden. The adapter fails rather than defaulting, which is the honest behaviour. **Reopened by a caller who asks for species assignment**, not by one who has populations without species: every `nemora` population has none, so that condition would fire on the normal case and would make the row unowned |
 
 ## Found, and not yet fixed
@@ -49,6 +49,12 @@ says which review changed it.
     (`DBSCASE(2)` only updates a case row that already exists, and the two drivers create it at
     different points); every other difference is reported by column and fails the run, and an
     explanation that stops applying is reported as `stale` rather than silently dropped.
+- **The fire-model keywords were unvalidated, and that is fixed.** `P50` found that `FMIN`'s body was
+  written as **raw lines**, so a caller spaced the fields by hand. A mis-spaced line is not refused —
+  `SNAGCLAS  0.0   10.0  20.0  40.0` reaches FVS as class 2 `20.0` and class 3 `0.0`, with no error.
+  The block now holds **keywords**, written by the same writer as everything else and checked against
+  `fmin.f`'s own fifty-five, and a fire-model keyword outside the block is refused. That is what made
+  the snag, down-wood and carbon tables reachable: **eight of nine comparable tables now match**.
 - **`FVS_InvReference` is written by the standalone on every run and never by this package's build.**
   The writer is compiled in and `fvs_` calls it — `objdump` shows the call — with byte-identical
   `dbsreference.f` and `dbscase.f` between the pin and upstream, a minimal `DATABASE` block, and the

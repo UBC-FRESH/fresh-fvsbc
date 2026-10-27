@@ -11,6 +11,7 @@ import pytest
 from fresh_fvsbc.keywords import (
     BLANK_SLOTS,
     FIELD_WIDTH,
+    FMIN_KEYWORDS,
     KEYWORD_TABLE,
     KEYWORDS,
     LINES_KEYWORDS,
@@ -147,10 +148,16 @@ def test_the_warning_says_the_defect_is_fvs_own() -> None:
     assert MISSPELLED_KEYWORD in MISSPELLING_WARNING
 
 
-def test_the_intended_spelling_is_refused_and_points_at_the_table() -> None:
-    """A caller who writes ``SALVAGE`` is writing a keyword the table does not hold."""
-    with pytest.raises(UnknownKeywordError, match='The table spells it "xSALVAGE"'):
+def test_the_intended_spelling_is_a_fire_model_keyword_not_a_top_level_one() -> None:
+    """``SALVAGE`` is real, but only inside ``FMIN``; the top-level table spells it ``xSALVAGE``.
+
+    The refusal names the context rather than the table's defect, because the defect is not the
+    reason here: FVS holds both spellings, in two different tables, and the caller needs to know
+    which one they are in.
+    """
+    with pytest.raises(KeywordOrderError, match="only between FMIN"):
         validate_keyword(Keyword("SALVAGE"))
+    assert validate_keyword(Keyword("FMIN", nested=(Keyword("SALVAGE", ("1",)),))) == []
 
 
 def test_a_case_difference_is_refused_and_points_at_the_table() -> None:
@@ -241,9 +248,9 @@ def test_a_block_line_is_written_whole_rather_than_as_a_field() -> None:
 def test_every_line_block_is_accepted() -> None:
     """Each name in ``LINES_KEYWORDS`` takes lines, and each is a keyword FVS reads.
 
-    The set has grown by discovery rather than by design: ``FMIN`` in ``P17``, because the fuels
-    and potfire options live inside it, and ``MISTOE`` in ``P26``, because the dwarf-mistletoe
-    options do.
+    The set has grown by discovery rather than by design: ``MISTOE`` in ``P26``, because the
+    dwarf-mistletoe options live inside it, and ``RDIN`` in ``P33``. ``FMIN`` left the set in
+    ``P50``: its body is keywords, and raw lines let a mis-spaced field be read as another number.
     """
     for name in sorted(LINES_KEYWORDS):
         assert validate_keyword(Keyword(name, lines=("x",))) == []
@@ -413,3 +420,63 @@ def test_a_supplemental_record_on_another_keyword_is_refused() -> None:
     """Only the keywords that read a second record may carry one, and the refusal names them."""
     with pytest.raises(UnsupportedKeywordError, match="does not take a supplemental record"):
         validate_keyword(Keyword("THINBA", ("1", "20"), supplemental=("1",)))
+
+
+def test_the_fire_model_block_renders_its_keywords_with_fvs_fields() -> None:
+    """``FMIN`` holds keywords, and each is written in FVS's ten-column fields.
+
+    A hand-spaced line is the failure this prevents: ``SNAGCLAS  0.0   10.0  20.0`` reads as
+    ``CLASS 2= 20.0`` rather than ``10.0``, and FVS reports no error for it.
+    """
+    block = Keyword(
+        "FMIN",
+        nested=(
+            Keyword("SNAGCLAS", ("0.0", "10.0", "20.0", "40.0")),
+            Keyword("CARBREPT", ("2",)),
+        ),
+    )
+    assert render_keyword(block) == (
+        "FMIN\nSNAGCLAS  0.0       10.0      20.0      40.0\nCARBREPT  2\nEND\n"
+    )
+
+
+def test_a_fire_model_keyword_outside_the_block_is_refused() -> None:
+    """FVS reads these only between ``FMIN`` and its ``END``, so a loose one is a silent no-op."""
+    with pytest.raises(KeywordOrderError, match="only between FMIN"):
+        validate_keyword(Keyword("SNAGOUT", ("1",)))
+
+
+def test_the_fire_model_block_refuses_a_name_fvs_does_not_hold() -> None:
+    """The block's body is checked against ``fmin.f``'s own table, not against the top-level one."""
+    with pytest.raises(UnknownKeywordError, match="not a fire-model keyword"):
+        validate_keyword(Keyword("FMIN", nested=(Keyword("SNAGOUTT", ("1",)),)))
+
+
+def test_the_fire_model_block_refuses_lines_and_nesting() -> None:
+    """None of the fire-model keywords takes a block, so one that does is a mistake."""
+    with pytest.raises(UnsupportedKeywordError, match="takes one record"):
+        validate_keyword(Keyword("FMIN", nested=(Keyword("SNAGOUT", lines=("x",)),)))
+
+
+def test_two_fire_model_keywords_take_a_supplemental_record() -> None:
+    """``FUELMODL`` reads two more numbers and ``DEFULMOD`` seven fuel-model names."""
+    block = Keyword(
+        "FMIN",
+        nested=(
+            Keyword("DEFULMOD", ("1",), supplemental=("F1", "F2", "F3", "F4", "F5", "F6", "F7")),
+        ),
+    )
+    assert "F7" in render_keyword(block)
+
+
+def test_a_fire_model_keyword_with_a_supplemental_record_it_does_not_take_is_refused() -> None:
+    """``SNAGOUT`` reads one record, so a second one would be read as the next keyword."""
+    with pytest.raises(UnsupportedKeywordError, match="takes no supplemental record"):
+        validate_keyword(Keyword("FMIN", nested=(Keyword("SNAGOUT", ("1",), supplemental=("2",)),)))
+
+
+def test_the_block_holds_every_fire_model_keyword_fvs_declares() -> None:
+    """The table is FVS's own, so a keyword it reads cannot be missing from the set."""
+    assert len(FMIN_KEYWORDS) == 55
+    for name in ("SNAGCLAS", "SNAGOUT", "SNAGSUM", "DWDVLOUT", "DWDCVOUT", "FUELOUT", "CARBREPT"):
+        assert name in FMIN_KEYWORDS

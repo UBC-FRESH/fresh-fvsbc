@@ -7,6 +7,12 @@ mentions it is the writer, and the writer's call sites are counted with `grep -r
 
 **Counts, after `P34`: 31 exposed, 8 with a writer and a call site, 5 with a writer and no call site, and 0 without a writer.**
 
+**And, after `P49` and `P50`, nine of the exposed tables are checked against FVS's own writer** by
+`scripts/oracle_compare.py`: `FVS_Carbon_Metric`, `FVS_Down_Wood_Cov_Metric`,
+`FVS_Down_Wood_Vol_Metric`, `FVS_Hrv_Carbon`, `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`,
+`FVS_StrClass_Metric`, `FVS_Summary_Metric` and `FVS_TreeList_Metric` all match the standalone value for
+value. `FVS_InvReference` is exposed and no run of this package writes it.
+
 ## The correction this sweep forced
 
 `P18` recorded that the dwarf-mistletoe and root-disease writers **do not exist in this source**. That was

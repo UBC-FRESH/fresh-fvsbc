@@ -51,7 +51,9 @@ __all__ = [
     "BLANK_SLOTS",
     "BLOCK_KEYWORDS",
     "FIELD_WIDTH",
+    "FMIN_KEYWORDS",
     "KEYWORDS",
+    "KEYWORD_BLOCK_KEYWORDS",
     "KEYWORD_TABLE",
     "LINES_KEYWORDS",
     "MISSPELLED_KEYWORD",
@@ -265,7 +267,7 @@ RECORD_KEYWORDS: frozenset[str] = frozenset({"STDIDENT", "TREEFMT"})
 #: lines, and the writer supplies the terminator, because a block without one swallows the rest of
 #: the file.
 LINES_KEYWORDS: frozenset[str] = frozenset(
-    {"COMMENT", "COMPUTE", "DATABASE", "ESTAB", "FMIN", "MISTOE", "RDIN"}
+    {"COMMENT", "COMPUTE", "DATABASE", "ESTAB", "MISTOE", "RDIN"}
 )
 
 #: The keywords whose block holds **other keywords** rather than lines: ``IF`` opens a conditional
@@ -276,12 +278,80 @@ LINES_KEYWORDS: frozenset[str] = frozenset(
 #: the units of its residual-density target. ``cuts.f`` reads ``PRMS(1..6)`` from the six post-year
 #: fields, which leaves ``QFATAR = INT(PRMS(7))`` for the supplemental record's value; the keyword
 #: guide says the same.
-SUPPLEMENTAL_KEYWORDS: frozenset[str] = frozenset({"THINQFA"})
+SUPPLEMENTAL_KEYWORDS: frozenset[str] = frozenset({"THINQFA", "FUELMODL", "DEFULMOD"})
 
 NESTED_KEYWORDS: frozenset[str] = frozenset({"IF"})
 
+#: The fire-model keywords ``FMIN`` reads, from ``metric/fire/base/fmin.f``'s own table. They are
+#: **not** top-level keywords: FVS accepts them only between ``FMIN`` and its ``END``, so the
+#: validator refuses one that stands alone rather than writing a record FVS would ignore.
+FMIN_KEYWORDS: frozenset[str] = frozenset(
+    {
+        "BURNREPT",
+        "CANCALC",
+        "CANFPROF",
+        "CARBCALC",
+        "CARBCUT",
+        "CARBREPT",
+        "CFIMCALC",
+        "DEFULMOD",
+        "DROUGHT",
+        "DUFFPROD",
+        "DWDCVOUT",
+        "DWDVLOUT",
+        "FIRECALC",
+        "FLAMEADJ",
+        "FMODLIST",
+        "FMORTMLT",
+        "FUELDCAY",
+        "FUELFOTO",
+        "FUELINIT",
+        "FUELMODL",
+        "FUELMOVE",
+        "FUELMULT",
+        "FUELOUT",
+        "FUELPOOL",
+        "FUELREPT",
+        "FUELSOFT",
+        "FUELTRET",
+        "LANDOUT",
+        "MOISTURE",
+        "MOREOUT",
+        "MORTCLAS",
+        "MORTREPT",
+        "PILEBURN",
+        "POTFIRE",
+        "POTFMOIS",
+        "POTFPAB",
+        "POTFSEAS",
+        "POTFTEMP",
+        "POTFWIND",
+        "SALVAGE",
+        "SALVSP",
+        "SIMFIRE",
+        "SNAGBRK",
+        "SNAGCLAS",
+        "SNAGDCAY",
+        "SNAGFALL",
+        "SNAGINIT",
+        "SNAGOUT",
+        "SNAGPBN",
+        "SNAGPSFT",
+        "SNAGSUM",
+        "SOILHEAT",
+        "STATFUEL",
+        "SVIMAGES",
+        "USECFIM",
+    }
+)
+
+#: The block keywords whose body holds **other keywords** and is closed by ``END``. ``FMIN`` is the
+#: one in this variant; its body is rendered with the same writer as any other keyword, so a
+#: parameter is padded to FVS's ten-column field rather than hand-spaced.
+KEYWORD_BLOCK_KEYWORDS: frozenset[str] = frozenset({"FMIN"})
+
 #: Every keyword that takes a block of some kind.
-BLOCK_KEYWORDS: frozenset[str] = LINES_KEYWORDS | NESTED_KEYWORDS
+BLOCK_KEYWORDS: frozenset[str] = LINES_KEYWORDS | NESTED_KEYWORDS | KEYWORD_BLOCK_KEYWORDS
 
 #: The keywords that start a stand's setup. A ``DATABASE`` block must precede the first of them:
 #: FVS refuses it later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, which is
@@ -394,6 +464,10 @@ def _validate_supplemental(keyword: Keyword) -> None:
             f'"{keyword.name}" reads exactly one supplemental record, and this set gives '
             f"{len(keyword.supplemental)}: without it FVS reads the next keyword as that record"
         )
+    if keyword.name in FMIN_KEYWORDS:
+        # ``FUELMODL`` reads two more numbers and ``DEFULMOD`` seven fuel-model names, and FVS
+        # parses both itself; only ``THINQFA``'s record has to be one of a fixed set of codes.
+        return
     record = keyword.supplemental[0]
     if record not in THINQFA_UNITS:
         allowed = ", ".join(f"{code} ({meaning})" for code, meaning in THINQFA_UNITS.items())
@@ -422,10 +496,12 @@ def validate_keyword(keyword: Keyword) -> list[str]:
         If the name is not in the table. The message names the keyword, and names the table's
         spelling when the name is a near miss.
     """
-    if (keyword.nested or keyword.otherwise) and keyword.name not in NESTED_KEYWORDS:
+    if (keyword.nested or keyword.otherwise) and (
+        keyword.name not in NESTED_KEYWORDS | KEYWORD_BLOCK_KEYWORDS
+    ):
         raise UnsupportedKeywordError(
             f'"{keyword.name}" does not take nested keywords; only '
-            f"{', '.join(sorted(NESTED_KEYWORDS))} does"
+            f"{', '.join(sorted(NESTED_KEYWORDS | KEYWORD_BLOCK_KEYWORDS))} does"
         )
     if keyword.lines and keyword.name not in LINES_KEYWORDS | NESTED_KEYWORDS:
         raise UnsupportedKeywordError(
@@ -439,6 +515,11 @@ def validate_keyword(keyword: Keyword) -> list[str]:
         )
     if keyword.name in SUPPLEMENTAL_KEYWORDS:
         _validate_supplemental(keyword)
+    if keyword.name in FMIN_KEYWORDS:
+        raise KeywordOrderError(
+            f'"{keyword.name}" is a fire-model keyword, and FVS reads it only between FMIN and '
+            "its END; put it in the block's nested keywords"
+        )
     if keyword.name not in KEYWORDS and keyword.name not in SPECIAL_KEYWORDS:
         near = _near_miss(keyword.name)
         hint = f' The table spells it "{near}".' if near is not None else ""
@@ -450,9 +531,59 @@ def validate_keyword(keyword: Keyword) -> list[str]:
     if keyword.name in NESTED_KEYWORDS:
         warnings.extend(validate_keywords(keyword.nested))
         warnings.extend(validate_keywords(keyword.otherwise))
+    if keyword.name in KEYWORD_BLOCK_KEYWORDS:
+        warnings.extend(_validate_fire_model_body(keyword.nested))
     if keyword.name == MISSPELLED_KEYWORD:
         warnings.append(MISSPELLING_WARNING)
     return warnings
+
+
+def _validate_fire_model_body(entries: Sequence[Keyword]) -> list[str]:
+    """Validate the keywords inside an ``FMIN`` block.
+
+    Parameters
+    ----------
+    entries : Sequence of Keyword
+        The block's body, in the order FVS reads it.
+
+    Returns
+    -------
+    list of str
+        Every warning the body raises. The fire-model keywords carry none of their own.
+
+    Raises
+    ------
+    UnknownKeywordError
+        On a name that is not in ``fmin.f``'s table. The message names the table's spelling when
+        the name is a near miss.
+    UnsupportedKeywordError
+        On a fire-model keyword given lines or a nested block, which none of them take.
+    KeywordWidthError
+        On a parameter wider than FVS's ten-column field.
+    """
+    for entry in entries:
+        if entry.name not in FMIN_KEYWORDS:
+            near = _near_miss(entry.name)
+            hint = f' The table spells it "{near}".' if near is not None else ""
+            raise UnknownKeywordError(
+                f'"{entry.name}" is not a fire-model keyword.{hint} An FMIN block holds only the '
+                f"keywords fmin.f reads, and {len(FMIN_KEYWORDS)} are known"
+            )
+        if entry.lines or entry.nested or entry.otherwise:
+            raise UnsupportedKeywordError(
+                f'"{entry.name}" takes one record inside FMIN, and none of them takes lines or a '
+                "nested block"
+            )
+        if entry.supplemental and entry.name not in SUPPLEMENTAL_KEYWORDS:
+            raise UnsupportedKeywordError(
+                f'"{entry.name}" takes no supplemental record; only '
+                f"{', '.join(sorted(SUPPLEMENTAL_KEYWORDS & FMIN_KEYWORDS))} do"
+            )
+        if entry.supplemental:
+            _validate_supplemental(entry)
+        for parameter in entry.parameters:
+            _check_width(entry.name, parameter)
+    return []
 
 
 def validate_keywords(keywords: Sequence[Keyword]) -> list[str]:
@@ -551,6 +682,8 @@ def render_keyword(keyword: Keyword) -> str:
         return head + lines + "THEN\n" + body + otherwise + "ENDIF\n"
     if keyword.name in LINES_KEYWORDS:
         return head + "".join(f"{line}\n" for line in keyword.lines) + "END\n"
+    if keyword.name in KEYWORD_BLOCK_KEYWORDS:
+        return head + "".join(render_keyword(entry) for entry in keyword.nested) + "END\n"
     if keyword.supplemental:
         return head + "".join(f"{record}\n" for record in keyword.supplemental)
     return head

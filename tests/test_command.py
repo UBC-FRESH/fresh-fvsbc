@@ -365,7 +365,7 @@ def test_a_block_for_a_keyword_that_takes_no_lines_exits_two(
         ]
     )
     assert code == cli.EXIT_BAD_INPUT
-    assert "does not take a block of lines" in capsys.readouterr().err
+    assert "does not take a block" in capsys.readouterr().err
 
 
 def test_the_two_options_keep_their_relative_order(
@@ -509,3 +509,12 @@ def test_the_documented_entry_point_exits_one_without_the_extension(tmp_path: Pa
     assert finished.returncode == cli.EXIT_FAILED_RUN
     assert "the run failed" in finished.stderr
     assert "pyfvs is not importable" in finished.stderr
+
+
+def test_a_fire_model_block_parses_its_entries_as_keywords() -> None:
+    """``FMIN`` holds keywords, so each ``|`` is parsed as one and the writer spaces its fields."""
+    keyword = cli._parse_block("FMIN|SNAGCLAS=0.0,10.0,20.0,40.0|CARBREPT=2")
+    assert keyword.name == "FMIN"
+    assert keyword.lines == ()
+    assert [entry.name for entry in keyword.nested] == ["SNAGCLAS", "CARBREPT"]
+    assert keyword.nested[0].parameters == ("0.0", "10.0", "20.0", "40.0")
