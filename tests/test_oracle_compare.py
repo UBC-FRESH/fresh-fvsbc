@@ -358,11 +358,9 @@ def test_an_explanation_that_is_no_longer_needed_is_stale(tmp_path: Path) -> Non
 def test_a_table_that_is_not_comparable_says_why(tmp_path: Path) -> None:
     """A table only one side writes is not a pass, and the reason is on the record."""
     ours = _database(tmp_path / "ours.db", {"FVS_Cases": [("c1",)]})
-    theirs = _database(
-        tmp_path / "theirs.db", {"FVS_Cases": [("c1",)], "FVS_InvReference": [("c1",)]}
-    )
+    theirs = _database(tmp_path / "theirs.db", {"FVS_Cases": [("c1",)], "FVS_Error": [("c1",)]})
     statuses = {result.table: result.status for result in oc.compare(ours, theirs)}
-    assert statuses["FVS_InvReference"] == "not comparable"
+    assert statuses["FVS_Error"] == "not comparable"
 
 
 def test_the_stand_row_leaves_the_inventory_year_to_the_runs_own_keyword() -> None:

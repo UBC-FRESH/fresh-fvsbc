@@ -33,6 +33,12 @@ The recipe is **two patch sets**, applied at two roots:
 1. `notes/reference/pyfvs-patchset.diff.gz` at the PyFVS checkout, for ADR 0004's items 1 and 2.
 2. `notes/reference/fvsbc-patchset.diff.gz` inside its FVS source submodule, for items 3 to 12.
 
+The PyFVS patch set carries a third change, added in `0.18.0`: **`src/api/fvs_step.f90` gains the
+`CALL DBSREFERENCE` that `fvs.f` makes immediately after `CALL STATS`.** The file is an extraction of
+`fvs.f`'s initialisation and had omitted it, so the extension never wrote `FVS_InvReference`. The
+original `fvs_` is dead code in the extension, which is why the omission was invisible: the writer was
+compiled, linked, and never called. `notes/triage.md` carries the evidence.
+
 ```bash
 git clone https://github.com/UBC-FRESH/PyFVS.git
 git -C PyFVS checkout e95172b

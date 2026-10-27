@@ -91,6 +91,29 @@ says which review changed it.
   year is still zero when the block is read — which is why the defect has gone unnoticed upstream. The
   validator now warns, and with the block first the four fire tables are written and **agree with the
   standalone value for value**.
+- **`FVS_InvReference` was never written, and the cause is found and fixed.** The extension is driven
+  by PyFVS's `src/api/fvs_step.f90`, an **extraction** of `fvs.f`'s initialisation — the file says so in
+  its own header. It calls `STATS` and **omitted `DBSREFERENCE`**, and the original `fvs_` is dead code
+  in the extension, so the writer was compiled in and never called. `objdump` showed the call inside
+  `fvs_` and I read that as proof it ran; the call graph is what settled it — nothing calls `fvs_`, and
+  `dbsreference_`'s only caller is `fvs_`. The build recipe's PyFVS patch set now carries the missing
+  call, verified from a clean clone of the pin: apply both patch sets, build, and `FVS_InvReference`
+  appears with 15 rows and **matches a standalone `FVSbc` value for value**.
+- **The fire-model keywords were unvalidated, and that is fixed.** `P50` found that `FMIN`'s body was
+  written as **raw lines**, so a caller spaced the fields by hand. A mis-spaced line is not refused —
+  `SNAGCLAS  0.0   10.0  20.0  40.0` reaches FVS as class 2 `20.0` and class 3 `0.0`, with no error.
+  The block now holds **keywords**, written by the same writer as everything else and checked against
+  `fmin.f`'s own fifty-five, and a fire-model keyword outside the block is refused. That is what made
+  the snag, down-wood and carbon tables reachable: **eight of nine comparable tables now match**.
+- **The fuels and potfire tables vanish if the `FMIN` block follows `INVYEAR`, and that is fixed.**
+  `FUELOUT` and `POTFIRE` set `IFLALB` and `IPFLMB` to `IY(1)` when they are read, and `fmdout.f` and
+  `fmpofl.f` treat **any positive value as "suppress this report"**. Read after `INVYEAR`, they switch
+  their own reports off: the run succeeds, `FVS_Fuels_Metric`, `FVS_PotFire_Metric` and
+  `FVS_PotFire_Cond_Metric` are simply absent, and nothing says so. **The official case never hits it**
+  because its inventory year comes from the input database rather than an `INVYEAR` keyword, so the
+  year is still zero when the block is read — which is why the defect has gone unnoticed upstream. The
+  validator now warns, and with the block first the four fire tables are written and **agree with the
+  standalone value for value**.
 - **`FVS_InvReference` is written by the standalone on every run and never by this package's build.**
   It is the one exposed table no run of this package produces. `P61` narrowed it as far as observation
   from outside the binary allows:
