@@ -12,7 +12,7 @@ tests in the same change set, and the gates configured in ``pyproject.toml`` cov
 
 from __future__ import annotations
 
-__version__ = "0.15.1"
+__version__ = "0.16.0"
 
 from fresh_fvsbc.keywords import (
     Keyword,
