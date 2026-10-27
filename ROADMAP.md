@@ -68,7 +68,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P57 Release 0.16.1 | #244 | `feature/p57-release-0-16-1` | complete |
 | P58 Oracle coverage | #248 | `feature/p58-oracle-coverage` | complete |
 | P59 The site-prep difference | #252 | `feature/p59-siteprep-attribution` | complete |
-| P60 Release 0.17.0 | #256 | `feature/p60-release-0-17-0` | active |
+| P60 Release 0.17.0 | #256 | `feature/p60-release-0-17-0` | complete |
 
 ## Lifecycle Map
 
@@ -1452,14 +1452,14 @@ Acceptance criteria:
 
 Parent issue: #256
 Branch: `feature/p60-release-0-17-0`
-Status: active
+Status: complete
 
 Goal: release `0.17.0`, because the lab needs the table recipes where it will find them.
 
-- [ ] P60.1 Version, recipes and notes for 0.17.0 (#257)
-  - [ ] A reference page carrying the recipe for every table.
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.16.1", with what is checked and what is not.
+- [x] P60.1 Version, recipes and notes for 0.17.0 (#257)
+  - [x] A reference page carrying the recipe for every table.
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.16.1", with what is checked and what is not.
 
 Acceptance criteria:
 
