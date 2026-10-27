@@ -48,6 +48,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P37 The web front end | #163 | `feature/p37-web-design` | complete |
 | P38 The web surface, first cut | #167 | `feature/p38-web-first-cut` | complete |
 | P39 A real BC case, and what it broke | #171 | `feature/p39-real-case` | complete |
+| P40 Release 0.12.0 | #175 | `feature/p40-release-0-12-0` | active |
 
 ## Lifecycle Map
 
@@ -1022,6 +1023,27 @@ Acceptance criteria:
 - A real 999-tree BC stand runs through the web surface and writes 7 tables, including 3996 per-tree rows.
 - The 1540-tree stand is refused by name, is visible as `failed`, and its log explains why.
 - A run started through the API can ask for output tables, in the order the contract requires.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 40: Release 0.12.0
+
+Parent issue: #175
+Branch: `feature/p40-release-0-12-0`
+Status: active
+
+Goal: release `0.12.0`, because `main` carries a whole new surface, verified against a real BC stand.
+
+- [ ] P40.1 Version and notes for 0.12.0 (#176)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.11.0".
+  - [ ] Add the 999-tree limit and the missing authentication to the known gaps, and renumber.
+  - [ ] Add the surface's verification to what is verified.
+
+Acceptance criteria:
+
+- The package reports `0.12.0`, and the notes say what changed and what remains.
+- A clean checkout installs the web extra, serves a run, and reads its tables through the API.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
