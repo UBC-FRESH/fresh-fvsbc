@@ -1,10 +1,32 @@
-# fresh-fvsbc 0.12.0
+# fresh-fvsbc 0.13.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.12.0
+
+- **`THINQFA` is usable.** The keyword reads **one supplemental record** whose first column names the units
+  of its residual-density target — `0` basal area per acre, `1` trees per acre, `2` stand density index —
+  and the wrapper could not write it. The command now takes it after a semicolon:
+  `--keyword THINQFA=1,0,24,0,1.4,2,100;1`. **A set without the record is refused rather than written**,
+  because FVS would read the next keyword as the units record and the run would be wrong without saying so.
+  The source is what settles it: `cuts.f` reads `PRMS(1..6)` from the six fields after the year, which
+  leaves `QFATAR = INT(PRMS(7))` for that record.
+- **The service works behind the JupyterHub proxy.** The dev container is **pre-authenticated** — JupyterHub
+  authenticates the browser and forwards a local port under
+  `/jupyterhub32/user/<name>/codeserver/proxy/<port>/` — so the service must bind off loopback and answer
+  **under the prefix**. A middleware strips the prefix when the request carries it, which is what JupyterHub
+  does, and leaves a request that does not alone. Verified live on `0.0.0.0`: both forms 200, the assets
+  200, the container's own address 200. **Two wrong answers preceded it**: FastAPI's deprecated `root_path`
+  answered both forms, and uvicorn's `root_path` answered neither.
+- **`scripts/oracle_compare.py`**, a first cut at checking a run against the standalone `FVSbc`. It renders a
+  standalone-runnable keyword file from a run directory, runs the binary and compares every exposed table.
+  **The tree handoff is unfinished**: the standalone reads inline `TREEDATA` records as keywords and writes
+  1001 `FVS_Error` rows, where the official case feeds trees through a `DATABASE ... DSNin ... TreeSQL`
+  block. The triage records it.
 
 ## What changed since 0.11.0
 
@@ -262,8 +284,11 @@ it.
    tree number, so the writer has three digits. A stand of 1540 trees — which the 2022 workshop's own case
    carries in one plot — is refused by name. Subdividing a stand into plots changes what the statistics
    mean, so it is a modelling decision and not a repair.
-3. **The web surface has no authentication.** It binds `127.0.0.1` and refuses anything else without
-   `--allow-remote`. That refusal is the security decision until there is an auth story.
+3. **The web surface has no authentication of its own, by design.** The dev container supplies it: the
+   JupyterHub port proxy authenticates the browser, so the service is deployed with
+   `--host 0.0.0.0 --allow-remote --root-path <proxy prefix>` and the proxy is what guards it. The service
+   still refuses a non-loopback bind without `--allow-remote`, and its message says why. **This is a
+   deployment assumption, not a defect** — reopened if the service is ever bound where no proxy fronts it.
 4. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
 5. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
