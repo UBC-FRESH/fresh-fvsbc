@@ -59,7 +59,8 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P48 Release 0.14.0 | #208 | `feature/p48-release-0-14-0` | complete |
 | P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | complete |
 | P50 The fire-model block | #216 | `feature/p50-fire-model-block` | complete |
-| P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | active |
+| P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | complete |
+| P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | active |
 
 ## Lifecycle Map
 
@@ -1284,6 +1285,24 @@ Acceptance criteria:
 - The package reports `0.15.0`, and the notes lead with the breaking change.
 - A clean checkout builds an `FMIN` block from keywords and the snag, down-wood and carbon tables appear.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 52: A refusal is reported
+
+Parent issue: #223
+Branch: `feature/p52-refusal-is-reported`
+Status: active
+
+Goal: report a refused keyword set instead of raising through the command line.
+
+- [ ] P52.1 A refused set is a reported error (#224)
+  - [ ] `KeywordOrderError` joins the input errors the command reports.
+  - [ ] A test for each order refusal.
+
+Acceptance criteria:
+
+- A `DATABASE` block after the stand exits `2` with the validator's message.
+- A fire-model keyword outside its block does the same.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
