@@ -31,6 +31,17 @@ says which review changed it.
 
 ## Found, and not yet fixed
 
+- **The oracle comparison's differences are unattributed, and one cause was mine.** Chasing the
+  `PLOT COUNT= 1` warning found that **the test case was inconsistent**, not the harness: the population is
+  one stand, so the tree list has **one** plot, while `DESIGN` named five. A consistent case still reports
+  0 of 5 tables agreeing, so the remaining candidates are the source drift (pin against upstream `28fda8ed`)
+  and whatever else the two builds do differently. **Reopened by attributing them.**
+- **A run that logs nothing was reported as failed, and that is fixed.** FVS writes `FVS_Error` only when
+  it has something to log; the reader treated an absent table as a failure to read, on the stated premise
+  that the extension wrote it on every run. A 999-tree single-plot case disproved the premise: FVS logged
+  nothing, wrote no table, and the package reported a good run as failed. `read_errors` now answers an
+  absent table with an empty frame of its columns, so silence reads as a clean run.
+
 - **The standalone oracle comparison is not finished, and the mechanism is now mapped.** The prebuilt
   `FVSbc` from upstream `28fda8ed` runs and writes a database, but it does not read the tree records the way
   `scripts/oracle_compare.py` writes them. What `P45` established:

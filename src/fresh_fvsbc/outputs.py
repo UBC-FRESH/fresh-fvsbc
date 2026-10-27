@@ -42,6 +42,7 @@ import pandas as pd
 __all__ = [
     "CASES_COLUMNS",
     "DATABASE_TABLES",
+    "ERROR_COLUMNS",
     "EXPOSED_TABLES",
     "IDENTITY_COLUMN",
     "ORACLE_TABLES",
@@ -131,7 +132,11 @@ IDENTITY_COLUMN: str = "CaseID"
 
 #: The tables this reader exposes. Contract rule 3: a table it has not tested is not in the API, and
 #: these two are the ones a run through the FFI is known to write.
-# #: The exposed tables checked against FVS's own database dump, as ``tests/test_oracle.py``
+# #: The columns ``FVS_Error`` carries, so an absent table can still be answered with a frame of the
+#: right shape rather than one a caller has to special-case.
+ERROR_COLUMNS: tuple[str, ...] = ("CaseID", "StandID", "Message")
+
+#: The exposed tables checked against FVS's own database dump, as ``tests/test_oracle.py``
 # compares it.
 # #: **Everything else is not checked against an independent source**: the reader proves the table
 # exists
@@ -286,6 +291,12 @@ def read_cases(db_path: str | Path) -> pd.DataFrame:
 def read_errors(db_path: str | Path) -> pd.DataFrame:
     """Read ``FVS_Error``, which holds messages of more than one severity.
 
+    **FVS writes the table only when it has something to log.** A run that raises no warning and
+    no error has no such table, and that is a clean run rather than a failure to read: this returns
+    an empty frame with the table's columns instead of raising. An earlier revision treated the
+    absent table as a failure, on the stated premise that the extension writes it on every run; a
+    999-tree single-plot case disproved that premise, and it reported a good run as failed.
+
     Parameters
     ----------
     db_path : str or Path
@@ -295,9 +306,12 @@ def read_errors(db_path: str | Path) -> pd.DataFrame:
     -------
     pandas.DataFrame
         Every row, errors and warnings together. Use :func:`errors_in` and :func:`warnings_in` to
-        separate them.
+        separate them. Empty when the run logged nothing.
     """
-    return read_table(db_path, "FVS_Error")
+    try:
+        return read_table(db_path, "FVS_Error")
+    except UnknownTableError:
+        return pd.DataFrame(columns=list(ERROR_COLUMNS))
 
 
 def _rows_of_severity(table: pd.DataFrame, severity: Severity) -> pd.DataFrame:

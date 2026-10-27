@@ -264,3 +264,22 @@ def test_a_run_with_no_database_cannot_be_checked(tmp_path: Path) -> None:
     """Checking a run that produced no database is the rule 1 failure, not a clean result."""
     with pytest.raises(MissingOutputError):
         check_run(tmp_path / "absent.db")
+
+
+def test_a_run_that_logged_nothing_has_no_error_rows(tmp_path: Path) -> None:
+    """FVS writes ``FVS_Error`` only when it has something to log, and silence is a clean run.
+
+    A 999-tree single-plot case raises no warning, so FVS writes no such table. Treating that as a
+    failure to read reported a perfectly good run as failed, which is what this test pins.
+    """
+    path = tmp_path / "quiet.db"
+    connection = sqlite3.connect(path)
+    try:
+        connection.execute("create table FVS_Cases (CaseID text, StandID text)")
+        connection.commit()
+    finally:
+        connection.close()
+
+    table = read_errors(path)
+    assert table.empty
+    assert list(table.columns) == ["CaseID", "StandID", "Message"]

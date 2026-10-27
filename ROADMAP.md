@@ -55,6 +55,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P44 Release 0.13.0 | #192 | `feature/p44-release-0-13-0` | complete |
 | P45 The tree handoff, mapped | #196 | `feature/p45-tree-handoff` | complete |
 | P46 The DSNin tree handoff | #200 | `feature/p46-dsnin` | complete |
+| P47 A quiet run | #204 | `feature/p47-quiet-run` | active |
 
 ## Lifecycle Map
 
@@ -1174,6 +1175,25 @@ Acceptance criteria:
 - The standalone reads every tree and writes the per-tree table.
 - The harness compares without treating a logged error as fatal.
 - The triage records that the differences are not yet attributed.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 47: A quiet run
+
+Parent issue: #204
+Branch: `feature/p47-quiet-run`
+Status: active
+
+Goal: stop reporting a run as failed when FVS simply had nothing to log.
+
+- [ ] P47.1 A run that logs nothing is not a failed run (#205)
+  - [ ] `read_errors` answers an absent `FVS_Error` with an empty frame.
+  - [ ] `ERROR_COLUMNS` names its columns.
+  - [ ] The contract page stops claiming the table is written on every run.
+
+Acceptance criteria:
+
+- A database without `FVS_Error` reads as no errors, with the table's columns.
+- The contract page says why, and names the case that disproved the old claim.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
