@@ -60,7 +60,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | complete |
 | P50 The fire-model block | #216 | `feature/p50-fire-model-block` | complete |
 | P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | complete |
-| P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | active |
+| P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | complete |
 
 ## Lifecycle Map
 
@@ -1291,13 +1291,13 @@ Acceptance criteria:
 
 Parent issue: #223
 Branch: `feature/p52-refusal-is-reported`
-Status: active
+Status: complete
 
 Goal: report a refused keyword set instead of raising through the command line.
 
-- [ ] P52.1 A refused set is a reported error (#224)
-  - [ ] `KeywordOrderError` joins the input errors the command reports.
-  - [ ] A test for each order refusal.
+- [x] P52.1 A refused set is a reported error (#224)
+  - [x] `KeywordOrderError` joins the input errors the command reports.
+  - [x] A test for each order refusal.
 
 Acceptance criteria:
 
