@@ -61,7 +61,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P50 The fire-model block | #216 | `feature/p50-fire-model-block` | complete |
 | P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | complete |
 | P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | complete |
-| P53 Release 0.15.1 | #228 | `feature/p53-release-0-15-1` | active |
+| P53 Release 0.15.1 | #228 | `feature/p53-release-0-15-1` | complete |
 
 ## Lifecycle Map
 
@@ -1310,14 +1310,14 @@ Acceptance criteria:
 
 Parent issue: #228
 Branch: `feature/p53-release-0-15-1`
-Status: active
+Status: complete
 
 Goal: release `0.15.1`, because `0.15.0` is published with a defect in it.
 
-- [ ] P53.1 Version and notes for 0.15.1 (#229)
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.15.0", leading with the fix.
-  - [ ] Verify both refusals from a clean checkout: a message and exit `2`.
+- [x] P53.1 Version and notes for 0.15.1 (#229)
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.15.0", leading with the fix.
+  - [x] Verify both refusals from a clean checkout: a message and exit `2`.
 
 Acceptance criteria:
 
