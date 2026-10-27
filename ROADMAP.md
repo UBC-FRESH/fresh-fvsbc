@@ -57,6 +57,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P46 The DSNin tree handoff | #200 | `feature/p46-dsnin` | complete |
 | P47 A quiet run | #204 | `feature/p47-quiet-run` | complete |
 | P48 Release 0.14.0 | #208 | `feature/p48-release-0-14-0` | complete |
+| P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | active |
 
 ## Lifecycle Map
 
@@ -1215,6 +1216,28 @@ Acceptance criteria:
 - The package reports `0.14.0`, and the notes say what changed and what remains.
 - A clean checkout runs a quiet stand and does not report it as failed.
 - The published documentation matches the source at the tag.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 49: The oracle, attributed
+
+Parent issue: #212
+Branch: `feature/p49-oracle-attributed`
+Status: active
+
+Goal: finish the standalone comparison so it is an oracle — it reports what agrees, explains what it
+can, and fails on anything it cannot.
+
+- [ ] P49.1 The comparison says what it means (#213)
+  - [ ] The output `DATABASE` block opens before the input block.
+  - [ ] `tree_num` is read with the blanks ignored, as Fortran reads it.
+  - [ ] Run-identity columns are not compared.
+  - [ ] An unexplained difference fails, and a stale explanation is reported.
+
+Acceptance criteria:
+
+- A run's `FVS_Summary_Metric` and `FVS_TreeList_Metric` match the standalone's value for value.
+- The run-identity columns cannot make a table differ.
+- An unexplained difference fails the comparison, and an explanation that stops applying is reported.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

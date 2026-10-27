@@ -97,7 +97,11 @@ Contract rules
    `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`, `FVS_Stats_Species_Metric`, `FVS_Stats_Stand`,
    `FVS_StrClass_Metric`,
    `FVS_Summary_Metric` and `FVS_TreeList_Metric`. Most are written only when a `DATABASE` block asks
-   for them, and the block must come before the stand setup — see :doc:`keywords`. Several need a
+   for them, and the block must come before the stand setup — see :doc:`keywords`. **One is exposed
+   and never written by a run of this package**: `FVS_InvReference` is produced on every run by a
+   standalone `FVSbc` built from the same source, and no run of this package produces it, for a cause
+   that is not established (`notes/triage.md`). Reading it is supported; a run that should have
+   written it is a question for the build, not for the reader. Several need a
    second trigger: the fuels, potfire and carbon tables an `FMIN` block, consumption a fire event
    (`SIMFIRE` schedules one), the per-tree tables a `TREELIST` or `CUTLIST` request, and
    `FVS_ATRTList_Metric` a **treatment** — it is the after-treatment listing, and a removal that takes

@@ -120,10 +120,11 @@ def test_a_row_count_difference_is_reported(tmp_path: Path) -> None:
 
 def test_a_table_only_one_side_wrote_is_reported(tmp_path: Path) -> None:
     """The comparison covers the union, so a table one side omitted cannot pass unnoticed."""
-    ours = _database(tmp_path / "ours.db", {"FVS_Cases": [("c1",)], "FVS_Error": [("c1",)]})
+    ours = _database(tmp_path / "ours.db", {"FVS_Cases": [("c1",)], "FVS_Compute": [("c1",)]})
     theirs = _database(tmp_path / "theirs.db", {"FVS_Cases": [("c1",)]})
-    statuses = {result.table: result.status for result in oc.compare(ours, theirs)}
-    assert statuses["FVS_Error"] == "missing"
+    results = {result.table: result for result in oc.compare(ours, theirs)}
+    assert results["FVS_Compute"].status == "differ"
+    assert "only this package wrote it" in results["FVS_Compute"].detail
 
 
 def test_an_unexposed_table_is_ignored(tmp_path: Path) -> None:
@@ -168,7 +169,7 @@ def test_a_successful_comparison_exits_zero(
 
     monkeypatch.setattr(subprocess, "run", fake_run)
     assert oc.main(["--run", str(run), "--binary", str(binary)]) == 0
-    assert "1 of 1 tables agree" in capsys.readouterr().out
+    assert "1 of 1 comparable tables agree" in capsys.readouterr().out
 
 
 def test_a_failing_standalone_is_reported(
@@ -225,9 +226,14 @@ def test_a_written_tree_list_round_trips_through_the_reader() -> None:
 
 
 def test_the_tree_id_is_read_the_way_fvs_reads_it() -> None:
-    """``tree_num`` shares its columns with the plot, and FVS reads the blanks as zeros."""
+    """``tree_num`` shares its columns with the plot, and Fortran ignores the embedded blanks.
+
+    ``BC_TREFMT`` reads ``I4`` for the plot, tabs back to column 1, then reads ``I7`` for the
+    tree, so a record for plot 1 tree 1 is the integer 11 — which is what FVS puts in its own
+    table. An earlier revision zero-filled the blanks and wrote 1001, a tree that does not exist.
+    """
     trees = oc.parse_trees("   1  1     1FD  10.0\n-999\n")
-    assert trees[0]["tree_num"] == 1001
+    assert trees[0]["tree_num"] == 11
 
 
 def test_the_terminator_is_not_a_tree() -> None:
@@ -264,7 +270,7 @@ def test_the_database_key_drops_the_inline_tree_block() -> None:
     rendered = oc.database_key(RUN_KEY, "input.db", "S1")
     assert "TREEFMT" not in rendered
     assert "TREEDATA" not in rendered
-    assert rendered.startswith("DATABASE\nDSNin\n")
+    assert "DSNin" in rendered
 
 
 def test_the_stand_record_is_read_from_the_runs_own_keywords() -> None:
@@ -281,3 +287,80 @@ def test_the_stand_record_is_read_from_the_runs_own_keywords() -> None:
     assert stand["Site_Species"] == "FD"
     assert stand["Site_Index"] == 15.0
     assert stand["Num_Plots"] == 5
+
+
+def test_the_input_block_follows_the_runs_own_output_block() -> None:
+    """The output block must open before a case begins, or FVS refuses it as a redefinition.
+
+    A stand read from an input database calls ``FORKOD`` with no location code and logs a
+    warning; logging it writes to the output database and starts the case. So an output block
+    placed after the input block is answered with ``FVS16``, ignored, and the default tables are
+    written instead.
+    """
+    key = "DATABASE\nDSNOut\nFVSOut.db\nSummary\nEND\nSTDIDENT\nS1\nPROCESS\n"
+    rendered = oc.database_key(key, "input.db", "S1")
+    assert rendered.index("DSNOut") < rendered.index("DSNin")
+    assert rendered.index("DSNin") < rendered.index("STDIDENT")
+
+
+def test_a_run_identity_column_is_not_a_difference(tmp_path: Path) -> None:
+    """``CaseID`` is minted per run, so two builds can never agree on it and it is not a result."""
+    ours = _database(tmp_path / "ours.db", {"FVS_Summary_Metric": [("case-a", 2020)]})
+    theirs = _database(tmp_path / "theirs.db", {"FVS_Summary_Metric": [("case-b", 2020)]})
+    columns = ("CaseID", "Year")
+    for path in (tmp_path / "ours.db", tmp_path / "theirs.db"):
+        connection = sqlite3.connect(path)
+        try:
+            connection.execute("alter table FVS_Summary_Metric rename to old")
+            connection.execute(f'create table FVS_Summary_Metric ("{columns[0]}", "{columns[1]}")')
+            connection.execute("insert into FVS_Summary_Metric select * from old")
+            connection.commit()
+        finally:
+            connection.close()
+    results = oc.compare(ours, theirs)
+    assert [result.status for result in results] == ["match"]
+
+
+def test_an_explained_column_is_reported_as_explained(tmp_path: Path) -> None:
+    """A difference the module already accounts for is counted apart from an unexplained one."""
+    ours = _database(tmp_path / "ours.db", {"FVS_Cases": [("S1", 1.0)]})
+    theirs = _database(tmp_path / "theirs.db", {"FVS_Cases": [("S1", -9.9)]})
+    for path in (tmp_path / "ours.db", tmp_path / "theirs.db"):
+        connection = sqlite3.connect(path)
+        try:
+            connection.execute("alter table FVS_Cases rename to old")
+            connection.execute("create table FVS_Cases (StandID, SamplingWt)")
+            connection.execute("insert into FVS_Cases select * from old")
+            connection.commit()
+        finally:
+            connection.close()
+    results = oc.compare(ours, theirs)
+    assert [result.status for result in results] == ["explained"]
+    assert "SamplingWt" in results[0].detail
+
+
+def test_an_explanation_that_is_no_longer_needed_is_stale(tmp_path: Path) -> None:
+    """An explanation that has stopped applying is an error, never a silent pass."""
+    ours = _database(tmp_path / "ours.db", {"FVS_Cases": [("S1", 1.0)]})
+    theirs = _database(tmp_path / "theirs.db", {"FVS_Cases": [("S1", 1.0)]})
+    for path in (tmp_path / "ours.db", tmp_path / "theirs.db"):
+        connection = sqlite3.connect(path)
+        try:
+            connection.execute("alter table FVS_Cases rename to old")
+            connection.execute("create table FVS_Cases (StandID, SamplingWt)")
+            connection.execute("insert into FVS_Cases select * from old")
+            connection.commit()
+        finally:
+            connection.close()
+    results = oc.compare(ours, theirs)
+    assert [result.status for result in results] == ["match", "stale"]
+
+
+def test_a_table_that_is_not_comparable_says_why(tmp_path: Path) -> None:
+    """A table only one side writes is not a pass, and the reason is on the record."""
+    ours = _database(tmp_path / "ours.db", {"FVS_Cases": [("c1",)]})
+    theirs = _database(
+        tmp_path / "theirs.db", {"FVS_Cases": [("c1",)], "FVS_InvReference": [("c1",)]}
+    )
+    statuses = {result.table: result.status for result in oc.compare(ours, theirs)}
+    assert statuses["FVS_InvReference"] == "not comparable"

@@ -31,46 +31,34 @@ says which review changed it.
 
 ## Found, and not yet fixed
 
-- **The oracle comparison's differences are unattributed, and one cause was mine.** Chasing the
-  `PLOT COUNT= 1` warning found that **the test case was inconsistent**, not the harness: the population is
-  one stand, so the tree list has **one** plot, while `DESIGN` named five. A consistent case still reports
-  0 of 5 tables agreeing, so the remaining candidates are the source drift (pin against upstream `28fda8ed`)
-  and whatever else the two builds do differently. **Reopened by attributing them.**
+- **The oracle comparison is attributed, and it now says what it means.** `P49` finished the
+  comparison `P45` and `P46` left running. **Every model value agrees** — `FVS_Summary_Metric` and
+  `FVS_TreeList_Metric` match value for value, including all 3,996 per-tree rows — and the `0 of 5`
+  was **not** source drift. What it was:
+  - **The output `DATABASE` block must open before a case begins.** Reading a stand from an input
+    database calls `FORKOD` with no location code and logs `FVS03`; logging it writes to the output
+    database and starts the case, and a `DATABASE` block naming `DSNOut` is then refused with
+    `FVS16` and **ignored**. The harness's block was being ignored, so the standalone's tables came
+    from the *default* options rather than from the run's own block.
+  - **`tree_num` is not `plot * 1000 + tree`.** `BC_TREFMT` reads `I4` for the plot, tabs back to
+    column 1, then reads `I7` for the tree, and Fortran ignores embedded blanks: plot 1 tree 1 is
+    **11**, not 1001. The harness zero-filled them and wrote a tree id that does not exist.
+  - **`CaseID` is minted per run**, so two builds can never agree on it. It is no longer compared,
+    and neither are `RunDateTime`, `KeywordFile`, `Version` or `RV`.
+  - **What the harness cannot explain still fails it.** `FVS_Cases.SamplingWt` is explained
+    (`DBSCASE(2)` only updates a case row that already exists, and the two drivers create it at
+    different points); every other difference is reported by column and fails the run, and an
+    explanation that stops applying is reported as `stale` rather than silently dropped.
+- **`FVS_InvReference` is written by the standalone on every run and never by this package's build.**
+  The writer is compiled in and `fvs_` calls it — `objdump` shows the call — with byte-identical
+  `dbsreference.f` and `dbscase.f` between the pin and upstream, a minimal `DATABASE` block, and the
+  same input database. **The cause is not established.** It is the one exposed table that no run of
+  this package produces. **Reopened by establishing the cause.**
 - **A run that logs nothing was reported as failed, and that is fixed.** FVS writes `FVS_Error` only when
   it has something to log; the reader treated an absent table as a failure to read, on the stated premise
   that the extension wrote it on every run. A 999-tree single-plot case disproved the premise: FVS logged
   nothing, wrote no table, and the package reported a good run as failed. `read_errors` now answers an
   absent table with an empty frame of its columns, so silence reads as a clean run.
-
-- **The standalone oracle comparison is not finished, and the mechanism is now mapped.** The prebuilt
-  `FVSbc` from upstream `28fda8ed` runs and writes a database, but it does not read the tree records the way
-  `scripts/oracle_compare.py` writes them. What `P45` established:
-  - **`TREEDATA`'s field 1 is a file reference number**, not a flag: default `2` means an external file, and
-    `15` means the records are inline. The harness wrote a bare `TREEDATA`, so FVS looked for an external
-    file and read the tree lines as keywords — 1001 `FVS_Error` rows.
-  - **`TREEDATA 15` with the records inline is still rejected**, before the stand setup and after it: FVS
-    reads them as keywords in both positions, and with the stand first it reports
-    `TOO FEW PROJECTABLE TREE RECORDS: 0`.
-  - **The external route needs `OPEN`**, which the guide names and which my two attempted forms are both
-    refused for: `FVS01 ERROR: INVALID KEYWORD` on the `OPEN` record itself and
-    `FVS04 ERROR: A REQUIRED PARAMETER IS MISSING`. Its field layout was not established.
-  - **`DATABASE ... DSNin ... TreeSQL` is the known-good route**, because the official case uses it. It needs
-    an input database with `FVS_StandInit` and `FVS_TreeInit`, which the harness does not write.
-
-  - **The `DSNin` route works.** `P46` builds an input database with `FVS_TreeInit` and `FVS_StandInit`
-    from a run's own tree list and keywords, prepends a `DATABASE DSNin ... TreeSQL` block, and the
-    standalone reads **all 999 trees** and writes **3996 `FVS_TreeList_Metric` rows**. `TREEDATA` and its
-    format are dropped from the key, because the trees now come from the database.
-  - **FVS exits 20 whenever it logs an error, and can still write a complete database.** The harness used
-    to treat any non-zero exit as fatal; it now keys on the database and reports the code.
-  - **The comparison runs, and 0 of 5 tables agree.** The differences are **not yet attributed**. Two
-    candidates are on the table and neither is the reader: the two builds come from different source
-    revisions — the extension from the pin `e95172b`/`ef5fa847`, the standalone from upstream `28fda8ed`
-    (ADR 0008) — and the standalone reports `PLOT COUNT= 1` against the run's `DESIGN` record of 5, so the
-    stand setup differs as well. **Attributing these is the next step**, and until it is done this
-    comparison is a tool that runs, not an oracle.
-
-  **Reopened by finishing it, which is the only way the 27 unverified tables get a check.**
 
 - **The web service has no authentication of its own, by design.** The dev container is
   pre-authenticated — JupyterHub proxies the port — so the service is deployed with `--host 0.0.0.0

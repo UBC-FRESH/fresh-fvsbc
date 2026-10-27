@@ -46,7 +46,7 @@ claim was the one that needed the most evidence.
 | `FVS_FIAVBC_TreeList` | `DBS_FIAVBC_TRLS` | fvs.f | writer and call site |
 | `FVS_Fuels_Metric` | `DBSFUELS` | fmdout.f | exposed |
 | `FVS_Hrv_Carbon` | `DBSFMHRPT` | fmchrvout.f | exposed |
-| `FVS_InvReference` | `DBSREFERENCE` | fvs.f | exposed |
+| `FVS_InvReference` | `DBSREFERENCE` | fvs.f | **exposed, and never written by this package's build** (see `notes/triage.md`) |
 | `FVS_Mortality_Metric` | `DBSFMMORT` | fmfout.f | exposed |
 | `FVS_PotFire_Cond_Metric` | `DBSFMPFC` | fmpofl.f | exposed |
 | `FVS_PotFire_Metric` | `DBSFMPF` | fmpofl.f | exposed |
