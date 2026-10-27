@@ -31,12 +31,22 @@ says which review changed it.
 
 ## Found, and not yet fixed
 
-- **The standalone oracle comparison is not finished.** The prebuilt `FVSbc` from upstream `28fda8ed` runs
-  and writes a database, but a keyword file with the tree records inlined after `TREEDATA` is rejected:
-  the standalone reads the tree lines as keywords and writes **1001 `FVS_Error` rows**. The official case
-  feeds trees through a `DATABASE ... DSNin ... TreeSQL` block instead, so the harness needs that handoff
-  rather than an inline one. `scripts/oracle_compare.py` renders, runs and compares; the tree handoff is
-  the open piece. **Reopened by finishing it, which is the only way the 27 unverified tables get a check.**
+- **The standalone oracle comparison is not finished, and the mechanism is now mapped.** The prebuilt
+  `FVSbc` from upstream `28fda8ed` runs and writes a database, but it does not read the tree records the way
+  `scripts/oracle_compare.py` writes them. What `P45` established:
+  - **`TREEDATA`'s field 1 is a file reference number**, not a flag: default `2` means an external file, and
+    `15` means the records are inline. The harness wrote a bare `TREEDATA`, so FVS looked for an external
+    file and read the tree lines as keywords — 1001 `FVS_Error` rows.
+  - **`TREEDATA 15` with the records inline is still rejected**, before the stand setup and after it: FVS
+    reads them as keywords in both positions, and with the stand first it reports
+    `TOO FEW PROJECTABLE TREE RECORDS: 0`.
+  - **The external route needs `OPEN`**, which the guide names and which my two attempted forms are both
+    refused for: `FVS01 ERROR: INVALID KEYWORD` on the `OPEN` record itself and
+    `FVS04 ERROR: A REQUIRED PARAMETER IS MISSING`. Its field layout was not established.
+  - **`DATABASE ... DSNin ... TreeSQL` is the known-good route**, because the official case uses it. It needs
+    an input database with `FVS_StandInit` and `FVS_TreeInit`, which the harness does not write.
+
+  **Reopened by finishing it, which is the only way the 27 unverified tables get a check.**
 
 - **The web service has no authentication of its own, by design.** The dev container is
   pre-authenticated — JupyterHub proxies the port — so the service is deployed with `--host 0.0.0.0

@@ -82,9 +82,18 @@ def standalone_key(run_key: str, tree_text: str) -> str:
     """Build a keyword file the standalone binary can read from a run's keyword file and tree list.
 
     The standalone reads the tree records **inline**, between ``TREEDATA`` and the next keyword. A
-    run
-    directory keeps them in a separate file, because the package drives FVS through PyFVS's step
-    API.
+    run directory keeps them in a separate file, because the package drives FVS through PyFVS's
+    step API.
+
+    .. warning::
+
+       **This route is known not to work yet.** ``P45`` found that ``TREEDATA``'s field 1 is a file
+       reference number — ``15`` for inline records, ``2`` by default for an external file — and
+       that the standalone reads these records as keywords whichever side of the stand setup they
+       sit. The route that is known to work is the official case's ``DATABASE ... DSNin ...
+       TreeSQL`` block, which needs an input database this module does not write.
+       ``notes/triage.md`` carries the detail. Until it is finished the comparison reports
+       differences that are this handoff, not the tables.
 
     Parameters
     ----------
