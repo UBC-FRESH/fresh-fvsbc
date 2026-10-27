@@ -182,4 +182,102 @@ def test_a_failing_standalone_is_reported(
         subprocess, "run", lambda command, **kw: subprocess.CompletedProcess(command, 20, "", "")
     )
     assert oc.main(["--run", str(run), "--binary", str(binary)]) == 2
-    assert "exited 20" in capsys.readouterr().err
+    assert "wrote no database (exit 20)" in capsys.readouterr().err
+
+
+def test_a_written_tree_list_round_trips_through_the_reader() -> None:
+    """The parser uses the writer's own spans, so a tree's values survive the round trip."""
+    from fresh_fvsbc.nemora import crown_class
+    from fresh_fvsbc.treelist import TreeListFields, resolve_species, write_tree_file
+
+    fields = TreeListFields(
+        plot_id=1,
+        tree_num=1,
+        tree_count=1.0,
+        tree_history=0,
+        species=resolve_species("FD"),
+        diam=10.0,
+        dg_incr=0.0,
+        live_ht=8.0,
+        trunc_ht=0.0,
+        htg_incr=0.0,
+        crown_ratio=crown_class(0.45),
+        damage1=0,
+        severity1=0,
+        damage2=0,
+        severity2=0,
+        damage3=0,
+        severity3=0,
+        tree_val=0,
+        tree_rx=0,
+        plot_slope=0,
+        plot_aspect=0,
+        plot_habitat=0,
+        plot_topo_pos=0,
+        plot_site_prep=0,
+        tree_age=60.0,
+    )
+    trees = oc.parse_trees(write_tree_file([fields]))
+    assert len(trees) == 1
+    assert trees[0]["species"] == "FD"
+    assert trees[0]["diam"] == 10.0
+    assert trees[0]["plot_id"] == 1
+
+
+def test_the_tree_id_is_read_the_way_fvs_reads_it() -> None:
+    """``tree_num`` shares its columns with the plot, and FVS reads the blanks as zeros."""
+    trees = oc.parse_trees("   1  1     1FD  10.0\n-999\n")
+    assert trees[0]["tree_num"] == 1001
+
+
+def test_the_terminator_is_not_a_tree() -> None:
+    """``-999`` ends the records and must not become one."""
+    assert oc.parse_trees("-999\n") == []
+
+
+def test_the_input_database_holds_the_stand_and_its_trees(tmp_path: Path) -> None:
+    """The ``DSNin`` database is what the standalone reads trees from, so both tables exist."""
+    database = oc.input_database(
+        tmp_path / "input.db",
+        stand_id="S1",
+        trees=[{"plot_id": 1, "tree_num": 1001, "species": "FD", "diam": 10.0}],
+        stand={"Stand_ID": "S1", "Variant": "BC", "Inv_Year": 2020},
+    )
+    connection = sqlite3.connect(database)
+    try:
+        assert connection.execute("select count(*) from FVS_TreeInit").fetchone()[0] == 1
+        assert connection.execute("select Stand_ID from FVS_StandInit").fetchone()[0] == "S1"
+        assert connection.execute("select Species from FVS_TreeInit").fetchone()[0] == "FD"
+    finally:
+        connection.close()
+
+
+def test_the_input_block_names_the_stand_twice() -> None:
+    """Both statements are filtered by the stand, and a mismatch would load nothing."""
+    block = oc.input_block("input.db", "S1")
+    assert block.count("WHERE Stand_ID = 'S1'") == 2
+    assert "DSNin" in block
+
+
+def test_the_database_key_drops_the_inline_tree_block() -> None:
+    """The trees come from the database, so the format and data records must not be sent as well."""
+    rendered = oc.database_key(RUN_KEY, "input.db", "S1")
+    assert "TREEFMT" not in rendered
+    assert "TREEDATA" not in rendered
+    assert rendered.startswith("DATABASE\nDSNin\n")
+
+
+def test_the_stand_record_is_read_from_the_runs_own_keywords() -> None:
+    """The stand row comes from ``INVYEAR``, ``SITECODE`` and ``DESIGN``, not a second source."""
+    key = (
+        "STDIDENT\nS1\n"
+        "SITECODE  FD        15\n"
+        "INVYEAR   2020\n"
+        "DESIGN    0         1         999       5         0         5         1\n"
+    )
+    stand = oc.stand_record(key, "S1", [{"plot_id": 1}])
+    assert stand["Stand_ID"] == "S1"
+    assert stand["Inv_Year"] == 2020
+    assert stand["Site_Species"] == "FD"
+    assert stand["Site_Index"] == 15.0
+    assert stand["Num_Plots"] == 5

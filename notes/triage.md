@@ -46,6 +46,19 @@ says which review changed it.
   - **`DATABASE ... DSNin ... TreeSQL` is the known-good route**, because the official case uses it. It needs
     an input database with `FVS_StandInit` and `FVS_TreeInit`, which the harness does not write.
 
+  - **The `DSNin` route works.** `P46` builds an input database with `FVS_TreeInit` and `FVS_StandInit`
+    from a run's own tree list and keywords, prepends a `DATABASE DSNin ... TreeSQL` block, and the
+    standalone reads **all 999 trees** and writes **3996 `FVS_TreeList_Metric` rows**. `TREEDATA` and its
+    format are dropped from the key, because the trees now come from the database.
+  - **FVS exits 20 whenever it logs an error, and can still write a complete database.** The harness used
+    to treat any non-zero exit as fatal; it now keys on the database and reports the code.
+  - **The comparison runs, and 0 of 5 tables agree.** The differences are **not yet attributed**. Two
+    candidates are on the table and neither is the reader: the two builds come from different source
+    revisions — the extension from the pin `e95172b`/`ef5fa847`, the standalone from upstream `28fda8ed`
+    (ADR 0008) — and the standalone reports `PLOT COUNT= 1` against the run's `DESIGN` record of 5, so the
+    stand setup differs as well. **Attributing these is the next step**, and until it is done this
+    comparison is a tool that runs, not an oracle.
+
   **Reopened by finishing it, which is the only way the 27 unverified tables get a check.**
 
 - **The web service has no authentication of its own, by design.** The dev container is
