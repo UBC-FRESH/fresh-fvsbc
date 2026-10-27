@@ -62,7 +62,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | complete |
 | P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | complete |
 | P53 Release 0.15.1 | #228 | `feature/p53-release-0-15-1` | complete |
-| P54 The fire tables | #232 | `feature/p54-fire-tables` | active |
+| P54 The fire tables | #232 | `feature/p54-fire-tables` | complete |
 
 ## Lifecycle Map
 
@@ -1330,14 +1330,14 @@ Acceptance criteria:
 
 Parent issue: #232
 Branch: `feature/p54-fire-tables`
-Status: active
+Status: complete
 
 Goal: give the oracle a fire, and make the four fire tables reachable and checked.
 
-- [ ] P54.1 The fire tables are reachable and checked (#233)
-  - [ ] The validator warns when `FUELOUT` or `POTFIRE` is read after `INVYEAR`.
-  - [ ] The harness leaves the inventory year to the run's own keyword.
-  - [ ] The four fire tables are checked against the standalone.
+- [x] P54.1 The fire tables are reachable and checked (#233)
+  - [x] The validator warns when `FUELOUT` or `POTFIRE` is read after `INVYEAR`.
+  - [x] The harness leaves the inventory year to the run's own keyword.
+  - [x] The four fire tables are checked against the standalone.
 
 Acceptance criteria:
 
