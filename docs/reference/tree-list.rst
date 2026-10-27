@@ -185,3 +185,13 @@ Resolved in `P2.2`, from the injection's source and from the two format strings:
   BC list and also passes trees would have it read with the injected 71-column format.
 - The remedy needs no change to PyFVS. ``FVS(variant, treelist_format=...)`` takes an override for both the
   Python template and the FVS format, so `fresh-fvsbc` can pass BC's.
+
+
+The 999-tree limit
+------------------
+
+**One plot holds at most 999 trees.** Because the plot's four columns and the tree number share the same
+digits, this writer places the tree number in columns 5 to 7, which leaves three. A stand of 1540 trees —
+which the 2022 workshop's own BC case carries in a single plot — cannot be written, and the adapter refuses
+it by name rather than failing deeper in the writer. Subdividing a stand into plots is a modelling decision,
+so the adapter does not make it for you.

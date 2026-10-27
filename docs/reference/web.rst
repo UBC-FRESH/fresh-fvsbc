@@ -75,11 +75,28 @@ Endpoints
     the pins and the variant list
 ``POST /api/runs``
     start a run by invoking the CLI
+``GET /api/runs/{id}/log``
+    the log the service captured, which is where a failed run's traceback is
 ``GET /api/runs/{id}/events``
     an SSE stream, or **204** when the run is done
 
 A table the reader does not expose is refused with its name, and so is a table the run did not write. An
 absent table is never rendered as an empty one.
+
+Starting a run
+--------------
+
+``POST /api/runs`` takes ``population``, ``species``, ``tree_age``, an optional ``id``, and ``keywords``: an
+**ordered** list in which an entry carrying ``|`` is a block (``NAME|LINE|LINE``) and anything else is a
+keyword (``NAME=FIELD,...``).
+
+Order is part of the contract. A ``DATABASE`` block must precede the stand setup, and ``FMIN``, ``MISTOE``,
+``RDIN`` and ``ESTAB`` follow it — so the list is passed through in the order given rather than grouped.
+Without a ``DATABASE`` block a run writes ``FVS_Cases`` and ``FVS_Error`` and nothing else, which is the
+first surprise a caller meets.
+
+A run whose child died is reported as ``failed``, and its traceback is at
+``GET /api/runs/{id}/log``. A run the service did not start has no log and reports an empty body.
 
 Not verified
 ------------

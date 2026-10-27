@@ -60,6 +60,13 @@ are checked against FVS's own database dump. For the rest, the reader proves the
 columns match the schema; it does not prove the numbers are right. `notes/reference/table-reachability.md`
 says which is which.
 
+## The browser surface
+
+There is an optional one: ``pip install 'fresh-fvsbc[web]'`` then ``fresh-fvsbc web --runs DIR``. It reads
+the artefacts a run already wrote and starts a run by invoking the CLI, never by importing the extension.
+It binds ``127.0.0.1`` only, and refuses anything else without ``--allow-remote``, because there is no
+authentication. `docs/reference/web.rst` is the contract.
+
 ## How to report what you find
 
 1. **Check `notes/triage.md` first.** Nine gaps are recorded there with dispositions and reopen conditions;

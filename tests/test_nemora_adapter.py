@@ -193,3 +193,25 @@ def test_the_adapted_records_are_what_the_writer_writes() -> None:
 def test_the_same_population_adapts_the_same_way_twice() -> None:
     """The adapter adds no nondeterminism of its own."""
     assert adapted() == adapted()
+
+
+def test_a_stand_over_the_plot_limit_is_refused_by_name() -> None:
+    """One plot holds at most 999 trees, and the refusal says why and what to do.
+
+    BC's tree record opens ``I4,T1,I7``; ``T1`` makes the tree number read from column 1, so the
+    plot's four columns and the tree number share the same digits and the writer has three left.
+    """
+    from fresh_fvsbc.nemora import MAX_TREES_PER_PLOT
+
+    population = synthetic_population(stands=("S1",), trees_per_stand=MAX_TREES_PER_PLOT + 1)
+    with pytest.raises(PopulationError, match="999"):
+        to_tree_list(population, species="FD", tree_age=60.0)
+
+
+def test_a_stand_at_the_plot_limit_is_accepted() -> None:
+    """The limit is a limit, not a margin: 999 trees in one stand is written."""
+    from fresh_fvsbc.nemora import MAX_TREES_PER_PLOT
+
+    population = synthetic_population(stands=("S1",), trees_per_stand=MAX_TREES_PER_PLOT)
+    records = to_tree_list(population, species="FD", tree_age=60.0)
+    assert len(records) == MAX_TREES_PER_PLOT

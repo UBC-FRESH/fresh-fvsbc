@@ -74,6 +74,9 @@ def create_app(
     app.state.roots = resolved
     app.state.allow_remote = allow_remote
     app.state.skins = {skin.id: skin for skin in skins}
+    #: The child processes this service started, so a run that died is reported as failed rather
+    #: than running forever. A restarted service loses this, and a dead run stays ``running``.
+    app.state.processes = {}
 
     def _find(run_id: str) -> runstore.Run:
         """Resolve a run identifier to a run, or raise the HTTP error for it.
@@ -146,10 +149,14 @@ def create_app(
         """
         records: list[dict[str, Any]] = []
         for run in runstore.discover(app.state.roots):
+            state: str = run.state
+            process = app.state.processes.get(run.id)
+            if state == "running" and process is not None and process.poll() is not None:
+                state = "complete" if process.returncode == 0 else "failed"
             records.append(
                 {
                     "id": run.id,
-                    "state": run.state,
+                    "state": state,
                     "path": str(run.path),
                     "tables": len(runstore.tables(run)) if run.state == "complete" else 0,
                 }
@@ -278,9 +285,9 @@ def create_app(
         Parameters
         ----------
         payload : dict
-            ``population`` (a path), ``species``, ``tree_age``, optional ``keywords`` (a list of
-            ``NAME=FIELD,...`` or ``NAME|LINE|LINE`` strings) and optional ``id`` for the directory
-            name.
+            ``population`` (a path), ``species``, ``tree_age``, optional ``keywords`` (an
+            **ordered** list: an entry carrying ``|`` is a block ``NAME|LINE|LINE``, anything else a
+            keyword ``NAME=FIELD,...``), and optional ``id``.
 
         Returns
         -------
@@ -321,17 +328,45 @@ def create_app(
             "--tree-age",
             str(tree_age),
         ]
-        for keyword in payload.get("keywords", []):
-            command.extend(["--keyword", str(keyword)])
+        # One ordered list, because order is part of the contract: a DATABASE block must precede
+        # the stand setup, while FMIN, MISTOE, RDIN and ESTAB follow it. An entry carrying "|" is a
+        # block (``NAME|LINE|LINE``); anything else is a keyword (``NAME=FIELD,...``). A block is
+        # also how a caller asks for output tables: without a DATABASE block a run writes
+        # FVS_Cases and FVS_Error and nothing else.
+        for entry in payload.get("keywords", []):
+            text = str(entry)
+            command.extend(["--block" if "|" in text else "--keyword", text])
         directory.mkdir(parents=True)
         log = (directory / "service.log").open("w", encoding="utf-8")
-        subprocess.Popen(
+        app.state.processes[identifier] = subprocess.Popen(
             command,
             stdout=log,
             stderr=subprocess.STDOUT,
             cwd=str(directory),
         )
         return JSONResponse(status_code=202, content={"id": identifier, "state": "running"})
+
+    @app.get("/api/runs/{run_id}/log")
+    def run_log(run_id: str) -> Response:
+        """Return the log the service captured for a run it started.
+
+        A run that failed wrote its traceback here and nowhere else, so this is how a caller
+        sees why.
+
+        Parameters
+        ----------
+        run_id : str
+            The run's identifier.
+
+        Returns
+        -------
+        fastapi.responses.Response
+            The log as ``text/plain``, empty when the run was not started by this service.
+        """
+        run = _find(run_id)
+        path = run.path / "service.log"
+        text = path.read_text(encoding="utf-8", errors="replace") if path.is_file() else ""
+        return Response(content=text, media_type="text/plain; charset=utf-8")
 
     @app.get("/api/runs/{run_id}/events")
     def run_events(run_id: str, request: Request) -> Response:

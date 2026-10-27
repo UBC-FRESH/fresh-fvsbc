@@ -56,6 +56,12 @@ DEFAULT_LIMIT: int = 200
 MAX_LIMIT: int = 5000
 
 
+#: The log the service writes when it starts a run. A directory holding one is a run the service
+#: made, even when the child died before it wrote its keyword file — which is exactly the case that
+#: has to be visible, because it is the one that failed.
+SERVICE_LOG_FILE_NAME: str = "service.log"
+
+
 class RunError(Exception):
     """A run directory, or an artefact inside it, could not be read."""
 
@@ -115,8 +121,9 @@ def _looks_like_a_run(path: Path) -> bool:
         ``True`` when the directory carries a keyword file or an output database. A directory with
         neither is not a run, and a root may hold others.
     """
-    return path.is_dir() and (
-        (path / KEYWORD_FILE_NAME).is_file() or (path / DATABASE_NAME).is_file()
+    return path.is_dir() and any(
+        (path / name).is_file()
+        for name in (KEYWORD_FILE_NAME, DATABASE_NAME, SERVICE_LOG_FILE_NAME)
     )
 
 
