@@ -67,6 +67,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P56 Warnings are delivered | #239 | `feature/p56-warnings-are-delivered` | complete |
 | P57 Release 0.16.1 | #244 | `feature/p57-release-0-16-1` | complete |
 | P58 Oracle coverage | #248 | `feature/p58-oracle-coverage` | complete |
+| P59 The site-prep difference | #252 | `feature/p59-siteprep-attribution` | active |
 
 ## Lifecycle Map
 
@@ -1426,6 +1427,24 @@ Acceptance criteria:
 - Each exposed table is produced by a case in this phase or has a recorded reason it cannot be.
 - `notes/reference/oracle-coverage.md` gives the recipe and the verdict for each.
 - Every difference the sweep found is in `notes/triage.md`.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 59: The site-prep difference
+
+Parent issue: #252
+Branch: `feature/p59-siteprep-attribution`
+Status: active
+
+Goal: attribute the `FVS_Regen_SitePrep` difference as far as the evidence goes.
+
+- [ ] P59.1 The site-prep difference is attributed as far as the evidence goes (#253)
+  - [ ] Compare the stand variables, plot count, tree rows and seed the two runs use.
+  - [ ] Record what is ruled out and what is left.
+
+Acceptance criteria:
+
+- Every observable input is compared and the result recorded.
+- The remaining hypothesis is stated as a hypothesis, with what would test it.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
