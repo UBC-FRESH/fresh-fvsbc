@@ -58,7 +58,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P47 A quiet run | #204 | `feature/p47-quiet-run` | complete |
 | P48 Release 0.14.0 | #208 | `feature/p48-release-0-14-0` | complete |
 | P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | complete |
-| P50 The fire-model block | #216 | `feature/p50-fire-model-block` | active |
+| P50 The fire-model block | #216 | `feature/p50-fire-model-block` | complete |
 
 ## Lifecycle Map
 
@@ -1245,16 +1245,16 @@ Acceptance criteria:
 
 Parent issue: #216
 Branch: `feature/p50-fire-model-block`
-Status: active
+Status: complete
 
 Goal: make `FMIN` a validated block of keywords, so the snag, down-wood, fuel, potfire and carbon
 tables can be asked for without hand-spacing FVS's fields.
 
-- [ ] P50.1 `FMIN` holds keywords (#217)
-  - [ ] The block moves from raw lines to keywords, rendered by the shared writer.
-  - [ ] The body is checked against `fmin.f`'s fifty-five keywords.
-  - [ ] A fire-model keyword outside the block is refused.
-  - [ ] `--block "FMIN|SNAGOUT=1|..."` parses each entry as a keyword.
+- [x] P50.1 `FMIN` holds keywords (#217)
+  - [x] The block moves from raw lines to keywords, rendered by the shared writer.
+  - [x] The body is checked against `fmin.f`'s fifty-five keywords.
+  - [x] A fire-model keyword outside the block is refused.
+  - [x] `--block "FMIN|SNAGOUT=1|..."` parses each entry as a keyword.
 
 Acceptance criteria:
 
