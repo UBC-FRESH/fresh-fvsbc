@@ -147,6 +147,12 @@ def crown_class(crown_ratio: float) -> int:
     return nearest
 
 
+#: The most trees one plot can carry. BC's tree record opens ``I4,T1,I7``, and ``T1`` makes the
+#: tree number read from column 1, so the plot's four columns and the tree number share the same
+#: digits. This writer places the tree number in columns 5 to 7, which leaves three digits.
+MAX_TREES_PER_PLOT: int = 999
+
+
 def _text(record: Mapping[str, object], field: str) -> str:
     """Return a population field as text, refusing a record that does not carry it."""
     if field not in record:
@@ -210,6 +216,19 @@ def to_tree_list(
     if tree_age is None:
         raise MissingAssignmentError(
             "the adapter needs a tree age, because nemora emits none; pass one in years"
+        )
+    per_stand: dict[str, int] = {}
+    for stem in population:
+        stand = _text(stem, "stand_id")
+        per_stand[stand] = per_stand.get(stand, 0) + 1
+    oversized = {stand: count for stand, count in per_stand.items() if count > MAX_TREES_PER_PLOT}
+    if oversized:
+        stand, count = sorted(oversized.items())[0]
+        raise PopulationError(
+            f"the stand {stand!r} carries {count} stems and one plot holds at most "
+            f"{MAX_TREES_PER_PLOT}: BC's tree record shares columns 1 to 4 between the plot "
+            "and the tree number, so a plot can only number 999 trees. Subdivide the stand into "
+            "plots, which is a modelling decision this adapter does not make for you"
         )
     resolved = resolve_species(species)
     supplied = plot_fields or {}

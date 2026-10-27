@@ -31,6 +31,11 @@ says which review changed it.
 
 ## Found, and not yet fixed
 
+- **One plot holds at most 999 trees, and a real BC stand can carry more.** The 2022 workshop's own case has
+  1540 trees in a single plot; the adapter now refuses it by name, with the reason. Fixing it means
+  subdividing a stand into plots, which changes what the statistics mean, so it is a modelling decision
+  rather than a repair. **Reopened by a caller who needs a stand above 999 trees in one plot.**
+
 - **The remaining tables are not all reachable, and the reason differs by table.** `P24` settled it
   mechanically: 25 of the 30 have a writer and a call site, five have a writer that nothing calls, and the
   burn report's gate needs an invalid input. **This corrects an earlier entry in this file** that said the

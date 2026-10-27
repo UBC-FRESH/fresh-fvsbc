@@ -240,3 +240,88 @@ def test_the_cli_dispatches_web_before_the_run_parser(
 
     assert cli.main(["web", "--runs", "/tmp", "--host", "0.0.0.0"]) == 2
     assert "allow-remote" in capsys.readouterr().err
+
+
+class _DeadProcess:
+    """A stand-in for a child that exited non-zero."""
+
+    returncode = 1
+
+    def poll(self) -> int:
+        """Report the child as exited.
+
+        Returns
+        -------
+        int
+            The exit code.
+        """
+        return 1
+
+
+def test_a_dead_child_is_reported_as_failed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A run whose child died is ``failed``, not ``running`` forever — the bug a real case found."""
+    monkeypatch.setattr(subprocess, "Popen", lambda *a, **k: _DeadProcess())
+    application = webapp.create_app([tmp_path])
+    client = TestClient(application)
+    started = client.post(
+        "/api/runs", json={"population": "p.json", "species": "FD", "tree_age": 60, "id": "dead"}
+    )
+    assert started.status_code == 202
+    # The CLI writes run.key before it does anything else, so a run that died still leaves one.
+    (tmp_path / "dead" / "run.key").write_text("STDIDENT\ndead\n", encoding="utf-8")
+    listed = client.get("/api/runs").json()
+    assert listed[0]["state"] == "failed"
+
+
+def test_the_run_log_is_served(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The child's traceback is reachable through the surface, where a failure is explained."""
+    monkeypatch.setattr(subprocess, "Popen", lambda *a, **k: _DeadProcess())
+    client = TestClient(webapp.create_app([tmp_path]))
+    client.post(
+        "/api/runs", json={"population": "p.json", "species": "FD", "tree_age": 60, "id": "dead"}
+    )
+    (tmp_path / "dead" / "run.key").write_text("STDIDENT\ndead\n", encoding="utf-8")
+    (tmp_path / "dead" / "service.log").write_text("boom\n", encoding="utf-8")
+    response = client.get("/api/runs/dead/log")
+    assert response.status_code == 200
+    assert response.text == "boom\n"
+
+
+def test_a_run_the_service_did_not_start_has_an_empty_log(client: TestClient) -> None:
+    """A run directory found on disk has no service log, and an empty body says so."""
+    response = client.get("/api/runs/run-a/log")
+    assert response.status_code == 200
+    assert response.text == ""
+
+
+def test_a_block_entry_keeps_its_place_in_the_command(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An entry carrying ``|`` becomes ``--block`` in order: a DATABASE block must come first."""
+    recorded: list[list[str]] = []
+
+    class _Stub:
+        """Stand-in for ``subprocess.Popen``."""
+
+        def __init__(self, command: list[str], **_: object) -> None:
+            recorded.append(command)
+
+    monkeypatch.setattr(subprocess, "Popen", _Stub)
+    client = TestClient(webapp.create_app([tmp_path]))
+    client.post(
+        "/api/runs",
+        json={
+            "population": "p.json",
+            "species": "FD",
+            "tree_age": 60,
+            "id": "ordered",
+            "keywords": ["DATABASE|DSNOut|FVSOut.db|ComputDB", "STDIDENT", "NUMCYCLE=2"],
+        },
+    )
+    command = recorded[0]
+    first = command.index("--block")
+    second = command.index("--keyword")
+    assert first < second, "the block must precede the keywords"
+    assert command[first + 1] == "DATABASE|DSNOut|FVSOut.db|ComputDB"
