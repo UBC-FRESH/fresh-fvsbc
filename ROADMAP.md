@@ -51,7 +51,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P40 Release 0.12.0 | #175 | `feature/p40-release-0-12-0` | complete |
 | P41 The container deployment and the oracle harness | #181 | `feature/p41-container-and-oracle` | complete |
 | P43 The proxy prefix | #186 | `feature/p43-proxy-prefix` | complete |
-| P42 The THINQFA supplemental record | #179 | `feature/p42-thinqfa` | active |
+| P42 The THINQFA supplemental record | #179 | `feature/p42-thinqfa` | complete |
 
 ## Lifecycle Map
 
@@ -1077,16 +1077,16 @@ Acceptance criteria:
 
 Parent issue: #179
 Branch: `feature/p42-thinqfa`
-Status: active
+Status: complete
 
 Goal: make `THINQFA` usable. The keyword reads a second record that selects the residual-density units, and
 the wrapper could not write it.
 
-- [ ] P42.1 Add the THINQFA supplemental record (#180)
-  - [ ] `SUPPLEMENTAL_KEYWORDS` and a `supplemental` tuple on `Keyword`.
-  - [ ] Exactly one record, first character `0`, `1` or `2`; refused when missing or on another keyword.
-  - [ ] Rendered immediately after the keyword, with no `END`.
-  - [ ] `--keyword THINQFA=...;0` through the CLI, which the web API inherits.
+- [x] P42.1 Add the THINQFA supplemental record (#180)
+  - [x] `SUPPLEMENTAL_KEYWORDS` and a `supplemental` tuple on `Keyword`.
+  - [x] Exactly one record, first character `0`, `1` or `2`; refused when missing or on another keyword.
+  - [x] Rendered immediately after the keyword, with no `END`.
+  - [x] `--keyword THINQFA=...;0` through the CLI, which the web API inherits.
 
 Acceptance criteria:
 
