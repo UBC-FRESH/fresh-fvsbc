@@ -518,3 +518,53 @@ def test_a_fire_model_block_parses_its_entries_as_keywords() -> None:
     assert keyword.lines == ()
     assert [entry.name for entry in keyword.nested] == ["SNAGCLAS", "CARBREPT"]
     assert keyword.nested[0].parameters == ("0.0", "10.0", "20.0", "40.0")
+
+
+def test_a_database_block_after_the_stand_is_reported_not_raised(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The validator refuses the order, and the command has to report that rather than trace back.
+
+    The check exists to catch the mistake FVS answers with ``FVS16``; a finding that reaches the
+    user as a Python traceback has not been delivered.
+    """
+    code = cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--keyword",
+            "STDIDENT=Order",
+            "--block",
+            "DATABASE|DSNOut|FVSOut.db|ComputDB",
+        ]
+    )
+    assert code == cli.EXIT_BAD_INPUT
+    assert "must precede the stand setup" in capsys.readouterr().err
+
+
+def test_a_fire_model_keyword_outside_its_block_is_reported_not_raised(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """``SNAGOUT`` outside ``FMIN`` is refused by the validator, and the command reports it."""
+    code = cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--keyword",
+            "STDIDENT=Loose",
+            "--keyword",
+            "SNAGOUT=1",
+        ]
+    )
+    assert code == cli.EXIT_BAD_INPUT
+    assert "only between FMIN" in capsys.readouterr().err

@@ -31,6 +31,7 @@ from fresh_fvsbc.keywords import (
     KEYWORD_BLOCK_KEYWORDS,
     LINES_KEYWORDS,
     Keyword,
+    KeywordOrderError,
     KeywordWidthError,
     UnknownKeywordError,
     UnsupportedKeywordError,
@@ -75,6 +76,7 @@ class CommandInputError(ValueError):
 _INPUT_ERRORS: tuple[type[Exception], ...] = (
     CommandInputError,
     KeywordConflictError,
+    KeywordOrderError,
     KeywordWidthError,
     MissingAssignmentError,
     OSError,
