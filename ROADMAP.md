@@ -54,7 +54,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P42 The THINQFA supplemental record | #179 | `feature/p42-thinqfa` | complete |
 | P44 Release 0.13.0 | #192 | `feature/p44-release-0-13-0` | complete |
 | P45 The tree handoff, mapped | #196 | `feature/p45-tree-handoff` | complete |
-| P46 The DSNin tree handoff | #200 | `feature/p46-dsnin` | active |
+| P46 The DSNin tree handoff | #200 | `feature/p46-dsnin` | complete |
 
 ## Lifecycle Map
 
@@ -1160,14 +1160,14 @@ Acceptance criteria:
 
 Parent issue: #200
 Branch: `feature/p46-dsnin`
-Status: active
+Status: complete
 
 Goal: make the standalone read a run's trees, so the oracle harness can compare at all.
 
-- [ ] P46.1 Read the trees through a DSNin input database (#201)
-  - [ ] An input database with `FVS_TreeInit` and `FVS_StandInit`.
-  - [ ] A `DSNin` block in place of the inline records.
-  - [ ] The exit-code fix: a logged error is not a fatal one.
+- [x] P46.1 Read the trees through a DSNin input database (#201)
+  - [x] An input database with `FVS_TreeInit` and `FVS_StandInit`.
+  - [x] A `DSNin` block in place of the inline records.
+  - [x] The exit-code fix: a logged error is not a fatal one.
 
 Acceptance criteria:
 
