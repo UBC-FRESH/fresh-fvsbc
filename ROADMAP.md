@@ -59,7 +59,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P48 Release 0.14.0 | #208 | `feature/p48-release-0-14-0` | complete |
 | P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | complete |
 | P50 The fire-model block | #216 | `feature/p50-fire-model-block` | complete |
-| P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | active |
+| P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | complete |
 | P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | active |
 
 ## Lifecycle Map
@@ -1270,15 +1270,15 @@ Acceptance criteria:
 
 Parent issue: #220
 Branch: `feature/p51-release-0-15-0`
-Status: active
+Status: complete
 
 Goal: release `0.15.0`, because `main` carries a breaking change to the fire-model block and nine
 tables now have a check where four did.
 
-- [ ] P51.1 Version and notes for 0.15.0 (#221)
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.14.0", leading with the breaking change.
-  - [ ] Say which nine tables are checked and which two are out of reach.
+- [x] P51.1 Version and notes for 0.15.0 (#221)
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.14.0", leading with the breaking change.
+  - [x] Say which nine tables are checked and which two are out of reach.
 
 Acceptance criteria:
 
