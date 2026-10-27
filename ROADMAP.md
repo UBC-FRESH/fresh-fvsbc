@@ -47,7 +47,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P36 Banking it for real use | #159 | `feature/p36-bank-for-deployment` | complete |
 | P37 The web front end | #163 | `feature/p37-web-design` | complete |
 | P38 The web surface, first cut | #167 | `feature/p38-web-first-cut` | complete |
-| P39 A real BC case, and what it broke | #171 | `feature/p39-real-case` | active |
+| P39 A real BC case, and what it broke | #171 | `feature/p39-real-case` | complete |
 
 ## Lifecycle Map
 
@@ -1006,16 +1006,16 @@ Acceptance criteria:
 
 Parent issue: #171
 Branch: `feature/p39-real-case`
-Status: active
+Status: complete
 
 Goal: run a real BC case from the 2022 workshop bundle through the web surface, and fix what it breaks.
 
-- [ ] P39.1 A real BC case, and the four defects it found (#172)
-  - [ ] Refuse a stand above 999 trees per plot by name, with the reason.
-  - [ ] Report a failed child as `failed`, and serve its log.
-  - [ ] Discover a run the service started even when the child died before writing `run.key`.
-  - [ ] Take one ordered keyword list, so a `DATABASE` block can precede the stand setup.
-  - [ ] Record the limit in the tree-list contract, the triage and the deployment note.
+- [x] P39.1 A real BC case, and the four defects it found (#172)
+  - [x] Refuse a stand above 999 trees per plot by name, with the reason.
+  - [x] Report a failed child as `failed`, and serve its log.
+  - [x] Discover a run the service started even when the child died before writing `run.key`.
+  - [x] Take one ordered keyword list, so a `DATABASE` block can precede the stand setup.
+  - [x] Record the limit in the tree-list contract, the triage and the deployment note.
 
 Acceptance criteria:
 
