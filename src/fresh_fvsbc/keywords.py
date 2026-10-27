@@ -51,6 +51,7 @@ __all__ = [
     "BLANK_SLOTS",
     "BLOCK_KEYWORDS",
     "FIELD_WIDTH",
+    "FIRE_MODEL_ORDER_WARNING",
     "FMIN_KEYWORDS",
     "KEYWORDS",
     "KEYWORD_BLOCK_KEYWORDS",
@@ -361,6 +362,19 @@ STAND_KEYWORDS: frozenset[str] = frozenset({"STDIDENT", "STDINFO", "STANDSQL"})
 #: The keyword whose spelling is defective in FVS, at slot 30.
 MISSPELLED_KEYWORD: str = "xSALVAGE"
 
+#: The fire-model keywords whose report gate captures the inventory year. ``FUELOUT`` and
+#: ``POTFIRE`` set ``IFLALB`` and ``IPFLMB`` to ``IY(1)`` when they are read, and ``fmdout.f`` and
+#: ``fmpofl.f`` treat any positive value as "suppress this report". Read after ``INVYEAR``, they
+#: therefore switch their own reports off, and the tables are never written.
+YEAR_CAPTURING_KEYWORDS: frozenset[str] = frozenset({"FUELOUT", "POTFIRE"})
+
+#: The warning the validator gives for a fire-model block that follows ``INVYEAR``.
+FIRE_MODEL_ORDER_WARNING: str = (
+    "an FMIN block that asks for FUELOUT or POTFIRE must precede INVYEAR: both capture the "
+    "inventory year when they are read, and FVS treats a positive value as 'suppress this report', "
+    "so the fuels and potfire tables would be silently not written"
+)
+
 #: The warning the validator gives for :data:`MISSPELLED_KEYWORD`.
 MISSPELLING_WARNING: str = (
     f'The table spells this "{MISSPELLED_KEYWORD}", with a leading "x", because the defect is in '
@@ -605,8 +619,16 @@ def validate_keywords(keywords: Sequence[Keyword]) -> list[str]:
         On the first keyword whose name is not in the table. Validation stops there rather than
         reporting the rest, because a set with an unknown keyword cannot be run.
     """
+    warnings: list[str] = []
     seen_stand = False
+    seen_inventory = False
     for keyword in keywords:
+        if keyword.name == "INVYEAR":
+            seen_inventory = True
+        if keyword.name == "FMIN" and seen_inventory:
+            captures = any(entry.name in YEAR_CAPTURING_KEYWORDS for entry in keyword.nested)
+            if captures:
+                warnings.append(FIRE_MODEL_ORDER_WARNING)
         if keyword.name == "DATABASE" and seen_stand:
             raise KeywordOrderError(
                 "a DATABASE block must precede the stand setup; FVS refuses it later with "
@@ -614,7 +636,6 @@ def validate_keywords(keywords: Sequence[Keyword]) -> list[str]:
             )
         if keyword.name in STAND_KEYWORDS:
             seen_stand = True
-    warnings: list[str] = []
     for keyword in keywords:
         warnings.extend(validate_keyword(keyword))
     return warnings

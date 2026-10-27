@@ -283,7 +283,6 @@ def test_the_stand_record_is_read_from_the_runs_own_keywords() -> None:
     )
     stand = oc.stand_record(key, "S1", [{"plot_id": 1}])
     assert stand["Stand_ID"] == "S1"
-    assert stand["Inv_Year"] == 2020
     assert stand["Site_Species"] == "FD"
     assert stand["Site_Index"] == 15.0
     assert stand["Num_Plots"] == 5
@@ -364,3 +363,13 @@ def test_a_table_that_is_not_comparable_says_why(tmp_path: Path) -> None:
     )
     statuses = {result.table: result.status for result in oc.compare(ours, theirs)}
     assert statuses["FVS_InvReference"] == "not comparable"
+
+
+def test_the_stand_row_leaves_the_inventory_year_to_the_runs_own_keyword() -> None:
+    """``FUELOUT`` and ``POTFIRE`` capture the inventory year, and FVS reads a positive value as
+    'suppress'. A database that sets the year before the fire-model block silently costs three
+    tables, so the harness lets the run's own ``INVYEAR`` set it in the order the run uses."""
+    key = "STDIDENT\nS1\nINVYEAR   2020\nSITECODE  FD        15\n"
+    stand = oc.stand_record(key, "S1", [{"plot_id": 1}])
+    assert "Inv_Year" not in stand
+    assert stand["Site_Index"] == 15.0

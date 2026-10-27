@@ -11,6 +11,7 @@ import pytest
 from fresh_fvsbc.keywords import (
     BLANK_SLOTS,
     FIELD_WIDTH,
+    FIRE_MODEL_ORDER_WARNING,
     FMIN_KEYWORDS,
     KEYWORD_TABLE,
     KEYWORDS,
@@ -480,3 +481,31 @@ def test_the_block_holds_every_fire_model_keyword_fvs_declares() -> None:
     assert len(FMIN_KEYWORDS) == 55
     for name in ("SNAGCLAS", "SNAGOUT", "SNAGSUM", "DWDVLOUT", "DWDCVOUT", "FUELOUT", "CARBREPT"):
         assert name in FMIN_KEYWORDS
+
+
+def test_a_fire_model_block_after_invyear_warns_that_its_tables_will_be_missing() -> None:
+    """``FUELOUT`` and ``POTFIRE`` capture the inventory year, and FVS reads a positive value as
+    'suppress'. After ``INVYEAR`` they switch their own reports off, and nothing says so."""
+    keywords = (
+        Keyword("INVYEAR", ("2020",)),
+        Keyword("FMIN", nested=(Keyword("FUELOUT", ("2",)),)),
+    )
+    assert validate_keywords(keywords) == [FIRE_MODEL_ORDER_WARNING]
+
+
+def test_a_fire_model_block_before_invyear_does_not_warn() -> None:
+    """Read first, the year is still zero, and the reports are written."""
+    keywords = (
+        Keyword("FMIN", nested=(Keyword("FUELOUT", ("2",)), Keyword("POTFIRE", ("2",)))),
+        Keyword("INVYEAR", ("2020",)),
+    )
+    assert validate_keywords(keywords) == []
+
+
+def test_a_block_that_captures_no_year_does_not_warn_after_invyear() -> None:
+    """``CARBREPT`` does not capture the year, so its position does not matter."""
+    keywords = (
+        Keyword("INVYEAR", ("2020",)),
+        Keyword("FMIN", nested=(Keyword("CARBREPT", ("2",)),)),
+    )
+    assert validate_keywords(keywords) == []

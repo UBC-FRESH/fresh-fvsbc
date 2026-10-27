@@ -55,6 +55,15 @@ says which review changed it.
   The block now holds **keywords**, written by the same writer as everything else and checked against
   `fmin.f`'s own fifty-five, and a fire-model keyword outside the block is refused. That is what made
   the snag, down-wood and carbon tables reachable: **eight of nine comparable tables now match**.
+- **The fuels and potfire tables vanish if the `FMIN` block follows `INVYEAR`, and that is fixed.**
+  `FUELOUT` and `POTFIRE` set `IFLALB` and `IPFLMB` to `IY(1)` when they are read, and `fmdout.f` and
+  `fmpofl.f` treat **any positive value as "suppress this report"**. Read after `INVYEAR`, they switch
+  their own reports off: the run succeeds, `FVS_Fuels_Metric`, `FVS_PotFire_Metric` and
+  `FVS_PotFire_Cond_Metric` are simply absent, and nothing says so. **The official case never hits it**
+  because its inventory year comes from the input database rather than an `INVYEAR` keyword, so the
+  year is still zero when the block is read — which is why the defect has gone unnoticed upstream. The
+  validator now warns, and with the block first the four fire tables are written and **agree with the
+  standalone value for value**.
 - **`FVS_InvReference` is written by the standalone on every run and never by this package's build.**
   The writer is compiled in and `fvs_` calls it — `objdump` shows the call — with byte-identical
   `dbsreference.f` and `dbscase.f` between the pin and upstream, a minimal `DATABASE` block, and the
