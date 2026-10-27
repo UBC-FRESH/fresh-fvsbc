@@ -325,3 +325,17 @@ def test_a_block_entry_keeps_its_place_in_the_command(
     second = command.index("--keyword")
     assert first < second, "the block must precede the keywords"
     assert command[first + 1] == "DATABASE|DSNOut|FVSOut.db|ComputDB"
+
+
+def test_the_service_answers_with_and_without_its_root_path(tmp_path: Path) -> None:
+    """A dev container publishes a port under a proxy prefix, and both forms must work.
+
+    JupyterHub maps ``/user/<name>/proxy/<port>/`` onto the service. ``--root-path`` makes the app
+    answer under that prefix as well as at the root, which is what the container needs.
+    """
+    _make_run(tmp_path / "run-a")
+    prefix = "/jupyterhub32/user/me/codeserver/proxy/8765"
+    client = TestClient(webapp.create_app([tmp_path], root_path=prefix))
+    assert client.get("/api/runs").status_code == 200
+    assert client.get(f"{prefix}/api/runs").status_code == 200
+    assert client.get(f"{prefix}/").status_code == 200

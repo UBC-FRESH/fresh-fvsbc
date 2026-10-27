@@ -64,8 +64,19 @@ says which is which.
 
 There is an optional one: ``pip install 'fresh-fvsbc[web]'`` then ``fresh-fvsbc web --runs DIR``. It reads
 the artefacts a run already wrote and starts a run by invoking the CLI, never by importing the extension.
-It binds ``127.0.0.1`` only, and refuses anything else without ``--allow-remote``, because there is no
-authentication. `docs/reference/web.rst` is the contract.
+`docs/reference/web.rst` is the contract.
+
+**In the dev container, run it like this**, because the container is pre-authenticated and JupyterHub
+publishes the port under a path::
+
+    fresh-fvsbc web --runs runs/ \
+      --host 0.0.0.0 --allow-remote \
+      --root-path /jupyterhub32/user/<name>/codeserver/proxy/9999 \
+      --port 9999
+
+Then open the proxy URL. ``--allow-remote`` is not a risk taken lightly: it is required because the proxy
+connects from outside the loopback, and **the proxy is what authenticates**. The service has no
+authentication of its own, so never bind it to a public interface without a proxy in front of it.
 
 ## How to report what you find
 

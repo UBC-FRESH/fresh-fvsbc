@@ -16,6 +16,28 @@ The bind is ``127.0.0.1`` by default, and a non-loopback address is refused unle
 passed, because there is no authentication. ``--root-path`` makes the app work under a notebook proxy
 prefix such as ``/user/<name>/proxy/8765/``.
 
+Deploying in a dev container
+-----------------------------
+
+The FRESH dev container is a **pre-authenticated** environment: JupyterHub authenticates the browser and
+proxies a local port to a generated path, so a service on port 9999 is reached at
+``https://fresh01.01101.dev/jupyterhub32/user/<name>/codeserver/proxy/9999/``. The service therefore has to
+listen **off loopback**, and it has to answer **under the prefix**:
+
+.. code-block:: bash
+
+   fresh-fvsbc web --runs runs/ \
+     --host 0.0.0.0 --allow-remote \
+     --root-path /jupyterhub32/user/<name>/codeserver/proxy/9999 \
+     --port 9999
+
+``--allow-remote`` is required because the proxy connects from outside the loopback interface. **The proxy
+is what authenticates**: the service has none of its own, and this is the deployment that supplies it. Do
+not expose the port directly.
+
+``--root-path`` is what makes the prefix work. The service answers both at ``/api/runs`` and under the
+prefix, and the front end asks for relative URLs, so one build serves either way.
+
 What it reads
 -------------
 

@@ -31,6 +31,18 @@ says which review changed it.
 
 ## Found, and not yet fixed
 
+- **The standalone oracle comparison is not finished.** The prebuilt `FVSbc` from upstream `28fda8ed` runs
+  and writes a database, but a keyword file with the tree records inlined after `TREEDATA` is rejected:
+  the standalone reads the tree lines as keywords and writes **1001 `FVS_Error` rows**. The official case
+  feeds trees through a `DATABASE ... DSNin ... TreeSQL` block instead, so the harness needs that handoff
+  rather than an inline one. `scripts/oracle_compare.py` renders, runs and compares; the tree handoff is
+  the open piece. **Reopened by finishing it, which is the only way the 27 unverified tables get a check.**
+
+- **The web service has no authentication of its own, by design.** The dev container is
+  pre-authenticated — JupyterHub proxies the port — so the service is deployed with `--host 0.0.0.0
+  --allow-remote --root-path <proxy prefix>`, and the proxy authenticates. This is a **deployment
+  assumption, not a defect**, and the refusal message says so. **Reopened if the service is ever bound to
+  an interface a proxy does not front.**
 - **One plot holds at most 999 trees, and a real BC stand can carry more.** The 2022 workshop's own case has
   1540 trees in a single plot; the adapter now refuses it by name, with the reason. Fixing it means
   subdividing a stand into plots, which changes what the statistics mean, so it is a modelling decision
