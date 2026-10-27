@@ -56,6 +56,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P45 The tree handoff, mapped | #196 | `feature/p45-tree-handoff` | complete |
 | P46 The DSNin tree handoff | #200 | `feature/p46-dsnin` | complete |
 | P47 A quiet run | #204 | `feature/p47-quiet-run` | complete |
+| P48 Release 0.14.0 | #208 | `feature/p48-release-0-14-0` | active |
 
 ## Lifecycle Map
 
@@ -1194,6 +1195,26 @@ Acceptance criteria:
 
 - A database without `FVS_Error` reads as no errors, with the table's columns.
 - The contract page says why, and names the case that disproved the old claim.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 48: Release 0.14.0
+
+Parent issue: #208
+Branch: `feature/p48-release-0-14-0`
+Status: active
+
+Goal: release `0.14.0`, because `main` carries a fix that mattered to a user-facing failure.
+
+- [ ] P48.1 Version and notes for 0.14.0 (#209)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.13.0", leading with the quiet-run fix.
+  - [ ] Say that the oracle comparison runs and is not yet an oracle.
+
+Acceptance criteria:
+
+- The package reports `0.14.0`, and the notes say what changed and what remains.
+- A clean checkout runs a quiet stand and does not report it as failed.
+- The published documentation matches the source at the tag.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

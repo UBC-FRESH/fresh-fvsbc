@@ -1,10 +1,28 @@
-# fresh-fvsbc 0.13.0
+# fresh-fvsbc 0.14.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.13.0
+
+- **A run that logs nothing is no longer reported as failed.** FVS writes `FVS_Error` **only when it has
+  something to log**, and the reader treated an absent table as a failure to read — on the premise, stated
+  in the output contract, that the extension writes it on every run. **That premise was false.** A
+  999-tree single-plot case raised no warning, wrote no such table, and the package reported a perfectly
+  good run as failed. `read_errors` now answers an absent table with an empty frame of its columns, so
+  silence reads as a clean run.
+- **The oracle harness reads a run's trees.** The standalone `FVSbc` now gets them through a
+  `DATABASE ... DSNin ... TreeSQL` input database built from the run's own tree list and keywords: **999
+  trees load and it writes 3,996 per-tree rows**. The inline `TREEDATA` route is dead — its field 1 is a
+  file reference number, `2` for an external file and `15` for inline records, and neither placement works.
+- **The comparison runs, and it is not yet an oracle.** It reports **0 of 5 tables agreeing** and the
+  differences are **unattributed**: the two builds come from different source revisions — the pin
+  `e95172b`/`ef5fa847` against upstream `28fda8ed`, because the pin's standalone will not build (ADR 0008)
+  — and that alone can move numbers. `notes/triage.md` says so rather than presenting a tool that runs as
+  a check that passes.
 
 ## What changed since 0.12.0
 
