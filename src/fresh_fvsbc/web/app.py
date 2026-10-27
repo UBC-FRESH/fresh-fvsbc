@@ -17,7 +17,7 @@ import json
 import subprocess
 import sys
 import time
-from collections.abc import Iterator, Sequence
+from collections.abc import Awaitable, Callable, Iterator, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -53,13 +53,16 @@ def create_app(
     ----------
     roots : sequence of Path
         The directories searched for run directories, one level deep.
+    root_path : str, optional
+        The prefix the app is served under. The service strips it from the request path when the
+        proxy leaves it on, and answers without it when the proxy removes it, so one build serves
+        either way. A proxy that forwards the prefix is the normal case: JupyterHub does not strip
+        it.
     allow_remote : bool, optional
         Whether the caller has accepted a non-loopback bind. The flag is carried into the app so
         the decision is recorded where it is used. Behind the JupyterHub port proxy this is the
         normal case: the proxy authenticates the request, and the service has to listen off
         loopback for it.
-    root_path : str, optional
-        The prefix the app is served under, for a notebook proxy.
 
     Returns
     -------
@@ -69,8 +72,37 @@ def create_app(
     app = FastAPI(
         title="fresh-fvsbc",
         description="A reader over the artefacts an FVS-BC run leaves behind.",
-        root_path=root_path,
     )
+    if root_path:
+        prefix = "/" + root_path.strip("/")
+
+        @app.middleware("http")
+        async def _strip_prefix(
+            request: Request, call_next: Callable[[Request], Awaitable[Response]]
+        ) -> Response:
+            """Strip the proxy's prefix when the request still carries it.
+
+            JupyterHub forwards ``/user/<name>/proxy/<port>/...`` without removing it, and a
+            proxy that does remove it is equally valid. Both land on the same routes.
+
+            Parameters
+            ----------
+            request : fastapi.Request
+                The incoming request.
+            call_next : callable
+                The rest of the stack.
+
+            Returns
+            -------
+            fastapi.responses.Response
+                The response.
+            """
+            path = request.scope.get("path", "")
+            if path == prefix or path.startswith(prefix + "/"):
+                request.scope["path"] = path[len(prefix) :] or "/"
+                request.scope["root_path"] = prefix
+            return await call_next(request)
+
     resolved = tuple(Path(root).resolve() for root in roots)
     skins = load_skins()
     app.state.roots = resolved
