@@ -69,7 +69,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P58 Oracle coverage | #248 | `feature/p58-oracle-coverage` | complete |
 | P59 The site-prep difference | #252 | `feature/p59-siteprep-attribution` | complete |
 | P60 Release 0.17.0 | #256 | `feature/p60-release-0-17-0` | complete |
-| P61 The reference table | #260 | `feature/p61-invreference` | active |
+| P61 The reference table | #260 | `feature/p61-invreference` | complete |
 
 ## Lifecycle Map
 
@@ -1473,15 +1473,15 @@ Acceptance criteria:
 
 Parent issue: #260
 Branch: `feature/p61-invreference`
-Status: active
+Status: complete
 
 Goal: narrow `FVS_InvReference` to a cause, or record precisely why it cannot be narrowed from outside
 the binary.
 
-- [ ] P61.1 The reference table is narrowed to a cause (#261)
-  - [ ] Compare the compiled writer in both binaries.
-  - [ ] Drive this package's run through the standalone's own `DSNin` route.
-  - [ ] Establish the state at the point of the call.
+- [x] P61.1 The reference table is narrowed to a cause (#261)
+  - [x] Compare the compiled writer in both binaries.
+  - [x] Drive this package's run through the standalone's own `DSNin` route.
+  - [x] Establish the state at the point of the call.
 
 Acceptance criteria:
 
