@@ -50,6 +50,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P39 A real BC case, and what it broke | #171 | `feature/p39-real-case` | complete |
 | P40 Release 0.12.0 | #175 | `feature/p40-release-0-12-0` | complete |
 | P41 The container deployment and the oracle harness | #181 | `feature/p41-container-and-oracle` | complete |
+| P43 The proxy prefix | #186 | `feature/p43-proxy-prefix` | active |
 
 ## Lifecycle Map
 
@@ -1069,6 +1070,24 @@ Acceptance criteria:
 - The reference page and the deployment note give the exact proxied command, and the refusal names it.
 - A test asserts the service answers with and without its root path.
 - `scripts/oracle_compare.py` renders, runs and compares, with tests that do not need the binary.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 43: The proxy prefix
+
+Parent issue: #186
+Branch: `feature/p43-proxy-prefix`
+Status: active
+
+Goal: make the service work behind the JupyterHub proxy without depending on whether it strips the prefix.
+
+- [ ] P43.1 Handle the proxy prefix in the service (#187)
+  - [ ] A middleware strips a configured prefix when the request carries it.
+  - [ ] The test asserts both forms.
+
+Acceptance criteria:
+
+- `/api/runs` and `<prefix>/api/runs` both answer 200, as do the assets.
+- No deprecation warning on start.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
