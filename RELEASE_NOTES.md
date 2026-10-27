@@ -1,10 +1,25 @@
-# fresh-fvsbc 0.15.0
+# fresh-fvsbc 0.15.1
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.15.0
+
+- **A refused keyword set is reported, not raised.** `validate_keywords` raises `KeywordOrderError` for
+  a `DATABASE` block after the stand setup — the exact mistake the check exists to catch — and the
+  command did not list it among its input errors, so Python printed a **traceback over the message**.
+  It has been that way since the order check was added, and every release before this one has it. The
+  same applied to a fire-model keyword written outside its `FMIN` block.
+
+  ```text
+  fresh-fvsbc: a DATABASE block must precede the stand setup; FVS refuses it later with
+  'KEYWORD ENTERED IS USED IN WRONG CONTEXT'. The official case puts it first
+  ```
+
+  Found by verifying `0.15.0` from a clean checkout, running the refusal the release notes describe.
 
 ## What changed since 0.14.0
 

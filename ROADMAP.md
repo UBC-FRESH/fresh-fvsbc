@@ -61,6 +61,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P50 The fire-model block | #216 | `feature/p50-fire-model-block` | complete |
 | P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | complete |
 | P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | complete |
+| P53 Release 0.15.1 | #228 | `feature/p53-release-0-15-1` | active |
 
 ## Lifecycle Map
 
@@ -1303,6 +1304,25 @@ Acceptance criteria:
 
 - A `DATABASE` block after the stand exits `2` with the validator's message.
 - A fire-model keyword outside its block does the same.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 53: Release 0.15.1
+
+Parent issue: #228
+Branch: `feature/p53-release-0-15-1`
+Status: active
+
+Goal: release `0.15.1`, because `0.15.0` is published with a defect in it.
+
+- [ ] P53.1 Version and notes for 0.15.1 (#229)
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.15.0", leading with the fix.
+  - [ ] Verify both refusals from a clean checkout: a message and exit `2`.
+
+Acceptance criteria:
+
+- The package reports `0.15.1`, and the notes lead with the fix.
+- A clean checkout refuses both cases with a message and exit `2`.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
