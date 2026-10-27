@@ -101,12 +101,10 @@ Contract rules
    and never written by a run of this package**: `FVS_InvReference` is produced on every run by a
    standalone `FVSbc` built from the same source, and no run of this package produces it, for a cause
    that is not established (`notes/triage.md`). Reading it is supported; a run that should have
-   written it is a question for the build, not for the reader. Several need a
-   second trigger: the fuels, potfire and carbon tables an `FMIN` block, consumption a fire event
-   (`SIMFIRE` schedules one), the per-tree tables a `TREELIST` or `CUTLIST` request, and
-   `FVS_ATRTList_Metric` a **treatment** — it is the after-treatment listing, and a removal that takes
-   everything creates the table and inserts nothing. The row counts of the four the official dump
-   carries are checked against it in `tests/test_oracle.py`.
+   written it is a question for the build, not for the reader. **Naming a table's option is never
+   enough on its own** — see :doc:`table-recipes` for the second thing each one needs. The row counts
+   of the four the official dump carries are checked against it in `tests/test_oracle.py`, and
+   twenty-seven of the thirty-one are checked against a standalone `FVSbc` value for value.
 
    **`FVS_StrClass_Metric` carries the structural stage**, which is the currency of old-growth and
    habitat assessment in British Columbia: one row per stratum per period, with its diameter, heights,

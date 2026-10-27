@@ -28,6 +28,7 @@ Three names are easy to confuse, so this project uses them distinctly.
    tree-list
    keywords
    outputs
+   table-recipes
    provenance
    nemora-ingest
    web

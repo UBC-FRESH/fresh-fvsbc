@@ -68,6 +68,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P57 Release 0.16.1 | #244 | `feature/p57-release-0-16-1` | complete |
 | P58 Oracle coverage | #248 | `feature/p58-oracle-coverage` | complete |
 | P59 The site-prep difference | #252 | `feature/p59-siteprep-attribution` | complete |
+| P60 Release 0.17.0 | #256 | `feature/p60-release-0-17-0` | active |
 
 ## Lifecycle Map
 
@@ -1445,6 +1446,26 @@ Acceptance criteria:
 
 - Every observable input is compared and the result recorded.
 - The remaining hypothesis is stated as a hypothesis, with what would test it.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 60: Release 0.17.0
+
+Parent issue: #256
+Branch: `feature/p60-release-0-17-0`
+Status: active
+
+Goal: release `0.17.0`, because the lab needs the table recipes where it will find them.
+
+- [ ] P60.1 Version, recipes and notes for 0.17.0 (#257)
+  - [ ] A reference page carrying the recipe for every table.
+  - [ ] Bump the version in two files.
+  - [ ] Add "What changed since 0.16.1", with what is checked and what is not.
+
+Acceptance criteria:
+
+- The package reports `0.17.0`.
+- The recipes page is published and linked from the output contract.
+- The notes say what is checked, what is not, and why.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
