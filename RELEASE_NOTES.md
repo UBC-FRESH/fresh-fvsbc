@@ -1,10 +1,39 @@
-# fresh-fvsbc 0.16.1
+# fresh-fvsbc 0.17.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.16.1
+
+- **There is now a recipe for every table.** Naming a table's option in a `DATABASE` block is **never
+  enough on its own**: the option is accepted whether or not the run does what the writer reports on,
+  and the table is then simply absent — the projection succeeds, the database is written, and nothing
+  says the table is missing. The new :doc:`reference/table-recipes` page gives the second thing each
+  one needs. Some of them are not obvious:
+
+  - a **removal** for the cut list and the after-treatment tree list;
+  - a **fire** for mortality and for consumption;
+  - **more than one plot** for the stand statistics, which are the distribution among sample points;
+  - an **infection** through the damage columns for the four dwarf-mistletoe tables, and `NEWSPRED` for
+    the fourth;
+  - a **`PLANT` line carrying stems per acre** for the regeneration tables;
+  - an **`RDIN` block with `RRINIT` and `RRDOUT`** for root disease. Earlier revisions of the docs
+    recorded its required parameters as undetermined; they are those two, and both tables are written
+    and match.
+
+- **Twenty-seven of the thirty-one exposed tables are checked against a standalone `FVSbc`** built from
+  the same source, and match it **value for value** — including every per-tree row. That is up from
+  thirteen, and from four before this stretch.
+
+- **One table is not checked, and the reason is on the record.** `FVS_Regen_SitePrep`'s `PcntNone`,
+  `PcntMech` and `PcntBurn` are the site-preparation allocation across plots, drawn from a random
+  distribution. They differ from the standalone's, and the difference is **not in this package**: both
+  runs agree on every observable input, this package's run is deterministic across seeds, and the writer
+  is a pass-through. What is left is a hypothesis about the two drivers' draw streams, and
+  `notes/triage.md` says so rather than guessing.
 
 ## What changed since 0.16.0
 
