@@ -66,7 +66,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P55 Release 0.16.0 | #236 | `feature/p55-release-0-16-0` | complete |
 | P56 Warnings are delivered | #239 | `feature/p56-warnings-are-delivered` | complete |
 | P57 Release 0.16.1 | #244 | `feature/p57-release-0-16-1` | complete |
-| P58 Oracle coverage | #248 | `feature/p58-oracle-coverage` | active |
+| P58 Oracle coverage | #248 | `feature/p58-oracle-coverage` | complete |
 
 ## Lifecycle Map
 
@@ -1412,14 +1412,14 @@ Acceptance criteria:
 
 Parent issue: #248
 Branch: `feature/p58-oracle-coverage`
-Status: active
+Status: complete
 
 Goal: point the oracle at every exposed table and record what each one needs.
 
-- [ ] P58.1 The oracle covers every exposed table (#249)
-  - [ ] A case per table family: fire, events, and the three raw-line blocks.
-  - [ ] `notes/reference/oracle-coverage.md` with the recipe and the verdict for each.
-  - [ ] Every difference the sweep found recorded in the triage.
+- [x] P58.1 The oracle covers every exposed table (#249)
+  - [x] A case per table family: fire, events, and the three raw-line blocks.
+  - [x] `notes/reference/oracle-coverage.md` with the recipe and the verdict for each.
+  - [x] Every difference the sweep found recorded in the triage.
 
 Acceptance criteria:
 
