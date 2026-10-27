@@ -67,7 +67,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P56 Warnings are delivered | #239 | `feature/p56-warnings-are-delivered` | complete |
 | P57 Release 0.16.1 | #244 | `feature/p57-release-0-16-1` | complete |
 | P58 Oracle coverage | #248 | `feature/p58-oracle-coverage` | complete |
-| P59 The site-prep difference | #252 | `feature/p59-siteprep-attribution` | active |
+| P59 The site-prep difference | #252 | `feature/p59-siteprep-attribution` | complete |
 
 ## Lifecycle Map
 
@@ -1433,13 +1433,13 @@ Acceptance criteria:
 
 Parent issue: #252
 Branch: `feature/p59-siteprep-attribution`
-Status: active
+Status: complete
 
 Goal: attribute the `FVS_Regen_SitePrep` difference as far as the evidence goes.
 
-- [ ] P59.1 The site-prep difference is attributed as far as the evidence goes (#253)
-  - [ ] Compare the stand variables, plot count, tree rows and seed the two runs use.
-  - [ ] Record what is ruled out and what is left.
+- [x] P59.1 The site-prep difference is attributed as far as the evidence goes (#253)
+  - [x] Compare the stand variables, plot count, tree rows and seed the two runs use.
+  - [x] Record what is ruled out and what is left.
 
 Acceptance criteria:
 
