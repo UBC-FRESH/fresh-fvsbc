@@ -127,12 +127,12 @@ Contract rules
    failed when it holds a row *of severity* `ERROR`, whatever the other tables contain, and its warnings are
    returned rather than discarded.
 
-   **The table's presence is not guaranteed either.** A ``DATABASE`` block names the tables a run
-   writes, and the official case's block does not name `FVS_Error`, so that run writes **no such
-   table**: "the run writes no error rows" is then true because there is nothing to hold one. The
-   reader treats an absent table as a failure to read, which is right for this project's route, where
-   the extension writes the table on every run, and it is not a claim about FVS in general. The oracle
-   test records which of the two it found.
+   **The table's presence is not guaranteed either.** FVS writes `FVS_Error` only when it has
+   something to log: a run that raises no warning and no error has no such table. An earlier revision of
+   this page said the extension wrote it on every run, and the reader treated an absent table as a
+   failure to read on that premise. A 999-tree single-plot case disproved it — FVS logged nothing, wrote
+   no table, and the package reported a good run as failed. The reader now answers an absent table with
+   an empty frame of the table's columns, so silence reads as a clean run.
 
 Not verified
 ------------
