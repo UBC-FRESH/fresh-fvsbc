@@ -136,6 +136,10 @@ The two that are not recipes
   and that is a clean run.
 * ``FVS_InvReference`` is exposed and **no run of this package produces it**, for a cause that is not
   established. Reading it is supported; a run that should have written it is a question for the build.
+  What is ruled out is on the record: the source files are identical to the ones a standalone
+  ``FVSbc`` builds from, the compiled routine is the same size in both binaries, the driver reads the
+  stand through the same route, and the output database is open and the case row created at the point
+  the writer runs. ``notes/triage.md`` carries it.
 
 .. note::
 

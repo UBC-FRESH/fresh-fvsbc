@@ -92,10 +92,25 @@ says which review changed it.
   validator now warns, and with the block first the four fire tables are written and **agree with the
   standalone value for value**.
 - **`FVS_InvReference` is written by the standalone on every run and never by this package's build.**
-  The writer is compiled in and `fvs_` calls it — `objdump` shows the call — with byte-identical
-  `dbsreference.f` and `dbscase.f` between the pin and upstream, a minimal `DATABASE` block, and the
-  same input database. **The cause is not established.** It is the one exposed table that no run of
-  this package produces. **Reopened by establishing the cause.**
+  It is the one exposed table no run of this package produces. `P61` narrowed it as far as observation
+  from outside the binary allows:
+
+  - **Not the source.** `dbsreference.f` and `dbscase.f` are byte-identical between the pin and
+    upstream, and the compiled `dbsreference_` is **the same size in both binaries** — 5,097 bytes.
+  - **Not the driver or the inputs.** This package's driver now reads the stand through the *same*
+    `DSNin` route the standalone uses, with the same keyword file structure, and still writes no such
+    table.
+  - **Not the handle, and not the case row.** `DBSSTATS` is called from `CALL STATS`, the statement
+    immediately before `CALL DBSREFERENCE` in `fvs.f`, and a run with `INVSTATS` and `STATS` **does**
+    write `FVS_Stats_Species_Metric`. So at the point `DBSREFERENCE` runs, the output database is
+    open and `DBSCASE(1)` has created the case row.
+
+  That leaves a **runtime-state difference inside the routine itself**, which is not observable from
+  outside: its silent exits are `fsql3_tableexists` reporting the table as present and the `CREATE`
+  returning an error, and nothing distinguishes them without a log line. **Establishing which needs a
+  build of the fork with one added write**, which is a change in the pinned fork and not here.
+
+  **Reopened by a build with that line**, or by an upstream fix.
 - **A run that logs nothing was reported as failed, and that is fixed.** FVS writes `FVS_Error` only when
   it has something to log; the reader treated an absent table as a failure to read, on the stated premise
   that the extension wrote it on every run. A 999-tree single-plot case disproved the premise: FVS logged
