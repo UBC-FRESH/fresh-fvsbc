@@ -52,7 +52,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P41 The container deployment and the oracle harness | #181 | `feature/p41-container-and-oracle` | complete |
 | P43 The proxy prefix | #186 | `feature/p43-proxy-prefix` | complete |
 | P42 The THINQFA supplemental record | #179 | `feature/p42-thinqfa` | complete |
-| P44 Release 0.13.0 | #192 | `feature/p44-release-0-13-0` | active |
+| P44 Release 0.13.0 | #192 | `feature/p44-release-0-13-0` | complete |
 
 ## Lifecycle Map
 
@@ -1117,16 +1117,16 @@ Acceptance criteria:
 
 Parent issue: #192
 Branch: `feature/p44-release-0-13-0`
-Status: active
+Status: complete
 
 Goal: release `0.13.0`, because `main` carries three things a deployment needs: `THINQFA`, the JupyterHub
 proxy fix, and the oracle harness first cut.
 
-- [ ] P44.1 Version and notes for 0.13.0 (#193)
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.12.0".
-  - [ ] Restate the authentication gap as the deployment assumption it is.
-  - [ ] Add the proxied verification to what is verified.
+- [x] P44.1 Version and notes for 0.13.0 (#193)
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.12.0".
+  - [x] Restate the authentication gap as the deployment assumption it is.
+  - [x] Add the proxied verification to what is verified.
 
 Acceptance criteria:
 
