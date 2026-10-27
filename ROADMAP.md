@@ -50,7 +50,8 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P39 A real BC case, and what it broke | #171 | `feature/p39-real-case` | complete |
 | P40 Release 0.12.0 | #175 | `feature/p40-release-0-12-0` | complete |
 | P41 The container deployment and the oracle harness | #181 | `feature/p41-container-and-oracle` | complete |
-| P43 The proxy prefix | #186 | `feature/p43-proxy-prefix` | active |
+| P43 The proxy prefix | #186 | `feature/p43-proxy-prefix` | complete |
+| P42 The THINQFA supplemental record | #179 | `feature/p42-thinqfa` | active |
 
 ## Lifecycle Map
 
@@ -1072,17 +1073,38 @@ Acceptance criteria:
 - `scripts/oracle_compare.py` renders, runs and compares, with tests that do not need the binary.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
+## Phase 42: The THINQFA supplemental record
+
+Parent issue: #179
+Branch: `feature/p42-thinqfa`
+Status: active
+
+Goal: make `THINQFA` usable. The keyword reads a second record that selects the residual-density units, and
+the wrapper could not write it.
+
+- [ ] P42.1 Add the THINQFA supplemental record (#180)
+  - [ ] `SUPPLEMENTAL_KEYWORDS` and a `supplemental` tuple on `Keyword`.
+  - [ ] Exactly one record, first character `0`, `1` or `2`; refused when missing or on another keyword.
+  - [ ] Rendered immediately after the keyword, with no `END`.
+  - [ ] `--keyword THINQFA=...;0` through the CLI, which the web API inherits.
+
+Acceptance criteria:
+
+- A `THINQFA` set renders its units record, and a set without one is refused by name.
+- The record reaches FVS through the CLI and therefore through the API.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
 ## Phase 43: The proxy prefix
 
 Parent issue: #186
 Branch: `feature/p43-proxy-prefix`
-Status: active
+Status: complete
 
 Goal: make the service work behind the JupyterHub proxy without depending on whether it strips the prefix.
 
-- [ ] P43.1 Handle the proxy prefix in the service (#187)
-  - [ ] A middleware strips a configured prefix when the request carries it.
-  - [ ] The test asserts both forms.
+- [x] P43.1 Handle the proxy prefix in the service (#187)
+  - [x] A middleware strips a configured prefix when the request carries it.
+  - [x] The test asserts both forms.
 
 Acceptance criteria:
 

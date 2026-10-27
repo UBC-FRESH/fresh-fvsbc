@@ -73,3 +73,21 @@ def test_dashboard_rejects_an_unknown_option() -> None:
     """The dashboard exits with status 2 on an option it does not know."""
     result = run_script("dashboard.py", "--bogus")
     assert result.returncode == 2
+
+
+def test_the_semicolon_form_gives_a_keyword_its_supplemental_record() -> None:
+    """``--keyword THINQFA=...;1`` is the record FVS reads after the keyword."""
+    from fresh_fvsbc.cli import _parse_keyword
+
+    keyword = _parse_keyword("THINQFA=1,0,24,0,1.4,2,100;1")
+    assert keyword.name == "THINQFA"
+    assert keyword.parameters == ("1", "0", "24", "0", "1.4", "2", "100")
+    assert keyword.supplemental == ("1",)
+
+
+def test_a_keyword_without_a_record_parses_as_before() -> None:
+    """The semicolon is optional, so every existing argument keeps its meaning."""
+    from fresh_fvsbc.cli import _parse_keyword
+
+    assert _parse_keyword("TIMEINT=,5").supplemental == ()
+    assert _parse_keyword("PROCESS").supplemental == ()

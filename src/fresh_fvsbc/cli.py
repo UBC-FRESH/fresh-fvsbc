@@ -139,10 +139,12 @@ def _parser() -> argparse.ArgumentParser:
         action="append",
         dest="entries",
         type=partial(_tagged, "keyword"),
-        metavar="NAME[=FIELD,...]",
+        metavar="NAME[=FIELD,...][;RECORD]",
         help=(
             "one keyword, in the order given; the fields are FVS's own parameter fields, and "
-            "a blank one is written as a gap, as in --keyword TIMEINT=,5"
+            "a blank one is written as a gap, as in --keyword TIMEINT=,5. A keyword that reads a "
+            "supplemental record takes it after a semicolon, as in "
+            "--keyword THINQFA=1,0,24,0,1.4,2,100;1"
         ),
     )
     parser.add_argument(
@@ -150,7 +152,7 @@ def _parser() -> argparse.ArgumentParser:
         action="append",
         dest="entries",
         type=partial(_tagged, "block"),
-        metavar="NAME[=FIELD,...]|LINE|LINE",
+        metavar="NAME[=FIELD,...][;RECORD]|LINE|LINE",
         help=(
             "one keyword that takes a block of lines, in the order given; the fields come before "
             "the first |, and each | starts a line, as in "
@@ -189,28 +191,33 @@ def _tagged(kind: str, text: str) -> tuple[str, str]:
 def _parse_keyword(text: str) -> Keyword:
     """Parse one ``--keyword`` argument.
 
+    A keyword that reads a supplemental record takes it after a semicolon, so
+    ``THINQFA=1,0,24,0,1.4,2,100;1`` gives the keyword its seven fields and the units record ``1``.
+
     Parameters
     ----------
     text : str
-        The argument, as ``NAME`` or ``NAME=FIELD,...``.
+        The argument, as ``NAME``, ``NAME=FIELD,...`` or ``NAME=FIELD,...;RECORD``.
 
     Returns
     -------
     Keyword
-        The keyword and its fields, in order.
+        The keyword, its fields and its supplemental record, in order.
 
     Raises
     ------
     CommandInputError
         If the argument names no keyword.
     """
-    name, separator, fields = text.partition("=")
+    body, _, record = text.partition(";")
+    name, separator, fields = body.partition("=")
     name = name.strip()
     if not name:
         raise CommandInputError(f"--keyword needs a name, and got {text!r}")
+    supplemental = (record.strip(),) if record else ()
     if not separator:
-        return Keyword(name)
-    return Keyword(name, tuple(fields.split(",")))
+        return Keyword(name, supplemental=supplemental)
+    return Keyword(name, tuple(fields.split(",")), supplemental=supplemental)
 
 
 def _parse_block(text: str) -> Keyword:

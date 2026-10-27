@@ -59,6 +59,7 @@ __all__ = [
     "RECORD_KEYWORDS",
     "SPECIAL_KEYWORDS",
     "STAND_KEYWORDS",
+    "SUPPLEMENTAL_KEYWORDS",
     "Keyword",
     "KeywordOrderError",
     "KeywordSet",
@@ -270,6 +271,13 @@ LINES_KEYWORDS: frozenset[str] = frozenset(
 #: The keywords whose block holds **other keywords** rather than lines: ``IF`` opens a conditional
 #: whose body is a sequence of keywords and whose terminator is ``ENDIF``. That is a nested
 #: structure this model does not have, so it is refused by name rather than written wrongly.
+#: Keywords that read **one extra record** after their own. ``THINQFA`` is the one in this
+#: variant: its own record carries the year and six parameters, and the record that follows names
+#: the units of its residual-density target. ``cuts.f`` reads ``PRMS(1..6)`` from the six post-year
+#: fields, which leaves ``QFATAR = INT(PRMS(7))`` for the supplemental record's value; the keyword
+#: guide says the same.
+SUPPLEMENTAL_KEYWORDS: frozenset[str] = frozenset({"THINQFA"})
+
 NESTED_KEYWORDS: frozenset[str] = frozenset({"IF"})
 
 #: Every keyword that takes a block of some kind.
@@ -345,6 +353,9 @@ class Keyword:
         one, and the writer adds the ``ENDIF`` that closes it.
     otherwise : tuple of Keyword, optional
         The ``ELSE`` branch of a conditional.
+    supplemental : tuple of str, optional
+        The record FVS reads **after** this keyword's own. Only :data:`SUPPLEMENTAL_KEYWORDS` take
+        one, and the writer does not close it: the record stands alone on its line.
     """
 
     name: str
@@ -352,6 +363,44 @@ class Keyword:
     lines: tuple[str, ...] = ()
     nested: tuple[Keyword, ...] = ()
     otherwise: tuple[Keyword, ...] = ()
+    supplemental: tuple[str, ...] = ()
+
+
+#: The residual-density units a ``THINQFA`` supplemental record may name, and what each means.
+THINQFA_UNITS: dict[str, str] = {
+    "0": "basal area per acre",
+    "1": "trees per acre",
+    "2": "stand density index",
+}
+
+
+def _validate_supplemental(keyword: Keyword) -> None:
+    """Check the one extra record a supplemental keyword reads.
+
+    Parameters
+    ----------
+    keyword : Keyword
+        The keyword, which is in :data:`SUPPLEMENTAL_KEYWORDS`.
+
+    Raises
+    ------
+    UnsupportedKeywordError
+        If the record is missing, if there is more than one, or if it does not name a unit. A
+        missing record is refused rather than written, because FVS would read the **next
+        keyword** as the units record and the set would be silently wrong.
+    """
+    if len(keyword.supplemental) != 1:
+        raise UnsupportedKeywordError(
+            f'"{keyword.name}" reads exactly one supplemental record, and this set gives '
+            f"{len(keyword.supplemental)}: without it FVS reads the next keyword as that record"
+        )
+    record = keyword.supplemental[0]
+    if record not in THINQFA_UNITS:
+        allowed = ", ".join(f"{code} ({meaning})" for code, meaning in THINQFA_UNITS.items())
+        raise UnsupportedKeywordError(
+            f'"{keyword.name}" takes a units code as its supplemental record, one of {allowed}; '
+            f"this set gives {record!r}"
+        )
 
 
 def validate_keyword(keyword: Keyword) -> list[str]:
@@ -383,6 +432,13 @@ def validate_keyword(keyword: Keyword) -> list[str]:
             f'"{keyword.name}" does not take lines; only '
             f"{', '.join(sorted(LINES_KEYWORDS | NESTED_KEYWORDS))} do"
         )
+    if keyword.supplemental and keyword.name not in SUPPLEMENTAL_KEYWORDS:
+        raise UnsupportedKeywordError(
+            f'"{keyword.name}" does not take a supplemental record; only '
+            f"{', '.join(sorted(SUPPLEMENTAL_KEYWORDS))} does"
+        )
+    if keyword.name in SUPPLEMENTAL_KEYWORDS:
+        _validate_supplemental(keyword)
     if keyword.name not in KEYWORDS and keyword.name not in SPECIAL_KEYWORDS:
         near = _near_miss(keyword.name)
         hint = f' The table spells it "{near}".' if near is not None else ""
@@ -495,6 +551,8 @@ def render_keyword(keyword: Keyword) -> str:
         return head + lines + "THEN\n" + body + otherwise + "ENDIF\n"
     if keyword.name in LINES_KEYWORDS:
         return head + "".join(f"{line}\n" for line in keyword.lines) + "END\n"
+    if keyword.supplemental:
+        return head + "".join(f"{record}\n" for record in keyword.supplemental)
     return head
 
 

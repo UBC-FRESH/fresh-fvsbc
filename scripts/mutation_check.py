@@ -197,8 +197,11 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         identifier="command-drops-a-blank-field",
         module="src/fresh_fvsbc/cli.py",
-        find='    return Keyword(name, tuple(fields.split(",")))',
-        replace='    return Keyword(name, tuple(field for field in fields.split(",") if field))',
+        find='    return Keyword(name, tuple(fields.split(",")), supplemental=supplemental)',
+        replace=(
+            '    return Keyword(name, tuple(field for field in fields.split(",") if field), '
+            "supplemental=supplemental)"
+        ),
         test="tests/test_command.py::test_a_keyword_keeps_its_blank_fields",
     ),
     Mutation(
