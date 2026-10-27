@@ -1,10 +1,33 @@
-# fresh-fvsbc 0.11.0
+# fresh-fvsbc 0.12.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.11.0
+
+- **There is a browser surface.** `pip install 'fresh-fvsbc[web]'` then `fresh-fvsbc web --runs DIR`. It is
+  **a reader over the artefacts a run already wrote** — `run.key`, `run.tre`, `FVSOut.db`, `run.sum`,
+  `summary.csv`, `provenance.json`, `variants.json` — and it starts a run by invoking the CLI in a
+  subprocess, never by importing the Fortran extension. FastAPI behind an optional extra, a **vanilla ES
+  module shell with no build step**, and four validated **skins** (`analyst`, `carbon`, `reviewer`,
+  `tables`) whose unknown panels and actions are refused by name.
+- **The surface marks which tables are verified.** `ORACLE_TABLES` is now a fact in `outputs.py`: four of
+  the 31 exposed tables are checked against FVS's own database dump and 27 are not. `GET /api/oracle`
+  reports the counts, every table record carries `oracle`, and the front end says so above the rows. A
+  number whose provenance is unchecked must not look like one whose provenance is checked.
+- **A real BC case ran through it, and broke four things.** The 2022 workshop bundle's own
+  `FVS-BC.Stand.Structure.Data.db` — one stand, 1540 trees, site index FD 15, inventory year 2020 — found:
+  **one plot holds at most 999 trees** (BC's record shares columns 1 to 4 between the plot and the tree
+  number), so a larger stand is now refused **by name with the reason**; a **failed child was reported as
+  running forever**, and is now reported `failed` with its log at `GET /api/runs/{id}/log`; a run that died
+  before writing `run.key` was **invisible**, and a directory holding the service's log is now discovered;
+  and the start request **grouped blocks after keywords**, which the `DATABASE`-first rule refuses — the
+  list is now one ordered sequence.
+- **A 999-tree subset of that real stand writes 7 tables through the surface**, including 3,996 per-tree
+  rows, with the oracle flag marking one of the seven as verified and six as not.
 
 ## What changed since 0.10.0
 
@@ -227,7 +250,7 @@ recipe.
 
 ## Known gaps
 
-Nine, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
+Eleven, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
 1. **The reader exposes thirty-one of 44 tables.** The other 13 are classified in
@@ -235,18 +258,24 @@ it.
    nothing calls, and the burn report's gate cannot be satisfied by valid input. **Of the eight candidates,
    six are blocked by something this project does not have** — an external climate attribute file, the FIA
    variant, a calibrated run, a bark-beetle specification, the sprout model — and none is blocked by effort.
-2. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
+2. **One plot holds at most 999 trees.** BC's tree record shares columns 1 to 4 between the plot and the
+   tree number, so the writer has three digits. A stand of 1540 trees — which the 2022 workshop's own case
+   carries in one plot — is refused by name. Subdividing a stand into plots changes what the statistics
+   mean, so it is a modelling decision and not a repair.
+3. **The web surface has no authentication.** It binds `127.0.0.1` and refuses anything else without
+   `--allow-remote`. That refusal is the security decision until there is an auth story.
+4. **The second official case, `YSM-SkyRanch`, differs** on three stands, 328 of 375 rows identical,
    unexplained since `P2.3`.
-3. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
+5. **The oracle is a 2022 fixture, and the FVS project's own checker skips this variant.** Agreement is
    evidence, not proof.
-4. **The residual on three dense stands** is attributed, not proven, to upstream changes.
-5. **`run.py`'s drive body is covered only where the extension is built**: 84 percent in the quality
+6. **The residual on three dense stands** is attributed, not proven, to upstream changes.
+7. **`run.py`'s drive body is covered only where the extension is built**: 84 percent in the quality
    job, which has no extension, and the gate is met at 97 percent overall because the build job covers
    the rest.
-6. **A parameter passed to the command cannot contain a comma.**
-7. **At `-O0` the variant writes no database at all**, so the optimiser is not optional.
-8. **The package needs a separately built extension.** Installing it does not build FVS.
-9. **The `nemora` adapter requires `species` and `tree_age`**, and species assignment is out of scope.
+8. **A parameter passed to the command cannot contain a comma.**
+9. **At `-O0` the variant writes no database at all**, so the optimiser is not optional.
+10. **The package needs a separately built extension.** Installing it does not build FVS.
+11. **The `nemora` adapter requires `species` and `tree_age`**, and species assignment is out of scope.
 
 ## What is not in this release
 
