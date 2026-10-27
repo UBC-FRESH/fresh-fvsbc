@@ -54,6 +54,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P42 The THINQFA supplemental record | #179 | `feature/p42-thinqfa` | complete |
 | P44 Release 0.13.0 | #192 | `feature/p44-release-0-13-0` | complete |
 | P45 The tree handoff, mapped | #196 | `feature/p45-tree-handoff` | complete |
+| P46 The DSNin tree handoff | #200 | `feature/p46-dsnin` | active |
 
 ## Lifecycle Map
 
@@ -1153,6 +1154,26 @@ Acceptance criteria:
 
 - The triage states each mechanism, each failure, and FVS's own message for it.
 - The harness warns, in its own docstring, that its tree handoff is unfinished.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 46: The DSNin tree handoff
+
+Parent issue: #200
+Branch: `feature/p46-dsnin`
+Status: active
+
+Goal: make the standalone read a run's trees, so the oracle harness can compare at all.
+
+- [ ] P46.1 Read the trees through a DSNin input database (#201)
+  - [ ] An input database with `FVS_TreeInit` and `FVS_StandInit`.
+  - [ ] A `DSNin` block in place of the inline records.
+  - [ ] The exit-code fix: a logged error is not a fatal one.
+
+Acceptance criteria:
+
+- The standalone reads every tree and writes the per-tree table.
+- The harness compares without treating a logged error as fatal.
+- The triage records that the differences are not yet attributed.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives
