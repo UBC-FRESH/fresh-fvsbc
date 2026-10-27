@@ -129,17 +129,23 @@ supplies the ``END``.
 code ``30`` with the Hawksworth rating as the severity — and ``NEWSPRED`` is what makes the per-tree
 table appear. Without it, three of the four are written and the fourth is not.
 
+``FVS_InvReference``
+--------------------
+
+It needs **no keyword at all** and is written on every run: species limits, site indices and volume
+equations, one row per species. It is produced by ``DBSREFERENCE``, which ``fvs.f`` calls immediately
+after ``STATS``.
+
+**Before `0.18.0` no run of this package produced it.** The extension is driven by PyFVS's
+``src/api/fvs_step.f90``, an extraction of ``fvs.f``'s initialisation that calls ``STATS`` and omitted
+``DBSREFERENCE``; the original ``fvs_`` is dead code in the extension, so the writer was compiled in and
+never called. The build recipe's PyFVS patch set now carries the missing call.
+
 The two that are not recipes
 ----------------------------
 
 * ``FVS_Error`` is written only when FVS logs something. A run that logs nothing has no such table,
   and that is a clean run.
-* ``FVS_InvReference`` is exposed and **no run of this package produces it**, for a cause that is not
-  established. Reading it is supported; a run that should have written it is a question for the build.
-  What is ruled out is on the record: the source files are identical to the ones a standalone
-  ``FVSbc`` builds from, the compiled routine is the same size in both binaries, the driver reads the
-  stand through the same route, and the output database is open and the case row created at the point
-  the writer runs. ``notes/triage.md`` carries it.
 
 .. note::
 

@@ -97,12 +97,8 @@ Contract rules
    `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`, `FVS_Stats_Species_Metric`, `FVS_Stats_Stand`,
    `FVS_StrClass_Metric`,
    `FVS_Summary_Metric` and `FVS_TreeList_Metric`. Most are written only when a `DATABASE` block asks
-   for them, and the block must come before the stand setup — see :doc:`keywords`. **One is exposed
-   and never written by a run of this package**: `FVS_InvReference` is produced on every run by a
-   standalone `FVSbc` built from the same source, and no run of this package produces it, for a cause
-   that is not established (`notes/triage.md`). Reading it is supported; a run that should have
-   written it is a question for the build, not for the reader. **Naming a table's option is never
-   enough on its own** — see :doc:`table-recipes` for the second thing each one needs. The row counts
+   for them, and the block must come before the stand setup — see :doc:`keywords`. **Naming a table's
+   option is never enough on its own** — see :doc:`table-recipes` for the second thing each one needs. The row counts
    of the four the official dump carries are checked against it in `tests/test_oracle.py`, and
    twenty-seven of the thirty-one are checked against a standalone `FVSbc` value for value.
 

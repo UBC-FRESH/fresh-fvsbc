@@ -81,10 +81,6 @@ NOT_COMPARABLE: dict[str, str] = {
         "location code and logs FVS03, which the keyword path never does, so the standalone writes "
         "the table and this package's run does not"
     ),
-    "FVS_InvReference": (
-        "the standalone writes it on every run and this package's build never does, even with a "
-        "minimal DATABASE block; notes/triage.md carries the evidence and the open question"
-    ),
 }
 
 #: Columns whose disagreement is explained, with the reason. Anything not named here is a
