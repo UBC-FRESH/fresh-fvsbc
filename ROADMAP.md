@@ -48,7 +48,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P37 The web front end | #163 | `feature/p37-web-design` | complete |
 | P38 The web surface, first cut | #167 | `feature/p38-web-first-cut` | complete |
 | P39 A real BC case, and what it broke | #171 | `feature/p39-real-case` | complete |
-| P40 Release 0.12.0 | #175 | `feature/p40-release-0-12-0` | active |
+| P40 Release 0.12.0 | #175 | `feature/p40-release-0-12-0` | complete |
 
 ## Lifecycle Map
 
@@ -1029,15 +1029,15 @@ Acceptance criteria:
 
 Parent issue: #175
 Branch: `feature/p40-release-0-12-0`
-Status: active
+Status: complete
 
 Goal: release `0.12.0`, because `main` carries a whole new surface, verified against a real BC stand.
 
-- [ ] P40.1 Version and notes for 0.12.0 (#176)
-  - [ ] Bump the version in two files.
-  - [ ] Add "What changed since 0.11.0".
-  - [ ] Add the 999-tree limit and the missing authentication to the known gaps, and renumber.
-  - [ ] Add the surface's verification to what is verified.
+- [x] P40.1 Version and notes for 0.12.0 (#176)
+  - [x] Bump the version in two files.
+  - [x] Add "What changed since 0.11.0".
+  - [x] Add the 999-tree limit and the missing authentication to the known gaps, and renumber.
+  - [x] Add the surface's verification to what is verified.
 
 Acceptance criteria:
 
