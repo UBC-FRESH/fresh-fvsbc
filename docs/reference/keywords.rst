@@ -103,6 +103,12 @@ Some keywords are the exception, because they read records of their own rather t
   ten-column field. An earlier revision took raw lines here and a caller could write exactly that;
   the block now takes keywords and the writer spaces them.
 
+  **The block must precede ``INVYEAR`` when it asks for ``FUELOUT`` or ``POTFIRE``.** Both capture
+  the inventory year when they are read, and ``fmdout.f`` and ``fmpofl.f`` treat **any positive
+  value as "suppress this report"**. Read after ``INVYEAR``, they switch their own reports off and
+  the fuels and potfire tables are **silently not written** — the run succeeds and the tables are
+  simply absent. The validator warns, and the warning names the two keywords.
+
   The body is checked against ``fmin.f``'s own table — **fifty-five keywords** — and one written
   outside the block is refused, because FVS would ignore it. ``FUELMODL`` and ``DEFULMOD`` read one
   supplemental record after their own, and the rest read one record. Each table is written only when

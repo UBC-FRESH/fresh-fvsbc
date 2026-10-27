@@ -62,6 +62,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P51 Release 0.15.0 | #220 | `feature/p51-release-0-15-0` | complete |
 | P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | complete |
 | P53 Release 0.15.1 | #228 | `feature/p53-release-0-15-1` | complete |
+| P54 The fire tables | #232 | `feature/p54-fire-tables` | active |
 
 ## Lifecycle Map
 
@@ -1323,6 +1324,26 @@ Acceptance criteria:
 
 - The package reports `0.15.1`, and the notes lead with the fix.
 - A clean checkout refuses both cases with a message and exit `2`.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 54: The fire tables
+
+Parent issue: #232
+Branch: `feature/p54-fire-tables`
+Status: active
+
+Goal: give the oracle a fire, and make the four fire tables reachable and checked.
+
+- [ ] P54.1 The fire tables are reachable and checked (#233)
+  - [ ] The validator warns when `FUELOUT` or `POTFIRE` is read after `INVYEAR`.
+  - [ ] The harness leaves the inventory year to the run's own keyword.
+  - [ ] The four fire tables are checked against the standalone.
+
+Acceptance criteria:
+
+- A block that asks for `FUELOUT` or `POTFIRE` after `INVYEAR` warns, naming both keywords.
+- A block before `INVYEAR` writes all four fire tables.
+- The oracle agrees with all four, value for value.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

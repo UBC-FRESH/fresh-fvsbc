@@ -438,12 +438,16 @@ def stand_record(key_text: str, stand_id: str, trees: list[dict[str, object]]) -
     -------
     dict
         Values keyed by the official schema's column names. Everything the keyword set does not
-        carry is left out, and the database writes NULL for it.
+        carry is left out, and the database writes NULL for it. The inventory year is left out even
+        when the set carries it, so the standalone reads it from the run's own ``INVYEAR`` in the
+        order the run uses; see the comment in the body for the tables that depend on it.
     """
     stand: dict[str, object] = {"Stand_ID": stand_id, "Variant": "BC"}
-    inventory = _keyword_fields(key_text, "INVYEAR")
-    if inventory and inventory[0]:
-        stand["Inv_Year"] = int(float(inventory[0]))
+    # ``Inv_Year`` is deliberately **not** copied from ``INVYEAR``. ``FUELOUT`` and ``POTFIRE``
+    # capture the inventory year when they are read, and ``fmdout.f`` and ``fmpofl.f`` treat any
+    # positive value as "suppress this report". A stand read from the database sets the year before
+    # the fire-model block, and the fuels and potfire tables then never appear; the run's own
+    # ``INVYEAR`` keyword sets it in the order the run uses, so the database leaves it NULL.
     site = _keyword_fields(key_text, "SITECODE")
     if len(site) >= 2:
         stand["Site_Species"] = site[0]

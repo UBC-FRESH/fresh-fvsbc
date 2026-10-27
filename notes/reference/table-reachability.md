@@ -7,11 +7,15 @@ mentions it is the writer, and the writer's call sites are counted with `grep -r
 
 **Counts, after `P34`: 31 exposed, 8 with a writer and a call site, 5 with a writer and no call site, and 0 without a writer.**
 
-**And, after `P49` and `P50`, nine of the exposed tables are checked against FVS's own writer** by
-`scripts/oracle_compare.py`: `FVS_Carbon_Metric`, `FVS_Down_Wood_Cov_Metric`,
-`FVS_Down_Wood_Vol_Metric`, `FVS_Hrv_Carbon`, `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`,
-`FVS_StrClass_Metric`, `FVS_Summary_Metric` and `FVS_TreeList_Metric` all match the standalone value for
-value. `FVS_InvReference` is exposed and no run of this package writes it.
+**And, after `P49`, `P50` and `P54`, thirteen of the exposed tables are checked against FVS's own
+writer** by `scripts/oracle_compare.py`: `FVS_Carbon_Metric`, `FVS_Consumption_Metric`,
+`FVS_Down_Wood_Cov_Metric`, `FVS_Down_Wood_Vol_Metric`, `FVS_Fuels_Metric`, `FVS_Hrv_Carbon`,
+`FVS_PotFire_Cond_Metric`, `FVS_PotFire_Metric`, `FVS_SnagDet_Metric`, `FVS_SnagSum_Metric`,
+`FVS_StrClass_Metric`, `FVS_Summary_Metric` and `FVS_TreeList_Metric` all match the standalone value
+for value. `FVS_InvReference` is exposed and no run of this package writes it.
+
+**The four fire tables need the `FMIN` block to precede `INVYEAR`**, because `FUELOUT` and `POTFIRE`
+capture the inventory year and FVS reads a positive value as "suppress" (`notes/triage.md`).
 
 ## The correction this sweep forced
 
