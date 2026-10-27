@@ -72,18 +72,44 @@ Some keywords are the exception, because they read records of their own rather t
   **after** the year, which leaves ``QFATAR = INT(PRMS(7))`` for the supplemental record's value. A set
   without the record is **refused**, not written, because FVS would read the next keyword as the units
   record and the run would be wrong without saying so.
-- ``COMMENT``, ``COMPUTE``, ``DATABASE``, ``FMIN`` and ``MISTOE`` take a **block of text lines** ended by
-  ``END``.
+- ``COMMENT``, ``COMPUTE``, ``DATABASE``, ``ESTAB``, ``MISTOE`` and ``RDIN`` take a **block of text
+  lines** ended by ``END``.
   A caller supplies the lines and the writer supplies the terminator, because a block without one
   swallows the rest of the file. **A ``DATABASE`` block must precede the stand setup**: FVS refuses it
   later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it
   first. The validator refuses a set that puts it after ``STDIDENT``, ``STDINFO`` or ``STANDSQL``.
-  **``FMIN`` is how a caller asks for the fuels, potfire, carbon and consumption tables**: ``FUELOUT``,
-  ``FUELREPT``, ``POTFIRE``, ``CARBREPT``, ``SIMFIRE``, ``DWDCVOUT``, ``CANFPROF`` and ``MORTREPT`` are options inside it rather
-  than keywords, which is why they are not in the table. Each writes its tables only when the ``DATABASE`` block names
-  the matching option — ``FuelsOut``, ``FuelReDB``, ``PotfirDB``, ``CARBREDB`` or ``BURNREDB`` — and the
-  option alone is never enough for carbon or consumption: ``CARBREDB`` needs ``CARBREPT``, and
-  ``BURNREDB`` needs an actual fire, which ``SIMFIRE`` schedules as activity 2506.
+- **``FMIN`` is a block of *keywords*, not of lines**, and it is how a caller asks for the snag,
+  down-wood, fuel, potfire, carbon and consumption tables. Its body is written by the same writer as
+  any other keyword, so a parameter lands in FVS's ten-column field:
+
+  .. code-block:: python
+
+     Keyword("FMIN", nested=(
+         Keyword("SNAGCLAS", ("0.0", "10.0", "20.0", "40.0")),
+         Keyword("SNAGOUT", ("1",)),
+         Keyword("CARBREPT", ("2",)),
+     ))
+
+  from the shell:
+
+  .. code-block:: console
+
+     $ fresh-fvsbc population.json --directory run \
+         --block "FMIN|SNAGCLAS=0.0,10.0,20.0,40.0|SNAGOUT=1|CARBREPT=2"
+
+  **The fields are not spaced by hand.** A hand-spaced line is read as different numbers and FVS
+  reports nothing: ``SNAGCLAS  0.0   10.0  20.0  40.0`` reaches FVS as class 1 ``0.0``, class 2
+  ``20.0``, class 3 ``0.0`` and class 4 ``2537.5``, because each value has to sit in its own
+  ten-column field. An earlier revision took raw lines here and a caller could write exactly that;
+  the block now takes keywords and the writer spaces them.
+
+  The body is checked against ``fmin.f``'s own table — **fifty-five keywords** — and one written
+  outside the block is refused, because FVS would ignore it. ``FUELMODL`` and ``DEFULMOD`` read one
+  supplemental record after their own, and the rest read one record. Each table is written only when
+  the ``DATABASE`` block names the matching option — ``SnagOuDB``, ``SnagSuDB``, ``DWDVLDB``,
+  ``DWDCVDB``, ``FuelsOut``, ``PotfirDB``, ``CARBREDB`` or ``BURNREDB`` — and the option alone is
+  never enough for carbon or consumption: ``CARBREDB`` needs ``CARBREPT``, and ``BURNREDB`` needs an
+  actual fire, which ``SIMFIRE`` schedules as activity 2506.
 
   **The burn report has no working path.** ``FVS_BurnReport_Metric`` is written only inside
   ``IF (IFMBRB .LT. 0)``, and ``IFMBRB`` is set to ``9999`` at initialisation and to the inventory year

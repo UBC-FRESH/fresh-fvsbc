@@ -58,6 +58,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P47 A quiet run | #204 | `feature/p47-quiet-run` | complete |
 | P48 Release 0.14.0 | #208 | `feature/p48-release-0-14-0` | complete |
 | P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | complete |
+| P50 The fire-model block | #216 | `feature/p50-fire-model-block` | active |
 
 ## Lifecycle Map
 
@@ -1238,6 +1239,29 @@ Acceptance criteria:
 - A run's `FVS_Summary_Metric` and `FVS_TreeList_Metric` match the standalone's value for value.
 - The run-identity columns cannot make a table differ.
 - An unexplained difference fails the comparison, and an explanation that stops applying is reported.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 50: The fire-model block
+
+Parent issue: #216
+Branch: `feature/p50-fire-model-block`
+Status: active
+
+Goal: make `FMIN` a validated block of keywords, so the snag, down-wood, fuel, potfire and carbon
+tables can be asked for without hand-spacing FVS's fields.
+
+- [ ] P50.1 `FMIN` holds keywords (#217)
+  - [ ] The block moves from raw lines to keywords, rendered by the shared writer.
+  - [ ] The body is checked against `fmin.f`'s fifty-five keywords.
+  - [ ] A fire-model keyword outside the block is refused.
+  - [ ] `--block "FMIN|SNAGOUT=1|..."` parses each entry as a keyword.
+
+Acceptance criteria:
+
+- The block renders each parameter in FVS's ten-column field.
+- A name outside `fmin.f`'s table is refused, and so is a fire-model keyword outside the block.
+- `--block "FMIN|SNAGOUT=1|SNAGSUM=2"` builds the block.
+- The snag, down-wood and carbon tables are written, and the oracle agrees with them.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

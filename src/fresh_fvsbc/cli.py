@@ -28,6 +28,7 @@ from functools import partial
 from pathlib import Path
 
 from fresh_fvsbc.keywords import (
+    KEYWORD_BLOCK_KEYWORDS,
     LINES_KEYWORDS,
     Keyword,
     KeywordWidthError,
@@ -154,9 +155,10 @@ def _parser() -> argparse.ArgumentParser:
         type=partial(_tagged, "block"),
         metavar="NAME[=FIELD,...][;RECORD]|LINE|LINE",
         help=(
-            "one keyword that takes a block of lines, in the order given; the fields come before "
-            "the first |, and each | starts a line, as in "
-            '--block "DATABASE|DSNOut|FVSOut.db|ComputDB"'
+            "one keyword that takes a block, in the order given; the fields come before the first "
+            "|, and each | starts an entry, as in "
+            '--block "DATABASE|DSNOut|FVSOut.db|ComputDB". FMIN takes keywords rather than lines, '
+            'as in --block "FMIN|SNAGOUT=1|SNAGSUM=2|CARBREPT=2"'
         ),
     )
     parser.add_argument(
@@ -238,14 +240,21 @@ def _parse_block(text: str) -> Keyword:
     CommandInputError
         If the argument names no keyword, or names one that takes no block of lines.
     """
-    head, *lines = text.split("|")
+    head, *entries = text.split("|")
     keyword = _parse_keyword(head)
+    if keyword.name in KEYWORD_BLOCK_KEYWORDS:
+        # The fire-model block holds keywords, so each entry is parsed as one and rendered by the
+        # same writer as any other keyword. A raw line here would be spaced by hand, and a
+        # mis-spaced field is read as a different number rather than refused.
+        return Keyword(
+            keyword.name, keyword.parameters, nested=tuple(_parse_keyword(e) for e in entries)
+        )
     if keyword.name not in LINES_KEYWORDS:
         raise CommandInputError(
-            f"--block names {keyword.name!r}, which does not take a block of lines; "
-            f"use --keyword for it, and --block for {', '.join(sorted(LINES_KEYWORDS))}"
+            f"--block names {keyword.name!r}, which does not take a block; use --keyword for it, "
+            f"and --block for {', '.join(sorted(LINES_KEYWORDS | KEYWORD_BLOCK_KEYWORDS))}"
         )
-    return Keyword(keyword.name, keyword.parameters, tuple(lines))
+    return Keyword(keyword.name, keyword.parameters, tuple(entries))
 
 
 def _read_population(path: Path) -> list[Mapping[str, object]]:
