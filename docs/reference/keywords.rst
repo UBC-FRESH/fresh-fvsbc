@@ -63,6 +63,15 @@ Some keywords are the exception, because they read records of their own rather t
 
 - ``STDIDENT`` takes the record after it as the stand id and title (``canada/bc/initre.f``).
 - ``TREEFMT`` takes the two records after it as the format (``metric/base/intree.f``).
+- ``THINQFA`` takes **one supplemental record**, whose first column names the units of its
+  residual-density target: ``0`` basal area per acre, ``1`` trees per acre, ``2`` stand density index. It
+  is written as a bare record with no terminator, immediately after the keyword, and the caller supplies
+  it after a semicolon: ``--keyword THINQFA=1,0,24,0,1.4,2,100;1``.
+
+  The reason is in the source rather than the guide: ``cuts.f`` reads ``PRMS(1..6)`` from the six fields
+  **after** the year, which leaves ``QFATAR = INT(PRMS(7))`` for the supplemental record's value. A set
+  without the record is **refused**, not written, because FVS would read the next keyword as the units
+  record and the run would be wrong without saying so.
 - ``COMMENT``, ``COMPUTE``, ``DATABASE``, ``FMIN`` and ``MISTOE`` take a **block of text lines** ended by
   ``END``.
   A caller supplies the lines and the writer supplies the terminator, because a block without one

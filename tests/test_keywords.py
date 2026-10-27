@@ -379,3 +379,37 @@ def test_two_keyword_sets_with_the_same_keywords_are_equal() -> None:
     second = KeywordSet(keywords=(Keyword("ECHOSUM"),))
     assert first == second
     assert first.digest == second.digest
+
+
+def test_thinqfa_renders_its_supplemental_record_without_a_terminator() -> None:
+    """``THINQFA`` reads one extra record, and the record stands alone: no ``END`` follows it."""
+    keyword = Keyword("THINQFA", ("1", "0", "24", "0", "1.4", "2", "100"), supplemental=("1",))
+    rendered = render_keyword(keyword)
+    assert rendered.endswith("100       \n1\n") or rendered.endswith("100\n1\n")
+    assert "END" not in rendered
+
+
+def test_thinqfa_without_its_record_is_refused() -> None:
+    """FVS would read the next keyword as the units record, so the set is refused instead."""
+    with pytest.raises(UnsupportedKeywordError, match="exactly one supplemental record"):
+        validate_keyword(Keyword("THINQFA", ("1", "0", "24", "0", "1.4", "2", "100")))
+
+
+def test_thinqfa_with_two_records_is_refused() -> None:
+    """One record is what FVS reads; a second would be read as a keyword and fail later."""
+    with pytest.raises(UnsupportedKeywordError, match="exactly one"):
+        validate_keyword(Keyword("THINQFA", (), supplemental=("1", "0")))
+
+
+def test_thinqfa_takes_only_the_three_units_codes() -> None:
+    """The units code is 0, 1 or 2, and the refusal names all three with their meaning."""
+    for code in ("0", "1", "2"):
+        assert validate_keyword(Keyword("THINQFA", (), supplemental=(code,))) == []
+    with pytest.raises(UnsupportedKeywordError, match="basal area per acre"):
+        validate_keyword(Keyword("THINQFA", (), supplemental=("3",)))
+
+
+def test_a_supplemental_record_on_another_keyword_is_refused() -> None:
+    """Only the keywords that read a second record may carry one, and the refusal names them."""
+    with pytest.raises(UnsupportedKeywordError, match="does not take a supplemental record"):
+        validate_keyword(Keyword("THINBA", ("1", "20"), supplemental=("1",)))
