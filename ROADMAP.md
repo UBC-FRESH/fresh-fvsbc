@@ -64,7 +64,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P53 Release 0.15.1 | #228 | `feature/p53-release-0-15-1` | complete |
 | P54 The fire tables | #232 | `feature/p54-fire-tables` | complete |
 | P55 Release 0.16.0 | #236 | `feature/p55-release-0-16-0` | complete |
-| P56 Warnings are delivered | #239 | `feature/p56-warnings-are-delivered` | active |
+| P56 Warnings are delivered | #239 | `feature/p56-warnings-are-delivered` | complete |
 
 ## Lifecycle Map
 
@@ -1372,14 +1372,14 @@ Acceptance criteria:
 
 Parent issue: #239
 Branch: `feature/p56-warnings-are-delivered`
-Status: active
+Status: complete
 
 Goal: deliver the validator's warnings through the command, because `0.16.0` computes them and drops
 them.
 
-- [ ] P56.1 The command delivers the validator's warnings (#240)
-  - [ ] Each warning the set carries is printed to standard error before the run.
-  - [ ] A test that fails if the delivery is removed.
+- [x] P56.1 The command delivers the validator's warnings (#240)
+  - [x] Each warning the set carries is printed to standard error before the run.
+  - [x] A test that fails if the delivery is removed.
 
 Acceptance criteria:
 
