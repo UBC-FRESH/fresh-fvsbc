@@ -57,7 +57,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P46 The DSNin tree handoff | #200 | `feature/p46-dsnin` | complete |
 | P47 A quiet run | #204 | `feature/p47-quiet-run` | complete |
 | P48 Release 0.14.0 | #208 | `feature/p48-release-0-14-0` | complete |
-| P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | active |
+| P49 The oracle, attributed | #212 | `feature/p49-oracle-attributed` | complete |
 
 ## Lifecycle Map
 
@@ -1222,16 +1222,16 @@ Acceptance criteria:
 
 Parent issue: #212
 Branch: `feature/p49-oracle-attributed`
-Status: active
+Status: complete
 
 Goal: finish the standalone comparison so it is an oracle — it reports what agrees, explains what it
 can, and fails on anything it cannot.
 
-- [ ] P49.1 The comparison says what it means (#213)
-  - [ ] The output `DATABASE` block opens before the input block.
-  - [ ] `tree_num` is read with the blanks ignored, as Fortran reads it.
-  - [ ] Run-identity columns are not compared.
-  - [ ] An unexplained difference fails, and a stale explanation is reported.
+- [x] P49.1 The comparison says what it means (#213)
+  - [x] The output `DATABASE` block opens before the input block.
+  - [x] `tree_num` is read with the blanks ignored, as Fortran reads it.
+  - [x] Run-identity columns are not compared.
+  - [x] An unexplained difference fails, and a stale explanation is reported.
 
 Acceptance criteria:
 
