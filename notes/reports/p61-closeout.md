@@ -41,8 +41,11 @@ Both are swallowed: `iInvRef = 0; RETURN`, with no message. **Nothing distinguis
 ## 4. What would settle it
 
 A build of the pinned fork with one write inside `DBSREFERENCE` — the value of `iRet` after each call.
-That is a change in the fork, and ADR 0001's open policy means it needs its own approval. It is named
-here so the next person does not repeat this phase.
+That is a change in the fork. **Correction:** an earlier revision of this line said it "needs its own
+approval under ADR 0001". That was wrong three ways — ADR 0001's open item is the policy for
+contributing patches **upstream**, the fork `UBC-FRESH/PyFVS` is one this project administers, and no
+approver is named anywhere in the repository. A diagnostic patch there is a local decision, not a
+request to anyone. It is named here so the next person does not repeat this phase.
 
 ## 5. What the phase is worth
 
