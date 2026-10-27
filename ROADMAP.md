@@ -63,7 +63,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P52 A refusal is reported | #223 | `feature/p52-refusal-is-reported` | complete |
 | P53 Release 0.15.1 | #228 | `feature/p53-release-0-15-1` | complete |
 | P54 The fire tables | #232 | `feature/p54-fire-tables` | complete |
-| P55 Release 0.16.0 | #236 | `feature/p55-release-0-16-0` | complete |
+| P55 Release 0.16.0 | #236 | `feature/p55-release-0-16-0` | active |
 | P56 Warnings are delivered | #239 | `feature/p56-warnings-are-delivered` | active |
 
 ## Lifecycle Map
