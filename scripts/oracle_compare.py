@@ -515,6 +515,83 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+class OracleInputError(RuntimeError):
+    """An input the comparison needs is missing or unusable.
+
+    Attributes
+    ----------
+    detail : str
+        What is wrong, in the words the command prints.
+    """
+
+    def __init__(self, detail: str) -> None:
+        super().__init__(detail)
+        self.detail = detail
+
+
+def compare_run(run: Path, binary: Path) -> tuple[Comparison, ...]:
+    """Compare a run's database against a standalone binary's output for the same case.
+
+    Parameters
+    ----------
+    run : Path
+        The run directory, holding the keyword file, the tree list and the database.
+    binary : Path
+        The standalone ``FVSbc``.
+
+    Returns
+    -------
+    tuple of Comparison
+        One record per table, as :func:`compare` returns them.
+
+    Raises
+    ------
+    OracleInputError
+        If the run is missing an artefact, holds no trees, or the standalone wrote no database.
+    """
+    key_path = run / KEYWORD_FILE_NAME
+    tree_path = tree_file_name(key_path)
+    database = run / DATABASE_NAME
+    for required in (key_path, tree_path, database):
+        if not required.is_file():
+            raise OracleInputError(f"{required} is missing")
+    workdir = Path(tempfile.mkdtemp(prefix="oracle-compare-"))
+    try:
+        key_text = key_path.read_text(encoding="utf-8")
+        trees = parse_trees(tree_path.read_text(encoding="utf-8"))
+        if not trees:
+            raise OracleInputError(f"{tree_path} holds no tree records")
+        stand_id = _stand_id(key_text, run)
+        input_database(
+            workdir / INPUT_DATABASE,
+            stand_id=stand_id,
+            trees=trees,
+            stand=stand_record(key_text, stand_id, trees),
+        )
+        (workdir / STANDALONE_KEY).write_text(
+            database_key(key_text, INPUT_DATABASE, stand_id), encoding="utf-8"
+        )
+        completed = subprocess.run(
+            [str(binary), f"--keywordfile={STANDALONE_KEY}"],
+            cwd=str(workdir),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        # FVS exits non-zero when it *logs* an error, and it can log one and still write a
+        # complete database — a `DATABASE` block it refuses, for instance. So the exit code is
+        # reported and the database is what decides whether the comparison can run.
+        theirs = workdir / DATABASE_NAME
+        if not theirs.is_file():
+            raise OracleInputError(
+                f"the standalone wrote no database (exit {completed.returncode})\n"
+                f"{completed.stdout[-2000:]}\n{completed.stderr[-2000:]}"
+            )
+        return compare(database, theirs)
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the comparison.
 
@@ -538,75 +615,27 @@ def main(argv: Sequence[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
-    run = args.run
-    key_path = run / KEYWORD_FILE_NAME
-    tree_path = tree_file_name(key_path)
-    database = run / DATABASE_NAME
-    for required in (key_path, tree_path, database):
-        if not required.is_file():
-            print(f"oracle_compare: {required} is missing", file=sys.stderr)
-            return 2
-
-    workdir = Path(tempfile.mkdtemp(prefix="oracle-compare-"))
     try:
-        key_text = key_path.read_text(encoding="utf-8")
-        trees = parse_trees(tree_path.read_text(encoding="utf-8"))
-        if not trees:
-            print(f"oracle_compare: {tree_path} holds no tree records", file=sys.stderr)
-            return 2
-        stand_id = _stand_id(key_text, run)
-        input_database(
-            workdir / INPUT_DATABASE,
-            stand_id=stand_id,
-            trees=trees,
-            stand=stand_record(key_text, stand_id, trees),
-        )
-        (workdir / STANDALONE_KEY).write_text(
-            database_key(key_text, INPUT_DATABASE, stand_id), encoding="utf-8"
-        )
-        completed = subprocess.run(
-            [str(binary), f"--keywordfile={STANDALONE_KEY}"],
-            cwd=str(workdir),
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        # FVS exits non-zero when it *logs* an error, and it can log one and still write a
-        # complete database — a `DATABASE` block it refuses, for instance. So the exit code is
-        # reported and the database is what decides whether the comparison can run.
-        theirs = workdir / DATABASE_NAME
-        if not theirs.is_file():
-            print(
-                f"oracle_compare: the standalone wrote no database (exit {completed.returncode})\n"
-                f"{completed.stdout[-2000:]}\n{completed.stderr[-2000:]}",
-                file=sys.stderr,
-            )
-            return 2
-        if completed.returncode != 0:
-            print(
-                f"  note: the standalone exited {completed.returncode} and wrote a database "
-                "anyway; FVS logs an error and carries on",
-                file=sys.stderr,
-            )
-        results = compare(database, theirs)
-        width = max((len(result.table) for result in results), default=10)
-        for result in results:
-            line = f"  {result.table:<{width}}  {result.status}"
-            print(line + (f"  ({result.detail})" if result.detail else ""))
-        counts: dict[str, int] = {}
-        for result in results:
-            counts[result.status] = counts.get(result.status, 0) + 1
-        comparable = counts.get("match", 0) + counts.get("explained", 0) + counts.get("differ", 0)
-        parts = [f"{counts.get('match', 0)} of {comparable} comparable tables agree"]
-        if counts.get("explained"):
-            parts.append(f"{counts['explained']} explained")
-        if counts.get("not comparable"):
-            parts.append(f"{counts['not comparable']} not comparable")
-        print("\n  " + "; ".join(parts) + ".")
-        failed = counts.get("differ", 0) + counts.get("stale", 0)
-        return 0 if not failed else 1
-    finally:
-        shutil.rmtree(workdir, ignore_errors=True)
+        results = compare_run(args.run, Path(binary))
+    except OracleInputError as error:
+        print(f"oracle_compare: {error.detail}", file=sys.stderr)
+        return 2
+    width = max((len(result.table) for result in results), default=10)
+    for result in results:
+        line = f"  {result.table:<{width}}  {result.status}"
+        print(line + (f"  ({result.detail})" if result.detail else ""))
+    counts: dict[str, int] = {}
+    for result in results:
+        counts[result.status] = counts.get(result.status, 0) + 1
+    comparable = counts.get("match", 0) + counts.get("explained", 0) + counts.get("differ", 0)
+    parts = [f"{counts.get('match', 0)} of {comparable} comparable tables agree"]
+    if counts.get("explained"):
+        parts.append(f"{counts['explained']} explained")
+    if counts.get("not comparable"):
+        parts.append(f"{counts['not comparable']} not comparable")
+    print("\n  " + "; ".join(parts) + ".")
+    failed = counts.get("differ", 0) + counts.get("stale", 0)
+    return 0 if not failed else 1
 
 
 #: The columns of the official input schema's tree table, in the order the FVS source declares
