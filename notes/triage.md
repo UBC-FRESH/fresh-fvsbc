@@ -49,33 +49,27 @@ says which review changed it.
     (`DBSCASE(2)` only updates a case row that already exists, and the two drivers create it at
     different points); every other difference is reported by column and fails the run, and an
     explanation that stops applying is reported as `stale` rather than silently dropped.
-- **`FVS_Regen_SitePrep` differs from the standalone, and it is the model rather than the writer.**
-  The oracle's first genuine difference, found by `P58`. The same case prints `PCT: 74 20 6` in this
-  package's `.out` and `PCT: 100 0 0` in the standalone's, in the same `SITE PREP SUMMARY` block.
+- **`FVS_Regen_SitePrep` is not comparable, and the cause is an uninitialised variable in FVS.**
+  `estab.f` decides whether to sample site preparation with `IF(LOAD.NE.1) GO TO 249`, and **`LOAD` is
+  assigned in only two places**: `IF(KDT+1-IY(1).GT.20) THEN; LOAD=0`, and inside `esetpr.f`'s
+  BURNPREP/MECHPREP loops. A stand within twenty years of inventory and with no site-prep keyword —
+  which is every ordinary run — reads **whatever was in that local**.
 
-  `P59` ruled out everything observable:
+  Measured, by instrumenting both builds: **`LOAD=0` here and `LOAD=1` in the standalone.** So one
+  samples the BC variant's stub probabilities (`strp/esprep.f` is a stub: `PNONE=0.75`, `PMECH=0.20`,
+  `PBURN=0.05`, no regression at all) and averages fifty draws to `74 20 6`; the other reuses `IPPREP`
+  and writes `100 0 0`. **The two builds disagree by luck of the stack.**
 
-  - **Not the stand variables.** `ESPREP` predicts the default probabilities from `ASPECT`, `SLOPE`,
-    `BA` and `ELEV`; both runs echo `ASPECT 0.`, `SLOPE 5%`, `ELEVATION 1158.2`, and both write 4,146
-    tree rows with one plot.
-  - **Not the seed.** `RANNSEED` 1, 2 and 3 give the same `74 20 6` and `76 20 4` for this package's
-    run, so the result is deterministic for a given input.
-  - **Not the writer.** `DBSSITEPREP` stores what `estab.f` hands it, and the `.out` prints the same
-    numbers from the same call.
+  Everything else was ruled out first: the stand variables, the plot count, the tree rows and the seed
+  all agree, and the writer is a pass-through. It is recorded as **not comparable** in
+  `scripts/oracle_compare.py` with this reason, rather than as a difference to chase.
 
-  What is left is `estab.f`'s site-prep selection: it fills `SUMPRE` from draws out of `WK6`, the
-  pre-generated uniform array, and `PcntNone/PcntMech/PcntBurn` are those counts as percentages after
-  plot replication (`DUPNPT = NPTIDS*IDUP`). **The most likely cause is that the two drivers consume
-  different numbers of draws from the stream before `estab.f` runs** — the standalone reads its trees
-  through a `DATABASE` block and this package through a tree-list file — so the same seed lands on
-  different draws. That is a hypothesis, not a finding: the draws themselves were not compared.
+  **What it does not affect:** the regeneration tally, the tree list, the summary and every other table
+  in the same run match. The three columns are integers describing an allocation.
 
-  **What this does not affect:** the regeneration tally, the tree list, the summary and every other
-  table in the same run match. `PcntNone/PcntMech/PcntBurn` are the only columns that move, and they
-  are three integers describing a random allocation, not a projection.
+  **Reopened by an upstream fix that initialises `LOAD`**, at which point the table becomes comparable
+  and should be moved back into `STANDALONE_VERIFIED`.
 
-  **Reopened by comparing the `WK6` draws the two runs actually used**, which needs the draw index
-  logged from both.
 - **The fire-model keywords were unvalidated, and that is fixed.** `P50` found that `FMIN`'s body was
   written as **raw lines**, so a caller spaced the fields by hand. A mis-spaced line is not refused —
   `SNAGCLAS  0.0   10.0  20.0  40.0` reaches FVS as class 2 `20.0` and class 3 `0.0`, with no error.

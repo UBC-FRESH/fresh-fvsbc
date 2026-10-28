@@ -150,7 +150,8 @@ The two that are not recipes
 
 .. note::
 
-   ``FVS_Regen_SitePrep``'s ``PcntNone``, ``PcntMech`` and ``PcntBurn`` are the site-preparation
-   allocation across plots, drawn from a random distribution, and they differ from a standalone
-   ``FVSbc``'s for a reason that is not established. Every other table in the same run matches.
-   ``notes/triage.md`` records what was ruled out.
+   ``FVS_Regen_SitePrep``'s ``PcntNone``, ``PcntMech`` and ``PcntBurn`` **cannot be relied on**. FVS
+   decides whether to sample site preparation by branching on a local, ``LOAD``, that it only assigns
+   when the stand is more than twenty years past inventory or a site-preparation keyword is present —
+   so an ordinary run reads an uninitialised value. Two builds of the same source disagree. Every other
+   table in the same run is unaffected; ``notes/triage.md`` carries the evidence.

@@ -371,3 +371,17 @@ def test_the_stand_row_leaves_the_inventory_year_to_the_runs_own_keyword() -> No
     stand = oc.stand_record(key, "S1", [{"plot_id": 1}])
     assert "Inv_Year" not in stand
     assert stand["Site_Index"] == 15.0
+
+
+def test_a_not_comparable_table_is_skipped_whatever_its_presence(tmp_path: Path) -> None:
+    """A table can be not comparable because *both* sides write it and FVS makes them disagree.
+
+    ``FVS_Regen_SitePrep`` is that case: the two builds read an uninitialised local and disagree by
+    luck of the stack. Reporting it as a difference would send the next person chasing this package
+    for FVS's bug, so the entry short-circuits before any comparison.
+    """
+    ours = _database(tmp_path / "ours.db", {"FVS_Regen_SitePrep": [("c1", 74)]})
+    theirs = _database(tmp_path / "theirs.db", {"FVS_Regen_SitePrep": [("c1", 100)]})
+    results = oc.compare(ours, theirs)
+    assert [result.status for result in results] == ["not comparable"]
+    assert "UNINITIALISED" in results[0].detail
