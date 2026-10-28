@@ -1,10 +1,29 @@
-# fresh-fvsbc 0.17.0
+# fresh-fvsbc 0.18.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.17.0
+
+- **`FVS_InvReference` is written, and it never was before.** The extension is driven by PyFVS's
+  `src/api/fvs_step.f90`, an *extraction* of `fvs.f`'s initialisation. It called `STATS` and **omitted
+  the `CALL DBSREFERENCE`** that follows it, and the original `fvs_` is dead code in the extension — so
+  the writer was compiled in, linked, and never called. The build recipe's PyFVS patch set now carries
+  the missing call.
+
+  It needs no keyword: every run writes it, one row per species, with the site indices and volume
+  equations FVS used. It now **matches a standalone `FVSbc` value for value**, verified from a clean
+  clone of the pinned fork.
+
+- **Twenty-eight of the thirty-one exposed tables match a standalone `FVSbc` value for value.**
+  `FVS_Error` is the only one that is not comparable, and it is not a defect: FVS writes it only when it
+  logs something.
+
+  This is a **build-recipe change**. An environment built from an earlier recipe still has the defect
+  and should be rebuilt.
 
 ## What changed since 0.16.1
 
