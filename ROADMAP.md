@@ -70,6 +70,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P59 The site-prep difference | #252 | `feature/p59-siteprep-attribution` | complete |
 | P60 Release 0.17.0 | #256 | `feature/p60-release-0-17-0` | complete |
 | P61 The reference table | #260 | `feature/p61-invreference` | complete |
+| P62 Who approves | #264 | `feature/p62-approval-is-named` | active |
 
 ## Lifecycle Map
 
@@ -1489,6 +1490,24 @@ Acceptance criteria:
 - The driver and the input route are ruled in or out.
 - The state at the point of the call is established.
 - What is left is named, with what would settle it.
+- `python scripts/dashboard.py` exits zero on the head commit.
+
+## Phase 62: Who approves
+
+Parent issue: #264
+Branch: `feature/p62-approval-is-named`
+Status: active
+
+Goal: correct a claim about approval that this project's own records do not support.
+
+- [ ] P62.1 The approval claim is corrected (#265)
+  - [ ] `P61`'s report: the sentence that read ADR 0001's open item as an approval gate.
+  - [ ] `ADR 0001`: its open item is about upstream contributions, and no fork-patch approver is named.
+
+Acceptance criteria:
+
+- Neither the report nor the ADR reads the upstream policy as a permission gate.
+- The correction is visible rather than silent.
 - `python scripts/dashboard.py` exits zero on the head commit.
 
 ## Open decisions and where the detail lives

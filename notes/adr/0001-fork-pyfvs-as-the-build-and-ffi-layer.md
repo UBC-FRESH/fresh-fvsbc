@@ -67,6 +67,12 @@ We fork `forest-modeling/PyFVS` to `UBC-FRESH/PyFVS` and consume it as a pinned 
   synthetic stem populations. The policy for contributing patches upstream is still open, and needs its
   own ADR when the first patch is proposed.
 
+  **That open item is about sending a patch upstream, not about patching the fork.** The fork is
+  `UBC-FRESH/PyFVS` and this project administers it, so a local patch is a commit here. A note in
+  `P61`'s report read the open item as an approval gate; it was corrected. **No approver for a fork
+  patch is named anywhere in the repository**, and `AGENTS.md`'s "maintainer" is the only approval
+  role the project has.
+
 ## Alternatives considered
 
 - Depend on `PyFVS` from PyPI or conda-forge. Rejected: it does not build the BC variant, and we cannot
