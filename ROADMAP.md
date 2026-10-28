@@ -70,7 +70,7 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 | P59 The site-prep difference | #252 | `feature/p59-siteprep-attribution` | complete |
 | P60 Release 0.17.0 | #256 | `feature/p60-release-0-17-0` | complete |
 | P61 The reference table | #260 | `feature/p61-invreference` | complete |
-| P62 Who approves | #264 | `feature/p62-approval-is-named` | active |
+| P62 Who approves | #264 | `feature/p62-approval-is-named` | complete |
 
 ## Lifecycle Map
 
@@ -1496,19 +1496,37 @@ Acceptance criteria:
 
 Parent issue: #264
 Branch: `feature/p62-approval-is-named`
-Status: active
+Status: complete
 
 Goal: correct a claim about approval that this project's own records do not support.
 
-- [ ] P62.1 The approval claim is corrected (#265)
-  - [ ] `P61`'s report: the sentence that read ADR 0001's open item as an approval gate.
-  - [ ] `ADR 0001`: its open item is about upstream contributions, and no fork-patch approver is named.
+- [x] P62.1 The approval claim is corrected (#265)
+  - [x] `P61`'s report: the sentence that read ADR 0001's open item as an approval gate.
+  - [x] `ADR 0001`: its open item is about upstream contributions, and no fork-patch approver is named.
 
 Acceptance criteria:
 
 - Neither the report nor the ADR reads the upstream policy as a permission gate.
 - The correction is visible rather than silent.
 - `python scripts/dashboard.py` exits zero on the head commit.
+
+## Work after the phase numbering
+
+`P62` was the last numbered phase. The work after it went straight to a branch and a pull request, at
+the maintainer's direction, because the phase machinery was costing more than it returned. It is
+recorded here so the roadmap is not a plan of record that stops a month ago.
+
+| What shipped | Pull request | Tag |
+| --- | --- | --- |
+| `ESTAB`, `MISTOE` and `RDIN` became blocks of keywords | #269 | `v0.19.0` |
+| The web surface verified, and its badge corrected from 4 to 28 | #271 | `v0.19.1` |
+| A `manylinux_2_28` wheel with `libgfortran` bundled, and `wheels.yml` | #273, #276 | `v0.20.0` |
+| Both distributions published to PyPI | #279 | `v0.20.0` |
+
+**The records that matter are still kept**: `CHANGE_LOG.md` carries an entry per change, the triage
+carries the open items and what would reopen them, `docs/` carries the contracts, and the dashboard
+gates every merge. What was dropped is the phase issue, the roadmap row, and the close-out report for
+each one.
 
 ## Open decisions and where the detail lives
 
