@@ -10,20 +10,26 @@ Each release carries a self-contained wheel for the pinned fork:
 
 .. code-block:: console
 
-   $ pip install https://github.com/UBC-FRESH/fresh-fvsbc/releases/download/v0.19.1/fresh_fvsbc_pyfvs-0.3.11-cp312-cp312-manylinux_2_28_x86_64.whl
-   $ pip install fresh-fvsbc
+   $ pip install https://github.com/UBC-FRESH/fresh-fvsbc/releases/download/v0.20.0/fresh_fvsbc_pyfvs-0.3.11-cp312-cp312-manylinux_2_28_x86_64.whl
+   $ pip install "git+https://github.com/UBC-FRESH/fresh-fvsbc@v0.20.0"
 
 
 Nothing else is needed: `auditwheel` bundles `libgfortran` into the wheel, so **gfortran does not
 have to be installed**, and the extension loads the bundled copy through its patched `RPATH`.
 
+.. note::
+
+   ``fresh-fvsbc`` itself is **not on PyPI yet**, so the second line installs it from the tag rather
+   than by name. When it is published, ``pip install fresh-fvsbc`` replaces it and nothing else about
+   this page changes.
+
 Pick the wheel that matches your Python — one is attached per version from 3.10 to 3.13 — and
-replace `v0.19.1` and the tag in the file name with the release you want. Check the release page for
+replace `v0.20.0` and the tag in the file name with the release you want. Check the release page for
 the exact list:
 
 .. code-block:: console
 
-   $ gh release view v0.19.1 --repo UBC-FRESH/fresh-fvsbc --json assets --jq '.assets[].name'
+   $ gh release view v0.20.0 --repo UBC-FRESH/fresh-fvsbc --json assets --jq '.assets[].name'
 
 
 **The wheel is Linux x86_64 and glibc 2.28 or later**, which covers RHEL 8+, Ubuntu 20.04+, Debian 10+
