@@ -10,6 +10,7 @@ import pytest
 
 from fresh_fvsbc.keywords import (
     BLANK_SLOTS,
+    BLOCK_BODIES,
     FIELD_WIDTH,
     FIRE_MODEL_ORDER_WARNING,
     FMIN_KEYWORDS,
@@ -156,7 +157,7 @@ def test_the_intended_spelling_is_a_fire_model_keyword_not_a_top_level_one() -> 
     reason here: FVS holds both spellings, in two different tables, and the caller needs to know
     which one they are in.
     """
-    with pytest.raises(KeywordOrderError, match="only between FMIN"):
+    with pytest.raises(KeywordOrderError, match="only inside a FMIN block"):
         validate_keyword(Keyword("SALVAGE"))
     assert validate_keyword(Keyword("FMIN", nested=(Keyword("SALVAGE", ("1",)),))) == []
 
@@ -249,18 +250,18 @@ def test_a_block_line_is_written_whole_rather_than_as_a_field() -> None:
 def test_every_line_block_is_accepted() -> None:
     """Each name in ``LINES_KEYWORDS`` takes lines, and each is a keyword FVS reads.
 
-    The set has grown by discovery rather than by design: ``MISTOE`` in ``P26``, because the
-    dwarf-mistletoe options live inside it, and ``RDIN`` in ``P33``. ``FMIN`` left the set in
-    ``P50``: its body is keywords, and raw lines let a mis-spaced field be read as another number.
+    The set is now only the three whose body really is text: ``COMMENT``, ``COMPUTE`` and
+    ``DATABASE``. ``FMIN`` left it first, and ``MISTOE``, ``RDIN`` and ``ESTAB`` after it: their
+    bodies are keywords, and raw lines let a mis-spaced field be read as another number.
     """
     for name in sorted(LINES_KEYWORDS):
         assert validate_keyword(Keyword(name, lines=("x",))) == []
 
 
-def test_a_mistoe_block_renders_its_lines_and_its_terminator() -> None:
-    """``MISTOE`` is a block whose sub-keywords are not keywords, so a caller supplies the lines."""
-    keyword = Keyword("MISTOE", (), ("MISTPINF        0        1       0.5",))
-    assert render_keyword(keyword) == "MISTOE\nMISTPINF        0        1       0.5\nEND\n"
+def test_a_mistoe_block_renders_its_keywords_in_fvs_fields() -> None:
+    """``MISTOE`` holds keywords, and each parameter lands in its own ten-column field."""
+    keyword = Keyword("MISTOE", nested=(Keyword("MISTPINF", ("0", "3", "0.5")),))
+    assert render_keyword(keyword) == "MISTOE\nMISTPINF  0         3         0.5\nEND\n"
 
 
 def test_a_database_block_must_precede_the_stand() -> None:
@@ -443,13 +444,13 @@ def test_the_fire_model_block_renders_its_keywords_with_fvs_fields() -> None:
 
 def test_a_fire_model_keyword_outside_the_block_is_refused() -> None:
     """FVS reads these only between ``FMIN`` and its ``END``, so a loose one is a silent no-op."""
-    with pytest.raises(KeywordOrderError, match="only between FMIN"):
+    with pytest.raises(KeywordOrderError, match="only inside a FMIN block"):
         validate_keyword(Keyword("SNAGOUT", ("1",)))
 
 
 def test_the_fire_model_block_refuses_a_name_fvs_does_not_hold() -> None:
     """The block's body is checked against ``fmin.f``'s own table, not against the top-level one."""
-    with pytest.raises(UnknownKeywordError, match="not a fire-model keyword"):
+    with pytest.raises(UnknownKeywordError, match="not a FMIN keyword"):
         validate_keyword(Keyword("FMIN", nested=(Keyword("SNAGOUTT", ("1",)),)))
 
 
@@ -509,3 +510,34 @@ def test_a_block_that_captures_no_year_does_not_warn_after_invyear() -> None:
         Keyword("FMIN", nested=(Keyword("CARBREPT", ("2",)),)),
     )
     assert validate_keywords(keywords) == []
+
+
+def test_every_keyword_block_renders_its_body_in_fvs_fields() -> None:
+    """All four blocks hold keywords, and each parameter lands in its own ten-column field."""
+    for name, body in sorted(BLOCK_BODIES.items()):
+        first = sorted(body)[0]
+        block = Keyword(name, nested=(Keyword(first, ("1",)),))
+        rendered = render_keyword(block)
+        assert rendered.startswith(f"{name}\n")
+        assert rendered.endswith("END\n")
+        assert f"{first:<10}1" in rendered
+
+
+def test_a_block_keyword_outside_its_block_is_refused_and_names_the_block() -> None:
+    """Each refusal names the block the keyword belongs to, because there are four of them now."""
+    cases = {"RRINIT": "RDIN", "PLANT": "ESTAB", "MISTPRT": "MISTOE", "SNAGOUT": "FMIN"}
+    for name, block in cases.items():
+        with pytest.raises(KeywordOrderError, match=f"only inside a {block} block"):
+            validate_keyword(Keyword(name))
+
+
+def test_a_name_that_is_also_a_top_level_keyword_stays_valid_there() -> None:
+    """``ESTAB`` and ``COMMENT`` appear in a block's table and are also top-level keywords."""
+    assert validate_keyword(Keyword("ESTAB", lines=())) == []
+    assert validate_keyword(Keyword("COMMENT", lines=("x",))) == []
+
+
+def test_each_block_checks_its_own_table() -> None:
+    """``RRINIT`` is not an ``ESTAB`` keyword, and the refusal says which table it checked."""
+    with pytest.raises(UnknownKeywordError, match="not a ESTAB keyword"):
+        validate_keyword(Keyword("ESTAB", nested=(Keyword("RRINIT"),)))

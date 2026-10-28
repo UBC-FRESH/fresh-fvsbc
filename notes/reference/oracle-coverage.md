@@ -56,7 +56,10 @@ initial state and the mortality table never appears.
 | `FVS_Stats_Species_Metric` | `INVSTATS` | `STATS` |
 | `FVS_Stats_Stand` | `INVSTATS` | `STATS` **and `DESIGN`'s fourth field above 1** — it is the distribution among sample points |
 
-### The blocks whose sub-keywords are not keywords
+### The blocks
+
+`RDIN`, `MISTOE` and `ESTAB` are blocks of **keywords**, written by the shared writer and checked
+against `rdinie.f`, `misin.f` and `esin.f`.
 
 | Table | Block | `DATABASE` option |
 | --- | --- | --- |

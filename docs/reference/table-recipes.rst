@@ -105,11 +105,12 @@ The event tables
      - an ``ESTAB`` block with a ``PLANT`` or ``NATURAL`` line **carrying stems per acre**; a line
        with zero is refused and takes the whole keyword set with it
 
-The blocks whose sub-keywords are not keywords
-----------------------------------------------
+The blocks
+----------
 
-``RDIN``, ``MISTOE`` and ``ESTAB`` take **lines**, not keywords: a caller supplies them and the writer
-supplies the ``END``.
+``RDIN``, ``MISTOE`` and ``ESTAB`` are blocks of **keywords**, written by the same writer as everything
+else and checked against their readers' own tables. A hand-spaced line is read as different numbers with
+no error, which is why they are not lines any more.
 
 .. list-table::
    :header-rows: 1

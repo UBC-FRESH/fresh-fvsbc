@@ -72,8 +72,7 @@ Some keywords are the exception, because they read records of their own rather t
   **after** the year, which leaves ``QFATAR = INT(PRMS(7))`` for the supplemental record's value. A set
   without the record is **refused**, not written, because FVS would read the next keyword as the units
   record and the run would be wrong without saying so.
-- ``COMMENT``, ``COMPUTE``, ``DATABASE``, ``ESTAB``, ``MISTOE`` and ``RDIN`` take a **block of text
-  lines** ended by ``END``.
+- ``COMMENT``, ``COMPUTE`` and ``DATABASE`` take a **block of text lines** ended by ``END``.
   A caller supplies the lines and the writer supplies the terminator, because a block without one
   swallows the rest of the file. **A ``DATABASE`` block must precede the stand setup**: FVS refuses it
   later with ``FVS16 ERROR: KEYWORD ENTERED IS USED IN WRONG CONTEXT``, and the official case puts it
@@ -144,23 +143,30 @@ Some keywords are the exception, because they read records of their own rather t
   among sample points and is written only when that count is above one; a run that leaves it at 1 writes
   the species statistics and a message saying the distribution cannot be computed.
 
-  **``ESTAB`` is a block, and its ``NATURAL`` and ``PLANT`` lines need the stems per acre.** ``esin.f``
-  refuses the line — and the whole set with it — when that field is zero. With it, the regeneration tally
-  and the site-preparation table are written. **``FVS_CalibStats`` is not exposed**: the table is created
-  but carries nothing unless the run is calibrated, and this package does not calibrate.
+- **``ESTAB``, ``MISTOE``, ``RDIN`` and ``FMIN`` are blocks of *keywords*, not of lines.** Each body is
+  written by the same writer as any other keyword, so a parameter lands in FVS's ten-column field, and
+  each is checked against its own reader's table — ``esin.f``, ``misin.f``, ``rdinie.f`` and ``fmin.f``:
 
-  **``MISTOE`` and ``RDIN`` are blocks, and their sub-keywords are not keywords.** ``MISTPRT`` inside
-  ``MISTOE`` sets ``PRTMIS`` and ``NEWSPRED`` sets ``NEWMOD``; without them two of the four dwarf-mistletoe
-  tables are never written. ``RDIN`` needs ``RRINIT`` (or ``RRTREIN``) or it refuses the whole set at its
-  ``END`` with "NEITHER TREELIST OR MANUAL INITIALIZATION SPECIFIED", and ``RRDOUT`` adds the detail
-  table.
+  .. code-block:: python
 
-  **``MISTOE`` is a block, and its sub-keywords are not keywords either.** ``MISTPINF``, ``MISTGMOD``,
-  ``DMAUTO`` and the rest are options inside it, read by ``MISIN``. A run with a ``MISTOE`` block is
-  accepted and the report echoes the sub-keyword, but **the dwarf-mistletoe tables do not appear**: they
-  need an infection state, and a block alone does not create one. ``RDIN`` starts the equivalent block for
-  root disease; its required parameters were not determined, so it is not modelled, and the root-disease
-  tables are likewise unexposed.
+     Keyword("RDIN", nested=(Keyword("RRINIT"), Keyword("RRDOUT")))
+     Keyword("ESTAB", nested=(Keyword("PLANT", ("0", "FD", "3680", "90")),))
+     Keyword("MISTOE", nested=(Keyword("MISTPINF", ("0", "3", "0.5")), Keyword("MISTPRT", ("1",))))
+
+  A keyword from one of those tables written outside its block is refused, because FVS would ignore it.
+  A name that is also a top-level keyword — ``ESTAB``, ``COMMENT`` — stays valid at the top level.
+
+  **A hand-spaced line here is read as different numbers and FVS reports nothing**, which is why these
+  are keywords now: ``MISTPINF        0        1       0.5`` reaches ``MISIN`` as species ``PW`` and
+  proportion ``0.50``, neither of which was written.
+
+  ``ESTAB``'s ``NATURAL`` and ``PLANT`` lines still need **stems per acre**: ``esin.f`` refuses the line —
+  and the whole set with it — when that field is zero. ``RDIN`` needs ``RRINIT`` (or ``RRTREIN``) or it
+  refuses the whole set at its ``END`` with "NEITHER TREELIST OR MANUAL INITIALIZATION SPECIFIED", and
+  ``RRDOUT`` adds the detail table. The dwarf-mistletoe tables need an **infection** as well as the
+  block: the rating enters through the damage columns, code 30 with the Hawksworth rating as the
+  severity. **``FVS_CalibStats`` is not exposed**: the table is created but carries nothing unless the
+  run is calibrated, and this package does not calibrate.
 - ``IF`` takes a block of **keywords** rather than lines: the condition record, ``THEN``, the body, and
   ``ENDIF``, with an optional ``ELSE`` branch. The official case's form is the one the run test checks.
   **``ALSOTRY`` is not modelled**, because no fixture here uses it.
