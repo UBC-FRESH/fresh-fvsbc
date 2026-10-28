@@ -4,8 +4,17 @@ Two distributions are published, and neither uses an API token.
 
 | Distribution | Workflow | What it is |
 | --- | --- | --- |
-| `fresh-fvsbc-pyfvs` | `wheels.yml` | the built BC variant, four wheels, one per Python |
-| `fresh-fvsbc` | `publish.yml` | this package, pure Python, sdist and wheel |
+| `fresh-fvsbc` | `release.yaml`, environment `pypi` | this package, pure Python, sdist and wheel |
+| `fresh-fvsbc-pyfvs` | built by `wheels.yml`, uploaded by hand | the built BC variant, four wheels, one per Python |
+
+**The workflow name and the environment names follow PyPI, not this repository.** PyPI was configured
+with `release.yaml` and the environments `pypi` and `testpypi`; the file and the environments are
+named that way so the two cannot drift. `release.yaml` also carries a manual `rehearse` job that
+publishes to TestPyPI under the `testpypi` environment, which is what that pending publisher is for.
+
+**`fresh-fvsbc-pyfvs` is uploaded by hand** when the pin changes, because its version is tied to the
+fork commit and does not change with every release of this package. Automating it needs a second
+trusted publisher on that project, with the same workflow and environment.
 
 Both use **trusted publishing**: GitHub mints a short-lived OIDC token, and PyPI accepts it for the
 workflow named in its configuration. Nothing is stored in this repository and nothing has to be
@@ -27,12 +36,15 @@ PyPI web interface, signed in as the owner of the project names.
 3. **Add a trusted publisher to each project.** *Project → Settings → Publishing → Add a new pending
    publisher → GitHub*, with these exact values:
 
-   | Field | `fresh-fvsbc-pyfvs` | `fresh-fvsbc` |
+   | Field | `fresh-fvsbc` | `fresh-fvsbc` (TestPyPI) |
    | --- | --- | --- |
    | Owner | `UBC-FRESH` | `UBC-FRESH` |
    | Repository | `fresh-fvsbc` | `fresh-fvsbc` |
-   | Workflow name | `wheels.yml` | `publish.yml` |
-   | Environment | `pypi` | `pypi` |
+   | Workflow name | `release.yaml` | `release.yaml` |
+   | Environment | `pypi` | `testpypi` |
+
+   Add a third, with the same workflow and environment `pypi`, if `fresh-fvsbc-pyfvs` is to be
+   published automatically rather than by hand.
 
    The workflow name and the environment are matched exactly. `wheels.yml` and `publish.yml` both
    declare `environment: pypi`, which is why that field is not blank.

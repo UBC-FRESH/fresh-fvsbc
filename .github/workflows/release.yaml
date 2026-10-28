@@ -1,0 +1,94 @@
+name: release
+
+# Publishes `fresh-fvsbc` to PyPI with **trusted publishing**: GitHub mints a short-lived OIDC token
+# and PyPI accepts it for the workflow named in its configuration. There is no API token in this
+# repository and nothing to rotate.
+#
+# The names below must match PyPI exactly, and they do not follow this repository's conventions —
+# PyPI was configured with `release.yaml` and the environments `pypi` and `testpypi`, so the file and
+# the environments are named that way rather than the other way round.
+#
+# `fresh-fvsbc-pyfvs` — the Fortran half — is not published here. Its wheels are built by
+# `wheels.yml` and attached to the release; it is uploaded by hand when the pin changes, which is
+# rare, and `notes/reference/publishing.md` says how.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build the sdist and wheel
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          # setuptools_scm reads the version from the tag, so the tag has to be present.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Build
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build --outdir dist
+
+      - name: Check the metadata
+        run: twine check dist/*
+
+      - name: Keep the distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist-wheel
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Collect the distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist-wheel
+          path: dist
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
+
+  rehearse:
+    name: Rehearse on TestPyPI
+    # Manual only: a tag publishes for real, and a rehearsal must not.
+    if: github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: testpypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Collect the distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist-wheel
+          path: dist
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
+          repository-url: https://test.pypi.org/legacy/
+          # A rehearsal runs more than once against the same version, which TestPyPI refuses.
+          skip-existing: true
