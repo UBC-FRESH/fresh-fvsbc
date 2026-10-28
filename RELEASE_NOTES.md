@@ -17,9 +17,10 @@ Pre-1.0, and the public API can change. The gaps that remain are listed at the e
   installed but the wheel:
 
   ```console
-  $ pip install https://github.com/UBC-FRESH/fresh-fvsbc/releases/download/v0.20.0/fresh_fvsbc_pyfvs-0.3.11-cp312-cp312-manylinux_2_28_x86_64.whl
-  $ pip install fresh-fvsbc
+  $ pip install "fresh-fvsbc[fvs]"
   ```
+
+  Both distributions are on PyPI: `fresh-fvsbc` and `fresh-fvsbc-pyfvs`.
 
   **Linux x86_64, glibc 2.28 or later** — RHEL 8+, Ubuntu 20.04+, Debian 10+, every current cluster.
   `docs/installation.rst` is the page, including what to do when there is no wheel for your platform.

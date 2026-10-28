@@ -3,44 +3,29 @@ Installing
 
 The BC variant is Fortran. There are two ways to get it, and the first is the one to try.
 
-From a wheel
-------------
-
-Each release carries a self-contained wheel for the pinned fork:
+From PyPI
+---------
 
 .. code-block:: console
 
-   $ pip install https://github.com/UBC-FRESH/fresh-fvsbc/releases/download/v0.20.0/fresh_fvsbc_pyfvs-0.3.11-cp312-cp312-manylinux_2_28_x86_64.whl
-   $ pip install "git+https://github.com/UBC-FRESH/fresh-fvsbc@v0.20.0"
+   $ pip install "fresh-fvsbc[fvs]"
 
 
-Nothing else is needed: `auditwheel` bundles `libgfortran` into the wheel, so **gfortran does not
-have to be installed**, and the extension loads the bundled copy through its patched `RPATH`.
+That is the whole install. The `fvs` extra pulls **`fresh-fvsbc-pyfvs`**, which is the BC variant
+itself: a self-contained wheel with `libgfortran` bundled inside it by `auditwheel repair`. **Nothing
+else has to be installed** — no gfortran, no meson, no patch sets — and the extension loads the bundled
+library through its patched `RPATH`.
 
-.. note::
-
-   ``fresh-fvsbc`` itself is **not on PyPI yet**, so the second line installs it from the tag rather
-   than by name. When it is published, ``pip install fresh-fvsbc`` replaces it and nothing else about
-   this page changes.
-
-Pick the wheel that matches your Python — one is attached per version from 3.10 to 3.13 — and
-replace `v0.20.0` and the tag in the file name with the release you want. Check the release page for
-the exact list:
-
-.. code-block:: console
-
-   $ gh release view v0.20.0 --repo UBC-FRESH/fresh-fvsbc --json assets --jq '.assets[].name'
-
-
-**The wheel is Linux x86_64 and glibc 2.28 or later**, which covers RHEL 8+, Ubuntu 20.04+, Debian 10+
-and every current cluster. `ldd --version` on the machine answers whether it will run there.
+The wheels are **Linux x86_64, glibc 2.28 or later**: RHEL 8+, Ubuntu 20.04+, Debian 10+, and every
+current cluster. `ldd --version` on the machine answers whether it will run there. One wheel is
+published per Python from 3.10 to 3.13.
 
 .. note::
 
    **Do not install upstream ``pyfvs`` in the same environment.** The fork installs the same
    ``pyfvs`` import package under a different distribution name, ``fresh-fvsbc-pyfvs``, so that the
    two cannot be confused; pip will not stop you from installing both, and whichever wins the import
-   is the one you get. A wheel for the fork is a wheel for this package.
+   is the one you get.
 
 From source
 -----------
