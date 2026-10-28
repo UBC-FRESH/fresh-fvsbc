@@ -1,0 +1,2 @@
+[console_scripts]
+fresh-fvsbc = fresh_fvsbc.cli:main

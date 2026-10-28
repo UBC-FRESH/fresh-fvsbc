@@ -12,6 +12,7 @@ project grows.
    :maxdepth: 2
    :caption: Usage
 
+   installation
    usage
 
 .. toctree::
