@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from fresh_fvsbc.outputs import EXPOSED_TABLES, ORACLE_TABLES
+from fresh_fvsbc.outputs import EXPOSED_TABLES, ORACLE_TABLES, STANDALONE_VERIFIED
 from fresh_fvsbc.web import runs
 
 
@@ -103,6 +103,11 @@ def test_the_oracle_flag_matches_the_checked_set(tmp_path: Path) -> None:
     assert listed["FVS_Summary_Metric"]["oracle"] is True
     assert listed["FVS_Cases"]["oracle"] is False
     assert set(ORACLE_TABLES) <= set(EXPOSED_TABLES)
+    # The dump is not the only reference. A table that matches a standalone FVSbc is checked too,
+    # and a client that showed it as unchecked would be wrong about the table it is showing.
+    assert set(STANDALONE_VERIFIED) <= set(EXPOSED_TABLES)
+    assert "FVS_InvReference" in STANDALONE_VERIFIED
+    assert "FVS_Regen_SitePrep" not in STANDALONE_VERIFIED
 
 
 def test_a_table_page_reports_the_total_and_the_slice(tmp_path: Path) -> None:

@@ -84,6 +84,11 @@ def test_the_oracle_endpoint_reports_how_much_is_verified(client: TestClient) ->
     assert payload["exposed"] == 31
     assert payload["oracle"] == 4
     assert "FVS_SnagDet_Metric" in payload["tables"]
+    # The standalone comparison is the broader source and the one the page leads with. Reporting
+    # only the dump's four would understate the surface by a factor of seven.
+    assert payload["standalone"] == 28
+    assert "FVS_InvReference" in payload["standalone_tables"]
+    assert "FVS_Regen_SitePrep" not in payload["standalone_tables"]
 
 
 def test_runs_lists_the_discovered_run(client: TestClient) -> None:

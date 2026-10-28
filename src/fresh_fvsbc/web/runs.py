@@ -22,7 +22,7 @@ from typing import Any, Literal
 
 import pandas as pd
 
-from fresh_fvsbc.outputs import EXPOSED_TABLES, ORACLE_TABLES, read_table
+from fresh_fvsbc.outputs import EXPOSED_TABLES, REFERENCE_VERIFIED, read_table
 from fresh_fvsbc.run import (
     DATABASE_NAME,
     KEYWORD_FILE_NAME,
@@ -289,7 +289,7 @@ def tables(run: Run) -> list[dict[str, Any]]:
                 "name": name,
                 "rows": len(frame),
                 "columns": [str(column) for column in frame.columns],
-                "oracle": name in ORACLE_TABLES,
+                "oracle": name in REFERENCE_VERIFIED,
                 "exposed": True,
             }
         )
@@ -339,7 +339,7 @@ def table(run: Run, name: str, *, limit: int = DEFAULT_LIMIT, offset: int = 0) -
         "total": len(frame),
         "limit": page_limit,
         "offset": page_offset,
-        "oracle": name in ORACLE_TABLES,
+        "oracle": name in REFERENCE_VERIFIED,
     }
 
 

@@ -46,6 +46,8 @@ __all__ = [
     "EXPOSED_TABLES",
     "IDENTITY_COLUMN",
     "ORACLE_TABLES",
+    "REFERENCE_VERIFIED",
+    "STANDALONE_VERIFIED",
     "MissingOutputError",
     "OutputError",
     "RunFailedError",
@@ -149,6 +151,51 @@ ORACLE_TABLES: tuple[str, ...] = (
     "FVS_SnagSum_Metric",
     "FVS_Summary_Metric",
 )
+
+#: The exposed tables compared against a **standalone ``FVSbc``** built from the same source, and
+#: found to agree value for value. That is a second independent source, and a broader one than the
+#: official dump: it covers every table a run of either build writes, not only the four the dump
+#: carries. ``scripts/oracle_compare.py`` produces the comparison and
+#: ``notes/reference/oracle-coverage.md`` records the verdict for each table.
+#:
+#: ``FVS_Regen_SitePrep`` is deliberately absent: its site-preparation allocation differs, for a
+#: reason that is not this package's. ``FVS_Error`` is absent because FVS writes it only when it
+#: logs something, so the two builds cannot be made to agree on its presence.
+STANDALONE_VERIFIED: tuple[str, ...] = (
+    "FVS_ATRTList_Metric",
+    "FVS_CanProfile",
+    "FVS_Carbon_Metric",
+    "FVS_Compute",
+    "FVS_Consumption_Metric",
+    "FVS_CutList_Metric",
+    "FVS_DM_Spp_Sum_Metric",
+    "FVS_DM_Stnd_Sum_Metric",
+    "FVS_DM_Sz_Sum_Metric",
+    "FVS_DM_TreeList_Metric",
+    "FVS_Down_Wood_Cov_Metric",
+    "FVS_Down_Wood_Vol_Metric",
+    "FVS_Fuels_Metric",
+    "FVS_Hrv_Carbon",
+    "FVS_InvReference",
+    "FVS_Mortality_Metric",
+    "FVS_PotFire_Cond_Metric",
+    "FVS_PotFire_Metric",
+    "FVS_RD_Det_Metric",
+    "FVS_RD_Sum_Metric",
+    "FVS_Regen_Tally_Metric",
+    "FVS_SnagDet_Metric",
+    "FVS_SnagSum_Metric",
+    "FVS_Stats_Species_Metric",
+    "FVS_Stats_Stand",
+    "FVS_StrClass_Metric",
+    "FVS_Summary_Metric",
+    "FVS_TreeList_Metric",
+)
+
+#: Every exposed table checked against **some** independent source, either the official dump or a
+#: standalone ``FVSbc``. A caller showing a number from a table outside this set must not present it
+#: as verified.
+REFERENCE_VERIFIED: frozenset[str] = frozenset(ORACLE_TABLES) | frozenset(STANDALONE_VERIFIED)
 
 EXPOSED_TABLES: tuple[str, ...] = (
     "FVS_ATRTList_Metric",

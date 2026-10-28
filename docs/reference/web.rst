@@ -61,9 +61,20 @@ a run directory, with one exception: starting a run creates a new one through th
 The oracle flag
 ---------------
 
-**This is the reason the surface exists.** Four of the exposed tables are checked against FVS's own database
-dump; the rest are not. ``GET /api/oracle`` reports the counts, every table record carries ``oracle``, and
-the front end marks an unverified table in the table list and above its rows.
+**This is the reason the surface exists.** Two independent sources check the exposed tables, and the
+broader one is not the obvious one:
+
+- **Four** are checked against FVS's own database dump — the tables the official case ships.
+- **Twenty-eight** are checked against a **standalone ``FVSbc``** built from the same source, and agree
+  value for value. That covers every table either build writes, not only the four the dump carries.
+  ``FVS_Regen_SitePrep`` is not among them: its site-preparation allocation differs, for a reason that is
+  not this package's. ``FVS_Error`` is not either: FVS writes it only when it logs something, so the two
+  builds cannot be made to agree on its presence.
+
+``GET /api/oracle`` reports both counts and both table lists, every table record carries ``oracle`` — which
+means *checked against a reference*, either one — and the front end marks an unverified table in the table
+list and above its rows. **The badge leads with the standalone count**, because reporting the dump's four
+alone would understate the surface by a factor of seven.
 
 A number whose provenance is unchecked must not look like one whose provenance is checked. `Output contract`
 says the same thing in prose; this surface says it on screen.
@@ -82,7 +93,7 @@ Endpoints
 ``GET /api/skins``
     the shipped manifests
 ``GET /api/oracle``
-    how many exposed tables have an independent check
+    how many exposed tables have an independent check, against the dump and against a standalone
 ``GET /api/runs``
     run directories under the roots, with state
 ``GET /api/runs/{id}/summary``
