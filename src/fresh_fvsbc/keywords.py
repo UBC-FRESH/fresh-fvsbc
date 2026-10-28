@@ -49,7 +49,10 @@ from dataclasses import dataclass, field
 
 __all__ = [
     "BLANK_SLOTS",
+    "BLOCK_BODIES",
     "BLOCK_KEYWORDS",
+    "BODY_KEYWORDS",
+    "ESTAB_KEYWORDS",
     "FIELD_WIDTH",
     "FIRE_MODEL_ORDER_WARNING",
     "FMIN_KEYWORDS",
@@ -58,7 +61,9 @@ __all__ = [
     "KEYWORD_TABLE",
     "LINES_KEYWORDS",
     "MISSPELLED_KEYWORD",
+    "MISTOE_KEYWORDS",
     "NESTED_KEYWORDS",
+    "RDIN_KEYWORDS",
     "RECORD_KEYWORDS",
     "SPECIAL_KEYWORDS",
     "STAND_KEYWORDS",
@@ -267,9 +272,7 @@ RECORD_KEYWORDS: frozenset[str] = frozenset({"STDIDENT", "TREEFMT"})
 #: The keywords whose content is a block of **text lines** ended by ``END``. A caller supplies the
 #: lines, and the writer supplies the terminator, because a block without one swallows the rest of
 #: the file.
-LINES_KEYWORDS: frozenset[str] = frozenset(
-    {"COMMENT", "COMPUTE", "DATABASE", "ESTAB", "MISTOE", "RDIN"}
-)
+LINES_KEYWORDS: frozenset[str] = frozenset({"COMMENT", "COMPUTE", "DATABASE"})
 
 #: The keywords whose block holds **other keywords** rather than lines: ``IF`` opens a conditional
 #: whose body is a sequence of keywords and whose terminator is ``ENDIF``. That is a nested
@@ -346,10 +349,136 @@ FMIN_KEYWORDS: frozenset[str] = frozenset(
     }
 )
 
-#: The block keywords whose body holds **other keywords** and is closed by ``END``. ``FMIN`` is the
-#: one in this variant; its body is rendered with the same writer as any other keyword, so a
-#: parameter is padded to FVS's ten-column field rather than hand-spaced.
-KEYWORD_BLOCK_KEYWORDS: frozenset[str] = frozenset({"FMIN"})
+#: The dwarf-mistletoe keywords ``MISTOE`` reads, from ``newmist/misin.f``'s own table.
+MISTOE_KEYWORDS: frozenset[str] = frozenset(
+    {
+        "DMBCA",
+        "DMBCI",
+        "DMCAP",
+        "DMCLUMP",
+        "DMCRTHRD",
+        "DMDEATH",
+        "DMETUNE",
+        "DMFLOWER",
+        "DMITUNE",
+        "DMKTUNE",
+        "DMLIGHT",
+        "DMOPAQ",
+        "DMOPQMLT",
+        "DMSED",
+        "DMSTUNE",
+        "DMTABLE",
+        "DMAUTO",
+        "MISTABLE",
+        "MISTGMOD",
+        "MISTHMOD",
+        "MISTMORT",
+        "MISTMULT",
+        "MISTOFF",
+        "MISTPINF",
+        "MISTPREF",
+        "MISTPRT",
+        "NEWSPRED",
+    }
+)
+
+#: The root-disease keywords ``RDIN`` reads, from ``rd/rdinie.f``'s own table. ``--RDv3--`` is a
+#: separator in that table rather than a keyword.
+RDIN_KEYWORDS: frozenset[str] = frozenset(
+    {
+        "BBOUT",
+        "BBCLEAR",
+        "BORATE",
+        "BBTYPE1",
+        "BBTYPE2",
+        "BBTYPE3",
+        "BBTYPE4",
+        "CARRY",
+        "COMMENT",
+        "DNSCALC",
+        "INFKILL",
+        "INFCOLO",
+        "INFMULT",
+        "INFSIMS",
+        "INOCLIFE",
+        "INOCSPAN",
+        "OPEN",
+        "PLOTINF",
+        "PLREAD",
+        "PSTUMP",
+        "RRCOMP",
+        "RRDOUT",
+        "RRECHO",
+        "RRHOSTS",
+        "RRINIT",
+        "RRJUMP",
+        "RRMINK",
+        "RRTREIN",
+        "RRTYPE",
+        "RSEED",
+        "SAREA",
+        "SDIRMULT",
+        "SMCOUT",
+        "SPORE",
+        "SPREAD",
+        "STREAD",
+        "TDISTN",
+        "TIMEDEAD",
+        "TTDMULT",
+        "WINDTHR",
+    }
+)
+
+#: The regeneration keywords ``ESTAB`` reads, from ``estb/esin.f``'s own table. ``ESTAB`` appears in
+#: it because the block can schedule another establishment; it is also a top-level keyword.
+ESTAB_KEYWORDS: frozenset[str] = frozenset(
+    {
+        "ADDTREES",
+        "AUTALLY",
+        "BUDWORM",
+        "BURNPREP",
+        "ESTAB",
+        "ESRANSD",
+        "EZCRUISE",
+        "HABGROUP",
+        "HTADJ",
+        "INGROW",
+        "MECHPREP",
+        "MINPLOTS",
+        "NATURAL",
+        "NOAUTALY",
+        "NOINGROW",
+        "NOSPROUT",
+        "OUTPUT",
+        "PASSALL",
+        "PLANT",
+        "PLOTINFO",
+        "RESETAGE",
+        "SPECMULT",
+        "SPROUT",
+        "STOCKADJ",
+        "TALLY",
+        "TALLYONE",
+        "TALLYTWO",
+        "THRSHOLD",
+    }
+)
+
+#: Each keyword block, and the keywords its reader accepts. The body is rendered with the same
+#: writer as any other keyword, so a parameter lands in FVS's ten-column field rather than being
+#: hand-spaced — a hand-spaced field is read as a different number and FVS reports nothing.
+BLOCK_BODIES: dict[str, frozenset[str]] = {
+    "ESTAB": ESTAB_KEYWORDS,
+    "FMIN": FMIN_KEYWORDS,
+    "MISTOE": MISTOE_KEYWORDS,
+    "RDIN": RDIN_KEYWORDS,
+}
+
+#: The block keywords whose body holds **other keywords** and is closed by ``END``.
+KEYWORD_BLOCK_KEYWORDS: frozenset[str] = frozenset(BLOCK_BODIES)
+
+#: Every keyword that is only valid inside a keyword block.
+BODY_KEYWORDS: frozenset[str] = frozenset().union(*BLOCK_BODIES.values())
 
 #: Every keyword that takes a block of some kind.
 BLOCK_KEYWORDS: frozenset[str] = LINES_KEYWORDS | NESTED_KEYWORDS | KEYWORD_BLOCK_KEYWORDS
@@ -529,11 +658,12 @@ def validate_keyword(keyword: Keyword) -> list[str]:
         )
     if keyword.name in SUPPLEMENTAL_KEYWORDS:
         _validate_supplemental(keyword)
-    if keyword.name in FMIN_KEYWORDS:
-        raise KeywordOrderError(
-            f'"{keyword.name}" is a fire-model keyword, and FVS reads it only between FMIN and '
-            "its END; put it in the block's nested keywords"
-        )
+    for block, body in BLOCK_BODIES.items():
+        if keyword.name in body and keyword.name not in KEYWORDS | SPECIAL_KEYWORDS:
+            raise KeywordOrderError(
+                f'"{keyword.name}" is read only inside a {block} block, between {block} and its '
+                "END; put it in that block's nested keywords"
+            )
     if keyword.name not in KEYWORDS and keyword.name not in SPECIAL_KEYWORDS:
         near = _near_miss(keyword.name)
         hint = f' The table spells it "{near}".' if near is not None else ""
@@ -546,52 +676,55 @@ def validate_keyword(keyword: Keyword) -> list[str]:
         warnings.extend(validate_keywords(keyword.nested))
         warnings.extend(validate_keywords(keyword.otherwise))
     if keyword.name in KEYWORD_BLOCK_KEYWORDS:
-        warnings.extend(_validate_fire_model_body(keyword.nested))
+        warnings.extend(_validate_block_body(keyword.name, keyword.nested))
     if keyword.name == MISSPELLED_KEYWORD:
         warnings.append(MISSPELLING_WARNING)
     return warnings
 
 
-def _validate_fire_model_body(entries: Sequence[Keyword]) -> list[str]:
-    """Validate the keywords inside an ``FMIN`` block.
+def _validate_block_body(block: str, entries: Sequence[Keyword]) -> list[str]:
+    """Validate the keywords inside a keyword block.
 
     Parameters
     ----------
+    block : str
+        The block's keyword, whose table the body is checked against.
     entries : Sequence of Keyword
-        The block's body, in the order FVS reads it.
+        The body, in the order FVS reads it.
 
     Returns
     -------
     list of str
-        Every warning the body raises. The fire-model keywords carry none of their own.
+        Every warning the body raises. These keywords carry none of their own.
 
     Raises
     ------
     UnknownKeywordError
-        On a name that is not in ``fmin.f``'s table. The message names the table's spelling when
-        the name is a near miss.
+        On a name that is not in the block's table. The message names the table's spelling when the
+        name is a near miss.
     UnsupportedKeywordError
-        On a fire-model keyword given lines or a nested block, which none of them take.
+        On a block keyword given lines or a nested block, which none of them takes.
     KeywordWidthError
         On a parameter wider than FVS's ten-column field.
     """
+    body = BLOCK_BODIES[block]
     for entry in entries:
-        if entry.name not in FMIN_KEYWORDS:
+        if entry.name not in body:
             near = _near_miss(entry.name)
             hint = f' The table spells it "{near}".' if near is not None else ""
             raise UnknownKeywordError(
-                f'"{entry.name}" is not a fire-model keyword.{hint} An FMIN block holds only the '
-                f"keywords fmin.f reads, and {len(FMIN_KEYWORDS)} are known"
+                f'"{entry.name}" is not a {block} keyword.{hint} A {block} block holds only the '
+                f"keywords its reader accepts, and {len(body)} are known"
             )
         if entry.lines or entry.nested or entry.otherwise:
             raise UnsupportedKeywordError(
-                f'"{entry.name}" takes one record inside FMIN, and none of them takes lines or a '
-                "nested block"
+                f'"{entry.name}" takes one record inside {block}, and none of them takes lines or '
+                "a nested block"
             )
         if entry.supplemental and entry.name not in SUPPLEMENTAL_KEYWORDS:
             raise UnsupportedKeywordError(
                 f'"{entry.name}" takes no supplemental record; only '
-                f"{', '.join(sorted(SUPPLEMENTAL_KEYWORDS & FMIN_KEYWORDS))} do"
+                f"{', '.join(sorted(SUPPLEMENTAL_KEYWORDS & body))} do"
             )
         if entry.supplemental:
             _validate_supplemental(entry)

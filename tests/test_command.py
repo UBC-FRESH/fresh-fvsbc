@@ -567,7 +567,7 @@ def test_a_fire_model_keyword_outside_its_block_is_reported_not_raised(
         ]
     )
     assert code == cli.EXIT_BAD_INPUT
-    assert "only between FMIN" in capsys.readouterr().err
+    assert "only inside a FMIN block" in capsys.readouterr().err
 
 
 def test_the_command_delivers_the_validators_warnings(
@@ -597,3 +597,11 @@ def test_the_command_delivers_the_validators_warnings(
         ]
     )
     assert "must precede INVYEAR" in capsys.readouterr().err
+
+
+def test_a_root_disease_block_parses_its_entries_as_keywords() -> None:
+    """``RDIN`` holds keywords too, so each ``|`` is parsed as one."""
+    keyword = cli._parse_block("RDIN|RRINIT|RRDOUT")
+    assert keyword.name == "RDIN"
+    assert keyword.lines == ()
+    assert [entry.name for entry in keyword.nested] == ["RRINIT", "RRDOUT"]
