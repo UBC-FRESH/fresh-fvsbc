@@ -18,6 +18,10 @@ fresh-fvsbc = "fresh_fvsbc.cli:main"
 [project.optional-dependencies]
 # The browser surface. The core install stays pandas-only; `fresh-fvsbc web` needs this extra.
 web = ["fastapi>=0.110", "uvicorn>=0.29"]
+# The built BC variant. It is Fortran, so it ships as its own wheel under a distinct distribution
+# name — see `docs/installation.rst` and the `wheels` workflow. The pin matches the fork commit the
+# patch sets were made against, so a wheel and a patch set cannot drift apart silently.
+fvs = ["fresh-fvsbc-pyfvs==0.3.11"]
 
 [project.urls]
 Repository = "https://github.com/UBC-FRESH/fresh-fvsbc"

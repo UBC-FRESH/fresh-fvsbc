@@ -1,0 +1,123 @@
+name: wheels
+
+# The BC variant is Fortran. Until this workflow existed, using this package meant owning a
+# gfortran toolchain, meson, and two patch sets — which is the whole distance between "our lab
+# uses it" and "another lab can". The wheel this builds is self-contained: auditwheel bundles
+# libgfortran, so nothing has to be installed but the wheel.
+#
+# manylinux_2_28 is the floor: glibc 2.28, which covers RHEL 8+, Ubuntu 20.04+, Debian 10+ and
+# every current cluster. If a target cluster is older than that, the image below is the one line
+# to change, and the tag follows.
+#
+# x86_64 only. aarch64, macOS and Windows each need their own toolchain and have no user yet.
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths:
+      - "notes/reference/pyfvs-patchset.diff.gz"
+      - "notes/reference/fvsbc-patchset.diff.gz"
+      - ".github/workflows/wheels.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build the BC wheel (${{ matrix.python }})
+    runs-on: ubuntu-24.04
+    container: quay.io/pypa/manylinux_2_28_x86_64
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["cp310", "cp311", "cp312", "cp313"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Install the Fortran toolchain
+        run: |
+          dnf install -y gcc-gfortran patchelf which
+          # The compiler version is provenance: a build that produces different numbers needs to be
+          # told apart from one that does not.
+          gfortran --version | head -1
+
+      - name: Check out the pinned fork and its FVS source
+        run: |
+          git config --global --add safe.directory '*'
+          git clone --filter=blob:none https://github.com/UBC-FRESH/PyFVS.git ${{ runner.temp }}/PyFVS
+          git -C ${{ runner.temp }}/PyFVS checkout e95172b
+          git -C ${{ runner.temp }}/PyFVS submodule update --init --recursive
+          echo "FVS source at $(git -C ${{ runner.temp }}/PyFVS/fvs rev-parse --short HEAD)"
+
+      - name: Apply the banked patch sets
+        run: |
+          gunzip -c notes/reference/pyfvs-patchset.diff.gz > ${{ runner.temp }}/pyfvs.patch
+          gunzip -c notes/reference/fvsbc-patchset.diff.gz > ${{ runner.temp }}/fvsbc.patch
+          git -C ${{ runner.temp }}/PyFVS apply --check ${{ runner.temp }}/pyfvs.patch
+          git -C ${{ runner.temp }}/PyFVS apply ${{ runner.temp }}/pyfvs.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/fvsbc.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/fvsbc.patch
+
+      - name: Build the wheel and repair it to manylinux
+        run: |
+          PY=/opt/python/${{ matrix.python }}-${{ matrix.python }}/bin
+          # meson-python finds meson on PATH, and this step invokes the interpreter by absolute path,
+          # so its bin directory has to be added explicitly.
+          export PATH="$PY:$PATH"
+          $PY/pip install -q --upgrade pip
+          # meson itself, not only the backend: --no-build-isolation means pip installs no build
+          # requirements, so the executable has to be here.
+          $PY/pip install -q meson meson-python ninja numpy setuptools_scm auditwheel
+          SETUPTOOLS_SCM_PRETEND_VERSION=0.3.11 $PY/pip wheel \
+            --no-build-isolation --no-deps ${{ runner.temp }}/PyFVS \
+            --config-settings=setup-args="-Dfvsvariants=bc" -w dist
+          # Without this the wheel only runs where gfortran is installed, which is the problem it
+          # exists to remove. The bundled copy is what the extension loads, via its patched RPATH.
+          $PY/auditwheel repair dist/*.whl -w wheelhouse
+          ls -l wheelhouse
+
+      - name: Prove the wheel is self-contained
+        run: |
+          PY=/opt/python/${{ matrix.python }}-${{ matrix.python }}/bin
+          export PATH="$PY:$PATH"
+          # With its dependencies: `import pyfvs` needs them, and skipping them tests the wheel
+          # against an environment nobody has.
+          $PY/pip install -q wheelhouse/*.whl
+          $PY/python -c "import pyfvs; print(pyfvs.list_variants())"
+          $PY/python - <<'PY'
+          import subprocess, sys
+          import pyfvs.fvsbc as module
+          linked = subprocess.run(["ldd", module.__file__], capture_output=True, text=True).stdout
+          assert "fresh_fvsbc_pyfvs.libs" in linked, linked
+          assert "not found" not in linked, linked
+          print("  libgfortran resolves inside the wheel")
+          PY
+
+      - name: Keep the wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.python }}
+          path: wheelhouse/*.whl
+          if-no-files-found: error
+
+  release:
+    name: Attach the wheels to the release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Collect the wheels
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Upload them
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -l dist
+          gh release upload "${GITHUB_REF_NAME}" dist/*.whl --clobber

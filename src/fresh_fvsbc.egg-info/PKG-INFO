@@ -1,0 +1,136 @@
+Metadata-Version: 2.4
+Name: fresh-fvsbc
+Version: 0.19.1
+Summary: A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+Author: UBC FRESH Lab
+License-Expression: MIT
+Project-URL: Repository, https://github.com/UBC-FRESH/fresh-fvsbc
+Project-URL: Documentation, https://ubc-fresh.github.io/fresh-fvsbc/
+Keywords: forest-modelling,fvs,british-columbia,growth-and-yield
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pandas>=2.0
+Provides-Extra: web
+Requires-Dist: fastapi>=0.110; extra == "web"
+Requires-Dist: uvicorn>=0.29; extra == "web"
+Dynamic: license-file
+
+# fresh-fvsbc
+
+`fresh-fvsbc` is a Python wrapper for the **BC variant** of the Forest Vegetation Simulator (FVS), the
+individual-tree growth model maintained by the USDA Forest Service. It builds the `FVSbc` variant from
+a pinned fork of [PyFVS](https://github.com/UBC-FRESH/PyFVS) and exposes BC keywords, species and BEC
+handling, and tidy simulation I/O.
+
+The FVS source is Fortran. `fresh-fvsbc` does not reimplement the build or the bindings: it pins the fork that
+owns them and adds the BC layer on top.
+
+## Where this sits
+
+```text
+FVS Fortran  ->  fork of PyFVS (build, FFI)  ->  fresh-fvsbc (BC semantics, tidy I/O)  ->  femic, ws3, ws4, freshforge
+                                                       ^
+                                                       |
+                                      nemora (synthetic stem populations)
+```
+
+- **Upstream.** `nemora` generates synthetic stem populations from fitted or user-defined distributions.
+  FVS needs a tree list as input, so `nemora` primes `fresh-fvsbc`. The bridge lives here, in `fresh-fvsbc`; `nemora`
+  takes no dependency on FVS. See [ADR 0003](notes/adr/0003-fvsbc-owns-the-bridge.md).
+- **Downstream.** `femic`, `ws3`, `ws4`, and `freshforge` take `fresh-fvsbc` as a pinned dependency. See
+  [ADR 0002](notes/adr/0002-fvsbc-is-a-standalone-package.md).
+
+## Status
+
+`ROADMAP.md` is the plan of record and the only home for status, and the GitHub issues carry the live
+status. At present `P5`, release and deploy, is active on `feature/p5-release`; `P0` to `P4` are
+complete.
+
+**The BC variant builds, imports, and runs.** The recipe is
+[ADR 0004](notes/adr/0004-the-fvsbc-build-recipe.md); the patch sets the build needs are banked at
+`notes/reference/`; and the numbers are compared against the FVS project's own BC test data in
+`notes/reference/fvsbc-validation.md`, with the limits of that comparison stated there.
+
+**The first release, 0.1.0, is being prepared.** Its notes and its list of known gaps are in
+[RELEASE_NOTES.md](RELEASE_NOTES.md); there is no tag and no wheel yet.
+
+## How this project works
+
+This project follows the UBC-FRESH dev workflow. Work is planned as phases, tasks, and subtasks in
+`ROADMAP.md`, mirrored in GitHub issues, and recorded in `CHANGE_LOG.md`. The agent operating contract is
+in `AGENTS.md`. Read `AGENTS.md`, then `ROADMAP.md`, before you change anything.
+
+## Quick start
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python scripts/dashboard.py
+```
+
+`scripts/dashboard.py` runs every quality gate: lint, format, strict types, tests with the coverage
+gate, the workflow validator, and the docs build with warnings as errors.
+
+**Before the first real modelling case**, read `notes/reference/deployment-readiness.md`. It has the install
+recipe that works — including the two steps that cost an hour each the first time — what real use will
+exercise that the tests do not, and where the known blind spots are.
+
+## Running a case
+
+The command reads a population file and a keyword set, runs one FVS-BC case, and reports where its
+outputs are. It needs the built variant; the build recipe is in ADR 0004.
+
+```bash
+python -m fresh_fvsbc population.json \
+  --directory run \
+  --species FD --tree-age 60 \
+  --keyword STDINFO=712,CHS131,0,200,35,16 \
+  --keyword SITECODE=FD,100 \
+  --keyword NUMCYCLE=4 \
+  --keyword PROCESS \
+  --keyword STOP
+```
+
+It exits `0` when the run completed, `1` when the run was attempted and failed, and `2` when the input
+was wrong before any run. The population file, the keyword fields, and the outputs are documented in
+`docs/usage.rst`.
+
+## Repository map
+
+| Path | Purpose |
+| --- | --- |
+| `AGENTS.md` | Operating contract for coding agents |
+| `ROADMAP.md` | Plan of record and issue tracker map |
+| `CHANGE_LOG.md` | Dated narrative of changes |
+| `docs/` | Documentation site |
+| `src/fresh_fvsbc/` | The package: the contracts, the orchestration, and the command |
+| `notes/adr/` | Decisions, one per file |
+| `notes/reference/` | Facts with provenance |
+| `notes/reports/` | Phase close-out reports |
+| `scripts/check_workflow.py` | Workflow validator |
+| `scripts/dashboard.py` | The green dashboard: every quality gate |
+| `tests/` | pytest suite, including a check that the planning surfaces pass the validator |
+
+## Decisions
+
+| ADR | Decision |
+| --- | --- |
+| [0001](notes/adr/0001-fork-pyfvs-as-the-build-and-ffi-layer.md) | Fork PyFVS as the FVS build and FFI layer |
+| [0002](notes/adr/0002-fvsbc-is-a-standalone-package.md) | `fresh-fvsbc` is a standalone package |
+| [0003](notes/adr/0003-fvsbc-owns-the-bridge.md) | `fresh-fvsbc` owns the bridge from synthetic stem populations |
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).
+
+`fresh-fvsbc` builds on two dependencies with their own terms:
+
+- **FVS** is produced by the USDA Forest Service and is in the U.S. public domain. It is released
+  without conditions on its use.
+- **PyFVS** is MIT, copyright 2021 Forest Modeling. `fresh-fvsbc` depends on the `UBC-FRESH/PyFVS` fork and
+  does not vendor it. Where a built artifact carries PyFVS code, its notice is retained.
+
+See [`notes/reference/license-analysis.md`](notes/reference/license-analysis.md) for the check and its
+provenance.
