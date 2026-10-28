@@ -1,10 +1,21 @@
-# fresh-fvsbc 0.19.0
+# fresh-fvsbc 0.19.1
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.19.0
+
+- **The web page no longer understates how much is verified.** Its badge read **"4 of 31 tables
+  verified"** — the four the official dump carries — while **28** have been checked against a standalone
+  `FVSbc`. A lab member reading the page to decide how far to trust the tool saw a number seven times too
+  low.
+
+  `GET /api/oracle` now reports both counts and both table lists, the per-table `oracle` flag means
+  *checked against a reference* rather than *in the dump*, and the badge leads with the standalone count.
+  Found by running the service against `0.19.0` and reading what it said.
 
 ## What changed since 0.18.0
 
