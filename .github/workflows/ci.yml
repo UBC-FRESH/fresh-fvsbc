@@ -122,12 +122,35 @@ jobs:
       # not the toolchain: FVS keeps its state in the process, so a case run after another projection
       # produces different numbers. The test now runs its case in a child process, and it passes in
       # either order.
+      # The oracle compares this package's output against a **standalone** FVSbc, which is a
+      # different build from a different source revision (ADR 0008). Without it in CI the
+      # "twenty-eight tables match" claim is a claim about the day it was measured.
+      - name: Build the standalone for the oracle
+        run: |
+          git clone --filter=blob:none https://github.com/forest-modeling/ForestVegetationSimulator.git \
+            "$RUNNER_TEMP/fvs-standalone"
+          git -C "$RUNNER_TEMP/fvs-standalone" checkout 28fda8ed
+          git -C "$RUNNER_TEMP/fvs-standalone" submodule update --init --recursive
+          # Both patch sets, in this order (ADR 0008): the BC one adds the variant's sources and its
+          # source-list entries, which is what defines dbsreference and the FIAVBC writers; the
+          # standalone one fixes three makefile flags. Without the first, the link fails on them.
+          gunzip -c notes/reference/fvsbc-patchset.diff.gz > "$RUNNER_TEMP/bc.patch"
+          git -C "$RUNNER_TEMP/fvs-standalone" apply --check "$RUNNER_TEMP/bc.patch"
+          git -C "$RUNNER_TEMP/fvs-standalone" apply "$RUNNER_TEMP/bc.patch"
+          gunzip -c notes/reference/fvsbc-standalone-patchset.diff.gz > "$RUNNER_TEMP/standalone.patch"
+          git -C "$RUNNER_TEMP/fvs-standalone" apply --check "$RUNNER_TEMP/standalone.patch"
+          git -C "$RUNNER_TEMP/fvs-standalone" apply "$RUNNER_TEMP/standalone.patch"
+          make -C "$RUNNER_TEMP/fvs-standalone/bin" FVSbc
+          "$RUNNER_TEMP/fvs-standalone/bin/FVSbc" --keywordfile=/dev/null 2>&1 | head -2 || true
+
       - name: Run the tests that need the extension
         env:
           FVSBC_CASE_DIR: ${{ runner.temp }}/PyFVS/fvs/tests/FVSbc
+          FVSBC_STANDALONE: ${{ runner.temp }}/fvs-standalone/bin/FVSbc
         run: |
           python -m pip install --quiet pytest pandas
-          python -m pytest tests/test_run.py tests/test_oracle.py -q -o addopts="" -p no:cacheprovider
+          python -m pytest tests/test_run.py tests/test_oracle.py tests/test_oracle_standalone.py \
+            -q -o addopts="" -p no:cacheprovider
 
   dashboard:
     name: Green dashboard summary
