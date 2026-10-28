@@ -1,10 +1,33 @@
-# fresh-fvsbc 0.18.0
+# fresh-fvsbc 0.19.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.18.0
+
+- **`ESTAB`, `MISTOE` and `RDIN` are blocks of keywords, not raw lines.** A **breaking change** for
+  anyone who built them with `lines=`, and the same defect `FMIN` had: a hand-spaced field is read as a
+  different number and FVS reports nothing. It is not hypothetical — this line reached `MISIN` as
+  species **PW**, proportion **0.50**, neither of which was written:
+
+  ```
+  MISTPINF        0        1       0.5
+  ```
+
+  ```python
+  Keyword("RDIN", nested=(Keyword("RRINIT"), Keyword("RRDOUT")))
+  Keyword("ESTAB", nested=(Keyword("PLANT", ("0", "FD", "3680", "90")),))
+  ```
+
+  Each body is checked against its own reader's table — `esin.f`'s 28, `misin.f`'s 27, `rdinie.f`'s
+  40 — and a keyword from one of those tables written outside its block is refused. A name that is also
+  a top-level keyword, `ESTAB` or `COMMENT`, stays valid there. From the shell:
+  `--block "RDIN|RRINIT|RRDOUT"`.
+
+  `LINES_KEYWORDS` is now only the three whose body really is text: `COMMENT`, `COMPUTE`, `DATABASE`.
 
 ## What changed since 0.17.0
 
