@@ -25,7 +25,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from fresh_fvsbc.outputs import EXPOSED_TABLES, ORACLE_TABLES
+from fresh_fvsbc.outputs import EXPOSED_TABLES, ORACLE_TABLES, STANDALONE_VERIFIED
 from fresh_fvsbc.web import runs as runstore
 from fresh_fvsbc.web.skins import load_skins
 
@@ -162,14 +162,21 @@ def create_app(
         Returns
         -------
         dict
-            ``exposed`` and ``oracle``, so a client can say how much of the surface is verified
-            without
-            having to know the number.
+            ``exposed``, ``oracle`` (the official dump), ``standalone`` (a standalone ``FVSbc``) and
+            the table lists, so a client can say how much of the surface is verified without having
+            to know the numbers.
+
+        Notes
+        -----
+        The standalone comparison is the broader of the two: it covers every table either build
+        writes, not only the four the official dump carries.
         """
         return {
             "exposed": len(EXPOSED_TABLES),
             "oracle": len(ORACLE_TABLES),
             "tables": list(ORACLE_TABLES),
+            "standalone": len(STANDALONE_VERIFIED),
+            "standalone_tables": list(STANDALONE_VERIFIED),
         }
 
     @app.get("/api/runs")

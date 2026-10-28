@@ -96,8 +96,10 @@ function renderShell() {
   badgeEl.textContent = state.run ? state.run.state : "";
 
   const oracleEl = document.getElementById("oracle-badge");
+  // The standalone comparison is the broader of the two and the one to lead with: it covers every
+  // table either build writes, not only the four the official dump carries.
   oracleEl.textContent = state.oracle
-    ? `${state.oracle.oracle} of ${state.oracle.exposed} tables verified`
+    ? `${state.oracle.standalone} of ${state.oracle.exposed} tables verified against a standalone FVSbc`
     : "";
 
   const note = document.getElementById("footer-note");
@@ -168,8 +170,8 @@ function oracleNotice(tables) {
   return el(
     "div",
     { className: "notice" },
-    `${unverified} of these ${tables.length} tables are not checked against an independent source. ` +
-      "Their numbers are FVS's own output read back, not agreement with a reference.",
+    `${unverified} of these ${tables.length} tables are not checked against a reference. ` +
+      "Their numbers are FVS's own output read back, not agreement with an independent build.",
   );
 }
 
