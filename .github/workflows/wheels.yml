@@ -37,7 +37,7 @@ jobs:
 
       - name: Install the Fortran toolchain
         run: |
-          dnf install -y gcc-gfortran which
+          dnf install -y gcc-gfortran patchelf which
           # The compiler version is provenance: a build that produces different numbers needs to be
           # told apart from one that does not.
           gfortran --version | head -1
@@ -63,7 +63,9 @@ jobs:
         run: |
           PY=/opt/python/${{ matrix.python }}-${{ matrix.python }}/bin
           $PY/pip install -q --upgrade pip
-          $PY/pip install -q meson-python ninja numpy setuptools_scm auditwheel patchelf
+          # meson itself, not only the backend: --no-build-isolation means pip installs no build
+          # requirements, so the executable has to be here.
+          $PY/pip install -q meson meson-python ninja numpy setuptools_scm auditwheel
           SETUPTOOLS_SCM_PRETEND_VERSION=0.3.11 $PY/pip wheel \
             --no-build-isolation --no-deps ${{ runner.temp }}/PyFVS \
             --config-settings=setup-args="-Dfvsvariants=bc" -w dist
