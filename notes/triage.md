@@ -99,41 +99,6 @@ says which review changed it.
   `dbsreference_`'s only caller is `fvs_`. The build recipe's PyFVS patch set now carries the missing
   call, verified from a clean clone of the pin: apply both patch sets, build, and `FVS_InvReference`
   appears with 15 rows and **matches a standalone `FVSbc` value for value**.
-- **The fire-model keywords were unvalidated, and that is fixed.** `P50` found that `FMIN`'s body was
-  written as **raw lines**, so a caller spaced the fields by hand. A mis-spaced line is not refused —
-  `SNAGCLAS  0.0   10.0  20.0  40.0` reaches FVS as class 2 `20.0` and class 3 `0.0`, with no error.
-  The block now holds **keywords**, written by the same writer as everything else and checked against
-  `fmin.f`'s own fifty-five, and a fire-model keyword outside the block is refused. That is what made
-  the snag, down-wood and carbon tables reachable: **eight of nine comparable tables now match**.
-- **The fuels and potfire tables vanish if the `FMIN` block follows `INVYEAR`, and that is fixed.**
-  `FUELOUT` and `POTFIRE` set `IFLALB` and `IPFLMB` to `IY(1)` when they are read, and `fmdout.f` and
-  `fmpofl.f` treat **any positive value as "suppress this report"**. Read after `INVYEAR`, they switch
-  their own reports off: the run succeeds, `FVS_Fuels_Metric`, `FVS_PotFire_Metric` and
-  `FVS_PotFire_Cond_Metric` are simply absent, and nothing says so. **The official case never hits it**
-  because its inventory year comes from the input database rather than an `INVYEAR` keyword, so the
-  year is still zero when the block is read — which is why the defect has gone unnoticed upstream. The
-  validator now warns, and with the block first the four fire tables are written and **agree with the
-  standalone value for value**.
-- **`FVS_InvReference` is written by the standalone on every run and never by this package's build.**
-  It is the one exposed table no run of this package produces. `P61` narrowed it as far as observation
-  from outside the binary allows:
-
-  - **Not the source.** `dbsreference.f` and `dbscase.f` are byte-identical between the pin and
-    upstream, and the compiled `dbsreference_` is **the same size in both binaries** — 5,097 bytes.
-  - **Not the driver or the inputs.** This package's driver now reads the stand through the *same*
-    `DSNin` route the standalone uses, with the same keyword file structure, and still writes no such
-    table.
-  - **Not the handle, and not the case row.** `DBSSTATS` is called from `CALL STATS`, the statement
-    immediately before `CALL DBSREFERENCE` in `fvs.f`, and a run with `INVSTATS` and `STATS` **does**
-    write `FVS_Stats_Species_Metric`. So at the point `DBSREFERENCE` runs, the output database is
-    open and `DBSCASE(1)` has created the case row.
-
-  That leaves a **runtime-state difference inside the routine itself**, which is not observable from
-  outside: its silent exits are `fsql3_tableexists` reporting the table as present and the `CREATE`
-  returning an error, and nothing distinguishes them without a log line. **Establishing which needs a
-  build of the fork with one added write**, which is a change in the pinned fork and not here.
-
-  **Reopened by a build with that line**, or by an upstream fix.
 - **A run that logs nothing was reported as failed, and that is fixed.** FVS writes `FVS_Error` only when
   it has something to log; the reader treated an absent table as a failure to read, on the stated premise
   that the extension wrote it on every run. A 999-tree single-plot case disproved the premise: FVS logged
@@ -150,12 +115,15 @@ says which review changed it.
   subdividing a stand into plots, which changes what the statistics mean, so it is a modelling decision
   rather than a repair. **Reopened by a caller who needs a stand above 999 trees in one plot.**
 
-- **The remaining tables are not all reachable, and the reason differs by table.** `P24` settled it
-  mechanically: 25 of the 30 have a writer and a call site, five have a writer that nothing calls, and the
-  burn report's gate needs an invalid input. **This corrects an earlier entry in this file** that said the
-  dwarf-mistletoe and root-disease writers do not exist — they do, as `DBSMIS1` and `DBSRD1`; the grep
-  that "proved" otherwise searched for the wrong symbol names. Evidence in
-  `notes/reference/table-reachability.md`.
+- **Every exposed table is reachable, and twenty-eight are verified.** `P24` settled which tables had a
+  writer and a call site; the coverage sweep went further and **produced all thirty-one**, of which
+  twenty-eight match a standalone `FVSbc` value for value. The other three are `FVS_Regen_SitePrep` (a
+  random allocation, above), `FVS_Cases` (`SamplingWt`, a driver-order artefact) and `FVS_Error` (written
+  only when FVS logs something, so the two builds cannot be made to agree on its presence). The recipes
+  are in `docs/reference/table-recipes.rst` and the evidence in `notes/reference/oracle-coverage.md`.
+  **This corrects two earlier entries**: one said the dwarf-mistletoe and root-disease writers do not
+  exist — they do, as `DBSMIS1` and `DBSRD1` — and another recorded `RDIN`'s required parameters as
+  undetermined; they are `RRINIT` and `RRDOUT`.
 
 - **The contract's table list is the base schema's, and BC builds the metric one.** Twenty-four names are
   wrong for this variant and at least two real tables are missing. Evidence and scope in
