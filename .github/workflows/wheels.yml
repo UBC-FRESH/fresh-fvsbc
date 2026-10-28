@@ -133,3 +133,30 @@ jobs:
           fi
           gh release upload "${GITHUB_REF_NAME}" dist/*.whl \
             --repo "${GITHUB_REPOSITORY}" --clobber
+
+  publish:
+    name: Publish the fork wheel to PyPI
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Collect the wheels
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      # Trusted publishing: GitHub mints an OIDC token and PyPI accepts it for the workflow named in
+      # its configuration, so there is no API token in this repository.
+      #
+      # `skip-existing` because the fork is pinned by commit and its version does not change with
+      # every release of this package: without it, every tag after the first would fail on a
+      # duplicate.
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
+          skip-existing: true
