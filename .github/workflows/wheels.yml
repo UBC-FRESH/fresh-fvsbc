@@ -81,7 +81,9 @@ jobs:
         run: |
           PY=/opt/python/${{ matrix.python }}-${{ matrix.python }}/bin
           export PATH="$PY:$PATH"
-          $PY/pip install -q --no-deps wheelhouse/*.whl
+          # With its dependencies: `import pyfvs` needs them, and skipping them tests the wheel
+          # against an environment nobody has.
+          $PY/pip install -q wheelhouse/*.whl
           $PY/python -c "import pyfvs; print(pyfvs.list_variants())"
           $PY/python - <<'PY'
           import subprocess, sys
