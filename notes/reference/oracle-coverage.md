@@ -76,20 +76,17 @@ against `rdinie.f`, `misin.f` and `esin.f`.
 columns — code `30` with the Hawksworth rating as the severity — and `NEWSPRED` is what makes the tree
 list appear. Without it three of the four are written and the fourth is not.
 
-## The open difference
+## The table that cannot be compared
 
-`FVS_Regen_SitePrep` **differs**, and the difference is in the model rather than in the writer: the
-`.out` prints `PCT: 74 20 6` for this package's run and `PCT: 100 0 0` for the standalone's, in the same
-`SITE PREP SUMMARY` block.
+`FVS_Regen_SitePrep` **is not comparable**, and the cause is in FVS rather than in either build:
+`estab.f` branches on `LOAD`, and `LOAD` is assigned only when the stand is more than twenty years past
+inventory or a site-prep activity exists. An ordinary run reads an **uninitialised local**.
 
-**`P59` ruled out every observable input**: both runs have one plot, 4,146 tree rows, the same aspect,
-slope, elevation and basal area, and this package's run is deterministic across seeds. What is left is
-`estab.f`'s site-prep selection, which fills `SUMPRE` from draws out of the pre-generated uniform array
-`WK6`; the likeliest cause is that the two drivers consume different numbers of draws before it runs.
-That is a hypothesis — the draws were not compared.
+Instrumenting both builds measured it: **`LOAD=0` here, `LOAD=1` in the standalone** — so one samples the
+BC variant's stub probabilities and the other reuses `IPPREP`. The two disagree by luck of the stack.
 
-The three columns that move are integers describing a random allocation, and every other table in the
-same run matches. `notes/triage.md` carries the evidence and what would reopen it.
+`notes/triage.md` carries the evidence and what would reopen it. Every other table in the same run
+matches.
 
 ## What this cost, and what it taught
 

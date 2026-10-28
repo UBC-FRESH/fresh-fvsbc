@@ -81,6 +81,14 @@ NOT_COMPARABLE: dict[str, str] = {
         "location code and logs FVS03, which the keyword path never does, so the standalone writes "
         "the table and this package's run does not"
     ),
+    "FVS_Regen_SitePrep": (
+        "its PcntNone, PcntMech and PcntBurn come from an UNINITIALISED local: estab.f reads LOAD "
+        "at 'IF(LOAD.NE.1) GO TO 249' and only assigns it when the stand is more than 20 years "
+        "past inventory or a site-prep activity exists, and esetpr.f assigns it only inside an "
+        "activity loop. Measured: LOAD=0 in this build and LOAD=1 in the standalone, so one "
+        "samples the stub's 0.75/0.20/0.05 and the other reuses IPPREP and writes 100/0/0. The "
+        "two builds disagree by luck of the stack, so the table cannot be compared"
+    ),
 }
 
 #: Columns whose disagreement is explained, with the reason. Anything not named here is a
@@ -202,12 +210,15 @@ def compare(ours: Path, theirs: Path) -> tuple[Comparison, ...]:
     results: list[Comparison] = []
     applicable: set[str] = set()
     for name in sorted(mine | other):
+        # A table in NOT_COMPARABLE is not compared whatever its presence: the reason may be that
+        # only one side writes it, or that both do and the difference is FVS's own rather than this
+        # package's. Reporting either as a pass would be a claim the module cannot make.
+        if name in NOT_COMPARABLE:
+            results.append(Comparison(name, "not comparable", NOT_COMPARABLE[name]))
+            continue
         if name not in other or name not in mine:
             side = "the standalone" if name in other else "this package"
-            if name in NOT_COMPARABLE:
-                results.append(Comparison(name, "not comparable", NOT_COMPARABLE[name]))
-            else:
-                results.append(Comparison(name, "differ", f"only {side} wrote it"))
+            results.append(Comparison(name, "differ", f"only {side} wrote it"))
             continue
         left = _canonical(read_table(ours, name))
         right = _canonical(read_table(theirs, name))
@@ -284,9 +295,11 @@ def _stale(results: list[Comparison], applicable: set[str]) -> list[Comparison]:
                 Comparison(table, "stale", "the explained columns now agree; drop the explanation")
             )
     for table in NOT_COMPARABLE:
-        if seen.get(table) in {"match", "explained"}:
+        if table not in EXPOSED_TABLES:
             stale.append(
-                Comparison(table, "stale", "both sides now write it; drop the not-comparable entry")
+                Comparison(
+                    table, "stale", "it is not an exposed table; drop the not-comparable entry"
+                )
             )
     return stale
 
