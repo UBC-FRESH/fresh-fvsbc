@@ -131,6 +131,12 @@ jobs:
             "$RUNNER_TEMP/fvs-standalone"
           git -C "$RUNNER_TEMP/fvs-standalone" checkout 28fda8ed
           git -C "$RUNNER_TEMP/fvs-standalone" submodule update --init --recursive
+          # Both patch sets, in this order (ADR 0008): the BC one adds the variant's sources and its
+          # source-list entries, which is what defines dbsreference and the FIAVBC writers; the
+          # standalone one fixes three makefile flags. Without the first, the link fails on them.
+          gunzip -c notes/reference/fvsbc-patchset.diff.gz > "$RUNNER_TEMP/bc.patch"
+          git -C "$RUNNER_TEMP/fvs-standalone" apply --check "$RUNNER_TEMP/bc.patch"
+          git -C "$RUNNER_TEMP/fvs-standalone" apply "$RUNNER_TEMP/bc.patch"
           gunzip -c notes/reference/fvsbc-standalone-patchset.diff.gz > "$RUNNER_TEMP/standalone.patch"
           git -C "$RUNNER_TEMP/fvs-standalone" apply --check "$RUNNER_TEMP/standalone.patch"
           git -C "$RUNNER_TEMP/fvs-standalone" apply "$RUNNER_TEMP/standalone.patch"
