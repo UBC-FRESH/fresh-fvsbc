@@ -1,0 +1,66 @@
+name: publish
+
+# Publishes `fresh-fvsbc` itself. The Fortran half — `fresh-fvsbc-pyfvs` — is published by the
+# `wheels` workflow, which already builds it.
+#
+# Both use PyPI's **trusted publishing**: GitHub mints a short-lived OIDC token and PyPI accepts it
+# for the workflow named in its configuration. There is no API token in this repository, and there is
+# nothing to rotate. The one-time setup on PyPI is in `notes/reference/publishing.md`.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build the sdist and wheel
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          # setuptools_scm reads the version from the tag, so the tag has to be present.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Build
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build --outdir dist
+
+      - name: Check the metadata
+        run: twine check dist/*
+
+      - name: Keep the distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist-wheel
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-24.04
+    # The environment is what PyPI's trusted publisher is configured against. It is also where an
+    # approval rule would live if this project ever wants one.
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Collect the distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist-wheel
+          path: dist
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
