@@ -1,10 +1,33 @@
-# fresh-fvsbc 0.19.1
+# fresh-fvsbc 0.20.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.19.1
+
+- **There is a wheel, and installing it needs no Fortran toolchain.** Until now, using this package
+  meant owning `gfortran`, `meson`, `ninja` and two patch sets — which is the whole distance between
+  "our lab uses it" and "another lab can".
+
+  Each release carries a self-contained wheel for the pinned fork, built in `manylinux_2_28` for
+  Python 3.10 to 3.13. `auditwheel repair` bundles `libgfortran` into it, so nothing has to be
+  installed but the wheel:
+
+  ```console
+  $ pip install https://github.com/UBC-FRESH/fresh-fvsbc/releases/download/v0.20.0/fresh_fvsbc_pyfvs-0.3.11-cp312-cp312-manylinux_2_28_x86_64.whl
+  $ pip install fresh-fvsbc
+  ```
+
+  **Linux x86_64, glibc 2.28 or later** — RHEL 8+, Ubuntu 20.04+, Debian 10+, every current cluster.
+  `docs/installation.rst` is the page, including what to do when there is no wheel for your platform.
+
+- **The fork's distribution is renamed `fresh-fvsbc-pyfvs`.** It installs the same `pyfvs` import
+  package as upstream, so a distinct distribution name is the only thing that stops the two being
+  installed over each other. `fresh-fvsbc[fvs]` names it as an extra. **Do not install upstream
+  `pyfvs` in the same environment** — pip will not stop you.
 
 ## What changed since 0.19.0
 
