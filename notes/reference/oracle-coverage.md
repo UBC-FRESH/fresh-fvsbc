@@ -8,6 +8,11 @@ book for the oracle: a table with no check needs a case here, and the case is us
 three tables were silently absent. **Twenty-eight of the thirty-one have now been produced and
 compared.**
 
+**It runs in CI.** `tests/test_oracle_standalone.py` builds one run from the recipes below and fails on
+any difference the comparison cannot explain; `ci.yml`'s extension job builds the standalone from
+upstream `28fda8ed` and points the test at it. Before that the number was a claim about the day it was
+measured.
+
 ## The result
 
 | Verdict | Tables |
