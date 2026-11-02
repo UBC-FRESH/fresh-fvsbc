@@ -28,6 +28,14 @@ below are listed in the order the pipeline uses them.
    :members:
    :show-inheritance:
 
+.. automodule:: fresh_fvsbc.backtest
+   :members:
+   :show-inheritance:
+
+.. automodule:: fresh_fvsbc.envelope
+   :members:
+   :show-inheritance:
+
 .. automodule:: fresh_fvsbc.keywords
    :members:
    :show-inheritance:
