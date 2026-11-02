@@ -1,7 +1,8 @@
 # The fresh-fvsbc web front end: design
 
-Status: design for `P37`. **No UI code lands before this note is on `main`.** This is the same rule the
-ws4 and fhops front ends were built under, and this note follows their architecture deliberately.
+Status: design for `P37`; updated for the web-visuals workstream (parent issue #299). **No UI code lands
+before this note is on `main`.** This is the same rule the ws4 and fhops front ends were built under, and
+this note follows their architecture deliberately.
 
 ## Prior art: what FVS Online actually is
 
@@ -34,8 +35,10 @@ A browser surface over **the artefacts a run already wrote**: the keyword set, t
 database, the summary, and the provenance. Skins are manifests over one application.
 
 Non-goals for the first cut: a second variant, UI-only state, multi-user authentication, a database of its
-own, a map, and 3D. **The CLI remains the only way to produce a result**; the service starts a run by
-invoking it, exactly as the existing `run_case` drives FVS in a child process (ADR 0010).
+own, a geographic map, and 3D editing. **The CLI remains the only way to produce a result**; the service
+starts a run by invoking it, exactly as the existing `run_case` drives FVS in a child process (ADR 0010).
+The **visuals** panel added in the web-visuals workstream is a read-only view, not a geographic map and not
+an editor; the section below states its limits.
 
 ## The artefact contract
 
@@ -102,7 +105,7 @@ Four skins ship, chosen for who actually opens this thing:
 | skin | panels | who it is for |
 | --- | --- | --- |
 | `analyst` | all | the default: run, browse, compare |
-| `reviewer` | tables, summary, provenance | read-only; checking someone else's result |
+| `reviewer` | tables, summary, visuals, provenance | read-only; checking someone else's result |
 | `carbon` | summary, tables, provenance | the carbon accounting workflow |
 | `tables` | tables | raw table browser for a caller debugging a reader |
 
@@ -116,6 +119,12 @@ Four skins ship, chosen for who actually opens this thing:
 - **Trees.** `FVS_TreeList_Metric` and `FVS_CutList_Metric` side by side, joined on `TreeId`, so a caller
   can see what a treatment took. The `CCum`/`CCuM` difference between the two tables is labelled in the UI
   rather than left as a trap.
+- **Visuals.** A 2D canvas and a 3D three.js viewer over the same per-tree payload, with a year selector.
+  The 2D map draws one cell per `PtIndex`, trees sized from DBH, species colours, and cut trees from the
+  cut list. The 3D view instanced trunks and crowns on a flat ground plane, with orbit and zoom. **FVS
+  writes no x/y**, so the layout is a stable spiral computed in `web/visuals.py` and the UI says so. **The
+  ground is flat** because the tables carry no terrain. The three.js runtime is vendored, not fetched from a
+  CDN, and it is imported only when the 3D view is chosen.
 - **Keywords.** `run.key` rendered read-only with the keyword names highlighted, and the run's identity.
 - **Provenance.** The three pins, the variant list, and the package version — the thing that makes a result
   reproducible.
