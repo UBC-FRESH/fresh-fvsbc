@@ -1550,8 +1550,9 @@ carry their species, site-index, mortality, growth, or BEC tables.
 | W6 calibration release | Can a user select a certified bundle and get provenance? | Release, docs, CLI/API surface, and envelope validator |
 
 W1 is active as parent issue #289, with child issues #290 to #295, on
-`feature/bc-calibration`. The later workstreams are recorded here when their
-predecessor closes.
+`feature/bc-calibration`. W1.6 is implemented on
+`feature/bc-calibration-domains` and queued for review; W1 closes when it
+merges. The later workstreams are recorded here when their predecessor closes.
 
 ### Web visuals
 

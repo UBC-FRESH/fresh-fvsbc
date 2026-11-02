@@ -22,6 +22,10 @@ outside the repository because they carry site identifiers.
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |
 | `baseline_report.md` | The baseline report and its limits |
+| `domain_power.csv` | The W1.6 coverage and sample-size table, one row per BEC variant |
+| `domain_summary.csv` | The W1.6 domain table, one row per BEC zone |
+| `domain-design.md` | The W1.6 domain, power, and pre-registered validation design |
+| `w2-upstream-work-package.md` | The W2 gate for `CWH`, `CDF`, `BWBS`, `CMA`, and `MH` |
 
 ## Counts
 
@@ -97,6 +101,27 @@ The agreement is exact to the published precision, which is the check that the
 weights, species filters, and interval construction are the same as the audit's.
 It is not a calibration and it is not independent of the archive: both read the
 same PSP snapshot.
+
+## The domains
+
+`domain-design.md` is the W1.6 design. It keeps the seven source BEC zones as the domains and
+applies a pre-registered sample-size rule:
+
+- 39 variants are **calibration** variants (at least 15 repeat sites and 50 intervals).
+- 47 are **validation-only** (at least 5 repeat sites or 10 intervals).
+- 35 are **insufficient** for either.
+- 32 are **upstream** because they are in `CWH`, `CDF`, `BWBS`, `CMA`, or `MH`.
+
+Six supported zones meet the calibration rule: ESSF, ICH, IDF, MS, SBPS, and SBS. PP is
+validation-only. The five upstream zones are the W2 gate. The per-variant table is `domain_power.csv`
+and the per-zone table is `domain_summary.csv`; both are written by:
+
+```bash
+PYTHONPATH=src python scripts/build_calibration_domains.py \
+  --coverage notes/reference/calibration/bec_coverage.csv \
+  --baseline notes/reference/calibration/baseline_summary.csv \
+  --out-dir notes/reference/calibration
+```
 
 ## Known limits
 

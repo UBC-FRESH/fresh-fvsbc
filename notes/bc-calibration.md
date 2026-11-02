@@ -259,7 +259,7 @@ the no-cut baseline. Dashboard: `OVERALL: GREEN`.
 Acceptance: a replication report, a protocol note, and an effort estimate; the
 report says plainly that KC is a pilot and not a province-wide certificate.
 
-Status: **implemented on `feature/bc-calibration-kc-protocol`**, pending review.
+Status: **merged** as `34eb125` on 2026-11-02.
 The protocol, the v2c bundle, and the replication report are in
 `notes/reference/calibration/`. The replication uses the corrected-BEC KC run
 already recorded in the KC instance; this repository did not re-execute the 24
@@ -269,24 +269,35 @@ Dashboard: `OVERALL: GREEN`.
 
 ### W1.6 (#295) Design the full-domain calibration and the upstream work package
 
-- [ ] Group the 47 data-rich BEC variants into a small number of calibration
+- [x] Group the 47 data-rich BEC variants into a small number of calibration
   domains by BEC zone, subzone, region, and species composition; do not propose
   153 separate models.
-- [ ] Do a sample-size and power table: which domains can identify capacity,
+- [x] Do a sample-size and power table: which domains can identify capacity,
   mortality, and growth; which are validation-only; which are out of scope.
-- [ ] Write the W2 upstream work package for `CWH`, `CDF`, `BWBS`, `CMA`, and
+- [x] Write the W2 upstream work package for `CWH`, `CDF`, `BWBS`, `CMA`, and
   `MH`: the missing species, site-index, mortality, growth, and BEC tables; the
   source files; the build and test plan; the risks; and the acceptance criteria
   for a pinned extension.
-- [ ] Pre-register the primary metrics, spatial and temporal holdouts, and
+- [x] Pre-register the primary metrics, spatial and temporal holdouts, and
   acceptance thresholds before any fitting.
-- [ ] Propose W2 to W6 with tasks, gates, and reviewer sign-off.
+- [x] Propose W2 to W6 with tasks, gates, and reviewer sign-off.
 - [ ] Review the design with the named reviewers, and record disagreements and
   resolutions rather than averaging them away.
 
 Acceptance: a coverage and power matrix, an upstream work package with a go/no-go
 gate, a pre-registered validation design, and a workstream proposal that the
 maintainer can approve or reject.
+
+Status: **implemented on `feature/bc-calibration-domains`**, pending review.
+The design keeps the seven source BEC zones as the domains. **Thirty-nine
+variants are calibration variants, forty-seven are validation-only, thirty-five
+are insufficient, and thirty-two are upstream.** ESSF, ICH, IDF, MS, SBPS, and
+SBS meet the calibration rule; PP is validation-only; the five upstream zones are
+the W2 gate. The per-variant and per-zone tables are `domain_power.csv` and
+`domain_summary.csv`; the design is `domain-design.md`; the W2 package is
+`w2-upstream-work-package.md`. The reviewer sign-off table is still pending,
+which is why the design is proposed rather than approved. Dashboard:
+`OVERALL: GREEN`.
 
 ## What W1 does not do
 
@@ -368,7 +379,7 @@ claim. It does not relax the threshold silently.
 | Two calibrations are confounded | Growth and mortality multipliers both change BA | Fix growth first or fit jointly with separate data, as the KC protocol proposes |
 | The envelope is circular | An envelope from the training plots is not independent | Hold out sites before fitting; report the envelope's own uncertainty |
 | Upstream source drifts | The 2011 variant table may not match the pinned code | Review the pinned source and record the commit with every bundle |
-| Reviewer time is the bottleneck | A calibration without review is not a certificate | W1.6 names reviewers and estimates effort |
+| Reviewer time is the bottleneck | A calibration without review is not a certificate | W1.6 names the reviewer roles and the W2 cost estimate; the maintainer names the people |
 
 Open decisions for the maintainer:
 
@@ -385,7 +396,9 @@ Open decisions for the maintainer:
 ## Activation
 
 W1 is active. The parent issue is #289, the six child issues are #290 to #295,
-and the branch is `feature/bc-calibration`. The next move is W1.1.
+and the branch is `feature/bc-calibration`. W1.1 to W1.6 are implemented; W1
+closes when the W1.6 design merges, and W2 is the next workstream. The W1.6
+reviewer sign-off is the only open subtask.
 
 ## References
 

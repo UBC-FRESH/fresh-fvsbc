@@ -1,0 +1,13 @@
+zone,variants,supported,calibration,validation_only,insufficient,upstream,sites,repeat_sites,intervals,dead_trees,capacity_ready,mortality_ready,growth_ready,mortality_mde_pct,ba_mde_m2ha,baseline_flags,verdict,claim
+BWBS,5,0,0,0,0,5,534,336,0,0,0,0,0,,,0,upstream,W2 extension required before any calibration.
+CDF,1,0,0,0,0,1,26,21,0,0,0,0,0,,,0,upstream,W2 extension required before any calibration.
+CMA,1,0,0,0,0,1,3,2,0,0,0,0,0,,,0,upstream,W2 extension required before any calibration.
+CWH,22,0,0,0,0,22,2335,2178,0,0,0,0,0,,,0,upstream,W2 extension required before any calibration.
+ESSF,36,36,2,19,15,0,420,279,620,8596,2,1,2,3.02,1.12,0,calibration,Narrow claim: fewer than three calibration variants; validate leave-one-variant-out.
+ICH,31,31,12,10,9,0,1269,950,3149,54185,12,12,11,1.2,0.5,0,calibration,"Calibrate capacity, mortality and growth; validate on held-out sites and variants."
+IDF,18,18,10,7,1,0,973,797,2126,33620,10,10,8,1.53,0.61,0,calibration,"Calibrate capacity, mortality and growth; validate on held-out sites and variants."
+MH,3,0,0,0,0,3,13,12,0,0,0,0,0,,,0,upstream,W2 extension required before any calibration.
+MS,11,11,5,2,4,0,376,307,1037,14837,5,3,3,2.3,0.87,0,calibration,"Calibrate capacity, mortality and growth; validate on held-out sites and variants."
+PP,2,2,0,1,1,0,16,10,27,303,0,0,0,16.09,5.39,0,validation-only,No calibration; use for validation and the empirical envelope only.
+SBPS,4,4,1,2,1,0,170,126,296,7594,1,1,1,3.21,1.63,3,calibration,Narrow claim: fewer than three calibration variants; validate leave-one-variant-out.
+SBS,19,19,9,6,4,0,1206,717,1931,41724,9,8,6,1.37,0.64,3,calibration,"Calibrate capacity, mortality and growth; validate on held-out sites and variants."
