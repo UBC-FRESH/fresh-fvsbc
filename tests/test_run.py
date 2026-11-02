@@ -19,6 +19,7 @@ import pandas as pd
 import pytest
 
 from fresh_fvsbc import run
+from fresh_fvsbc.bec import BecCodeError
 from fresh_fvsbc.keywords import (
     Keyword,
     KeywordSet,
@@ -70,8 +71,16 @@ def a_tree() -> TreeListFields:
 
 
 def a_set(*names: str) -> tuple[Keyword, ...]:
-    """Build a keyword set from names, in order, with no parameters."""
-    return tuple(Keyword(name) for name in names)
+    """Build a keyword set from names, in order, with a valid BEC for ``STDINFO``.
+
+    A BC run must carry a BEC-bearing ``STDINFO``; the helper supplies the
+    working ``CAR IDFdk3/01`` form so a test that is not about the BEC does not
+    have to spell it out.
+    """
+    return tuple(
+        Keyword(name, ("CAR", "IDFdk3/01")) if name == "STDINFO" else Keyword(name)
+        for name in names
+    )
 
 
 def a_database(path: Path, *, cases: int = 1, messages: tuple[str, ...] = ()) -> Path:
@@ -218,20 +227,28 @@ def test_an_unknown_keyword_is_refused_before_anything_is_written(tmp_path: Path
     assert not target.exists()
 
 
+def test_a_run_without_stdinfo_is_refused_before_anything_is_written(tmp_path: Path) -> None:
+    """A BC run without ``STDINFO`` would silently use ``ICHmw2/01``."""
+    target = tmp_path / "run"
+    with pytest.raises(BecCodeError, match="needs STDINFO"):
+        run.run_case([a_tree()], a_set("PROCESS", "STOP"), directory=target)
+    assert not target.exists()
+
+
 def test_the_run_writes_the_inputs_the_record_and_the_result(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """One call writes the keyword file, the tree list, the record, and returns the tables."""
     monkeypatch.setattr(run, "_drive", a_fake_drive(messages=(WARNING,)))
     given = (
-        Keyword("STDINFO"),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01")),
         Keyword("RANNSEED", ("1",)),
         Keyword("PROCESS"),
         Keyword("STOP"),
     )
     result = run.run_case([a_tree()], given, directory=tmp_path / "run")
 
-    assert result.keyword_file.read_text().startswith("STDINFO\n")
+    assert result.keyword_file.read_text().startswith("STDINFO")
     assert result.keyword_file.read_text().count("TREEFMT") == 1
     tree_file = run.tree_file_name(result.keyword_file)
     assert tree_file.read_text() == write_tree_record(a_tree()) + "\n-999\n"
@@ -240,6 +257,7 @@ def test_the_run_writes_the_inputs_the_record_and_the_result(
     record = json.loads((result.directory / "provenance.json").read_text())
     assert record["case_id"] == "case-0"
     assert record["variant"] == "bc"
+    assert record["bec"] == "CAR IDFdk3/01"
     assert record["variant_list"] == ["BC"]
     assert record["keyword_set_hash"] == KeywordSet(run.with_tree_handoff(given)).digest
     assert result.provenance.treelist_hash == result.provenance.as_record()["treelist_hash"]
@@ -350,7 +368,7 @@ def test_the_seed_is_recorded_from_the_set(tmp_path: Path, monkeypatch: pytest.M
     monkeypatch.setattr(run, "_drive", a_fake_drive())
     result = run.run_case(
         [a_tree()],
-        (Keyword("STDINFO"), Keyword("RANNSEED", ("7",))),
+        (Keyword("STDINFO", ("CAR", "IDFdk3/01")), Keyword("RANNSEED", ("7",))),
         directory=tmp_path / "run",
     )
     assert result.provenance.random_seed == 7
@@ -429,7 +447,7 @@ def test_an_fmin_block_writes_the_fuels_and_potfire_tables(tmp_path: Path) -> No
             ("DSNOut", "FVSOut.db", "Summary", "FuelsOut", "FuelReDB", "PotfirDB", "ComputDB"),
         ),
         Keyword("STDIDENT", ("FMIN   fuels",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -471,7 +489,7 @@ def test_a_carbrept_option_writes_the_two_carbon_tables(tmp_path: Path) -> None:
     keywords = (
         Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "CARBREDB", "ComputDB")),
         Keyword("STDIDENT", ("CARBON  fmin",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -514,7 +532,7 @@ def test_simfire_schedules_the_fire_a_consumption_row_needs(tmp_path: Path) -> N
             ("DSNOut", "FVSOut.db", "Summary", "FuelsOut", "FuelReDB", "BURNREDB", "ComputDB"),
         ),
         Keyword("STDIDENT", ("FIRE   simfire",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -557,7 +575,7 @@ def test_a_mistoe_block_is_accepted_by_fvs(tmp_path: Path) -> None:
     keywords = (
         Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "MISRPTS", "ComputDB")),
         Keyword("STDIDENT", ("MISTOE block",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -609,7 +627,7 @@ def test_a_treelist_request_writes_the_per_tree_tables(tmp_path: Path) -> None:
             ),
         ),
         Keyword("STDIDENT", ("TREES  per tree",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -666,7 +684,7 @@ def test_a_treatment_writes_the_attribute_list_and_the_structural_stage(tmp_path
             ("DSNOut", "FVSOut.db", "Summary", "ATRTLIDB", "STRCLSDB", "ComputDB"),
         ),
         Keyword("STDIDENT", ("STAGE  atrtlist",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -705,7 +723,7 @@ def test_canfprof_writes_the_canopy_profile(tmp_path: Path) -> None:
     keywords = (
         Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "ComputDB")),
         Keyword("STDIDENT", ("CANOPY profile",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -741,7 +759,7 @@ def test_design_field_four_sets_the_sample_point_count(tmp_path: Path) -> None:
     keywords = (
         Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "INVSTATS", "ComputDB")),
         Keyword("STDIDENT", ("POINTS five",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -780,7 +798,7 @@ def test_mortrept_and_a_fire_write_the_mortality_table(tmp_path: Path) -> None:
             "DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "MORTREDB", "FuelsOut", "ComputDB")
         ),
         Keyword("STDIDENT", ("MORT   fire",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -820,7 +838,7 @@ def test_damage_code_thirty_is_the_mistletoe_rating(tmp_path: Path) -> None:
     keywords = (
         Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "MISRPTS", "ComputDB")),
         Keyword("STDIDENT", ("MIST   damage",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -857,7 +875,7 @@ def test_mistprt_and_newspred_write_all_four_dm_tables(tmp_path: Path) -> None:
     keywords = (
         Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "MISRPTS", "ComputDB")),
         Keyword("STDIDENT", ("MIST   four",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -896,7 +914,7 @@ def test_rrinit_and_rrdout_write_the_root_disease_tables(tmp_path: Path) -> None
             ("DSNOut", "FVSOut.db", "Summary", "RDSUM", "RDDETAIL", "ComputDB"),
         ),
         Keyword("STDIDENT", ("ROOT   disease",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -932,7 +950,7 @@ def test_an_estab_block_writes_the_regeneration_tables(tmp_path: Path) -> None:
     keywords = (
         Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "REGREPTS", "ComputDB")),
         Keyword("STDIDENT", ("REGEN  estab",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -962,7 +980,7 @@ def test_a_conditional_reaches_fvs(tmp_path: Path) -> None:
     condition = "MOD(AGE,20) EQ 0"
     keywords = (
         Keyword("STDIDENT", ("IFTEST   conditional",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -994,7 +1012,7 @@ def test_a_database_block_first_writes_the_tables_it_asks_for(tmp_path: Path) ->
     keywords = (
         Keyword("DATABASE", (), ("DSNOut", "FVSOut.db", "Summary", "ComputDB")),
         Keyword("STDIDENT", ("DBTEST   tables",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -1031,7 +1049,7 @@ def test_a_compute_block_reaches_fvs(tmp_path: Path) -> None:
     expression = "BigVol = spmcdbh(3,0,0, 20.0, 999.0, 0,999,0)"
     keywords = (
         Keyword("STDIDENT", ("BLOCK   compute",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),
@@ -1064,7 +1082,7 @@ def test_a_synthetic_stand_runs_end_to_end(tmp_path: Path) -> None:
     population = synthetic_population()
     keywords = (
         Keyword("STDIDENT", ("SYNTHETIC   P3.5 end to end",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 __version__ = "0.20.0"
 
+from fresh_fvsbc.bec import BecCode, BecCodeError
 from fresh_fvsbc.keywords import (
     Keyword,
     KeywordSet,
@@ -62,6 +63,8 @@ from fresh_fvsbc.treelist import (
 
 __all__ = [
     "AmbiguousSpeciesError",
+    "BecCode",
+    "BecCodeError",
     "BuildError",
     "CrownRatioError",
     "ExtensionUnavailableError",

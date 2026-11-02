@@ -386,7 +386,7 @@ def test_a_run_after_another_case_is_not_contaminated(tmp_path: Path) -> None:
     case = case_directory()
     keywords = (
         Keyword("STDIDENT", ("CONTAMINATION   first",)),
-        Keyword("STDINFO", ("712", "CHS131", "0", "200", "35", "16")),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("MANAGED", ("0", "1")),
         Keyword("SITECODE", ("FD", "100")),
         Keyword("INVYEAR", ("0",)),

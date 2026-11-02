@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import pytest
 
+from fresh_fvsbc.bec import BecCodeError
 from fresh_fvsbc.keywords import (
     BLANK_SLOTS,
     BLOCK_BODIES,
@@ -180,6 +181,23 @@ def test_a_set_stops_at_the_first_unknown_keyword() -> None:
     """A set with an unknown keyword cannot run, so validation does not report past it."""
     with pytest.raises(UnknownKeywordError, match='"NOPE" is not a keyword'):
         validate_keywords([Keyword("STDIDENT"), Keyword("NOPE"), Keyword("ALSONOPE")])
+
+
+def test_stdinfo_with_a_valid_bec_is_accepted() -> None:
+    """The working ``CAR IDFdk3/01`` form is the one the source resolves."""
+    assert validate_keyword(Keyword("STDINFO", ("CAR", "IDFdk3/01"))) == []
+
+
+def test_stdinfo_without_a_bec_is_refused() -> None:
+    """A bare ``STDINFO`` would leave FVS on its silent ``ICHmw2/01`` default."""
+    with pytest.raises(BecCodeError, match="first two fields"):
+        KeywordSet((Keyword("STDINFO"),))
+
+
+def test_stdinfo_with_the_legacy_code_is_refused() -> None:
+    """``712,CHS131`` is not a BEC, and FVS would run ``ICHmw2/01`` instead."""
+    with pytest.raises(BecCodeError, match="ICHmw2/01"):
+        KeywordSet((Keyword("STDINFO", ("712", "CHS131")),))
 
 
 def test_a_field_keyword_renders_ten_column_fields_on_its_own_record() -> None:

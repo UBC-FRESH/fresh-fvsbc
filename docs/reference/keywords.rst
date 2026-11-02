@@ -187,7 +187,25 @@ keywords, in `canada/bc/initre.f`:
   species comes from the first ``SITECODE`` card, and it names field 3 as the species field.
 - ``SETSITE`` is in the table at slot 139.
 
-BEC values arrive as a structured value, not as a flat code. `canada/bc/BCPLOT.F77` declares:
+BEC values arrive in the **first two fields of ``STDINFO``**. Option 14 of
+`canada/bc/initre.f` concatenates those two fields and calls ``HABTYP``; option 138,
+``SETSITE``, does the same when it is given a habitat type. ``canada/bc/habtyp.f``
+searches the concatenation for a region token, a zone token, a two-letter subzone
+with an optional variant, a slash, and a site series. If any part is missing it
+calls its error path and leaves the BEC at the documented default,
+``ICHmw2/01``.
+
+The working form is:
+
+.. code-block:: text
+
+   STDINFO   CAR       IDFdk3/01 60        200       35        16
+
+The first two fields carry the code: the region, then the zone, subzone, and site
+series. The series is mandatory. ``CAR IDFdk3`` alone does not resolve, because
+there is no slash.
+
+``canada/bc/BCPLOT.F77`` declares the structured value that ``BECSET`` resolves:
 
 .. code-block:: fortran
 
@@ -201,17 +219,20 @@ BEC values arrive as a structured value, not as a flat code. `canada/bc/BCPLOT.F
         CHARACTER (LEN=15) :: PrettyName !IDFmw1/01-YC
       END TYPE
 
-So a BEC value is a region, a zone, a subzone, and a series, with two derived renderings. `BECSET` in
-`canada/bc/becset.f` resolves it. That file's header names the input as the ``BECINFO`` keyword, but
-``BECINFO`` appears nowhere in the keyword table and nowhere in the code except two comments. It is
-either a documented name for input that now arrives another way, or a stale comment.
+**What the package does.** ``STDINFO`` is validated before a run starts.
+:class:`fresh_fvsbc.bec.BecCode` parses the first two fields and refuses a code that
+would not resolve, naming the accepted grammar, the supported zones, and the silent
+default. It refuses ``STDINFO=712,CHS131,...`` for the same reason: that string is
+not a BEC, and FVS would run ``ICHmw2/01``. The supported zones are ``ESSF``,
+``ICH``, ``IDF``, ``MS``, ``PP``, ``SBS``, and ``SBPS``; they are also the zones
+``canada/bc/sitset.f`` assigns default maximum basal area for. ``CWH``, ``CDF``,
+``BWBS``, ``CMA``, and ``MH`` are not represented by the variant, and a code in one
+of them is refused by name rather than defaulted.
 
-**Answered in `P3`.** ``BECINFO`` is a **stale comment**. It appears nowhere in the keyword table and
-nowhere in the code except two comments in ``canada/bc/becset.f``. ``BECSET`` is called from
-``canada/bc/sitset.f``, not from the keyword reader, and it derives the BEC from the site species and the
-habitat data that ``SITECODE`` supplies. So **a caller does not supply a BEC value at all** — the model
-derives it — and there is no keyword to accept one. `P2.1` assigned this to `P2.2` and `P2.2` did not
-discharge it; it is discharged here.
+``BECINFO`` is a stale comment. It appears nowhere in the keyword table and nowhere
+in the code except two comments in ``canada/bc/becset.f``. ``BECSET`` is called from
+``canada/bc/sitset.f``, not from the keyword reader. ``SITECODE`` supplies the site
+species; it does not supply the BEC.
 
 Contract rules
 --------------
@@ -238,6 +259,10 @@ Contract rules
    structure, so that it identifies exactly what FVS read, and it is written with its algorithm named,
    as ``sha256:`` followed by the digest. Order is part of the identity, because FVS processes a set in
    order.
+6. A BC run carries a ``STDINFO`` with a BEC in its first two fields, and the package validates it
+   before the run starts. An invalid code, or a set with no ``STDINFO``, is refused rather than left
+   on FVS's silent ``ICHmw2/01`` default. The accepted grammar and the supported zones are in
+   :class:`fresh_fvsbc.bec.BecCode`.
 
 The open hazard
 ---------------

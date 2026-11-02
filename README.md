@@ -68,7 +68,7 @@ outputs are. It needs the built variant; the build recipe is in ADR 0004.
 python -m fresh_fvsbc population.json \
   --directory run \
   --species FD --tree-age 60 \
-  --keyword STDINFO=712,CHS131,0,200,35,16 \
+  --keyword STDINFO=CAR,IDFdk3/01,0,200,35,16 \
   --keyword SITECODE=FD,100 \
   --keyword NUMCYCLE=4 \
   --keyword PROCESS \

@@ -35,6 +35,8 @@ A record has these fields.
      - The variant built and run, which for this project is ``bc``
    * - ``variant_list``
      - The full variant list the build produced, so a mistaken build is visible
+   * - ``bec``
+     - The validated BEC the run used, such as ``CAR IDFdk3/01``
    * - ``keyword_set_hash``
      - A hash of the keyword set, canonically serialized
    * - ``treelist_hash``

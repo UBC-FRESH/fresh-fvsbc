@@ -185,3 +185,28 @@ Newest entries last. Each milestone gets a dated entry that matches the roadmap 
 - **`FVS_Regen_SitePrep` is not comparable, and the cause is an uninitialised variable in FVS.** `estab.f` decides whether to sample site preparation with `IF(LOAD.NE.1) GO TO 249`, and `LOAD` is assigned in only two places: when the stand is more than twenty years past inventory, and inside `esetpr.f`'s BURNPREP/MECHPREP loops. An ordinary run reads **whatever was in that local**. Instrumenting both builds measured it: **`LOAD=0` here, `LOAD=1` in the standalone** — so one samples the BC variant's stub probabilities (`strp/esprep.f` is a stub: 0.75/0.20/0.05, no regression) and averages fifty draws to `74 20 6`, while the other reuses `IPPREP` and writes `100 0 0`. The two disagree by luck of the stack. The stand variables, the plot count, the tree rows and the seed were all ruled out first. `NOT_COMPARABLE` now short-circuits **before** any comparison rather than only applying to a table one side wrote, so a table both sides write but FVS makes disagree is reported as not comparable with the reason instead of as a difference to chase.
 - **The CI oracle covers all twenty-eight verified tables, not nineteen.** The docs claimed 28 and the CI case checked 19; the nine it missed need different runs — an infection for the four mistletoe tables, an `RDIN` block for root disease, a `PLANT` line for the regeneration tally, a `COMPUTE` block and `CANFPROF` for the other two. There are four cases now, one per family, and a fifth test that **fails if a table is added to `STANDALONE_VERIFIED` with no case that would notice it breaking** — the exact defect this fixes, caught automatically next time. Both skip on a missing extension or a missing binary, so the quality job stays fast: 61 passed in the extension job, 5 skipped in the quality job.
 - **Trusted publishing works, proven end to end.** PyPI was configured with `release.yaml` and the environments `pypi` and `testpypi`, so the workflow is named that way rather than the other way round. `release.yaml` builds the sdist and wheel, runs `twine check`, and publishes on a `v*` tag under `pypi`; a manual `rehearse` job publishes to TestPyPI under `testpypi`. **The rehearsal ran and succeeded** — `fresh-fvsbc 0.20.0` is on TestPyPI with no API token anywhere in the repository, so the next release needs no `twine upload` by hand. `wheels.yml` no longer publishes: `fresh-fvsbc-pyfvs` is tied to the fork commit and does not change with every release, so it is uploaded when the pin changes, and automating it needs a second trusted publisher on that project.
+- **W1 scaffold: the BC-wide calibration programme, and a stale checkout corrected.** The local
+  checkout was 60 commits behind `origin/main`; `main` already uses `P44` for Release 0.13.0 and,
+  after `P62`, records post-phase work as a branch and a pull request rather than a numbered phase.
+  The programme is therefore **W1 to W6**, not a new `P44`. The plan is `notes/bc-calibration.md`,
+  the roadmap subsection is "Calibration programme", the parent issue is #289, the six child issues
+  are #290 to #295, and the branch is `feature/bc-calibration`. The substance is unchanged: the BC
+  variant resolves seven zones, and `CWH`, `CDF`, `BWBS`, `CMA`, and `MH` need an upstream extension
+  (W2) before they can be calibrated. Dashboard: `OVERALL: GREEN`, every gate, before this commit.
+- `W1.1`: **the BEC is a validated input, and the silent `ICHmw2/01` default is closed.** `STDINFO`
+  fields 1 and 2 are concatenated by `canada/bc/initre.f` and parsed by `canada/bc/habtyp.f`; a code
+  that does not resolve leaves FVS on its documented default, `ICHmw2/01`, with a maximum basal area
+  of 89 m2/ha. The package now parses those fields with a new `fresh_fvsbc.bec.BecCode`, refuses a
+  malformed code, a code in a zone the variant does not represent, and a run with no `STDINFO` at
+  all, and exits 2 before writing a file. The accepted form is `STDINFO=CAR,IDFdk3/01,...`, and
+  the provenance record now carries the validated code as `"bec": "CAR IDFdk3/01"`.
+  **The pinned source was checked rather than assumed**: `habtyp.f`, `initre.f`, `sitset.f`, and
+  `becset.f` are identical at the pinned FVS commit `ef5fa847` and at the inspected `c210536`.
+  **Verified on a real run**: `CAR IDFdk3/01` echoes `BEC=IDFdk3/01` and `MAXIMUM BASAL AREA FOR
+  IDFdk3/01 IS SET BY DEFAULT TO: 53.0 SQ M/HA`; `712,CHS131` exits 2 with the reason and writes no
+  run directory. The README, `docs/usage.rst`, and `docs/reference/keywords.rst` now show the valid
+  form; the smoke-run and synthetic-run notes keep their historical command with a correction note.
+  ADR 0011 records the decision. `tests/test_bec.py` covers the grammar, the five unsupported zones,
+  the legacy string, and the direct-constructor invariants; 23 test fixtures and the command tests
+  moved from the legacy code to the valid form. Dashboard: `OVERALL: GREEN`, every gate, before this
+  commit.

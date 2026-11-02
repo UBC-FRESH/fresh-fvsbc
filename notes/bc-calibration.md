@@ -131,25 +131,30 @@ before the baseline would repeat the KC mistake in a larger frame.
 
 ### W1.1 (#290) Make the BC input contract true, and remove the silent BEC fallback
 
-- [ ] Read `canada/bc/initre.f` options 14 and 138, `canada/bc/habtyp.f`,
+- [x] Read `canada/bc/initre.f` options 14 and 138, `canada/bc/habtyp.f`,
   `canada/bc/sitset.f`, and `canada/bc/becset.f` at the pinned FVS source commit,
   and record the exact grammar and the default path.
-- [ ] Add a `BecCode` value object with region, zone, subzone, and series; parse
+- [x] Add a `BecCode` value object with region, zone, subzone, and series; parse
   and render the `STDINFO` form; reject an unsupported zone, a missing series, or
   a malformed code by name.
-- [ ] Make `run_case` validate the BEC before the child process starts, and record
+- [x] Make `run_case` validate the BEC before the child process starts, and record
   the validated BEC in the provenance record.
-- [ ] Correct `docs/reference/keywords.rst`, `docs/usage.rst`, the README, and the
+- [x] Correct `docs/reference/keywords.rst`, `docs/usage.rst`, the README, and the
   smoke-run examples that use `712,CHS131`.
-- [ ] Test that a valid `CAR IDFdk3/01` run echoes `BEC=IDFdk3/01`; that a bare
+- [x] Test that a valid `CAR IDFdk3/01` run echoes `BEC=IDFdk3/01`; that a bare
   `IDFdk3` is refused; that `712,CHS131` is refused; and that an invalid input
   exits 2 before FVS is launched.
-- [ ] Record the decision as an ADR: the BEC is a required, validated input, and
+- [x] Record the decision as an ADR: the BEC is a required, validated input, and
   the package does not inherit FVS's silent default.
 
 Acceptance: a run with `CAR IDFdk3/01` echoes that BEC; a run with an invalid code
 is refused with a message that names the accepted grammar; the docs no longer say
 the caller does not supply a BEC.
+
+Status: **implemented on `feature/bc-calibration`**, pending review. The real run
+echoed `BEC=IDFdk3/01` and `MAXIMUM BASAL AREA ... 53.0 SQ M/HA`; `712,CHS131`
+exited 2 and wrote no run directory; the provenance record carries
+`"bec": "CAR IDFdk3/01"`. Dashboard: `OVERALL: GREEN`.
 
 ### W1.2 (#291) Build the provincial calibration dataset
 
