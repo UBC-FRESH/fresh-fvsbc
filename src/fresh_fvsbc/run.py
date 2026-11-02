@@ -61,6 +61,8 @@ from pathlib import Path
 import pandas as pd
 
 from fresh_fvsbc.bec import BecCode, BecCodeError
+from fresh_fvsbc.bundle import BundleError, CalibrationBundle
+from fresh_fvsbc.calibration import SPECIES_GROUPS
 from fresh_fvsbc.keywords import Keyword, KeywordSet
 from fresh_fvsbc.nemora import PlotFields, to_tree_list
 from fresh_fvsbc.outputs import check_run, read_cases
@@ -431,6 +433,20 @@ class RunResult:
     database: Path
 
 
+def _species_groups(records: Sequence[TreeListFields]) -> tuple[str, ...]:
+    """Return the calibration groups present in a tree list."""
+    return tuple(
+        sorted(
+            {SPECIES_GROUPS.get(str(record["species"]).upper(), "UNKNOWN") for record in records}
+        )
+    )
+
+
+def _management(keywords: Sequence[Keyword]) -> str:
+    """Return whether a treatment keyword is present."""
+    return "managed" if any(keyword.name == "MANAGED" for keyword in keywords) else "untreated"
+
+
 def _bec_of(keywords: Sequence[Keyword]) -> BecCode:
     """Return the BEC a run carries, or refuse a set that does not name one.
 
@@ -472,6 +488,7 @@ def run_case(
     directory: str | Path,
     variant: str = "bc",
     key_name: str = KEYWORD_FILE_NAME,
+    calibration: CalibrationBundle | None = None,
 ) -> RunResult:
     """Run one case: write the inputs, drive BC, read the outputs, and record the provenance.
 
@@ -495,6 +512,10 @@ def run_case(
         The variant to run. Defaults to ``bc``, which is the only variant this project wraps.
     key_name : str, optional
         The keyword file's name inside ``directory``. The tree file takes the same base name.
+    calibration : CalibrationBundle, optional
+        A bundle the run uses. The caller renders the bundle into ``keywords``;
+        the run checks the domain and refuses a set that does not carry the
+        bundle's keywords. The bundle id is recorded in provenance.
 
     Returns
     -------
@@ -506,6 +527,9 @@ def run_case(
     BecCodeError
         If the set carries no ``STDINFO``, or its first two fields are not a BEC the
         variant resolves.
+    BundleError
+        If the calibration bundle's domain does not cover the run, or the set does
+        not carry the keywords the bundle renders.
     KeywordConflictError
         If the keyword set carries a keyword the orchestration writes.
     UnknownKeywordError
@@ -520,6 +544,20 @@ def run_case(
         If the projection ends badly, or the run recorded no case.
     """
     bec = _bec_of(keywords)
+    if calibration is not None:
+        calibration.check_domain(
+            bec,
+            _species_groups(records),
+            _management(keywords),
+            dbh_values=tuple(float(record["diam"]) for record in records),
+        )
+        missing = [keyword for keyword in calibration.render() if keyword not in keywords]
+        if missing:
+            names = ", ".join(keyword.name for keyword in missing)
+            raise BundleError(
+                f"{calibration.bundle_id} renders {names}, and the keyword set does not "
+                "carry them; render the bundle into the set before the run"
+            )
     handoff = with_tree_handoff(keywords)
     keyword_set = KeywordSet(handoff)
     target = Path(directory).expanduser().resolve()
@@ -541,6 +579,7 @@ def run_case(
         case_id=case_id,
         run_datetime=run_datetime,
         bec=str(bec),
+        calibration_id=calibration.bundle_id if calibration is not None else "",
         variant_list=driven.variants,
         random_seed=_seed_of(handoff),
     )

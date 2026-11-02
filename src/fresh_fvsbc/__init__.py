@@ -15,6 +15,7 @@ from __future__ import annotations
 __version__ = "0.20.0"
 
 from fresh_fvsbc.bec import BecCode, BecCodeError
+from fresh_fvsbc.bundle import BundleError, CalibrationBundle, load_bundle
 from fresh_fvsbc.keywords import (
     Keyword,
     KeywordSet,
@@ -66,6 +67,8 @@ __all__ = [
     "BecCode",
     "BecCodeError",
     "BuildError",
+    "BundleError",
+    "CalibrationBundle",
     "CrownRatioError",
     "ExtensionUnavailableError",
     "FieldWidthError",
@@ -87,6 +90,7 @@ __all__ = [
     "check_run",
     "from_cases",
     "keyword_set_hash",
+    "load_bundle",
     "read_cases",
     "read_errors",
     "read_table",

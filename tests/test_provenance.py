@@ -37,6 +37,7 @@ CONTRACT_FIELDS: tuple[str, ...] = (
     "variant",
     "variant_list",
     "bec",
+    "calibration_id",
     "keyword_set_hash",
     "treelist_hash",
     "case_id",
@@ -94,6 +95,7 @@ def a_provenance() -> Provenance:
         case_id=case_id,
         run_datetime=run_datetime,
         bec="CAR IDFdk3/01",
+        calibration_id="test-bundle",
         variant_list=built_variants(REAL_VARIANT_REPORT),
         random_seed=1,
     )
@@ -236,6 +238,7 @@ def test_a_record_for_the_whole_chain_from_the_fixture_to_the_database() -> None
         case_id=case_id,
         run_datetime=run_datetime,
         bec="CAR IDFdk3/01",
+        calibration_id="test-bundle",
         variant_list=built_variants(REAL_VARIANT_REPORT),
         random_seed=1,
     )

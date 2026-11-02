@@ -20,6 +20,7 @@ import pytest
 
 from fresh_fvsbc import run
 from fresh_fvsbc.bec import BecCodeError
+from fresh_fvsbc.bundle import BundleDomainError, BundleError, load_bundle
 from fresh_fvsbc.keywords import (
     Keyword,
     KeywordSet,
@@ -31,6 +32,14 @@ from fresh_fvsbc.outputs import MissingOutputError, RunFailedError, read_table
 from fresh_fvsbc.provenance import Provenance
 from fresh_fvsbc.treelist import BC_TREFMT, TreeListFields, write_tree_record
 from nemora_fixtures import synthetic_population
+
+PILOT = (
+    Path(__file__).resolve().parents[1]
+    / "notes"
+    / "reference"
+    / "calibration"
+    / "pilot-bundle.json"
+)
 
 WARNING = (
     "FVS03 WARNING:  FOREST CODE INDICATES THE GEOGRAPHIC LOCATION IS OUTSIDE THE RANGE OF THE "
@@ -233,6 +242,51 @@ def test_a_run_without_stdinfo_is_refused_before_anything_is_written(tmp_path: P
     with pytest.raises(BecCodeError, match="needs STDINFO"):
         run.run_case([a_tree()], a_set("PROCESS", "STOP"), directory=target)
     assert not target.exists()
+
+
+def test_a_bundle_is_recorded_in_provenance(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A run that carries a bundle records its id, and the domain check passes."""
+    monkeypatch.setattr(run, "_drive", a_fake_drive())
+    bundle = load_bundle(PILOT)
+    keywords = (
+        Keyword("STDINFO", ("CAR", "IDFdk3/01")),
+        *bundle.render(),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_case([a_tree()], keywords, directory=tmp_path / "run", calibration=bundle)
+    assert result.provenance.calibration_id == "bc-pilot-2026-11-02"
+    assert result.provenance.as_record()["calibration_id"] == "bc-pilot-2026-11-02"
+
+
+def test_a_bundle_refuses_a_set_without_its_keywords(tmp_path: Path) -> None:
+    """The caller must render the bundle; a claimed bundle with no keywords is refused."""
+    bundle = load_bundle(PILOT)
+    with pytest.raises(BundleError, match="renders"):
+        run.run_case(
+            [a_tree()],
+            a_set("STDINFO", "PROCESS", "STOP"),
+            directory=tmp_path / "run",
+            calibration=bundle,
+        )
+
+
+def test_a_bundle_refuses_a_run_outside_its_domain(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An SBS stand is outside the pilot bundle's IDF domain."""
+    monkeypatch.setattr(run, "_drive", a_fake_drive())
+    bundle = load_bundle(PILOT)
+    keywords = (
+        Keyword("STDINFO", ("CAR", "SBSmc2/01")),
+        *bundle.render(),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    with pytest.raises(BundleDomainError, match="IDFdk3"):
+        run.run_case([a_tree()], keywords, directory=tmp_path / "run", calibration=bundle)
 
 
 def test_the_run_writes_the_inputs_the_record_and_the_result(
