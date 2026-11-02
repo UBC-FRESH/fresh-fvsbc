@@ -208,5 +208,7 @@ Newest entries last. Each milestone gets a dated entry that matches the roadmap 
   form; the smoke-run and synthetic-run notes keep their historical command with a correction note.
   ADR 0011 records the decision. `tests/test_bec.py` covers the grammar, the five unsupported zones,
   the legacy string, and the direct-constructor invariants; 23 test fixtures and the command tests
-  moved from the legacy code to the valid form. Dashboard: `OVERALL: GREEN`, every gate, before this
-  commit.
+  moved from the legacy code to the valid form. **The extension job now installs `six`**: PyFVS
+  imports it and its package metadata does not declare it, so the extension tests failed before FVS
+  started. The oracle cases also carry the valid BEC now. Dashboard: `OVERALL: GREEN`, every gate,
+  before this commit.

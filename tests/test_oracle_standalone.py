@@ -50,6 +50,7 @@ def _common() -> tuple[Keyword, ...]:
     """Return the keywords every case needs, in the order FVS reads them."""
     return (
         Keyword("STDIDENT", ("Oracle.1",)),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("SITECODE", ("FD", "15")),
         Keyword("INVYEAR", ("2020",)),
         Keyword("DESIGN", ("0", "1", "999", "5", "0", "5", "1")),

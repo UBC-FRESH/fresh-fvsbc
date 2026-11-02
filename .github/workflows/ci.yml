@@ -148,7 +148,7 @@ jobs:
           FVSBC_CASE_DIR: ${{ runner.temp }}/PyFVS/fvs/tests/FVSbc
           FVSBC_STANDALONE: ${{ runner.temp }}/fvs-standalone/bin/FVSbc
         run: |
-          python -m pip install --quiet pytest pandas
+          python -m pip install --quiet pytest pandas six
           python -m pytest tests/test_run.py tests/test_oracle.py tests/test_oracle_standalone.py \
             -q -o addopts="" -p no:cacheprovider
 
