@@ -31,4 +31,5 @@ Three names are easy to confuse, so this project uses them distinctly.
    table-recipes
    provenance
    nemora-ingest
+   calibration-data
    web

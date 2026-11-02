@@ -151,30 +151,39 @@ Acceptance: a run with `CAR IDFdk3/01` echoes that BEC; a run with an invalid co
 is refused with a message that names the accepted grammar; the docs no longer say
 the caller does not supply a BEC.
 
-Status: **implemented on `feature/bc-calibration`**, pending review. The real run
-echoed `BEC=IDFdk3/01` and `MAXIMUM BASAL AREA ... 53.0 SQ M/HA`; `712,CHS131`
-exited 2 and wrote no run directory; the provenance record carries
-`"bec": "CAR IDFdk3/01"`. Dashboard: `OVERALL: GREEN`.
+Status: **merged** as `bd88bfd` on 2026-11-02. The real run echoed
+`BEC=IDFdk3/01` and `MAXIMUM BASAL AREA ... 53.0 SQ M/HA`; `712,CHS131` exited 2
+and wrote no run directory; the provenance record carries
+`"bec": "CAR IDFdk3/01"`. Dashboard and CI: green.
 
 ### W1.2 (#291) Build the provincial calibration dataset
 
-- [ ] Ingest the FAIB PSP header, visit, plot, and tree files into a documented,
+- [x] Ingest the FAIB PSP header, visit, plot, and tree files into a documented,
   reproducible dataset; keep site-level extracts outside the tracked tree.
-- [ ] Build visit summaries, remeasurement intervals, and tree-survival rows;
+- [x] Build visit summaries, remeasurement intervals, and tree-survival rows;
   crosswalk PSP species to FVS species; attach BEC, TSA, and ownership; flag
   harvest, fire, insect, and other disturbance where the data allow.
-- [ ] Publish aggregate coverage and envelope tables under `notes/reference/`,
+- [x] Publish aggregate coverage and envelope tables under `notes/reference/`,
   with counts and checksums, and no site identifiers or personal paths.
-- [ ] Run QA checks: expansion factors, negative or zero basal area, duplicate
+- [x] Run QA checks: expansion factors, negative or zero basal area, duplicate
   tree IDs, missing versus dead trees, interval length, and species that do not
   crosswalk.
-- [ ] Write the data dictionary and manifest, including the inclusion rules and
+- [x] Write the data dictionary and manifest, including the inclusion rules and
   the years used.
 
 Acceptance: the ingest reproduces 7,341 sites and 23,956 visits; 4,430 sites are
 in the supported zones; at least 3,000 have repeat measurements; the BEC coverage
 table is published; the QA report names every exclusion; the tracked files contain
 no site-level records.
+
+Status: **implemented on `feature/bc-calibration-dataset`**, pending review. The
+build reproduced 7,341 sites / 23,956 visits, 4,430 supported sites, 13,191
+supported visits, 9,186 intervals, and 1,031,828 tree-survival rows. The `IDFdk3`
+envelope matches the independent WS4 IDF audit exactly at the published precision.
+The aggregate tables are in `notes/reference/calibration/`; the tree-level tables
+stay out of the tracked tree. The damage columns flag 54,269 tree-survival rows;
+harvest and fire are not identifiable from this extract, so an analyst must
+exclude a known harvest interval separately. Dashboard: `OVERALL: GREEN`.
 
 ### W1.3 (#292) Define the calibration parameter contract
 

@@ -1,0 +1,54 @@
+{
+  "inputs": {
+    "faib_header.csv": {
+      "bytes": 1406012,
+      "sha256": "f029e21c149079036683ad65acf03b74975952d945926d1d3d607047079ea8b2"
+    },
+    "faib_sample_byvisit.csv": {
+      "bytes": 3186768,
+      "sha256": "9b6db29182c4509d526ef16c06fb03f6cd9959ccf0125099af055e7e52fece60"
+    },
+    "faib_plot_header.csv": {
+      "bytes": 2815639,
+      "sha256": "dcb206e5c70acc449a2371b1799ee915474b72cb9b200659e4905826b45514ae"
+    },
+    "faib_tree_detail.csv": {
+      "bytes": 740181676,
+      "sha256": "d9f609cd42dd32d0d9e3cac19a6b654771ad2b1e2642c97452a6328143a4c910"
+    }
+  },
+  "rows": {
+    "header": 7341,
+    "visits": 23956,
+    "plots": 24974,
+    "trees": 1880204,
+    "visit_summaries": 13966,
+    "intervals": 9186,
+    "tree_survival": 1031828,
+    "coverage": 153,
+    "envelope": 121,
+    "species": 37
+  },
+  "parameters": {
+    "min_years": 2,
+    "max_years": 40
+  },
+  "supported_zones": [
+    "ESSF",
+    "ICH",
+    "IDF",
+    "MS",
+    "PP",
+    "SBS",
+    "SBPS"
+  ],
+  "unsupported_zones": [
+    "CWH",
+    "CDF",
+    "BWBS",
+    "CMA",
+    "MH"
+  ],
+  "source": "FAIB PSP compilation",
+  "archive": "psp"
+}
