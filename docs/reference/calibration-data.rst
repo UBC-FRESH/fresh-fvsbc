@@ -151,6 +151,15 @@ the observed maximum. The grouped summaries also carry annual **net** BA and TPH
 change; the gross mortality table is not requested by this baseline. That is the
 reference the calibration is judged against, not a calibration.
 
+Full-domain design
+------------------
+
+`notes/reference/calibration/full-domain-design.md` groups the 47 data-rich
+supported variants into 12 calibration domains, fixes the power thresholds and
+the holdouts, and sets the W2–W6 sequence. `domain-plan.csv` carries the counts;
+`w2-upstream-package.md` scopes the upstream work for `CWH`, `CDF`, `BWBS`,
+`CMA`, `MH`, and the 19 subzones the variant does not resolve.
+
 What it does not do
 -------------------
 
