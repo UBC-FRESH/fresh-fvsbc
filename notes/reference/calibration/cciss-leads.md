@@ -61,8 +61,8 @@ BC BGC labels. The top species by rating count are:
 - **CMA:** no rows.
 
 This changes the W2 priority. The coastal gap is **six species** (`Dr`, `Ss`,
-`Yc`, `Ba`, `Mb`, `Hm`); the boreal gap is **two** (`Sb`, `Lt`) if `Sx` is mapped
-to `SE`; the mountain-heather gap is the same coastal species. `Pj` and `Bb` are
+`Yc`, `Ba`, `Mb`, `Hm`); the boreal gap is **one high-priority** species (`Sb`),
+with `Lt` medium and excluded in the species table; the mountain-heather gap is the same coastal species. `Pj` and `Bb` are
 not in the BC-only BWBS suitability table; they appear only in cross-border
 labels, so they are lower priority than the earlier count suggested.
 
@@ -110,7 +110,7 @@ the BC variant description, and the PSP calibration.
 2. Use the BC BGC table to add the 19 subzones and the five zones to the W2
    source audit.
 3. Use the suitability ratings to rank the species additions. Start with the six
-   coastal and two boreal species above; leave the minor Pacific and oak species
+   coastal and `Sb` above; leave `Lt` and the minor Pacific and oak species
    out unless a reviewer asks.
 4. Use `StockStands` and `StockingInfo` to cross-check preferred/acceptable
    species by site series.

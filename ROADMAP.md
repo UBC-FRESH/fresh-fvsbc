@@ -1549,9 +1549,10 @@ carry their species, site-index, mortality, growth, or BEC tables.
 | W5 independent validation | Does each bundle transfer to held-out sites, TSAs, and years? | Certificates with a claim boundary per domain |
 | W6 calibration release | Can a user select a certified bundle and get provenance? | Release, docs, CLI/API surface, and envelope validator |
 
-W1 is active as parent issue #289, with child issues #290 to #295, on
-`feature/bc-calibration`. The later workstreams are recorded here when their
-predecessor closes.
+W1 is complete: parent issue #289, child issues #290 to #295. W2 is active as
+parent issue #310, starting with the CCISS-informed species/BEC crosswalk, W2.1
+#311, on `feature/w2-crosswalk`. The later workstreams are recorded here when
+their predecessor closes.
 
 ### Web visuals
 

@@ -1,0 +1,125 @@
+cciss_code,common_name,scientific_name,native,lifeform,excluded_in_cciss,fvs_code,status,zones,e1_e3_ratings,priority
+DR,red alder,Alnus rubra,N,2,,,MISSING,CDF;CWH,164,high
+SS,Sitka spruce,Picea sitchensis,N,1,,,MISSING: spruce group; SE may substitute for a first pass,CWH;MH,153,high
+BA,amabilis fir,Abies amabilis,N,1,,,MISSING,CWH;ESSF;ICH;MH,142,high
+HM,mountain hemlock,Tsuga mertensiana,N,1,,,MISSING,CWH;ESSF;ICH;MH,133,high
+YC,yellow-cedar,Chamaecyparis nootkatensis,N,1,,,MISSING,CWH;ESSF;MH,115,high
+SB,black spruce,Picea mariana,N,1,,,MISSING: spruce group; SE may substitute for a first pass,BWBS;ESSF;ICH;SBPS;SBS;SWB,96,high
+MB,bigleaf maple,Acer macrophyllum,N,2,,,MISSING,CDF;CWH;IDF,62,high
+SX,interior spruce,Picea engelmannii x glauca,N,1,,,MISSING: spruce group; SE may substitute for a first pass,BWBS;CWH;ESSF;ICH;IDF;MS;PP;SBPS;SBS;SWB,1009,medium
+LT,tamarack,Larix laricina,N,1,x,,MISSING,BWBS;SBS,7,medium
+RA,arbutus,Arbutus menziesii,N,2,x,,MISSING,CDF,7,medium
+QG,Garry oak,Quercus garryana,N,2,x,,MISSING,CDF,6,medium
+BB,balsam fir,Abies balsamea,E,1,,,MISSING,,0,medium
+PJ,jack pine,Pinus banksiana,E,1,,,MISSING,,0,medium
+SW,white spruce,Picea glauca,N,1,,,MISSING: spruce group; SE may substitute for a first pass,,0,medium
+PL,lodgepole pine,Pinus contorta,N,1,,PL,FVS,BWBS;CDF;CWH;ESSF;ICH;IDF;MH;MS;SBPS;SBS;SWB,1013,low
+BL,subalpine fir,Abies lasiocarpa,N,1,,BL,FVS,BWBS;CWH;ESSF;ICH;IDF;MH;MS;SBPS;SBS;SWB,899,low
+FD,Douglas-fir,Pseudotsuga menziesii,N,1,,FD,FVS,BG;CDF;CWH;ESSF;ICH;IDF;MS;PP;SBPS;SBS,612,low
+AT,trembling aspen,Populus tremuloides,N,2,,AT,FVS,BG;BWBS;ESSF;ICH;IDF;MS;PP;SBPS;SBS;SWB,585,low
+CW,western redcedar,Thuja plicata,N,1,,CW,FVS,CDF;CWH;ESSF;ICH;IDF;MH;MS;PP;SBS,450,low
+AC,black cottonwood/,Populus trichocarpa/balsamifera,N,2,,AC,FVS,BG;BWBS;CDF;CWH;ESSF;ICH;IDF;MS;PP;SBPS;SBS,435,low
+HW,western hemlock,Tsuga heterophylla,N,1,,HW,FVS,CDF;CWH;ESSF;ICH;IDF;MH,432,low
+EP,common paper birch,Betula papyrifera,N,2,,EP,FVS,BG;BWBS;CWH;ESSF;ICH;IDF;MS;PP;SBS,424,low
+LW,western larch,Larix occidentalis,N,1,,LW,FVS,CWH;ESSF;ICH;IDF;MS;SBPS;SBS,313,low
+PY,ponderosa pine,Pinus ponderosa,N,1,,PY,FVS,BG;CWH;ICH;IDF;MS;PP,141,low
+PW,western white pine,Pinus monticola,N,1,,PW,FVS,CDF;CWH;ESSF;ICH;IDF;MS;SBS,137,low
+PA,whitebark pine,Pinus albicaulis,N,1,x,,MISSING,ESSF;ICH;MS,116,low
+BG,grand fir,Abies grandis,N,1,,BG,FVS,CDF;CWH;ICH;IDF,34,low
+LA,subalpine larch,Larix lyallii,N,1,x,,MISSING,ESSF,19,low
+PF,limber pine,Pinus flexilis,N,1,x,,MISSING,ESSF;ICH;IDF;MS,13,low
+BP,noble fir,Abies procera,P,1,,,MISSING,CWH,2,low
+JR,Rocky Mountain juniper,Juniperus scopulorum,N,1,x,,MISSING,IDF,2,low
+X,No tree species,,N,1,,,MISSING,ICH,2,low
+AA,narrowleaf cottonwood,Populus angustifolia,P,2,x,,MISSING,,0,low
+ACB,balsam poplar,Populus balsamifera,N,2,,AC,FVS,,0,low
+ACT,black cottonwood,Populus trichocarpa,N,2,,AC,FVS,,0,low
+AD,eastern cottonwood,Populus deltoides,E,2,x,,MISSING,,0,low
+ADC,plains cottonwood,Populus deltoides ssp. monilifera,E,2,x,,MISSING,,0,low
+ADD,eastern cottonwood,Populus deltoides ssp. deltoides,E,2,x,,MISSING,,0,low
+AF,Fremont cottonwood,Populus freemontii,E,2,x,,MISSING,,0,low
+AX,poplar hybrid,Populus sp. x Populus sp.,N,2,x,,MISSING,,0,low
+BC,white fir,Abies concolor,P,1,,,MISSING,,0,low
+BLA,corkbark fir,Abies lasiocarpa var. arizonica,P,1,x,,MISSING,,0,low
+BM,Shasta red fir,Abies magnifica var. shastensis,P,1,x,,MISSING,,0,low
+DW,white alder,Alnus rhombifolia,E,2,x,,MISSING,,0,low
+EA,Alaska paper birch,Betula neoalaskana,N,2,x,,MISSING,,0,low
+EE,European birch,Betula pendula,E,2,x,,MISSING,,0,low
+ES,silver birch,Betula pubescens,E,2,x,,MISSING,,0,low
+EW,water birch,Betula occidentalis,N,2,x,,MISSING,,0,low
+EXP,Alaska x paper birch hybrid,Betula x winteri,N,2,x,,MISSING,,0,low
+EY,yellow birch,Betula alleghaniensis,P,2,x,,MISSING,,0,low
+FDC,coast Douglas-fir,Pseudotsuga menziesii var. menziesii,N,1,,FD,FVS,,0,low
+FDI,Rocky Mountain Douglas-fir,Pseudotsuga menziesii var. glauca,N,1,,FD,FVS,,0,low
+GP,western flowering dogwood,Cornus nuttallii,N,2,x,,MISSING,,0,low
+HXM,mountain x western hemlock hybrid,Tsuga heterophylla x mertensiana,N,1,x,,MISSING,,0,low
+JO,oneseed juniper,Juniperus monosperma,P,1,x,,MISSING,,0,low
+JS,seaside juniper,Juniperus maritima,N,1,x,,MISSING,,0,low
+JU,Utah juniper,Juniperus osteosperma,P,1,x,,MISSING,,0,low
+JW,western juniper,Juniperus occidentalis,P,1,x,,MISSING,,0,low
+KC,cascara,Rhamnus purshiana,N,2,x,,MISSING,,0,low
+LD,Dahurian larch,Larix gmelinii,P,1,x,,MISSING,,0,low
+LS,Siberian larch,Larix siberica,P,1,x,,MISSING,,0,low
+ME,box-elder,Acer negundo,E,2,x,,MISSING,,0,low
+MN,Norway maple,Acer platanoides,E,2,x,,MISSING,,0,low
+MS,sycamore maple,Acer pseudoplatanus,E,2,x,,MISSING,,0,low
+MT,bigtooth maple,Acer grandidentatum,P,2,x,,MISSING,,0,low
+MV,vine maple,Acer circinatum,N,2,x,,MISSING,,0,low
+OA,incense-cedar,Calocedrus decurrens,P,1,x,,MISSING,,0,low
+OB,giant sequoia,Sequoiadendron giganteum,P,1,x,,MISSING,,0,low
+OC,coast redwood,Sequoia sempervirens,P,1,,,COLLISION: FVS OC is other conifer; coast redwood needs a new code,,0,low
+OD,European mountain-ash,Sorbus aucuparia,E,2,x,,MISSING,,0,low
+OE,Siberian elm,Ulmus pumila,E,2,x,,MISSING,,0,low
+OF,common pear,Pyrus communis,E,2,x,,MISSING,,0,low
+OG,Oregon ash,Fraxinus latifolia,E,2,x,,MISSING,,0,low
+OH,white ash,Fraxinus americana,P,2,x,OH,FVS,,0,low
+OI,shagbark hickory,Carya ovata,P,2,x,,MISSING,,0,low
+OJ,tree-of-heaven,Ailanthus altissima,E,1,x,,MISSING,,0,low
+OK,Japanese walnut,Juglans ailanthifolia,E,2,x,,MISSING,,0,low
+OL,California laurel,Umbellularia californica,P,2,x,,MISSING,,0,low
+OM,curl-leaf mountain mahogany,Cercocarpus ledifolius,P,2,x,,MISSING,,0,low
+ON,California buckeye,Aesculus califorica,N,2,x,,MISSING,,0,low
+OP,green ash,Fraxinus pennsylvanica,N,2,x,,MISSING,,0,low
+OT,tanoak,Lithocarpus densiflorus,P,2,x,,MISSING,,0,low
+OY,giant chinkapin,Chrysolepis chrysophylla,P,2,x,,MISSING,,0,low
+OZ,western sycamore,Platanus racemosa,N,2,x,,MISSING,,0,low
+PB,bristlecone pine,Pinus aristida,P,1,x,,MISSING,,0,low
+PC,California foothill pine,Pinus sabiniana,N,1,x,,MISSING,,0,low
+PE,twoneedle pinyon,Pinus edulis,P,1,x,,MISSING,,0,low
+PLC,shore pine,Pinus contorta var. contorta,N,1,,PL,FVS,,0,low
+PLI,lodgepole pine,Pinus contorta var. latifolia,N,1,,PL,FVS,,0,low
+PM,Monterey pine,Pinus radiata,P,1,x,,MISSING,,0,low
+PN,singleleaf pinyon,Pinus monophylla,P,1,x,,MISSING,,0,low
+PR,red pine,Pinus resinosa,P,1,x,,MISSING,,0,low
+PS,sugar pine,Pinus lambertiana,P,1,,,MISSING,,0,low
+PXJ,lodgepole x jack pine hybrid,Pinus x murraybanksiana,N,1,x,,MISSING,,0,low
+QA,Gambel oak,Quercus gambelii,P,2,x,,MISSING,,0,low
+QB,black oak,Quercus kelloggii,P,2,x,,MISSING,,0,low
+QC,canyon live oak,Quercus chrysolepsis,P,2,x,,MISSING,,0,low
+QD,blue oak,Quercus douglasii,N,2,x,,MISSING,,0,low
+QE,English oak,Quercus robur,E,2,x,,MISSING,,0,low
+QL,valley oak,Quercus lobata,N,2,x,,MISSING,,0,low
+QM,bur oak,Quercus macrocarpa,N,2,x,,MISSING,,0,low
+QS,Sadler oak,Quercus sadleriana,P,2,x,,MISSING,,0,low
+QV,huckleberry oak,Quercus vaccinifolia,P,2,x,,MISSING,,0,low
+QW,white oak,Quercus alba,P,2,x,,MISSING,,0,low
+QX,California live oak,Quercus agrifolia,N,2,x,,MISSING,,0,low
+QZ,interior live oak,Quercus wislizeni,N,2,x,,MISSING,,0,low
+SE,Engelmann spruce,Picea engelmannii,N,1,,SE,FVS,,0,low
+SN,Norway spruce,Picea abies,P,1,x,,MISSING,,0,low
+SP,blue spruce,Picea pungens,P,1,x,,MISSING,,0,low
+SXS,hybrid Sitka spruce,Picea x lutzii,N,1,,,MISSING: spruce group; SE may substitute for a first pass,,0,low
+TW,western yew,Taxus brevifolia,N,1,x,,MISSING,,0,low
+UA,cultivated apple,Malus pumila,E,2,x,,MISSING,,0,low
+UP,Pacific crab apple,Malus fusca,N,2,x,,MISSING,,0,low
+VB,bitter cherry,Prunus emarginata,N,2,x,,MISSING,,0,low
+VP,pin cherry,Prunus pensylvanica,N,2,x,,MISSING,,0,low
+VS,sweet cherry,Prunus avium,E,2,x,,MISSING,,0,low
+VV,choke cherry,Prunus virginiana,N,2,x,,MISSING,,0,low
+WA,peach-leaf willow,Salix amygdaloides,N,2,x,,MISSING,,0,low
+WB,Bebb's willow,Salix bebbiana,N,2,x,,MISSING,,0,low
+WD,pussy willow,Salix discolor,N,2,x,,MISSING,,0,low
+WP,Pacific willow,Salix lasiandra,N,2,x,,MISSING,,0,low
+WS,Scouler's  willow,Salix scouleriana,N,2,x,,MISSING,,0,low
+WT,Sitka willow,Salix sitchensis,N,2,x,,MISSING,,0,low
+YP,Port Orford-cedar,Chamaecyparis lawsoniana,P,1,,,MISSING,,0,low
