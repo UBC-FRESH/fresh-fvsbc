@@ -9,6 +9,7 @@ reader will copy.
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from pathlib import Path
 
 # The fixture is intentionally JSON-shaped and mutated by each test, so its
@@ -218,3 +219,97 @@ def test_a_bundle_can_be_built_directly_for_a_test() -> None:
         claim="test",
     )
     assert bundle.render()[0].name == "BAMAX"
+
+
+def test_a_region_outside_the_domain_is_refused(tmp_path: Path) -> None:
+    """The region is checked before the BEC."""
+    record = _record()
+    record["domain"]["regions"] = ["KAM"]
+    bundle = load_bundle(_write(tmp_path, record))
+    with pytest.raises(BundleDomainError, match="KAM"):
+        bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,))
+
+
+def test_an_empty_domain_is_unrestricted(tmp_path: Path) -> None:
+    """An empty domain means the bundle does not narrow the run."""
+    record = _record()
+    record["domain"] = {}
+    bundle = load_bundle(_write(tmp_path, record))
+    bundle.check_domain(BecCode.parse("CAR SBSmc2/01"), ("HW",), "managed", (120.0,))
+
+
+def test_domain_requires_dbh_values_when_it_names_classes(tmp_path: Path) -> None:
+    """A DBH domain cannot be checked without the run's DBHs."""
+    bundle = load_bundle(_write(tmp_path, _record()))
+    with pytest.raises(BundleDomainError, match="did not provide DBHs"):
+        bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated")
+
+
+def test_a_parameter_without_bounds_is_allowed(tmp_path: Path) -> None:
+    """A keyword with no bound is rendered and not checked."""
+    record = _record()
+    del record["parameters"][0]["bounds"]
+    bundle = load_bundle(_write(tmp_path, record))
+    assert bundle.parameters[0].bounds is None
+
+
+def test_a_missing_file_is_refused(tmp_path: Path) -> None:
+    """A missing bundle is a BundleError, not a FileNotFoundError."""
+    with pytest.raises(BundleError, match="cannot read"):
+        load_bundle(tmp_path / "absent.json")
+
+
+def test_a_file_that_is_not_json_is_refused(tmp_path: Path) -> None:
+    """A malformed bundle names the JSON error."""
+    path = tmp_path / "bundle.json"
+    path.write_text("{not json")
+    with pytest.raises(BundleError, match="is not JSON"):
+        load_bundle(path)
+
+
+def test_a_json_list_is_refused(tmp_path: Path) -> None:
+    """The bundle is an object, not a list."""
+    path = tmp_path / "bundle.json"
+    path.write_text("[]")
+    with pytest.raises(BundleError, match="JSON object"):
+        load_bundle(path)
+
+
+@pytest.mark.parametrize(
+    ("mutate", "match"),
+    [
+        (lambda r: r.update(bundle_id="Bad ID"), "bundle_id"),
+        (lambda r: r.update(version="1"), "semantic version"),
+        (lambda r: r["pins"].update(variant="pn"), "variant"),
+        (lambda r: r.update(claim=1), "claim"),
+        (lambda r: r.update(pins=[]), "pins"),
+        (lambda r: r["domain"].update(regions=["XXX"]), "unknown values"),
+        (lambda r: r["domain"].update(species_groups=["ZZ"]), "unknown values"),
+        (lambda r: r["domain"].update(management=["fire"]), "unknown values"),
+        (lambda r: r["domain"].update(dbh_classes={}), "dbh_classes"),
+        (lambda r: r["domain"].update(dbh_classes=[[0]]), "min, max"),
+        (lambda r: r["domain"].update(dbh_classes=[[10, 0]]), "min must be below max"),
+        (lambda r: r.update(parameters=[]), "non-empty list"),
+        (lambda r: r.update(parameters=[1]), "must be an object"),
+        (lambda r: r["parameters"][0].update(fields="53"), "list of strings"),
+        (lambda r: r["parameters"][0].update(value_index=-1), "non-negative"),
+        (lambda r: r["parameters"][0].update(bounds=1), "bounds must be an object"),
+        (lambda r: r["parameters"][0].update(bounds={"min": "a", "max": 2}), "numeric min and max"),
+        (lambda r: r["parameters"][0].update(bounds={"min": 89, "max": 25}), "below max"),
+        (
+            lambda r: r["parameters"][0].update(fields=["12345678901"]),
+            "not a valid keyword",
+        ),
+        (lambda r: r["parameters"][0].update(fields=["abc"]), "not numeric"),
+        (lambda r: r["review"].update(signed_off="yes"), "true or false"),
+        (lambda r: r.update(training=[]), "training"),
+    ],
+)
+def test_an_invalid_bundle_is_refused(
+    tmp_path: Path, mutate: Callable[[dict[str, Any]], None], match: str
+) -> None:
+    """Every malformed field is refused with a message that names it."""
+    record = _record()
+    mutate(record)
+    with pytest.raises(BundleError, match=match):
+        load_bundle(_write(tmp_path, record))
