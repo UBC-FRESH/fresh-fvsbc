@@ -172,6 +172,8 @@ def _report(summary: pd.DataFrame, skips: pd.DataFrame, rows: pd.DataFrame) -> s
         "  age.",
         "- A tree whose species does not resolve to one of BC's 15 is skipped and counted.",
         "- The sample is BEC-stratified, not a random sample of BC stands.",
+        "- Annual **net** change is the summary-level comparison; the gross mortality",
+        "  table is not requested by this baseline.",
         "- The envelope flag is an empirical sample property, not a biological maximum.",
         "- The initial BA is reproduced closely; the end-of-interval BA is not. The",
         "  flagged cases are the finding, and a mean over one interval per BEC is not",

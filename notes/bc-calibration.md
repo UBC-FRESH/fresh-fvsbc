@@ -216,13 +216,16 @@ parameters. Dashboard and CI: green.
 - [x] Run uncalibrated FVS-BC on a stratified sample of PSP intervals across the
   supported zones and TSAs, initialized from the first measurement and grown to
   the second with no cut and no calibration.
-- [ ] Compare BA, TPH, QMD, top height, volume, and annual mortality by BEC, TSA,
-  species group, DBH class, and basal-area class.
-- [ ] Build an empirical envelope table (p99 and maximum) by BEC and species, and
+- [x] Compare BA, TPH, QMD, top height, volume, and annual net change by BEC,
+  TSA, species group, DBH class, and basal-area class.
+  - [x] The grouped summaries cover TSA, species group, DBH class, and BA class.
+  - [x] Annual net BA and TPH change are in the grouped summaries. Gross mortality
+    is not available from a no-cut, no-fire summary; that needs the mortality table
+    and a fire, which the baseline does not schedule.
+- [x] Build an empirical envelope table (p99 and maximum) by BEC and species, and
   a post-run validator that flags an output outside it; never silently clip.
   - [x] The BEC-level envelope and the flag validator are built and tested.
-  - [ ] The species-level envelope is not yet split out; the grouped summaries are
-    the first cut.
+  - [x] The species-level envelope is `bec_species_envelope.csv`, 594 BEC × group rows.
 - [x] Test that the validator flags the legacy 77 m2/ha KC case and passes the
   corrected 50 m2/ha case; fail closed when the envelope table is missing.
 - [x] Write the baseline report with residual plots and a statement of what the
@@ -232,13 +235,14 @@ Acceptance: the baseline report and envelope table exist; the validator flags th
 known bad case; the run orchestration returns the flag without changing the
 numbers.
 
-Status: **first cut implemented on `feature/bc-calibration-baseline`**, pending
-review. 89 intervals across 89 BEC variants were compared; 19 variants were
-skipped because the variant does not resolve their subzone. The initial stand is
-reproduced closely (mean BA bias -0.87 m2/ha, MAE 0.93), while 5 predictions are
-above the observed maximum and 1 above the p99. The report and grouped summaries
-are in `notes/reference/calibration/`. **Open in W1.4**: annual mortality by
-species/DBH/BA class, and the species-level envelope. Dashboard: `OVERALL: GREEN`.
+Status: **implemented on `feature/bc-calibration-w1-4-complete`**, pending review.
+89 intervals across 89 BEC variants were compared; 19 variants were skipped because
+the variant does not resolve their subzone. The initial stand is reproduced closely
+(mean BA bias -0.87 m2/ha, MAE 0.93), while 5 predictions are above the observed
+maximum and 1 above the p99. The report, the BEC summary, the grouped summaries,
+and the 594-row BEC × species envelope are in `notes/reference/calibration/`.
+Annual net BA/TPH change is the summary-level comparison; gross mortality is outside
+the no-cut baseline. Dashboard: `OVERALL: GREEN`.
 
 ### W1.5 (#294) Replicate the KC pilot as a protocol, not a parameter set
 

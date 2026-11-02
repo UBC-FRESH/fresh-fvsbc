@@ -11,6 +11,7 @@ outside the repository because they carry site identifiers.
 | --- | --- |
 | `bec_coverage.csv` | Sites, visits, repeat sites, intervals, live/dead/missing/damaged trees by BEC |
 | `bec_envelope.csv` | BA p50/p90/p99/max, mean TPH and mean volume by BEC |
+| `bec_species_envelope.csv` | The same envelope by BEC and species group |
 | `species_crosswalk.csv` | Observed PSP species, the FVS code when known, the calibration group |
 | `manifest.json` | Input sizes and SHA-256, row counts, interval bounds, supported zones |
 | `pilot-bundle.json` | The unsigned calibration-bundle contract pilot |
@@ -33,6 +34,7 @@ outside the repository because they carry site identifiers.
 | Tree-survival rows with a damage code | 54,269 |
 | BEC variants in the coverage table | 153 |
 | BEC variants in the envelope table | 121 |
+| BEC × species envelope rows | 594 |
 | Observed PSP species codes | 37 |
 
 The unsupported zones (`CWH`, `CDF`, `BWBS`, `CMA`, `MH`) are counted in
@@ -69,8 +71,10 @@ list construction is sound. **The end of the interval is not**: 5 predictions
 are above the observed maximum and 1 is above the p99. The worst are `SBPSmc`
 (predicted 11,214 m2/ha against 30.6 observed) and `SBPSdc` (4,705 against
 11.2). The default mortality does not remove enough small-tree density in those
-cases. The per-interval table stays in the runtime directory because its
-`interval_id` carries a site identifier; only the grouped tables are tracked.
+cases. The grouped summaries also carry annual **net** BA and TPH change; the
+gross mortality table is not requested by this baseline. The per-interval table
+stays in the runtime directory because its `interval_id` carries a site
+identifier; only the grouped tables are tracked.
 
 ## The IDF check
 

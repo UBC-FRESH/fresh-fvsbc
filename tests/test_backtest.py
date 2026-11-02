@@ -397,6 +397,8 @@ def test_the_command_runs_with_the_seams_stubbed(
                 "predicted_ba1": 33.0,
                 "bias_ba": 1.0,
                 "bias_tph": -10.0,
+                "bias_net_ba_rate": 0.1,
+                "bias_net_tph_rate": -1.0,
                 "bias_qmd": 0.1,
                 "bias_top_height": 0.2,
                 "bias_volume": 1.0,
