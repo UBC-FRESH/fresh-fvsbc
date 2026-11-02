@@ -1,0 +1,97 @@
+{
+  "bundle_id": "kc-pilot-v2c-2026-11-02",
+  "version": "0.2.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": ["CAR"],
+    "becs": ["IDFdk3", "IDFxm"],
+    "species_groups": ["FD", "SE", "PL", "HW"],
+    "dbh_classes": [[0, 10], [10, 25], [25, 40], [40, 999]],
+    "management": ["untreated"]
+  },
+  "parameters": [
+    {
+      "keyword": "BAMAX",
+      "fields": ["53"],
+      "units": "m2/ha",
+      "value_index": 0,
+      "bounds": {"min": 25.0, "max": 89.0}
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": ["1", "FD", "1.2000"],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {"min": 0.25, "max": 4.0}
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": ["1", "SE", "1.3948"],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {"min": 0.25, "max": 4.0}
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": ["1", "PL", "1.0000"],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {"min": 0.25, "max": 4.0}
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": ["1", "HW", "1.0000"],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {"min": 0.25, "max": 4.0}
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": ["1", "FD", "2.8000", "0", "999"],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {"min": 0.25, "max": 4.0}
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": ["1", "SE", "3.8261", "0", "999"],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {"min": 0.25, "max": 4.0}
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": ["1", "PL", "8.0000", "0", "999"],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {"min": 0.25, "max": 8.0}
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": ["1", "HW", "1.2012", "0", "999"],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {"min": 0.25, "max": 4.0}
+    }
+  ],
+  "training": {
+    "data_checksum": "sha256:d9f609cd42dd32d0d9e3cac19a6b654771ad2b1e2642c97452a6328143a4c910",
+    "split": "24 AFRF Knife Creek PSP plots, 1993-2013; in-sample; no independent site",
+    "objective": "species-group BA and TPH at 2013; damped fixed point; 28 iterations",
+    "convergence": {
+      "iterations": 28,
+      "max_parameter_change": 0.0009,
+      "loss_change": 0.000036
+    }
+  },
+  "review": {
+    "reviewer": "KC pilot, not signed off",
+    "date": "2026-11-02",
+    "signed_off": false
+  },
+  "claim": "Regional KC pilot; not a province-wide calibration. PL is at its bound; v1 was fitted under the wrong BEC; no independent-site validation."
+}

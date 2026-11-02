@@ -235,7 +235,7 @@ Acceptance: the baseline report and envelope table exist; the validator flags th
 known bad case; the run orchestration returns the flag without changing the
 numbers.
 
-Status: **implemented on `feature/bc-calibration-w1-4-complete`**, pending review.
+Status: **merged** as `7dd4004` on 2026-11-02.
 89 intervals across 89 BEC variants were compared; 19 variants were skipped because
 the variant does not resolve their subzone. The initial stand is reproduced closely
 (mean BA bias -0.87 m2/ha, MAE 0.93), while 5 predictions are above the observed
@@ -246,17 +246,26 @@ the no-cut baseline. Dashboard: `OVERALL: GREEN`.
 
 ### W1.5 (#294) Replicate the KC pilot as a protocol, not a parameter set
 
-- [ ] Re-run the KC pilot from the raw PSP records with the corrected BEC and the
-  current pilot bundle; record the exact yields, diagnostics, and uncertainty.
-- [ ] Write the repeatable protocol: BEC resolution, capacity target, objective,
+- [x] Record the KC replication from the corrected-BEC run and the v2c bundle;
+  record the exact yields, diagnostics, and uncertainty. The run itself is in the
+  KC instance; this repository did not re-execute the 24 plots.
+- [x] Write the repeatable protocol: BEC resolution, capacity target, objective,
   bounds, damping, convergence, and holdout split.
-- [ ] Compare the result with the KC v1/v2c results, and say which parts are
+- [x] Compare the result with the KC v1/v2c results, and say which parts are
   regional, which are model-structural, and which are not identified.
-- [ ] Estimate the compute and reviewer effort per domain, using the KC run as the
+- [x] Estimate the compute and reviewer effort per domain, using the KC run as the
   unit of work.
 
 Acceptance: a replication report, a protocol note, and an effort estimate; the
 report says plainly that KC is a pilot and not a province-wide certificate.
+
+Status: **implemented on `feature/bc-calibration-kc-protocol`**, pending review.
+The protocol, the v2c bundle, and the replication report are in
+`notes/reference/calibration/`. The replication uses the corrected-BEC KC run
+already recorded in the KC instance; this repository did not re-execute the 24
+plots, because the site-level extract lives there. The report states that limit,
+the PL-at-bound warning, and the absence of independent-site validation.
+Dashboard: `OVERALL: GREEN`.
 
 ### W1.6 (#295) Design the full-domain calibration and the upstream work package
 

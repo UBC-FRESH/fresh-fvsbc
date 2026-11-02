@@ -15,6 +15,9 @@ outside the repository because they carry site identifiers.
 | `species_crosswalk.csv` | Observed PSP species, the FVS code when known, the calibration group |
 | `manifest.json` | Input sizes and SHA-256, row counts, interval bounds, supported zones |
 | `pilot-bundle.json` | The unsigned calibration-bundle contract pilot |
+| `kc-pilot-bundle.json` | The KC v2c regional pilot bundle; unsigned, PL at its bound |
+| `kc-protocol.md` | The repeatable KC pilot protocol and its claim boundary |
+| `kc-replication.md` | The KC pilot results, diagnostics, uncertainty, and effort |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |
