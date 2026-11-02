@@ -331,6 +331,11 @@ def compare_rows(
     observed_ba = _number(interval["ba0"])
     observed_next_ba = _number(observed_next["ba"])
     observed_next_tph = _number(observed_next["tph"])
+    years = _number(interval["years"])
+    observed_net_ba = (observed_next_ba - observed_ba) / years
+    predicted_net_ba = (predicted_end["ba"] - predicted_start["ba"]) / years
+    observed_net_tph = (observed_next_tph - _number(interval["tph0"])) / years
+    predicted_net_tph = (predicted_end["tph"] - predicted_start["tph"]) / years
     return {
         "interval_id": interval["interval_id"],
         "BEC": bec,
@@ -344,6 +349,12 @@ def compare_rows(
         "observed_ba1": observed_next_ba,
         "predicted_ba1": predicted_end["ba"],
         "bias_ba": predicted_end["ba"] - observed_next_ba,
+        "observed_net_ba_rate": observed_net_ba,
+        "predicted_net_ba_rate": predicted_net_ba,
+        "bias_net_ba_rate": predicted_net_ba - observed_net_ba,
+        "observed_net_tph_rate": observed_net_tph,
+        "predicted_net_tph_rate": predicted_net_tph,
+        "bias_net_tph_rate": predicted_net_tph - observed_net_tph,
         "observed_tph1": observed_next_tph,
         "predicted_tph1": predicted_end["tph"],
         "bias_tph": predicted_end["tph"] - observed_next_tph,
@@ -386,6 +397,10 @@ def summarise(rows: pd.DataFrame, by: tuple[str, ...] = ("BEC",)) -> pd.DataFram
         mae_ba=("bias_ba", lambda values: float(values.abs().mean())),
         bias_tph=("bias_tph", "mean"),
         mae_tph=("bias_tph", lambda values: float(values.abs().mean())),
+        bias_net_ba_rate=("bias_net_ba_rate", "mean"),
+        mae_net_ba_rate=("bias_net_ba_rate", lambda values: float(values.abs().mean())),
+        bias_net_tph_rate=("bias_net_tph_rate", "mean"),
+        mae_net_tph_rate=("bias_net_tph_rate", lambda values: float(values.abs().mean())),
         bias_qmd=("bias_qmd", "mean"),
         mae_qmd=("bias_qmd", lambda values: float(values.abs().mean())),
         bias_top_height=("bias_top_height", "mean"),

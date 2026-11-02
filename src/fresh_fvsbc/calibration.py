@@ -57,6 +57,7 @@ __all__ = [
     "Manifest",
     "build_dataset",
     "species_crosswalk",
+    "species_envelope",
 ]
 
 #: The four FAIB PSP files the dataset needs.
@@ -148,6 +149,8 @@ class CalibrationDataset:
         BEC coverage, including the zones the variant does not resolve.
     envelope : pandas.DataFrame
         Basal-area and volume envelope by BEC.
+    species_envelope : pandas.DataFrame
+        Basal-area envelope by BEC and species group.
     species : pandas.DataFrame
         The PSP-to-FVS species crosswalk.
     manifest : Mapping
@@ -160,6 +163,7 @@ class CalibrationDataset:
     tree_survival: pd.DataFrame
     coverage: pd.DataFrame
     envelope: pd.DataFrame
+    species_envelope: pd.DataFrame
     species: pd.DataFrame
     manifest: Manifest
 
@@ -496,6 +500,46 @@ def _coverage(
     return coverage.sort_values(["supported", "sites"], ascending=[False, False], ignore_index=True)
 
 
+def species_envelope(tree_survival: pd.DataFrame) -> pd.DataFrame:
+    """Build the basal-area envelope by BEC and species group.
+
+    Parameters
+    ----------
+    tree_survival : pandas.DataFrame
+        The tree-survival table, with ``BEC``, ``group``, ``interval_id``,
+        ``ba``, and ``phf``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        One row per BEC and group, with the plot count, BA p50/p90/p99/max,
+        and mean TPH.
+    """
+    if tree_survival.empty:
+        return pd.DataFrame(
+            columns=["BEC", "group", "plots", "ba_p50", "ba_p90", "ba_p99", "ba_max", "tph_mean"]
+        )
+    plots = tree_survival.groupby(["BEC", "group", "interval_id"], as_index=False).agg(
+        ba=("ba", "sum"), tph=("phf", "sum")
+    )
+    rows: list[dict[str, object]] = []
+    for (bec, group), frame in plots.groupby(["BEC", "group"], sort=True):
+        ba = frame["ba"]
+        rows.append(
+            {
+                "BEC": bec,
+                "group": group,
+                "plots": int(frame.shape[0]),
+                "ba_p50": float(ba.quantile(0.50)),
+                "ba_p90": float(ba.quantile(0.90)),
+                "ba_p99": float(ba.quantile(0.99)),
+                "ba_max": float(ba.max()),
+                "tph_mean": float(frame["tph"].mean()),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
 def _envelope(visits: pd.DataFrame) -> pd.DataFrame:
     """Build the basal-area and volume envelope by BEC."""
     rows: list[dict[str, object]] = []
@@ -557,6 +601,7 @@ def _manifest(
     tree_survival: pd.DataFrame,
     coverage: pd.DataFrame,
     envelope: pd.DataFrame,
+    species_envelope_frame: pd.DataFrame,
     species: pd.DataFrame,
 ) -> Manifest:
     """Build the input and output manifest, without a machine-specific path."""
@@ -578,6 +623,7 @@ def _manifest(
             "tree_survival": int(tree_survival.shape[0]),
             "coverage": int(coverage.shape[0]),
             "envelope": int(envelope.shape[0]),
+            "species_envelope": int(species_envelope_frame.shape[0]),
             "species": int(species.shape[0]),
         },
         "parameters": {"min_years": MIN_YEARS, "max_years": MAX_YEARS},
@@ -628,6 +674,7 @@ def build_dataset(psp_dir: str | Path, out_dir: str | Path) -> CalibrationDatase
     intervals, tree_survival = _intervals(visits, trees)
     coverage = _coverage(header, visits_meta, intervals, tree_survival)
     envelope = _envelope(visits)
+    species_envelope_frame = species_envelope(tree_survival)
     species = species_crosswalk(trees)
     manifest = _manifest(
         source,
@@ -641,6 +688,7 @@ def build_dataset(psp_dir: str | Path, out_dir: str | Path) -> CalibrationDatase
         tree_survival,
         coverage,
         envelope,
+        species_envelope_frame,
         species,
     )
 
@@ -650,6 +698,7 @@ def build_dataset(psp_dir: str | Path, out_dir: str | Path) -> CalibrationDatase
         "tree_survival.csv": tree_survival,
         "bec_coverage.csv": coverage,
         "bec_envelope.csv": envelope,
+        "bec_species_envelope.csv": species_envelope_frame,
         "species_crosswalk.csv": species,
     }
     for name, frame in outputs.items():
@@ -662,6 +711,7 @@ def build_dataset(psp_dir: str | Path, out_dir: str | Path) -> CalibrationDatase
         tree_survival=tree_survival,
         coverage=coverage,
         envelope=envelope,
+        species_envelope=species_envelope_frame,
         species=species,
         manifest=manifest,
     )

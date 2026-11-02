@@ -149,6 +149,7 @@ def test_build_writes_the_tables_and_the_manifest(tmp_path: Path) -> None:
         "tree_survival.csv",
         "bec_coverage.csv",
         "bec_envelope.csv",
+        "bec_species_envelope.csv",
         "species_crosswalk.csv",
         "manifest.json",
     ):
@@ -156,6 +157,7 @@ def test_build_writes_the_tables_and_the_manifest(tmp_path: Path) -> None:
     manifest = json.loads((dataset.directory / "manifest.json").read_text())
     assert manifest["rows"]["intervals"] == 3
     assert manifest["rows"]["tree_survival"] == 6
+    assert manifest["rows"]["species_envelope"] > 0
     assert manifest["parameters"] == {"min_years": 2, "max_years": 40}
     assert manifest["archive"] == "psp"
 
@@ -198,6 +200,7 @@ def test_envelope_is_built_from_supported_visits(tmp_path: Path) -> None:
     dataset = build_dataset(archive, tmp_path / "out")
     assert set(dataset.envelope["BEC"]) == {"IDFdk3", "SBSmc2"}
     assert dataset.envelope["ba_p99"].notna().all()
+    assert set(dataset.species_envelope["group"]) == {"FD", "HW", "PL", "SE", "UNKNOWN"}
 
 
 def test_species_crosswalk_marks_an_unknown_code(tmp_path: Path) -> None:

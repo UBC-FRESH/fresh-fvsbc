@@ -53,6 +53,8 @@ The builder writes six tables and a manifest:
      - BEC: sites, visits, repeat sites, intervals, live/dead/missing/damaged trees
    * - ``bec_envelope.csv``
      - BEC: BA p50/p90/p99/max, mean TPH, mean volume
+   * - ``bec_species_envelope.csv``
+     - BEC and species group: the same envelope
    * - ``species_crosswalk.csv``
      - PSP species code: FVS code, calibration group, known flag
    * - ``manifest.json``
@@ -125,7 +127,7 @@ Current snapshot
 The 2026-11-02 build of the archive holds **7,341 sites and 23,956 visits**. Of
 those, **4,430 sites** and **13,191 visits** are in the seven supported zones;
 9,186 interval pairs and 1,031,828 tree-survival rows are in the supported-zone
-dataset. The aggregate tables are in
+dataset. The aggregate tables, including 594 BEC × species envelope rows, are in
 ``notes/reference/calibration/``.
 
 The `IDFdk3` envelope is an independent check of the ingest: BA p50 26.1, p90
@@ -145,8 +147,9 @@ the runtime directory; the grouped tables and the report are in
 The 2026-11-02 run compared 89 intervals and skipped 19 BEC variants the variant
 does not resolve. The initial stand was reproduced closely (mean BA bias -0.87
 m2/ha, MAE 0.93); the end of the interval was not, with five predictions above
-the observed maximum. That is the reference the calibration is judged against,
-not a calibration.
+the observed maximum. The grouped summaries also carry annual **net** BA and TPH
+change; the gross mortality table is not requested by this baseline. That is the
+reference the calibration is judged against, not a calibration.
 
 What it does not do
 -------------------
