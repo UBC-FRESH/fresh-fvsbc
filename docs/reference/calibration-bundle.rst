@@ -8,7 +8,10 @@ provenance. It does not fit the parameters.
 
 The contract lives in :class:`fresh_fvsbc.bundle.CalibrationBundle`. A
 contract pilot is at ``notes/reference/calibration/pilot-bundle.json``; it is
-deliberately unsigned and is not a calibration.
+deliberately unsigned and is not a calibration. The worked regional example is
+``notes/reference/calibration/kc-pilot-bundle.json``; its protocol and claim
+boundary are in ``notes/reference/calibration/kc-protocol.md``, and its results
+are in ``notes/reference/calibration/kc-replication.md``.
 
 Fields
 ------

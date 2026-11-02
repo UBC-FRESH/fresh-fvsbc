@@ -31,6 +31,7 @@ from fresh_fvsbc.provenance import FVS_SOURCE_COMMIT, PYFVS_COMMIT
 
 ROOT: Path = Path(__file__).resolve().parents[1]
 PILOT: Path = ROOT / "notes" / "reference" / "calibration" / "pilot-bundle.json"
+KC_PILOT: Path = ROOT / "notes" / "reference" / "calibration" / "kc-pilot-bundle.json"
 
 
 def _record() -> dict[str, Any]:
@@ -93,6 +94,15 @@ def test_a_valid_bundle_loads_and_renders(tmp_path: Path) -> None:
     assert KeywordSet(rendered).render().startswith("BAMAX")
     assert bundle.record() == {"calibration_id": "test-bundle", "calibration_version": "0.1.0"}
     assert bundle.warnings == ()
+
+
+def test_the_kc_pilot_bundle_loads_and_carries_its_two_warnings() -> None:
+    """The KC bundle is unsigned and its PL multiplier sits at its bound."""
+    bundle = load_bundle(KC_PILOT)
+    assert bundle.bundle_id == "kc-pilot-v2c-2026-11-02"
+    assert len(bundle.render()) == 9
+    assert any("not signed off" in warning for warning in bundle.warnings)
+    assert any("sits at a bound" in warning for warning in bundle.warnings)
 
 
 def test_the_pilot_bundle_loads_and_is_unsigned(tmp_path: Path) -> None:
