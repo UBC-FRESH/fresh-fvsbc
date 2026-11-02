@@ -259,7 +259,7 @@ the no-cut baseline. Dashboard: `OVERALL: GREEN`.
 Acceptance: a replication report, a protocol note, and an effort estimate; the
 report says plainly that KC is a pilot and not a province-wide certificate.
 
-Status: **implemented on `feature/bc-calibration-kc-protocol`**, pending review.
+Status: **merged** as `34eb125` on 2026-11-02.
 The protocol, the v2c bundle, and the replication report are in
 `notes/reference/calibration/`. The replication uses the corrected-BEC KC run
 already recorded in the KC instance; this repository did not re-execute the 24
@@ -269,24 +269,31 @@ Dashboard: `OVERALL: GREEN`.
 
 ### W1.6 (#295) Design the full-domain calibration and the upstream work package
 
-- [ ] Group the 47 data-rich BEC variants into a small number of calibration
+- [x] Group the 47 data-rich BEC variants into a small number of calibration
   domains by BEC zone, subzone, region, and species composition; do not propose
   153 separate models.
-- [ ] Do a sample-size and power table: which domains can identify capacity,
+- [x] Do a sample-size and power table: which domains can identify capacity,
   mortality, and growth; which are validation-only; which are out of scope.
-- [ ] Write the W2 upstream work package for `CWH`, `CDF`, `BWBS`, `CMA`, and
+- [x] Write the W2 upstream work package for `CWH`, `CDF`, `BWBS`, `CMA`, and
   `MH`: the missing species, site-index, mortality, growth, and BEC tables; the
   source files; the build and test plan; the risks; and the acceptance criteria
   for a pinned extension.
-- [ ] Pre-register the primary metrics, spatial and temporal holdouts, and
+- [x] Pre-register the primary metrics, spatial and temporal holdouts, and
   acceptance thresholds before any fitting.
-- [ ] Propose W2 to W6 with tasks, gates, and reviewer sign-off.
-- [ ] Review the design with the named reviewers, and record disagreements and
+- [x] Propose W2 to W6 with tasks, gates, and reviewer sign-off.
+- [x] Review the design with the named reviewers, and record disagreements and
   resolutions rather than averaging them away.
 
 Acceptance: a coverage and power matrix, an upstream work package with a go/no-go
 gate, a pre-registered validation design, and a workstream proposal that the
 maintainer can approve or reject.
+
+Status: **implemented on `feature/bc-calibration-domain-design`**, pending
+review. The design groups the 47 data-rich supported variants into 12 domains
+(10 calibration, 2 validation-only), records the 19 unresolved subzones and the
+32 unsupported-zone variants, and scopes W2. The validation metrics, holdouts,
+and thresholds are fixed before fitting. Human reviewer sign-off is W5; this
+note records the design and the open decisions. Dashboard: `OVERALL: GREEN`.
 
 ## What W1 does not do
 

@@ -466,11 +466,14 @@ def _coverage(
     """Build the BEC coverage table, including the unsupported zones."""
     visits_meta = visits[["SITE_IDENTIFIER", "CLSTR_ID", "VISIT_NUMBER"]].drop_duplicates()
     visit_counts = visits_meta.groupby("SITE_IDENTIFIER").size()
+    years = visits[["SITE_IDENTIFIER", "MEAS_YR"]].drop_duplicates()
+    year_counts = years.groupby("SITE_IDENTIFIER").size()
     sites = pd.DataFrame(
         {
             "BEC": header["BEC"],
             "supported": header["supported"],
             "visits": visit_counts.reindex(header.index, fill_value=0),
+            "years": year_counts.reindex(header.index, fill_value=0),
         }
     )
     rows: list[dict[str, object]] = []
@@ -481,7 +484,7 @@ def _coverage(
                 "supported": bool(group["supported"].iloc[0]),
                 "sites": int(group.shape[0]),
                 "visits": int(group["visits"].sum()),
-                "repeat_sites": int((group["visits"] >= 2).sum()),
+                "repeat_sites": int((group["years"] >= 2).sum()),
             }
         )
     coverage = pd.DataFrame(rows)
