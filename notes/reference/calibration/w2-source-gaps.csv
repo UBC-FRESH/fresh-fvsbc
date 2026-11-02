@@ -1,0 +1,18 @@
+component,file,lines,status,evidence,missing_for,change_required,priority
+Region tokens,canada/bc/habtyp.f,30-32,exists,"RGN = CAR, KAM, NEL",,,low
+Zone tokens,canada/bc/habtyp.f,34-40,partial,"ZN = ESSF, ICH, IDF, MS, PP, SBS, SBPS","CWH, CDF, BWBS, CMA, MH",Add the five zone tokens,high
+Subzone tokens,canada/bc/habtyp.f,42-60,partial,19 two-letter tokens,40 CCISS supported units; 18 have PSP intervals,Add tokens or refuse the unit explicitly,high
+Species list,canada/bc/blkdat.f,74-75,partial,JSP = 15 species,"DR, SS, BA, HM, YC, SB, MB and other minor species",Add JSP codes,high
+Species code tables,canada/bc/blkdat.f,77-85,partial,FIAJSP and PLNJSP = 15 species,Same as JSP,Add FIA and plant-symbol codes,high
+Default BAMAX,canada/bc/sitset.f,61-242,partial,Cases for IDF dk1-4/dm1-2/mw1-2/xh1-2/xm; ICH mk1/mw2/mw3/wk1/dw; ESSF dk/wc4/wm; MS dk/dm1; PP dh2/xh2; SBS all; SBPS all,Many supported subzones; all five unsupported zones,"Add defaults, or refuse a unit without a default",high
+BAMAX fallback,canada/bc/sitset.f,244-250,exists,Sets BAMAX=10 m2/ha and writes a warning,,Never use 10 as a silent default for a new unit,high
+Large-tree DG adjustment,canada/bc/becset.f,"57-62, 175-176, 754-841, 856-861, 1185-1198",partial,15 species; 12 subzone modifiers; V3 for ICH/IDF/SBS/SBPS; V2 for ESSF/MS/PP,New zones and species; ESSF/MS/PP already use V2,Add coefficients or refuse the unit,high
+Height growth,canada/bc/htgf.f,"111-127, 134-1226",partial,15 species coefficients; 44 BEC/site-series entries,New zones and species,Add coefficients,high
+Mortality,canada/bc/morts.f,"203-349, 1096-1107",partial,15 species; FMRT only ICH and IDF; ESSF/MS/PP default to ICH; SBS to ICH (SBSdw2 to IDF); SBPS to IDF,New zones and species; ESSF/MS/PP table already a default,Add tables or document the default and its validity,high
+Crown,canada/bc/crown.f,91-143,partial,15 species PARM and MAPHAB,New species,Add coefficients,high
+Bark ratio,canada/bc/bratio.f,26-30,partial,15 species BARK1 and IMAP,New species,Add coefficients,medium
+Diameter variance,canada/bc/dgdriv.f,104-107,partial,15 species PSIGSQ,New species,Add values,medium
+Volume and taper,canada/bc/min.f,90-92 and LOG,partial,15 species mapped to Kozak codes,New species,Add Kozak codes and coefficients,high
+Regeneration,canada/bc/regent.f,186-208 and ST_COEF,partial,15 species arrays and 27 ST_COEF entries,New species,Add entries,medium
+BEC parameter tables,canada/bc/becset.f,754-841,partial,12 all-region subzone modifiers,New zones and subzones,Add entries,high
+Site index,canada/bc/initre.f,477-481,not-used,NOTE: SITE INDEX IS NOT USED IN THIS VARIANT,,Remove site index from the W2 gap list,low

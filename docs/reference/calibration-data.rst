@@ -162,7 +162,9 @@ the holdouts, and sets the W2–W6 sequence. `domain-plan.csv` carries the count
 records the public CCISS code and data leads: seven high-priority missing
 species (six coastal plus black spruce), the BEC/site-series tables for the
 missing subzones, and the `w2-species-bec-crosswalk.csv` / `w2-bec-gap.csv`
-working tables.
+working tables. `w2-source-audit.md` reads the pinned Fortran and records the
+go/no-go: 18 subzones are a bounded extension, while the five zones need a
+separate parameter-development project; site index is not used by the variant.
 
 What it does not do
 -------------------

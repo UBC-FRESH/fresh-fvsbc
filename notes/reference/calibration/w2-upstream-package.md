@@ -23,7 +23,7 @@ BEC parameter tables. `canada/bc/blkdat.f` carries 15 species.
 | 5 zones | `CWH`, `CDF`, `BWBS`, `CMA`, `MH` are absent from `HABTYP`; 32 variants, 2,911 sites, 10,765 visits | All coastal and boreal calibration |
 | 19 subzones | `ESSFdh1`, `ESSFmv1`, `IDFdh`, `SBSdh1`, `MSxv`, and 14 more are absent from the subzone list; 220 sites, 300 intervals | Subzone-specific calibration in the supported zones |
 | Species | The 15 `JSP` codes do not cover seven high-priority species: `Dr`, `Ss`, `Yc`, `Ba`, `Mb`, `Hm`, and `Sb`; `Lt` is medium and excluded in CCISS; `Sx` maps to `SE` | Tree-list ingestion and volume/taper/height growth |
-| Site index | `SITECODE`/`SETSITE` carry site species and index, but the coastal/boreal site-index curves are not in the variant | Growth and capacity defaults |
+| Site index | The variant **does not use site index** (`initre.f` 477–481); `SITECODE`/`SETSITE` are reported, not used | Nothing; remove it from the gap list |
 | Mortality | The variant's mortality tables are zone/species specific | A calibrated capacity cannot stand without a mortality response |
 | BEC tables | `becset.f` parameters are keyed to the zones/subzones it knows | Species growth and height/diameter curves |
 
@@ -54,12 +54,31 @@ candidate species, seven high-priority missing species, and 218 BC BGC units:
 125 supported, 40 missing subzones (18 with PSP intervals), and 53 missing-zone
 units (29 with PSP sites). The raw CCISS tables are not committed.
 
+## 1.3 W2.2 result
+
+`w2-source-audit.md` and `w2-source-gaps.csv` read the pinned source. The
+bounded result is:
+
+- **18 subzones with PSP data: partial go.** Add the parser tokens and
+  source-backed `BAMAX` defaults; the growth/mortality for ESSF/MS subzones
+  still uses V2/ICH defaults and must be validated, not claimed.
+- **`CWH`, `CDF`, `BWBS`, `MH`: no-go without a parameter source.** They need
+  new species plus growth, mortality, crown, bark, volume, and regeneration
+  tables. A parser-only extension would use ICH mortality and the 10 m2/ha
+  fallback.
+- **`CMA`: no-go.** Three units, no CCISS suitability rows.
+
+The default-BA fallback is 10 m2/ha (`sitset.f` 244–250); it must not be used
+for a new unit. The mortality table is ICH/IDF only; ESSF/MS/PP already default
+to ICH, and SBS to ICH except `SBSdw2` to IDF.
+
 ## 2. Work package
 
 ### 2.1 Source audit
 
 - Read `canada/bc/habtyp.f`, `sitset.f`, `becset.f`, `blkdat.f`, `BCPLOT.F77`,
-  and the mortality/growth routines at the pinned commit.
+  and the mortality/growth routines at the pinned commit. **Site index is not
+  used** (`initre.f` 477–481); do not add site-index curves.
 - Build a matrix of zone → subzone → species → site-index → mortality/growth
   table, marking what exists, what is missing, and what is a stale default.
 - Record the exact source lines and the commit. Do not rely on the 2011 variant
