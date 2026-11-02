@@ -1,6 +1,6 @@
 # ADR 0011: the BEC is a validated input
 
-Status: proposed; accepted when the W1.1 pull request merges
+Status: accepted on 2026-11-02, when the W1.1 pull request merged
 Date: 2026-11-02
 Issues: #289, #290
 

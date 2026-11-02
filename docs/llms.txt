@@ -15,6 +15,7 @@
 - [Output contract](reference/outputs.html): the SQLite tables an FVS-BC run writes, and the rules for reading them.
 - [Provenance contract](reference/provenance.html): what every run records, and where it lives.
 - [nemora ingestion contract](reference/nemora-ingest.html): how a synthetic stem population becomes a tree list, and what cannot be supplied.
+- [Calibration dataset](reference/calibration-data.html): the FAIB PSP ingest, its tables, inclusion rules, and data governance.
 
 ## Agent protocols
 
