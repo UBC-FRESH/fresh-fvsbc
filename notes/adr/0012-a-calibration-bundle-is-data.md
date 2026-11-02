@@ -1,6 +1,6 @@
 # ADR 0012: a calibration bundle is data, not code
 
-Status: proposed; accepted when the W1.3 pull request merges
+Status: accepted on 2026-11-02, when the W1.3 pull request merged
 Date: 2026-11-02
 Issues: #289, #292
 

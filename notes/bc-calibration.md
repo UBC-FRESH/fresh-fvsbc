@@ -206,23 +206,39 @@ exclude a known harvest interval separately. Dashboard: `OVERALL: GREEN`.
 Acceptance: a pilot bundle loads, validates, renders, and appears in provenance;
 an out-of-domain or out-of-bounds bundle is refused by name.
 
+Status: **merged** as `2d58129` on 2026-11-02. The pilot bundle loads with its
+unsigned warning, renders `BAMAX`, `BAIMULT`, and `MORTMULT`, runs against a real
+IDFdk3 stand, and records `calibration_id=bc-pilot-2026-11-02`; FVS echoes the
+parameters. Dashboard and CI: green.
+
 ### W1.4 (#293) Build the baseline backtest and the envelope oracle
 
-- [ ] Run uncalibrated FVS-BC on a stratified sample of PSP intervals across the
+- [x] Run uncalibrated FVS-BC on a stratified sample of PSP intervals across the
   supported zones and TSAs, initialized from the first measurement and grown to
   the second with no cut and no calibration.
 - [ ] Compare BA, TPH, QMD, top height, volume, and annual mortality by BEC, TSA,
   species group, DBH class, and basal-area class.
 - [ ] Build an empirical envelope table (p99 and maximum) by BEC and species, and
   a post-run validator that flags an output outside it; never silently clip.
-- [ ] Test that the validator flags the legacy 77 m2/ha KC case and passes the
+  - [x] The BEC-level envelope and the flag validator are built and tested.
+  - [ ] The species-level envelope is not yet split out; the grouped summaries are
+    the first cut.
+- [x] Test that the validator flags the legacy 77 m2/ha KC case and passes the
   corrected 50 m2/ha case; fail closed when the envelope table is missing.
-- [ ] Write the baseline report with residual plots and a statement of what the
+- [x] Write the baseline report with residual plots and a statement of what the
   sample does and does not represent.
 
 Acceptance: the baseline report and envelope table exist; the validator flags the
 known bad case; the run orchestration returns the flag without changing the
 numbers.
+
+Status: **first cut implemented on `feature/bc-calibration-baseline`**, pending
+review. 89 intervals across 89 BEC variants were compared; 19 variants were
+skipped because the variant does not resolve their subzone. The initial stand is
+reproduced closely (mean BA bias -0.87 m2/ha, MAE 0.93), while 5 predictions are
+above the observed maximum and 1 above the p99. The report and grouped summaries
+are in `notes/reference/calibration/`. **Open in W1.4**: annual mortality by
+species/DBH/BA class, and the species-level envelope. Dashboard: `OVERALL: GREEN`.
 
 ### W1.5 (#294) Replicate the KC pilot as a protocol, not a parameter set
 

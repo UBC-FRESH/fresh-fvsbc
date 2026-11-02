@@ -13,6 +13,11 @@ outside the repository because they carry site identifiers.
 | `bec_envelope.csv` | BA p50/p90/p99/max, mean TPH and mean volume by BEC |
 | `species_crosswalk.csv` | Observed PSP species, the FVS code when known, the calibration group |
 | `manifest.json` | Input sizes and SHA-256, row counts, interval bounds, supported zones |
+| `pilot-bundle.json` | The unsigned calibration-bundle contract pilot |
+| `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
+| `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
+| `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |
+| `baseline_report.md` | The baseline report and its limits |
 
 ## Counts
 
@@ -52,6 +57,20 @@ They need the upstream extension in W2 before they can be calibrated.
 - **Damage is a partial disturbance flag.** `damage=True` means one of the five
   `DAM_AGN*` columns is positive. The extract has no reliable harvest or fire
   history, so an analyst must exclude a known harvest interval separately.
+
+## Baseline backtest
+
+The 2026-11-02 baseline ran **89 intervals across 89 BEC variants**, one per
+variant, with no cut and no calibration. **Nineteen variants were skipped**
+because the variant does not resolve their subzone; they are listed in
+`baseline_skipped_becs.csv`. **The initial stand is reproduced closely**: mean
+BA bias -0.87 m2/ha, median -0.64, MAE 0.93, which is the check that the tree
+list construction is sound. **The end of the interval is not**: 5 predictions
+are above the observed maximum and 1 is above the p99. The worst are `SBPSmc`
+(predicted 11,214 m2/ha against 30.6 observed) and `SBPSdc` (4,705 against
+11.2). The default mortality does not remove enough small-tree density in those
+cases. The per-interval table stays in the runtime directory because its
+`interval_id` carries a site identifier; only the grouped tables are tracked.
 
 ## The IDF check
 

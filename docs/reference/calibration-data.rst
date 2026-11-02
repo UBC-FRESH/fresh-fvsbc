@@ -132,6 +132,22 @@ The `IDFdk3` envelope is an independent check of the ingest: BA p50 26.1, p90
 43.6, p99 54.1, maximum 63.7, mean TPH 2,820, and mean volume 134.2, which match
 the WS4 IDF audit to the published precision.
 
+Baseline backtest
+-----------------
+
+`scripts/run_baseline_backtest.py` grows a BEC-stratified sample of intervals
+from the first measurement to the second with no cut and no calibration. It
+writes the per-interval comparison, the BEC summary, the grouped summaries, and
+the envelope flags. The per-interval file carries site identifiers and stays in
+the runtime directory; the grouped tables and the report are in
+``notes/reference/calibration/``.
+
+The 2026-11-02 run compared 89 intervals and skipped 19 BEC variants the variant
+does not resolve. The initial stand was reproduced closely (mean BA bias -0.87
+m2/ha, MAE 0.93); the end of the interval was not, with five predictions above
+the observed maximum. That is the reference the calibration is judged against,
+not a calibration.
+
 What it does not do
 -------------------
 
