@@ -35,7 +35,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"fresh_fvsbc.web" = ["skins/*.json", "static/*"]
+"fresh_fvsbc.web" = ["skins/*.json", "static/*", "static/vendor/three/*"]
 
 [tool.ruff]
 line-length = 100

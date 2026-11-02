@@ -145,3 +145,78 @@ svg.chart text { fill: var(--muted); font-size: 11px; }
   color: var(--ink);
   font-size: 13px;
 }
+
+/* Stand visuals: a 2D schematic map and a 3D viewer over the per-tree tables. */
+
+.stand-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 8px 0 10px;
+}
+
+.stand-toolbar label { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.segmented button { border: 0; border-radius: 0; background: transparent; }
+.segmented button.active { background: var(--panel-2); color: var(--accent); }
+
+.stand-stats { margin-left: auto; font-size: 12px; }
+
+.stand-stage {
+  position: relative;
+  height: min(68vh, 720px);
+  min-height: 360px;
+  background: #0e1214;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stand-canvas, .stand-3d { display: block; width: 100%; height: 100%; }
+.stand-3d canvas { display: block; width: 100%; height: 100%; }
+.stand-canvas[hidden], .stand-3d[hidden] { display: none; }
+
+.stand-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(26, 32, 38, 0.96);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  max-width: 260px;
+  z-index: 2;
+}
+.stand-tooltip .strong { font-weight: 600; }
+
+.stand-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin: 10px 0 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.stand-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--accent);
+}
+.swatch-cut { background: var(--warn); border-radius: 2px; }
+
+.stand-note { font-size: 12px; margin: 4px 0 0; max-width: 900px; }
+

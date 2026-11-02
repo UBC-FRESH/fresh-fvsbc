@@ -344,3 +344,14 @@ def test_the_service_answers_with_and_without_its_root_path(tmp_path: Path) -> N
     assert client.get("/api/runs").status_code == 200
     assert client.get(f"{prefix}/api/runs").status_code == 200
     assert client.get(f"{prefix}/").status_code == 200
+
+
+def test_the_shell_carries_the_visuals_import_map_and_the_vendored_runtime() -> None:
+    """The 3D view is local, so the import map and the vendored three.js must ship together."""
+    index = (webapp.STATIC_DIRECTORY / "index.html").read_text(encoding="utf-8")
+    assert '"three": "./vendor/three/three.module.js"' in index
+    assert (webapp.STATIC_DIRECTORY / "visuals.js").is_file()
+    vendor = webapp.STATIC_DIRECTORY / "vendor" / "three"
+    assert (vendor / "three.module.js").is_file()
+    assert (vendor / "OrbitControls.js").is_file()
+    assert (vendor / "LICENSE").is_file()

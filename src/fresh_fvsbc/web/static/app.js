@@ -133,6 +133,10 @@ function selectPanel(panel) {
 
 async function renderPanel() {
   const body = document.getElementById("panel-body");
+  if (typeof body._dispose === "function") {
+    body._dispose();
+    body._dispose = null;
+  }
   body.replaceChildren();
   if (!state.run) {
     body.append(el("p", { className: "muted" }, "Choose a run."));
@@ -148,6 +152,7 @@ async function renderPanel() {
     tables: renderTables,
     summary: renderSummary,
     trees: renderTrees,
+    visuals: renderVisuals,
     keywords: renderKeywords,
     provenance: renderProvenance,
     compare: renderCompare,
@@ -391,6 +396,12 @@ async function renderTrees(body) {
       ),
     );
   }
+}
+
+async function renderVisuals(body) {
+  // three.js is fetched only when this panel opens, and only when the 3D view is chosen.
+  const module = await import("./visuals.js");
+  await module.mountVisuals(body, state.run.id);
 }
 
 async function renderKeywords(body) {

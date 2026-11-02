@@ -29,6 +29,7 @@ PANELS: frozenset[str] = frozenset(
         "tables",
         "summary",
         "trees",
+        "visuals",
         "keywords",
         "provenance",
         "compare",
