@@ -22,13 +22,30 @@ BEC parameter tables. `canada/bc/blkdat.f` carries 15 species.
 | --- | --- | --- |
 | 5 zones | `CWH`, `CDF`, `BWBS`, `CMA`, `MH` are absent from `HABTYP`; 32 variants, 2,911 sites, 10,765 visits | All coastal and boreal calibration |
 | 19 subzones | `ESSFdh1`, `ESSFmv1`, `IDFdh`, `SBSdh1`, `MSxv`, and 14 more are absent from the subzone list; 220 sites, 300 intervals | Subzone-specific calibration in the supported zones |
-| Species | The 15 `JSP` codes do not cover the coastal and boreal mixes (e.g., `SS`, `YC`, `RA`, `MB`, `SW`, `BL`) | Tree-list ingestion and volume/taper/height growth |
+| Species | The 15 `JSP` codes do not cover six coastal species (`Dr`, `Ss`, `Yc`, `Ba`, `Mb`, `Hm`) or two boreal species (`Sb`, `Lt`); `Sx` maps to `SE` | Tree-list ingestion and volume/taper/height growth |
 | Site index | `SITECODE`/`SETSITE` carry site species and index, but the coastal/boreal site-index curves are not in the variant | Growth and capacity defaults |
 | Mortality | The variant's mortality tables are zone/species specific | A calibrated capacity cannot stand without a mortality response |
 | BEC tables | `becset.f` parameters are keyed to the zones/subzones it knows | Species growth and height/diameter curves |
 
 The W1.4 baseline is the evidence that the subzone gap is real: 19 variants were
 skipped because `BecCode` refused a code the variant would have defaulted.
+
+## 1.1 Leads from CCISS
+
+The CCISS code and data (`bcgov/ccissr`, BC Data Catalogue, OGL-BC) carry the
+species codes, the BEC and site-series tables, and the E1–E3 suitability
+ratings for the zones the variant does not resolve. `cciss-leads.md` records
+the extraction. The priority list is:
+
+- **Coastal:** `Dr` red alder, `Ss` Sitka spruce, `Yc` yellow-cedar, `Ba`
+  amabilis fir, `Mb` bigleaf maple, `Hm` mountain hemlock.
+- **CDF:** `Dr` and `Mb`; `Ra` arbutus and `Qg` Garry oak are minor.
+- **Boreal:** `Sb` black spruce and `Lt` tamarack; `Sx` interior spruce maps to
+  `SE` for a first pass.
+- **CMA:** no CCISS suitability rows; out of scope without expert input.
+
+The 19 missing subzones are mostly a BEC/site-series gap, not a new species
+gap: 18 are in the CCISS BEC table, with 5–14 site series each.
 
 ## 2. Work package
 

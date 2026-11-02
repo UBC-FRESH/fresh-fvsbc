@@ -21,6 +21,7 @@ outside the repository because they carry site identifiers.
 | `domain-plan.csv` | The 12 calibration domains and their sample sizes |
 | `full-domain-design.md` | The domain design, power thresholds, pre-registered validation, and W2–W6 sequence |
 | `w2-upstream-package.md` | The upstream work package for the five zones and 19 subzones |
+| `cciss-leads.md` | The CCISS code/data leads, species priority, and BEC coverage for W2 |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |
