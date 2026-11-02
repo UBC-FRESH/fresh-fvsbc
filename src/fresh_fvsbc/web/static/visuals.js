@@ -536,6 +536,7 @@ async function createScene(container) {
   const animate = () => {
     if (disposed) return;
     requestAnimationFrame(animate);
+    if (container.hidden) return;
     controls.update();
     renderer.render(scene, camera);
   };
