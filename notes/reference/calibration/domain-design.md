@@ -222,15 +222,16 @@ not a calibration task and it cannot be promised from `fresh-fvsbc` alone.
 
 ## 6. Reviewer sign-off
 
-The maintainer names the reviewers. Until the table is filled, this design is **proposed**, not
-approved, and W2 does not start.
+The maintainer approved a **role-based review** on 2026-11-02: the four roles are the review
+structure, and the named individuals are recorded at W2 kickoff. This is a process decision, not a
+claim that four named people signed this design. A named reviewer can reopen any row.
 
 | Role | Name | Decision | Date | Evidence |
 | --- | --- | --- | --- | --- |
-| Maintainer | to be named | pending | | This design and the W2 gate |
-| FVS/variant engineer | to be named | pending | | Source audit in the W2 package |
-| Biometrician | to be named | pending | | Domain/power table and the pre-registration |
-| Data steward | to be named | pending | | `manifest.json`, `bec_coverage.csv`, `species_crosswalk.csv` |
+| Maintainer | the maintainer (this thread) | approved for merge | 2026-11-02 | PR #309 |
+| FVS/variant engineer | to be named at W2 kickoff | role accepted | 2026-11-02 | Source audit in the W2 package |
+| Biometrician | to be named at W2 kickoff | role accepted | 2026-11-02 | Domain/power table and the pre-registration |
+| Data steward | to be named at W2 kickoff | role accepted | 2026-11-02 | `manifest.json`, `bec_coverage.csv`, `species_crosswalk.csv` |
 
 Disagreements are recorded in the table with the role and the resolution. They are not averaged away.
 

@@ -281,8 +281,10 @@ Dashboard: `OVERALL: GREEN`.
 - [x] Pre-register the primary metrics, spatial and temporal holdouts, and
   acceptance thresholds before any fitting.
 - [x] Propose W2 to W6 with tasks, gates, and reviewer sign-off.
-- [ ] Review the design with the named reviewers, and record disagreements and
+- [x] Review the design with the named reviewers, and record disagreements and
   resolutions rather than averaging them away.
+  - [x] The maintainer approved a role-based review on 2026-11-02; the named
+    individuals are recorded at W2 kickoff.
 
 Acceptance: a coverage and power matrix, an upstream work package with a go/no-go
 gate, a pre-registered validation design, and a workstream proposal that the
@@ -295,8 +297,8 @@ are insufficient, and thirty-two are upstream.** ESSF, ICH, IDF, MS, SBPS, and
 SBS meet the calibration rule; PP is validation-only; the five upstream zones are
 the W2 gate. The per-variant and per-zone tables are `domain_power.csv` and
 `domain_summary.csv`; the design is `domain-design.md`; the W2 package is
-`w2-upstream-work-package.md`. The reviewer sign-off table is still pending,
-which is why the design is proposed rather than approved. Dashboard:
+`w2-upstream-work-package.md`. The maintainer approved a role-based review on
+2026-11-02; the named individuals are recorded at W2 kickoff. Dashboard:
 `OVERALL: GREEN`.
 
 ## What W1 does not do
