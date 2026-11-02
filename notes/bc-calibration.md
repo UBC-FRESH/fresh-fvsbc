@@ -176,9 +176,9 @@ in the supported zones; at least 3,000 have repeat measurements; the BEC coverag
 table is published; the QA report names every exclusion; the tracked files contain
 no site-level records.
 
-Status: **implemented on `feature/bc-calibration-dataset`**, pending review. The
-build reproduced 7,341 sites / 23,956 visits, 4,430 supported sites, 13,191
-supported visits, 9,186 intervals, and 1,031,828 tree-survival rows. The `IDFdk3`
+Status: **merged** as `60878d9` on 2026-11-02. The build reproduced 7,341 sites /
+23,956 visits, 4,430 supported sites, 13,191 supported visits, 9,186 intervals,
+and 1,031,828 tree-survival rows. The `IDFdk3`
 envelope matches the independent WS4 IDF audit exactly at the published precision.
 The aggregate tables are in `notes/reference/calibration/`; the tree-level tables
 stay out of the tracked tree. The damage columns flag 54,269 tree-survival rows;
@@ -187,20 +187,20 @@ exclude a known harvest interval separately. Dashboard: `OVERALL: GREEN`.
 
 ### W1.3 (#292) Define the calibration parameter contract
 
-- [ ] Define a versioned JSON schema for a calibration bundle: id and version;
+- [x] Define a versioned JSON schema for a calibration bundle: id and version;
   FVS and PyFVS pins; domain (region, BEC, species group, DBH class, management
   regime); parameters and units; bounds; training and validation split; data
   checksums; objective; convergence diagnostics; reviewer sign-off; claim
   boundary.
-- [ ] Implement load, validate, and render: a bundle becomes an ordered keyword
+- [x] Implement load, validate, and render: a bundle becomes an ordered keyword
   set (`BAMAX`, `SDIMAX`, `BAIMULT`, `MORTMULT`, and any other supported
   parameter), with BC's metric units and the documented keyword order.
-- [ ] Refuse a bundle outside its declared domain, a parameter outside its bounds,
+- [x] Refuse a bundle outside its declared domain, a parameter outside its bounds,
   a missing pin, or a missing checksum; warn when a parameter sits at a bound.
-- [ ] Record the bundle id in the provenance record and in the run directory.
-- [ ] Test the round trip, the domain refusal, the unit error, the bound warning,
+- [x] Record the bundle id in the provenance record and in the run directory.
+- [x] Test the round trip, the domain refusal, the unit error, the bound warning,
   and the keyword order.
-- [ ] Record the decision as an ADR: a calibration bundle is data, not code; the
+- [x] Record the decision as an ADR: a calibration bundle is data, not code; the
   package applies it but does not fit it.
 
 Acceptance: a pilot bundle loads, validates, renders, and appears in provenance;

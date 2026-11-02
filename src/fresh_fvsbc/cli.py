@@ -28,6 +28,7 @@ from functools import partial
 from pathlib import Path
 
 from fresh_fvsbc.bec import BecCodeError
+from fresh_fvsbc.bundle import BundleError
 from fresh_fvsbc.keywords import (
     KEYWORD_BLOCK_KEYWORDS,
     LINES_KEYWORDS,
@@ -77,6 +78,7 @@ class CommandInputError(ValueError):
 #: carry, a species that does not resolve, a population record the adapter cannot read.
 _INPUT_ERRORS: tuple[type[Exception], ...] = (
     BecCodeError,
+    BundleError,
     CommandInputError,
     KeywordConflictError,
     KeywordOrderError,

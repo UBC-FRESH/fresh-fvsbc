@@ -161,6 +161,8 @@ class Provenance:
     bec : str, optional
         The validated BEC the run used, such as ``CAR IDFdk3/01``. Empty only when
         a record is built without a run, as some contract tests do.
+    calibration_id : str, optional
+        The id of the calibration bundle the run used, when it used one.
     fresh_fvsbc_version : str, optional
         The version of this package that ran. Defaults to the installed one.
     pyfvs_commit : str, optional
@@ -179,6 +181,7 @@ class Provenance:
     case_id: str
     run_datetime: str
     bec: str = ""
+    calibration_id: str = ""
     fresh_fvsbc_version: str = __version__
     pyfvs_commit: str = PYFVS_COMMIT
     fvs_source_commit: str = FVS_SOURCE_COMMIT
@@ -201,6 +204,7 @@ class Provenance:
             "variant": self.variant,
             "variant_list": list(self.variant_list),
             "bec": self.bec,
+            "calibration_id": self.calibration_id,
             "keyword_set_hash": self.keyword_set_hash,
             "treelist_hash": self.treelist_hash,
             "case_id": self.case_id,

@@ -24,6 +24,10 @@ below are listed in the order the pipeline uses them.
    :members:
    :show-inheritance:
 
+.. automodule:: fresh_fvsbc.bundle
+   :members:
+   :show-inheritance:
+
 .. automodule:: fresh_fvsbc.keywords
    :members:
    :show-inheritance:

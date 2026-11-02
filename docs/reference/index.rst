@@ -32,4 +32,5 @@ Three names are easy to confuse, so this project uses them distinctly.
    provenance
    nemora-ingest
    calibration-data
+   calibration-bundle
    web

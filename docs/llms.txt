@@ -16,6 +16,7 @@
 - [Provenance contract](reference/provenance.html): what every run records, and where it lives.
 - [nemora ingestion contract](reference/nemora-ingest.html): how a synthetic stem population becomes a tree list, and what cannot be supplied.
 - [Calibration dataset](reference/calibration-data.html): the FAIB PSP ingest, its tables, inclusion rules, and data governance.
+- [Calibration bundle](reference/calibration-bundle.html): the versioned parameter contract, its domain, bounds, pins, and provenance id.
 
 ## Agent protocols
 
