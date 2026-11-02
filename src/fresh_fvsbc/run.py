@@ -60,6 +60,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from fresh_fvsbc.bec import BecCode, BecCodeError
 from fresh_fvsbc.keywords import Keyword, KeywordSet
 from fresh_fvsbc.nemora import PlotFields, to_tree_list
 from fresh_fvsbc.outputs import check_run, read_cases
@@ -430,6 +431,40 @@ class RunResult:
     database: Path
 
 
+def _bec_of(keywords: Sequence[Keyword]) -> BecCode:
+    """Return the BEC a run carries, or refuse a set that does not name one.
+
+    Parameters
+    ----------
+    keywords : Sequence of Keyword
+        The caller's set, before the tree handoff is inserted.
+
+    Returns
+    -------
+    BecCode
+        The validated BEC from the first two ``STDINFO`` fields.
+
+    Raises
+    ------
+    BecCodeError
+        If the set carries no ``STDINFO``, or its first two fields do not parse.
+        A BC run without one leaves FVS on its documented default, ``ICHmw2/01``,
+        which is not the stand the caller described.
+    """
+    for keyword in keywords:
+        if keyword.name == "STDINFO":
+            if len(keyword.parameters) < 2:
+                raise BecCodeError(
+                    "STDINFO needs a BEC in its first two fields, as in "
+                    "'STDINFO=CAR,IDFdk3/01,...'; without one FVS silently uses ICHmw2/01"
+                )
+            return BecCode.from_fields(keyword.parameters[0], keyword.parameters[1])
+    raise BecCodeError(
+        "a BC run needs STDINFO with a BEC in its first two fields, as in "
+        "'STDINFO=CAR,IDFdk3/01,...'; without one FVS silently uses ICHmw2/01"
+    )
+
+
 def run_case(
     records: Sequence[TreeListFields],
     keywords: Sequence[Keyword],
@@ -468,6 +503,9 @@ def run_case(
 
     Raises
     ------
+    BecCodeError
+        If the set carries no ``STDINFO``, or its first two fields are not a BEC the
+        variant resolves.
     KeywordConflictError
         If the keyword set carries a keyword the orchestration writes.
     UnknownKeywordError
@@ -481,6 +519,7 @@ def run_case(
     RunError
         If the projection ends badly, or the run recorded no case.
     """
+    bec = _bec_of(keywords)
     handoff = with_tree_handoff(keywords)
     keyword_set = KeywordSet(handoff)
     target = Path(directory).expanduser().resolve()
@@ -501,6 +540,7 @@ def run_case(
         treelist_hash=treelist_hash(records),
         case_id=case_id,
         run_datetime=run_datetime,
+        bec=str(bec),
         variant_list=driven.variants,
         random_seed=_seed_of(handoff),
     )

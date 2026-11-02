@@ -47,6 +47,8 @@ import hashlib
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 
+from fresh_fvsbc.bec import BecCode, BecCodeError
+
 __all__ = [
     "BLANK_SLOTS",
     "BLOCK_BODIES",
@@ -668,6 +670,13 @@ def validate_keyword(keyword: Keyword) -> list[str]:
         near = _near_miss(keyword.name)
         hint = f' The table spells it "{near}".' if near is not None else ""
         raise UnknownKeywordError(f'"{keyword.name}" is not a keyword.{hint}')
+    if keyword.name == "STDINFO":
+        if len(keyword.parameters) < 2:
+            raise BecCodeError(
+                "STDINFO needs a BEC in its first two fields, as in "
+                "'STDINFO=CAR,IDFdk3/01,...'; without one FVS silently uses ICHmw2/01"
+            )
+        BecCode.from_fields(keyword.parameters[0], keyword.parameters[1])
     if keyword.name not in RECORD_KEYWORDS:
         for parameter in keyword.parameters:
             _check_width(keyword.name, parameter)

@@ -158,6 +158,9 @@ class Provenance:
         The ``CaseID`` from ``FVS_Cases``.
     run_datetime : str
         The ``RunDateTime`` from ``FVS_Cases``.
+    bec : str, optional
+        The validated BEC the run used, such as ``CAR IDFdk3/01``. Empty only when
+        a record is built without a run, as some contract tests do.
     fresh_fvsbc_version : str, optional
         The version of this package that ran. Defaults to the installed one.
     pyfvs_commit : str, optional
@@ -175,6 +178,7 @@ class Provenance:
     treelist_hash: str
     case_id: str
     run_datetime: str
+    bec: str = ""
     fresh_fvsbc_version: str = __version__
     pyfvs_commit: str = PYFVS_COMMIT
     fvs_source_commit: str = FVS_SOURCE_COMMIT
@@ -196,6 +200,7 @@ class Provenance:
             "fvs_source_commit": self.fvs_source_commit,
             "variant": self.variant,
             "variant_list": list(self.variant_list),
+            "bec": self.bec,
             "keyword_set_hash": self.keyword_set_hash,
             "treelist_hash": self.treelist_hash,
             "case_id": self.case_id,

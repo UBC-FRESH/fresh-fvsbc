@@ -11,7 +11,7 @@ did not write.
      --directory run \
      --species FD --tree-age 60 \
      --keyword "STDIDENT=SYNTHETIC   the command" \
-     --keyword STDINFO=712,CHS131,0,200,35,16 \
+     --keyword STDINFO=CAR,IDFdk3/01,0,200,35,16 \
      --keyword MANAGED=0,1 \
      --keyword SITECODE=FD,100 \
      --keyword INVYEAR=0 \

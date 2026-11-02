@@ -1528,6 +1528,31 @@ carries the open items and what would reopen them, `docs/` carries the contracts
 gates every merge. What was dropped is the phase issue, the roadmap row, and the close-out report for
 each one.
 
+### Calibration programme
+
+`notes/bc-calibration.md` is the plan of record for making `fresh-fvsbc` usable
+for growth-and-yield work across all of BC. It is a named workstream, not a
+numbered phase, and it follows the convention above: a parent issue, child
+issues, a branch, a pull request, and a changelog entry, without a phase row.
+
+The programme has two tracks. The seven zones the BC variant resolves today can
+be calibrated from the public PSP archive now. `CWH`, `CDF`, `BWBS`, `CMA`, and
+`MH` need an upstream PyFVS/FVS extension first, because the variant does not
+carry their species, site-index, mortality, growth, or BEC tables.
+
+| Workstream | What it answers | Exit |
+| --- | --- | --- |
+| W1 foundation | Can the package take a valid BEC, ingest the provincial data, represent a parameter set, measure a baseline, and state the upstream gap? | Contracts, dataset, schema, baseline, upstream work package, and design |
+| W2 full-domain coverage | Can the variant represent the five missing zones? | A pinned upstream extension, or a documented go/no-go with cost and evidence |
+| W3 full-domain baseline | Where does uncalibrated FVS-BC fail across the full domain? | Residual atlas by BEC, TSA, species, size, and density |
+| W4 domain calibration | What capacity, mortality, and growth parameters are identifiable in each domain? | Versioned bundles with cross-validation and no parameter at a bound |
+| W5 independent validation | Does each bundle transfer to held-out sites, TSAs, and years? | Certificates with a claim boundary per domain |
+| W6 calibration release | Can a user select a certified bundle and get provenance? | Release, docs, CLI/API surface, and envelope validator |
+
+W1 is active as parent issue #289, with child issues #290 to #295, on
+`feature/bc-calibration`. The later workstreams are recorded here when their
+predecessor closes.
+
 ## Open decisions and where the detail lives
 
 The detail for each phase lives in its focused plan under `notes/`; the evidence lives in

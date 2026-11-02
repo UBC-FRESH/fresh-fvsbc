@@ -50,6 +50,7 @@ def _common() -> tuple[Keyword, ...]:
     """Return the keywords every case needs, in the order FVS reads them."""
     return (
         Keyword("STDIDENT", ("Oracle.1",)),
+        Keyword("STDINFO", ("CAR", "IDFdk3/01", "0", "200", "35", "16")),
         Keyword("SITECODE", ("FD", "15")),
         Keyword("INVYEAR", ("2020",)),
         Keyword("DESIGN", ("0", "1", "999", "5", "0", "5", "1")),
@@ -90,7 +91,7 @@ def _main_case() -> tuple[list[TreeListFields], tuple[Keyword, ...]]:
             "STRCLSDB",
             "INVSTATS",
         ),
-        *_common()[:1],
+        *_common()[:2],
         Keyword("SITECODE", ("FD", "15")),
         Keyword(
             "FMIN",
@@ -108,7 +109,7 @@ def _main_case() -> tuple[list[TreeListFields], tuple[Keyword, ...]]:
                 Keyword("SIMFIRE", ("1", "20", "1", "21", "1", "100", "1")),
             ),
         ),
-        *_common()[2:],
+        *_common()[3:],
         Keyword("STRCLASS"),
         Keyword("STATS"),
         Keyword("TREELIST"),

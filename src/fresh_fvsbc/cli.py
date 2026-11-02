@@ -27,6 +27,7 @@ from collections.abc import Mapping, Sequence
 from functools import partial
 from pathlib import Path
 
+from fresh_fvsbc.bec import BecCodeError
 from fresh_fvsbc.keywords import (
     KEYWORD_BLOCK_KEYWORDS,
     LINES_KEYWORDS,
@@ -75,6 +76,7 @@ class CommandInputError(ValueError):
 #: What the run raises when the input is wrong: a keyword FVS does not hold, one it cannot
 #: carry, a species that does not resolve, a population record the adapter cannot read.
 _INPUT_ERRORS: tuple[type[Exception], ...] = (
+    BecCodeError,
     CommandInputError,
     KeywordConflictError,
     KeywordOrderError,

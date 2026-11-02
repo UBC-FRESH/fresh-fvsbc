@@ -195,6 +195,11 @@ The documented entry point, `python -m fresh_fvsbc`, run against the synthetic p
 environment. The keyword set is the caller's, passed through unchanged; the command adds `TREEFMT` and
 `TREEDATA` by way of the orchestration and nothing else.
 
+**Correction (W1.1).** The command below uses `STDINFO=712,CHS131`, which FVS
+resolves to `ICHmw2/01`, not the IDF stand the test intended. The run is kept as
+the historical record. A current run uses `STDINFO=CAR,IDFdk3/01,...`, and the
+package now refuses the legacy form.
+
 ```bash
 RUN=run
 PYTHONPATH=src python -m fresh_fvsbc population.json \

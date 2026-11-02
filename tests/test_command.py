@@ -88,7 +88,7 @@ def test_a_completed_run_exits_zero_and_names_its_outputs(
             "--tree-age",
             "60",
             "--keyword",
-            "STDINFO",
+            "STDINFO=CAR,IDFdk3/01",
             "--keyword",
             "PROCESS",
             "--keyword",
@@ -118,6 +118,8 @@ def test_a_run_that_holds_an_error_exits_one(
             "FD",
             "--tree-age",
             "60",
+            "--keyword",
+            "STDINFO=CAR,IDFdk3/01",
         ]
     )
     captured = capsys.readouterr()
@@ -215,6 +217,25 @@ def test_an_unknown_keyword_exits_two(tmp_path: Path, capsys: pytest.CaptureFixt
     assert "is not a keyword" in capsys.readouterr().err
 
 
+def test_an_invalid_bec_exits_two(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """A BEC FVS would silently default is bad input, not a run to report."""
+    code = cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--keyword",
+            "STDINFO=712,CHS131",
+        ]
+    )
+    assert code == cli.EXIT_BAD_INPUT
+    assert "ICHmw2/01" in capsys.readouterr().err
+
+
 def test_a_keyword_that_carries_the_handoff_exits_two(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -228,6 +249,8 @@ def test_a_keyword_that_carries_the_handoff_exits_two(
             "FD",
             "--tree-age",
             "60",
+            "--keyword",
+            "STDINFO=CAR,IDFdk3/01",
             "--keyword",
             "TREEDATA",
         ]
@@ -324,12 +347,12 @@ def test_the_command_passes_the_callers_keywords_through(
             "--tree-age",
             "60",
             "--keyword",
-            "STDINFO=712,CHS131",
+            "STDINFO=CAR,IDFdk3/01",
             "--keyword",
             "PROCESS",
         ]
     )
-    assert list(captured[0]) == [Keyword("STDINFO", ("712", "CHS131")), Keyword("PROCESS")]
+    assert list(captured[0]) == [Keyword("STDINFO", ("CAR", "IDFdk3/01")), Keyword("PROCESS")]
 
 
 def test_a_block_argument_parses_its_lines() -> None:
@@ -429,7 +452,7 @@ def test_a_run_through_the_command_writes_a_compute_table(tmp_path: Path) -> Non
             "--keyword",
             "STDIDENT=CLI   block",
             "--keyword",
-            "STDINFO=712,CHS131,0,200,35,16",
+            "STDINFO=CAR,IDFdk3/01,0,200,35,16",
             "--keyword",
             "MANAGED=0,1",
             "--keyword",
@@ -499,6 +522,8 @@ def test_the_documented_entry_point_exits_one_without_the_extension(tmp_path: Pa
             "FD",
             "--tree-age",
             "60",
+            "--keyword",
+            "STDINFO=CAR,IDFdk3/01",
         ],
         cwd=ROOT,
         capture_output=True,

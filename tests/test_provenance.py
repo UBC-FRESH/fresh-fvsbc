@@ -36,6 +36,7 @@ CONTRACT_FIELDS: tuple[str, ...] = (
     "fvs_source_commit",
     "variant",
     "variant_list",
+    "bec",
     "keyword_set_hash",
     "treelist_hash",
     "case_id",
@@ -92,6 +93,7 @@ def a_provenance() -> Provenance:
         treelist_hash=treelist_hash([A_RECORD]),
         case_id=case_id,
         run_datetime=run_datetime,
+        bec="CAR IDFdk3/01",
         variant_list=built_variants(REAL_VARIANT_REPORT),
         random_seed=1,
     )
@@ -122,11 +124,17 @@ def test_the_source_commit_is_the_one_the_notes_abbreviate() -> None:
 
 
 def test_the_record_carries_no_path_and_no_credential() -> None:
-    """Rule 4: a record may be cited in a tracked file, so it holds neither."""
+    """Rule 4: a record may be cited in a tracked file, so it holds neither.
+
+    The BEC carries a slash, so the check is for path-shaped strings rather than
+    for the character.
+    """
     text = a_provenance().to_json()
-    assert "/" not in text
+    for marker in ("/home/", "/Users/", "/tmp/", "C:\\\\Users"):
+        assert marker not in text
     assert "password" not in text.lower()
     assert "token" not in text.lower()
+    assert '"bec": "CAR IDFdk3/01"' in text
 
 
 def test_the_hashes_are_named_with_their_algorithm() -> None:
@@ -227,6 +235,7 @@ def test_a_record_for_the_whole_chain_from_the_fixture_to_the_database() -> None
         treelist_hash=treelist_hash(records),
         case_id=case_id,
         run_datetime=run_datetime,
+        bec="CAR IDFdk3/01",
         variant_list=built_variants(REAL_VARIANT_REPORT),
         random_seed=1,
     )

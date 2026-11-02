@@ -43,6 +43,11 @@ The keyword file is `pn`'s bare-ground fixture, adapted. Two changes: the specie
 is BC's code, where the US variants use `DF`; and `VOLEQNUM` is dropped, because it names a US volume
 equation.
 
+**Correction (W1.1).** The `STDINFO` line below uses `712,CHS131`, which does not
+resolve to a BEC; FVS silently uses `ICHmw2/01`. The run is kept as the historical
+smoke test. A current run writes `STDINFO CAR IDFdk3/01 0 200 35 16`, and the package
+now refuses the legacy form.
+
 ```text
 STDIDENT
 TEST_BC   BC smoke test - bare ground, one planting
