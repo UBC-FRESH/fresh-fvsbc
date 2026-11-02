@@ -1,7 +1,7 @@
 {
   "id": "reviewer",
   "title": "Reviewer",
-  "panels": ["tables", "summary", "provenance"],
+  "panels": ["tables", "summary", "visuals", "provenance"],
   "actions": [],
   "read_only": true
 }

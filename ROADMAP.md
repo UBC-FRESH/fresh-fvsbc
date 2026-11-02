@@ -1553,6 +1553,22 @@ W1 is active as parent issue #289, with child issues #290 to #295, on
 `feature/bc-calibration`. The later workstreams are recorded here when their
 predecessor closes.
 
+### Web visuals
+
+The web surface is a reader over a run's artefacts. This workstream adds a **schematic stand view**,
+not a geographic map: FVS writes no x/y, so the backend assigns a stable position in a cell per
+`PtIndex`, and the 3D ground is flat because the tables carry no terrain. The panel follows the
+fhops Scenario Studio's visual language, not its editor.
+
+Parent issue: #299. Branch: `feature/web-visuals`.
+
+| Task | What it delivers | Issue |
+| --- | --- | --- |
+| V1.1 | The per-tree visual payload and its tests | #300 |
+| V1.2 | The 2D stand map | #301 |
+| V1.3 | The 3D stand viewer | #302 |
+| V1.4 | Skins, docs, and verification | #303 |
+
 ## Open decisions and where the detail lives
 
 The detail for each phase lives in its focused plan under `notes/`; the evidence lives in

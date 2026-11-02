@@ -110,3 +110,11 @@ def test_an_empty_directory_is_refused(tmp_path: Path) -> None:
     """A directory with no manifests is an error, not an empty application."""
     with pytest.raises(SkinError, match="no skin manifests"):
         load_skins(tmp_path)
+
+
+def test_the_visuals_panel_is_registered_and_ships_in_the_working_skins() -> None:
+    """A panel the registry does not know is refused, so the registry and skins move together."""
+    assert "visuals" in PANELS
+    skins = {skin.id: skin for skin in load_skins()}
+    assert "visuals" in skins["analyst"].panels
+    assert "visuals" in skins["reviewer"].panels

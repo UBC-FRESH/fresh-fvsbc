@@ -58,6 +58,30 @@ File                What the surface uses it for
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.
 
+The stand visuals
+-----------------
+
+The **visuals** panel draws the stand from two tables in ``FVSOut.db``:
+
+- ``FVS_TreeList_Metric`` is the live stand, one row per tree per period.
+- ``FVS_CutList_Metric`` marks the trees a treatment removed. It is optional: a run that cut nothing
+  does not write it, and the view then shows no cut trees rather than inventing them.
+
+The 2D map and the 3D viewer share **one payload** from ``GET /api/runs/{id}/visuals``. The map is a
+canvas; the 3D view is three.js with orbit and zoom. Both are read-only. Neither is a map in the
+geographic sense:
+
+- **FVS writes no x/y coordinates.** The layout is schematic: each plot (``PtIndex``) gets a square
+  cell, and its trees are spaced on a stable golden-angle spiral ordered by ``TreeIndex``. The same
+  rows always produce the same picture.
+- **The 3D ground is flat.** The per-tree tables carry no terrain, so the viewer draws a ground plane
+  and a grid rather than a surface it cannot support.
+- **Every displayed value comes from the run**: species, DBH, height, TPH, crown ratio, the year, and
+  whether a tree is in the cut list. Only the arrangement is computed.
+
+The three.js runtime is **vendored** under ``static/vendor/three/`` with its MIT licence, and loaded
+only when a caller chooses the 3D view. The 2D map needs no WebGL, and the main shell stays light.
+
 The oracle flag
 ---------------
 
@@ -85,7 +109,8 @@ Skins
 A skin is a JSON manifest listing the panels and actions a role gets. Four ship: ``analyst``, ``carbon``,
 ``reviewer`` and ``tables``. The loader validates every panel and action against a registry and **refuses an
 unknown name rather than dropping it**, because a manifest that silently loses a panel lies about what a
-role can do. ``read_only`` removes every mutating action.
+role can do. ``read_only`` removes every mutating action. The ``analyst`` and ``reviewer`` skins carry
+the ``visuals`` panel; the reviewer sees the same stand read-only.
 
 Endpoints
 ---------
@@ -102,6 +127,8 @@ Endpoints
     exposed tables written, with counts and the flag
 ``GET /api/runs/{id}/tables/{name}``
     one table, paged, with its columns
+``GET /api/runs/{id}/visuals?year=``
+    the schematic stand payload: layout, trees, cut trees, species and the year's summary row
 ``GET /api/runs/{id}/keywords``
     ``run.key`` as text
 ``GET /api/runs/{id}/provenance``
@@ -137,5 +164,8 @@ Not verified
 - **No authentication, and no plan for one in this surface.** That is why a remote bind is refused.
 - **No live progress.** The event stream reports what the run directory holds — running, then complete — and
   does not invent a cycle count the child did not write.
-- **No map.** A run here is a stand, not a land base. The ws4 and fhops front ends have one because their
-  artefacts are spatial; these are not.
+- **No geographic map.** The 2D and 3D views are a schematic stand view over the per-tree tables. They
+  carry no coordinates, no block polygon, no road, and no land base. The ws4 and fhops front ends have a
+  map because their artefacts are spatial; FVS's per-tree tables are not.
+- **No 3D editing.** The viewer orbits and zooms; it does not move a tree, paint terrain, or write a
+  project. That is the Scenario Studio's job, over its own artefacts.
