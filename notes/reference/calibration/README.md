@@ -25,6 +25,8 @@ outside the repository because they carry site identifiers.
 | `w2-species-bec-crosswalk.csv` | Every candidate species, its FVS code or missing status, zones, ratings, and priority |
 | `w2-bec-gap.csv` | Every BC BGC unit, its resolution status, site-series count, PSP coverage, and missing species |
 | `w2-crosswalk.md` | The W2.1 method, counts, and claim boundary |
+| `w2-source-audit.md` | The W2.2 pinned-source audit and go/no-go |
+| `w2-source-gaps.csv` | The component-by-component source gap matrix |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |
