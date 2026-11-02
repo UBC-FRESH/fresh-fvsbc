@@ -27,6 +27,7 @@ from fastapi.staticfiles import StaticFiles
 
 from fresh_fvsbc.outputs import EXPOSED_TABLES, ORACLE_TABLES, STANDALONE_VERIFIED
 from fresh_fvsbc.web import runs as runstore
+from fresh_fvsbc.web import visuals as visualstore
 from fresh_fvsbc.web.skins import load_skins
 
 __all__ = ["create_app", "main"]
@@ -272,6 +273,29 @@ def create_app(
         run = _find(run_id)
         try:
             return runstore.table(run, name, limit=limit, offset=offset)
+        except runstore.RunError as error:
+            raise HTTPException(status_code=404, detail=str(error)) from error
+
+    @app.get("/api/runs/{run_id}/visuals")
+    def run_visuals(run_id: str, year: int | None = Query(None)) -> dict[str, Any]:
+        """Return the schematic 2D and 3D stand payload for one year.
+
+        Parameters
+        ----------
+        run_id : str
+            The run's identifier.
+        year : int, optional
+            The year to draw. The first year in the tree list is used when this is omitted.
+
+        Returns
+        -------
+        dict
+            The layout, the trees, the cut trees, the species counts, and the summary row for the
+            year. A run with no per-tree table answers with ``available`` false and a reason.
+        """
+        run = _find(run_id)
+        try:
+            return visualstore.visuals(run, year)
         except runstore.RunError as error:
             raise HTTPException(status_code=404, detail=str(error)) from error
 
