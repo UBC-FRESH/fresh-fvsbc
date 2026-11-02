@@ -159,8 +159,10 @@ supported variants into 12 calibration domains, fixes the power thresholds and
 the holdouts, and sets the W2–W6 sequence. `domain-plan.csv` carries the counts;
 `w2-upstream-package.md` scopes the upstream work for `CWH`, `CDF`, `BWBS`,
 `CMA`, `MH`, and the 19 subzones the variant does not resolve. `cciss-leads.md`
-records the public CCISS code and data leads: six coastal species, two boreal
-species, and the BEC/site-series tables for the missing subzones.
+records the public CCISS code and data leads: seven high-priority missing
+species (six coastal plus black spruce), the BEC/site-series tables for the
+missing subzones, and the `w2-species-bec-crosswalk.csv` / `w2-bec-gap.csv`
+working tables.
 
 What it does not do
 -------------------

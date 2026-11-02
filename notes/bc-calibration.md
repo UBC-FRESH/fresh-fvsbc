@@ -288,8 +288,7 @@ Acceptance: a coverage and power matrix, an upstream work package with a go/no-g
 gate, a pre-registered validation design, and a workstream proposal that the
 maintainer can approve or reject.
 
-Status: **implemented on `feature/bc-calibration-domain-design`**, pending
-review. The design groups the 47 data-rich supported variants into 12 domains
+Status: **merged** as `1ba4fd2` on 2026-11-02. The design groups the 47 data-rich supported variants into 12 domains
 (10 calibration, 2 validation-only), records the 19 unresolved subzones and the
 32 unsupported-zone variants, and scopes W2. The validation metrics, holdouts,
 and thresholds are fixed before fitting. Human reviewer sign-off is W5; this
