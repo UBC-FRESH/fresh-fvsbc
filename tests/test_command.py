@@ -522,6 +522,8 @@ def test_the_documented_entry_point_exits_one_without_the_extension(tmp_path: Pa
             "FD",
             "--tree-age",
             "60",
+            "--keyword",
+            "STDINFO=CAR,IDFdk3/01",
         ],
         cwd=ROOT,
         capture_output=True,
