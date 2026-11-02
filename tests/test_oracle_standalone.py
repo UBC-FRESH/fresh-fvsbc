@@ -91,7 +91,7 @@ def _main_case() -> tuple[list[TreeListFields], tuple[Keyword, ...]]:
             "STRCLSDB",
             "INVSTATS",
         ),
-        *_common()[:1],
+        *_common()[:2],
         Keyword("SITECODE", ("FD", "15")),
         Keyword(
             "FMIN",
@@ -109,7 +109,7 @@ def _main_case() -> tuple[list[TreeListFields], tuple[Keyword, ...]]:
                 Keyword("SIMFIRE", ("1", "20", "1", "21", "1", "100", "1")),
             ),
         ),
-        *_common()[2:],
+        *_common()[3:],
         Keyword("STRCLASS"),
         Keyword("STATS"),
         Keyword("TREELIST"),
