@@ -1,9 +1,9 @@
 # W3.1 full-domain baseline
 
-Status: first pass complete with the fixed local 0.3.13 build
+Status: first pass complete with the released 0.3.13 build
 Date: 2026-11-03
 Issue: #325
-Build: `fresh-fvsbc-pyfvs 0.3.13` (local; release pending) + `fresh-fvsbc 0.21.1`
+Build: `fresh-fvsbc-pyfvs 0.3.13` + `fresh-fvsbc 0.21.2`
 Inputs: public FAIB PSP extract, four CSV files; raw tree rows stay outside the tracked tree
 
 This is the uncalibrated reference, not a calibration. Each interval is grown from
@@ -105,5 +105,5 @@ finding and the tests.
 - The envelope is empirical and not independent of the training plots.
 - The five unsupported zones are absent; W2.2 recorded them as no-go without a
   parameter source.
-- The fixed binary is **not published yet**. The result is reproducible from the
-  local patch set, but not from PyPI until 0.3.13 is released.
+- The fixed binary is released as `fresh-fvsbc-pyfvs 0.3.13`; the result is
+  reproducible from PyPI with `fresh-fvsbc 0.21.2`.

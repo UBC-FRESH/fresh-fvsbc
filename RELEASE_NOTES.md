@@ -1,10 +1,25 @@
-# fresh-fvsbc 0.21.1
+# fresh-fvsbc 0.21.2
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.21.1
+
+- **The `fvs` extra moves to `fresh-fvsbc-pyfvs 0.3.13`.** The new wheel fixes a pre-existing BEC
+  resolver bug: `KAM` + `MS` contains `MM` across the region/zone boundary, so `MSxk1` resolved as
+  `MSmm`. The fourth build-time patch anchors the subzone token after the zone. The 19 W2.3
+  subzones still resolve, and the `KAM`/`MS` regression is in the CI extension job.
+
+- **W3.1 baseline:** the supported-domain baseline now compares **108 intervals with 0 skipped**,
+  against 89 compared and 19 skipped in W1.4. The aggregate residual tables and
+  `notes/reference/calibration/baseline_v3.md` are in the repository. This is a baseline, not a
+  calibration.
+
+- **Install:** `pip install "fresh-fvsbc[fvs]==0.21.2"`. The `fvs` extra pins
+  `fresh-fvsbc-pyfvs==0.3.13`.
 
 ## What changed since 0.21.0
 
