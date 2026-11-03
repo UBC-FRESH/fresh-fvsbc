@@ -1,0 +1,24 @@
+{
+  "model_id": "sbpsmk-100mile-ingrowth-2026-11-03",
+  "version": "0.1.0",
+  "source": "FAIB PSP tree_detail; all 100 Mile House TSA SBPSmk intervals",
+  "training": {
+    "intervals": 16,
+    "sites": 10,
+    "rate": "mean new-tree TPH per year by species group"
+  },
+  "rates": {
+    "SBPSmk": {
+      "FD": 4.000703,
+      "HW": 13.290868,
+      "PL": 75.711998,
+      "SE": 11.355656
+    }
+  },
+  "claim": "100 Mile-specific recruitment candidate; not a province-wide or certified model.",
+  "build": {
+    "pyfvs": "fresh-fvsbc-pyfvs 0.4.1",
+    "wrapper": "fresh-fvsbc 0.21.3",
+    "variant": "bc"
+  }
+}
