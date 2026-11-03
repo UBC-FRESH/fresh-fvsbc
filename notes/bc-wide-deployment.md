@@ -31,7 +31,7 @@ coefficient quality, not access.
 We do **not** wait for a perfect species model before making the province runnable. We stage it:
 
 - **Stage A — donor-alias prototype.** Keep the 15 `JSP` species. Map the seven missing species to the nearest
-  donor (`Ss`/`Sb`→`SE`, `Ba`→`BG`/`BL`, `Hm`→`HW`, `Yc`→`CW`, `Dr`/`Mb`→`AT`/`AC`). Add the five zone tokens
+  donor (`Ss`/`Sb`→`SE`, `Ba`→`BG`, `Hm`→`HW`, `Yc`→`CW`, `Dr`→`AT`, `Mb`→`AC`). Add the five zone tokens
   and provisional `BAMAX` from the PSP envelope. Build and smoke. This is a **prototype**, not a certificate.
 - **Stage B — true species tables.** Add the seven species to `MAXSP` and every model component only after the
   prototype shows which donor aliases fail. This is a parameter-development task, with the PSP data as the
@@ -48,7 +48,7 @@ This is how the seven supported zones were built: first make it run, then measur
 | --- | --- | --- | --- |
 | D1 | All-zone dataset and envelope | `all-zone` coverage, envelope, species envelope for the five zones; p99/max by BEC | Data builds; five-zone rows exist; no site IDs tracked |
 | D2 | BEC parser and defaults | Five zone tokens and the 32 PSP BEC labels in `habtyp.f`; `BAMAX` cases in `sitset.f`; wrapper `BecCode` | Every label parses; every default is source-backed or explicitly provisional; no 10 m2/ha silent fallback |
-| D3 | Species alias prototype | `bcspp.f` donor mappings for the seven species; crosswalk table with the donor and the reason | Every PSP species in the five zones maps to a code; the mapping is recorded |
+| D3 | Species alias prototype | Wrapper `DONOR_SPECIES` and `bcspp.f` donor mappings for the seven species; crosswalk table with the donor and the reason | Every PSP species in the five zones maps to a code; the mapping is recorded |
 | D4 | Build and smoke | Patched PyFVS/FVS fork; built BC wheel; one case per zone/label | Every smoke case echoes BEC and BAMAX and writes a database; existing zones unchanged |
 | D5 | Provincial baseline | All-zone uncalibrated baseline; residual atlas by BEC/TSA/species/size/density | Initial stand check; envelope flags; every unsupported unit named |
 | D6 | Parameter development | True species tables or accepted donors; mortality/growth/crown/bark/volume/regeneration coefficients with sources | A 50-interval baseline per zone; initial BA MAE no worse than the W1.4 0.93 m2/ha; donor substitutions stated |
@@ -86,7 +86,7 @@ low and are pilot/validation units, not capacity claims.
 ### Week 2 — D2/D3: parser and donor aliases
 
 - Add `CWH`, `CDF`, `BWBS`, `CMA`, `MH` to the BEC parser and the missing subzone tokens.
-- Map the seven high-priority species to donors in `bcspp.f`; record the mapping in `w2-species-bec-crosswalk.csv`.
+- Map the seven high-priority species in the wrapper `DONOR_SPECIES` (and the matching `bcspp.f` donor paths); record the mapping in `w2-species-bec-crosswalk.csv`.
 - Add `BAMAX` cases for the five zones from the D1 p99 values; mark them provisional.
 - Add the wrapper `BecCode` tokens and tests.
 
@@ -101,6 +101,13 @@ species smoke is still `FD`; D3 owns the seven donor aliases and species-specifi
 `w2-five-zone.patch.gz`; it is banked, not in `wheels.yml` or a released pin.
 
 **Deliverable:** the 32-label prototype; see `w2-five-zone-prototype.md`.
+
+**D3 result (2026-11-03):** the wrapper now resolves `Ss`, `Sb`, `Ba`, `Hm`, `Yc`, `Dr`, and `Mb`
+through an explicit `DONOR_SPECIES` table (`SE`, `SE`, `BG`, `HW`, `CW`, `AT`, `AC`). **7/7 species
+smoke pass**: the input code runs, the output `SpeciesFVS` carries the donor, each case echoes its
+five-zone BEC and BAMAX, and each writes a database (`w2-five-zone-species-smoke.csv`). The alias is
+not silent: it is a public mapping, tested, and the output says which donor it used. True species
+tables are D6.
 
 ### Week 3 — D4: build and smoke
 

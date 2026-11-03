@@ -33,6 +33,7 @@ from typing import TypedDict
 
 __all__ = [
     "BC_TREFMT",
+    "DONOR_SPECIES",
     "FIA_CODES",
     "FIELD_DESCRIPTORS",
     "FIELD_NAMES",
@@ -264,6 +265,18 @@ JSP_CODES: tuple[str, ...] = (
     "OH",
 )
 
+#: The seven high-priority BC species the 15-code variant does not carry, and the donor each one
+#: uses until the true species tables land. The output carries the donor code, not the input code.
+DONOR_SPECIES: dict[str, str] = {
+    "SS": "SE",  # Sitka spruce -> spruce group
+    "SB": "SE",  # black spruce -> spruce group
+    "BA": "BG",  # amabilis fir -> grand fir, the nearest true fir
+    "HM": "HW",  # mountain hemlock -> western hemlock
+    "YC": "CW",  # yellow-cedar -> western redcedar
+    "DR": "AT",  # red alder -> trembling aspen, a pioneer broadleaf
+    "MB": "AC",  # bigleaf maple -> black cottonwood, a broadleaf
+}
+
 #: The parallel FIA numeric codes, ``FIAJSP``. ``202`` appears twice, for ``FD`` and for ``OC``.
 FIA_CODES: tuple[str, ...] = (
     "119",
@@ -341,7 +354,8 @@ def resolve_species(code: str) -> str:
     Raises
     ------
     UnknownSpeciesError
-        If the code appears in none of the three lists.
+        If the code appears in none of the three lists and is not a donor alias. The donor aliases
+        are :data:`DONOR_SPECIES`; the caller receives the donor ``JSP`` code, not the input code.
     AmbiguousSpeciesError
         If the code appears at more than one position, which ``202`` does because BC gives it to
         both ``FD`` and ``OC``. An ambiguous code is not resolved to a default.
@@ -350,9 +364,14 @@ def resolve_species(code: str) -> str:
     if key in _AMBIGUOUS_SPECIES:
         candidates = ", ".join(_AMBIGUOUS_SPECIES[key])
         raise AmbiguousSpeciesError(f"species code {code!r} could mean any of {candidates}")
-    if key not in _SPECIES:
-        raise UnknownSpeciesError(f"species code {code!r} is not one of BC's 15 species")
-    return _SPECIES[key]
+    if key in _SPECIES:
+        return _SPECIES[key]
+    if key in DONOR_SPECIES:
+        return DONOR_SPECIES[key]
+    donors = ", ".join(f"{source}->{donor}" for source, donor in sorted(DONOR_SPECIES.items()))
+    raise UnknownSpeciesError(
+        f"species code {code!r} is not one of BC's 15 species and is not a donor alias ({donors})"
+    )
 
 
 class TreeListFields(TypedDict):

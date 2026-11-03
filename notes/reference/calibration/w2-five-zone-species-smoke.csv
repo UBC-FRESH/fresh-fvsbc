@@ -1,0 +1,8 @@
+input_species,donor,bec,bec_echo,bamax_echo_m2ha,species_fvs_out,database,status
+SS,SE,CWHdm,CWHdm/01,112.0,SE,True,OK
+SB,SE,BWBSdk,BWBSdk/01,51.0,SE,True,OK
+BA,BG,CWHdm,CWHdm/01,112.0,BG,True,OK
+HM,HW,CWHdm,CWHdm/01,112.0,HW,True,OK
+YC,CW,CWHdm,CWHdm/01,112.0,CW,True,OK
+DR,AT,CWHdm,CWHdm/01,112.0,AT,True,OK
+MB,AC,CWHdm,CWHdm/01,112.0,AC,True,OK
