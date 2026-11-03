@@ -100,3 +100,33 @@ def test_a_direct_constructor_refuses_an_unsupported_zone() -> None:
     """The value object cannot be built with a zone the variant does not represent."""
     with pytest.raises(BecCodeError, match="zone"):
         BecCode(region="CAR", zone="CWH", subzone="vm1", series="01")
+
+
+@pytest.mark.parametrize(
+    "bec",
+    [
+        "ESSFdh1/01",
+        "ESSFdv1/01",
+        "ESSFmv/01",
+        "ESSFmv1/01",
+        "ESSFmv2/01",
+        "ESSFmv3/01",
+        "ESSFmv4/01",
+        "ESSFvc/01",
+        "ESSFwh1/01",
+        "ESSFwv/01",
+        "ESSFxv2/01",
+        "ICHvc/01",
+        "ICHxw/01",
+        "IDFdh/01",
+        "IDFxw/01",
+        "IDFxx2/01",
+        "MSxv/01",
+        "SBSdh1/01",
+        "SBSun/01",
+    ],
+)
+def test_the_w2_subzones_parse(bec: str) -> None:
+    """The wrapper knows the subzones the W2.3 patch adds to the variant."""
+    code = BecCode.parse(f"CAR {bec}")
+    assert code.pretty == bec

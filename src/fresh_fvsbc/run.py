@@ -481,6 +481,63 @@ def _bec_of(keywords: Sequence[Keyword]) -> BecCode:
     )
 
 
+def _echoed_bec(directory: Path) -> str | None:
+    """Return the BEC in the run's ``STDINFO`` echo, or ``None`` when there is no line.
+
+    Parameters
+    ----------
+    directory : Path
+        The run's directory, which holds ``run.out``.
+
+    Returns
+    -------
+    str or None
+        The code after ``BEC=`` on the first ``STDINFO`` line, without the trailing
+        semicolon. ``None`` when the report or the line is absent.
+    """
+    report = directory / "run.out"
+    if not report.is_file():
+        return None
+    for line in report.read_text(encoding="latin-1").splitlines():
+        if line.lstrip().startswith("STDINFO") and "BEC=" in line:
+            return line.split("BEC=", 1)[1].split()[0].rstrip(";")
+    return None
+
+
+def _refuse_unresolved_bec(directory: Path, bec: BecCode) -> None:
+    """Refuse a run whose build resolved a different BEC from the requested one.
+
+    The wrapper's token list and the variant's ``HABTYP`` list must agree. If the
+    installed extension predates a token, FVS silently falls back to
+    ``ICHmw2/01``, so the run's own echo is the oracle that the code was
+    represented.
+
+    Parameters
+    ----------
+    directory : Path
+        The run's directory.
+    bec : BecCode
+        The BEC the caller requested.
+
+    Raises
+    ------
+    BecCodeError
+        If the run wrote no ``STDINFO`` echo, or it names a different code.
+    """
+    echoed = _echoed_bec(directory)
+    if echoed is None:
+        raise BecCodeError(
+            f"the run wrote no STDINFO BEC= echo, so {bec.pretty} cannot be confirmed; "
+            "the installed BC build may not support it"
+        )
+    if echoed.upper() != bec.pretty.upper():
+        raise BecCodeError(
+            f"FVS resolved the requested BEC {bec.pretty} as {echoed}; the installed BC "
+            "build does not carry this code. Build the variant with the W2.3 patch or use "
+            "a build that resolves it"
+        )
+
+
 def run_case(
     records: Sequence[TreeListFields],
     keywords: Sequence[Keyword],
@@ -525,8 +582,9 @@ def run_case(
     Raises
     ------
     BecCodeError
-        If the set carries no ``STDINFO``, or its first two fields are not a BEC the
-        variant resolves.
+        If the set carries no ``STDINFO``, its first two fields are not a BEC the
+        variant resolves, or the run echoes a different BEC because the installed
+        build does not carry the requested code.
     BundleError
         If the calibration bundle's domain does not cover the run, or the set does
         not carry the keywords the bundle renders.
@@ -567,6 +625,7 @@ def run_case(
     tree_file_name(keyword_file).write_text(write_tree_file(records))
 
     driven = _drive(keyword_file.name, variant=variant, directory=target)
+    _refuse_unresolved_bec(target, bec)
 
     database = database_path(target)
     cases = read_cases(database)

@@ -67,6 +67,7 @@ def a_fake_drive(*, messages: tuple[str, ...] = ()) -> Callable[..., run._Drive]
     """Return a drive that writes the database a real run would write, in the run directory."""
 
     def drive(key_name: str, *, variant: str, directory: Path) -> run._Drive:
+        (directory / "run.out").write_text("STDINFO    BEC=IDFdk3/01     ;\n", encoding="latin-1")
         a_database(directory / run.DATABASE_NAME, messages=messages)
         return run._Drive(summary=pd.DataFrame({"Year": [0, 10]}), variants=("BC",))
 

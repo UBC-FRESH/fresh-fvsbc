@@ -1550,9 +1550,11 @@ carry their species, site-index, mortality, growth, or BEC tables.
 | W6 calibration release | Can a user select a certified bundle and get provenance? | Release, docs, CLI/API surface, and envelope validator |
 
 W1 is complete: parent issue #289, child issues #290 to #295. W2 is active as
-parent issue #310, starting with the CCISS-informed species/BEC crosswalk, W2.1
-#311, on `feature/w2-crosswalk`. The later workstreams are recorded here when
-their predecessor closes.
+parent issue #310: W2.1 #311 built the CCISS-informed species/BEC crosswalk,
+W2.2 #313 audited the pinned source, and W2.3 #315 built and smoke-tested the
+19-subzone patch. The five-zone parameter-development project remains a
+separate decision. The later workstreams are recorded here when their
+predecessor closes.
 
 ### Web visuals
 

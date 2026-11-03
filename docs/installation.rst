@@ -31,7 +31,7 @@ From source
 -----------
 
 If there is no wheel for your platform, the build recipe is ADR 0004 and ADR 0006: clone the pinned
-fork, apply two patch sets, and build. It needs `gfortran`, `meson`, `ninja` and `patchelf`, and it
+fork, apply three patch sets, and build. It needs `gfortran`, `meson`, `ninja` and `patchelf`, and it
 takes a few minutes:
 
 .. code-block:: console
@@ -41,9 +41,14 @@ takes a few minutes:
    $ git -C PyFVS submodule update --init --recursive
    $ gunzip -c notes/reference/pyfvs-patchset.diff.gz  | git -C PyFVS apply -
    $ gunzip -c notes/reference/fvsbc-patchset.diff.gz   | git -C PyFVS/fvs apply -
+   $ gunzip -c notes/reference/calibration/w2-subzones.patch.gz | git -C PyFVS/fvs apply -
    $ SETUPTOOLS_SCM_PRETEND_VERSION=0.3.11 pip install --no-build-isolation ./PyFVS \
        --config-settings=setup-args="-Dfvsvariants=bc"
    $ pip install fresh-fvsbc
+
+The third patch adds the 19 W2.3 subzones and their provisional defaults. Without it the variant still
+builds, but those codes fall back to ``ICHmw2/01``; ``run_case`` refuses that fallback rather than
+returning a plausible run.
 
 
 What you get

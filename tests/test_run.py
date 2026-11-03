@@ -136,13 +136,20 @@ def a_result(directory: Path) -> run.RunResult:
 
 
 def a_fake_drive(
-    *, messages: tuple[str, ...] = (), cases: int = 1, database: bool = True
+    *,
+    messages: tuple[str, ...] = (),
+    cases: int = 1,
+    database: bool = True,
+    echoed_bec: str = "IDFdk3/01",
 ) -> Callable[..., run._Drive]:
     """Return a drive that writes the database a real run would write, in the run directory."""
 
     def drive(key_name: str, *, variant: str, directory: Path) -> run._Drive:
         assert (directory / key_name).is_file()
         assert (directory / Path(key_name).with_suffix(".tre")).is_file()
+        (directory / "run.out").write_text(
+            f"STDINFO    BEC={echoed_bec}     ;\n", encoding="latin-1"
+        )
         if database:
             a_database(directory / run.DATABASE_NAME, cases=cases, messages=messages)
         return run._Drive(summary=pd.DataFrame({"Year": [0, 10]}), variants=("BC",))
@@ -242,6 +249,23 @@ def test_a_run_without_stdinfo_is_refused_before_anything_is_written(tmp_path: P
     with pytest.raises(BecCodeError, match="needs STDINFO"):
         run.run_case([a_tree()], a_set("PROCESS", "STOP"), directory=target)
     assert not target.exists()
+
+
+def test_a_build_that_does_not_resolve_the_bec_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An older build that silently falls back to ``ICHmw2/01`` must not look like a success."""
+    monkeypatch.setattr(run, "_drive", a_fake_drive(echoed_bec="ICHmw2/01"))
+    keywords = (
+        Keyword("STDINFO", ("CAR", "ESSFdh1/01")),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    with pytest.raises(
+        BecCodeError,
+        match=r"resolved the requested BEC ESSFdh1/01 as ICHmw2/01",
+    ):
+        run.run_case([a_tree()], keywords, directory=tmp_path / "run")
 
 
 def test_a_bundle_is_recorded_in_provenance(
