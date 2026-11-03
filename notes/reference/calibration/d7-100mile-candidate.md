@@ -1,6 +1,6 @@
 # D7.8 100 Mile-specific ingrowth candidate
 
-Status: **candidate passes both pre-registered biases on six LOSO folds**; not a bundle or certificate
+Status: **candidate passes the site-grouped LOSO**; temporal holdout D7.9 failed/unavailable; not a bundle or certificate
 Date: 2026-11-03
 Issue: #362
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.3`
@@ -60,7 +60,7 @@ mortality multiplier; the D7.4 diagnosis was right about the mechanism.
 
 ## 5. Next
 
-1. Temporal holdout within 100 Mile (early intervals train, later intervals test).
+1. Temporal holdout within 100 Mile: D7.9 found only one eligible later interval and it fails BA (+33.4%). More data are required.
 2. Freeze the rate model and add it to the bundle schema with an `ESTAB` section.
 3. If the temporal holdout passes, issue a **100 Mile candidate bundle**, still not a certificate.
 

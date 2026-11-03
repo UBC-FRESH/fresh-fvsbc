@@ -1,0 +1,19 @@
+{
+  "model_id": "sbpsmk-100mile-temporal-2026-11-03",
+  "version": "0.1.0",
+  "source": "FAIB PSP tree_detail; 100 Mile intervals starting 1998 or earlier",
+  "training": {
+    "intervals": 10,
+    "sites": 10,
+    "rate": "mean new-tree TPH per year by species group"
+  },
+  "rates": {
+    "SBPSmk": {
+      "FD": 4.000703,
+      "HW": 17.159037,
+      "PL": 124.046818,
+      "SE": 14.711167
+    }
+  },
+  "claim": "Temporal-rate candidate only; not a bundle."
+}
