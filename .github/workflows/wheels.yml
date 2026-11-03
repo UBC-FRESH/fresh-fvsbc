@@ -73,7 +73,7 @@ jobs:
           # meson itself, not only the backend: --no-build-isolation means pip installs no build
           # requirements, so the executable has to be here.
           $PY/pip install -q meson meson-python ninja numpy setuptools_scm auditwheel
-          SETUPTOOLS_SCM_PRETEND_VERSION=0.3.11 $PY/pip wheel \
+          SETUPTOOLS_SCM_PRETEND_VERSION=0.3.12 $PY/pip wheel \
             --no-build-isolation --no-deps ${{ runner.temp }}/PyFVS \
             --config-settings=setup-args="-Dfvsvariants=bc" -w dist
           # Without this the wheel only runs where gfortran is installed, which is the problem it
