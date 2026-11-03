@@ -1,6 +1,6 @@
 # ADR 0006: The build recipe is two patch sets
 
-Status: accepted on 2026-10-23; extended by the W2.3 patch set on 2026-11-03 (see below).
+Status: accepted on 2026-10-23.
 Date: 2026-10-23
 Issues: #18 (P3.1)
 Refines: ADR 0004
@@ -57,19 +57,6 @@ SETUPTOOLS_SCM_PRETEND_VERSION=0.3.11 python -m pip install --no-build-isolation
 
 CI applies both, with `git apply --check` before each, in the job `P3.1` added. ADR 0004's twelve items
 and its reasoning stand; only its rebuild instructions are superseded, and its status line points here.
-
-## W2.3 extension (2026-11-03)
-
-W2.3 adds a **third patch set**, `notes/reference/calibration/w2-subzones.patch.gz`, applied inside the
-FVS source submodule **after** `fvsbc-patchset.diff.gz`. It adds ten subzone tokens, widens the
-`HABTYP` search loop to reach them, and gives the 19 subzones a provisional default maximum basal
-area. The loop is the load-bearing half: the first build widened only the array, so every new code
-still fell back to `ICHmw2/01`.
-
-CI's build job, the `wheels` workflow, and `docs/installation.rst` apply the third patch with
-`git apply --check` first. The first two patch sets and their reasoning stand; a build without the
-third still compiles, but it cannot resolve the 19 subzones, and `run_case` refuses the fallback. The
-build and smoke evidence is `notes/reference/calibration/w2-subzone-patch.md`.
 
 ## Consequences
 
