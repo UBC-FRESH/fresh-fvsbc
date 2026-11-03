@@ -1,11 +1,13 @@
 # W2.3 subzone patch
 
-Status: patch prepared and apply-checked; not built or pinned
-Date: 2026-11-02
+Status: built and smoke-tested; banked as the third build-time patch set; wheel `0.3.12` not published
+Date: 2026-11-03
 Patch: `w2-subzones.patch.gz`
 Defaults: `w2-subzone-defaults.csv`
 Audit: `w2-source-audit.md`
-Pins: FVS `ef5fa8470cc89f81ca445e7c906e274f200e80fd`; PyFVS `e95172b`
+Base pins: FVS `ef5fa8470cc89f81ca445e7c906e274f200e80fd`; PyFVS `e95172b`
+Patch SHA-256: `ee019bbede50b75edd6066b6f3bc9d3554d846aa6a0b1bb432f2de442b157ce3`
+Wheel version: `fresh-fvsbc-pyfvs 0.3.12` (built, not published)
 
 This is the bounded W2.3 change from the audit. It adds the 19 supported-zone
 subzones with PSP data to the parser and gives each a **provisional** default
@@ -16,12 +18,14 @@ maximum basal area. It does not add the five zones or any species.
 `w2-subzones.patch.gz` changes two files:
 
 - `canada/bc/habtyp.f`: `SZ` grows from 19 to 29 and gains `DH`, `DV`, `MV`,
-  `VC`, `WH`, `WV`, `XV`, `XW`, `XX`, `UN`.
+  `VC`, `WH`, `WV`, `XV`, `XW`, `XX`, `UN`. **`HABTYP`'s loop must grow too**:
+  the first patch left `DO I = 1,19`, so the ten new tokens were never searched;
+  the corrected patch uses `DO I = 1,29`.
 - `canada/bc/sitset.f`: adds default `BAMAX` cases for the 19 subzones.
 
-The patch was generated against the pinned source and `git apply --check`
-passes after decompression. It is not committed to the FVS fork yet, and the BC variant has not been
-rebuilt from it.
+The patch is generated against the pinned source and applies after the two
+existing patch sets (ADR 0006). It is banked here as the **third build-time
+patch set**; the FVS source pin does not move (ADR 0013).
 
 ## 2. The 19 subzones
 
@@ -59,47 +63,53 @@ source and W4 owns the final capacity decision.
   default; SBS uses ICH except `SBSdw2`, and SBPS uses IDF.
 - It does not remove the 10 m²/ha fallback for a unit outside these cases. The
   19 subzones avoid it; another unit can still reach it.
-- It does not build or pin the fork. That is the next step.
+- It does not publish the wheel or move the `fvs` extra pin. W2.3 closes when
+  `fresh-fvsbc-pyfvs 0.3.12` is published and the wrapper accepts the subzones.
 
-## 4. Build and smoke plan
+## 4. Build and smoke evidence
+
+Built on 2026-11-03 from a clean PyFVS checkout at `e95172b` with the FVS source
+at `ef5fa847`, applying all three patch sets:
 
 ```bash
-# 1. a clean PyFVS fork at the pin
 git clone https://github.com/UBC-FRESH/PyFVS
 git -C PyFVS checkout e95172b
 git -C PyFVS submodule update --init --recursive
-
-# 2. apply the W2.3 patch to the FVS source submodule
-gunzip -c w2-subzones.patch.gz > /tmp/w2-subzones.patch
-git -C PyFVS/fvs apply /tmp/w2-subzones.patch
-
-# 3. build the BC variant
-SETUPTOOLS_SCM_PRETEND_VERSION=0.3.11 \
-  python -m pip install --no-build-isolation ./PyFVS \
+gunzip -c pyfvs-patchset.diff.gz  | git -C PyFVS apply -
+gunzip -c fvsbc-patchset.diff.gz  | git -C PyFVS/fvs apply -
+gunzip -c w2-subzones.patch.gz    | git -C PyFVS/fvs apply -
+SETUPTOOLS_SCM_PRETEND_VERSION=0.3.12 \
+  python -m pip wheel --no-build-isolation --no-deps ./PyFVS \
   --config-settings=setup-args="-Dfvsvariants=bc"
-
-# 4. for each subzone, run one case with STDINFO=CAR,<bec>/01,...
-#    and read run.out for:
-#      STDINFO    BEC=<bec>/01
-#      MAXIMUM BASAL AREA FOR <bec>/01 IS SET BY DEFAULT TO: <value> SQ M/HA
 ```
 
-Smoke cases:
+The wheel built and imported, and `pyfvs.list_variants()` reported
+`{'BC': {'lib': 'pyfvs.fvsbc', 'status': 'OK'}}`.
 
-- 19 subzones, one case each.
-- The existing seven zones, one case each.
-- The official case, unchanged.
+**19/19 subzones pass**: each echoed its own BEC and the expected provisional
+`BAMAX`, and each wrote a database. The existing-zone controls were unchanged:
+`ESSFdk/01` 64, `ICHmw2/01` 89, `IDFdk3/01` 53, `MSdm1/01` 63, `PPxh2/01` 32,
+`SBSmc2/01` 55, `SBPSmk/01` 55.
 
-Acceptance for the build step:
+The first build **failed the subzone smoke** because `HABTYP` still looped to
+19; `ESSFdh1/01` echoed `ICHmw2/01`. The loop fix is why the corrected patch is
+the banked one.
 
-- Every subzone echoes its code.
-- The default BAMAX echo matches `w2-subzone-defaults.csv`.
-- Every smoke run writes a database.
-- The existing case is unchanged.
-- The new FVS and PyFVS pins are recorded here, and the patch set is banked.
+## 5. Pins and release state
 
-## 5. Claim boundary
+- FVS base pin: `ef5fa8470cc89f81ca445e7c906e274f200e80fd` (unchanged).
+- PyFVS base pin: `e95172b` (unchanged).
+- Third patch: `w2-subzones.patch.gz`, SHA-256 above.
+- Wheel built: `fresh-fvsbc-pyfvs 0.3.12`; not published.
+- `pyproject.toml`'s `fvs` extra remains `0.3.11` until `0.3.12` is published.
+- The wrapper's new `SUBZONES` tokens must land **with** the `0.3.12` pin, not
+  before it; `0.3.11` does not carry the patch and would fall back to `ICHmw2/01`.
 
-This is a patch and a plan. The variant does not yet resolve the subzones in a
-released build. The defaults are provisional and the mortality model is still
-the existing default. W4 calibrates; W2.3 only makes the subzone representable.
+CI and `wheels.yml` apply the third patch and build `0.3.12`; `docs/installation`
+names the three-patch recipe. ADR 0013 records the decision.
+
+## 6. Claim boundary
+
+This is a patch and a build, not a released pin and not a calibration. The
+defaults are provisional and the mortality model is still the existing default.
+W4 calibrates; W2.3 only makes the subzone representable.

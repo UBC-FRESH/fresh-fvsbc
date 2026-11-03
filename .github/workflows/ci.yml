@@ -97,15 +97,18 @@ jobs:
         run: |
           gunzip -c notes/reference/pyfvs-patchset.diff.gz > "$RUNNER_TEMP/pyfvs.patch"
           gunzip -c notes/reference/fvsbc-patchset.diff.gz > "$RUNNER_TEMP/fvsbc.patch"
+          gunzip -c notes/reference/calibration/w2-subzones.patch.gz > "$RUNNER_TEMP/w2-subzones.patch"
           git -C "$RUNNER_TEMP/PyFVS" apply --check "$RUNNER_TEMP/pyfvs.patch"
           git -C "$RUNNER_TEMP/PyFVS" apply "$RUNNER_TEMP/pyfvs.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/fvsbc.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/fvsbc.patch"
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/w2-subzones.patch"
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/w2-subzones.patch"
 
       - name: Build the BC variant
         working-directory: ${{ runner.temp }}/PyFVS
         env:
-          SETUPTOOLS_SCM_PRETEND_VERSION: "0.3.11"
+          SETUPTOOLS_SCM_PRETEND_VERSION: "0.3.12"
         run: |
           python -m pip install --no-build-isolation . \
             --config-settings=setup-args="-Dfvsvariants=bc"
