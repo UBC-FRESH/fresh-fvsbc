@@ -16,6 +16,7 @@ from fresh_fvsbc.keywords import Keyword
 
 __all__ = [
     "eligible_intervals",
+    "ingrowth_keyword",
     "insert_parameters",
     "parameter_keywords",
     "summarise_probe",
@@ -181,3 +182,51 @@ def summarise_probe(
         )
         .reset_index()
     )
+
+
+def ingrowth_keyword(
+    *,
+    bec: str,
+    years: float,
+    rates: Mapping[str, Mapping[str, float]],
+    scale: float = 1.0,
+) -> Keyword | None:
+    """Build an ``ESTAB`` natural-regeneration block from annual rates.
+
+    Parameters
+    ----------
+    bec : str
+        The BEC label that selects the rate row.
+    years : float
+        The projection interval length, in years.
+    rates : Mapping of str to Mapping of str to float
+        BEC label to species code to annual recruitment, in trees per hectare
+        per year.
+    scale : float, optional
+        A multiplier on the annual rate, used for sensitivity.
+
+    Returns
+    -------
+    Keyword or None
+        An ``ESTAB`` block with one ``NATURAL`` line per species, or ``None``
+        when the BEC has no positive rate.
+
+    Raises
+    ------
+    ValueError
+        If ``years`` or ``scale`` is negative.
+    """
+    if years < 0:
+        raise ValueError("years must not be negative")
+    if scale < 0:
+        raise ValueError("scale must not be negative")
+    lines: list[Keyword] = []
+    for species, rate in rates.get(bec, {}).items():
+        tph = float(rate) * years * scale
+        if tph <= 0:
+            continue
+        # NATURAL reads trees per acre; 1 TPH = 0.404686 TPA.
+        lines.append(Keyword("NATURAL", ("1", species, f"{tph * 0.404686:.1f}", "100.0")))
+    if not lines:
+        return None
+    return Keyword("ESTAB", nested=tuple(lines))

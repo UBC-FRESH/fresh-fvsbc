@@ -12,6 +12,7 @@ import pytest
 import run_calibration_probe as probe
 from fresh_fvsbc.calibration_probe import (
     eligible_intervals,
+    ingrowth_keyword,
     insert_parameters,
     parameter_keywords,
     summarise_probe,
@@ -220,3 +221,20 @@ def test_probe_main_refuses_missing_data_and_empty_tree_rows(
     monkeypatch.setattr(probe, "_read_trees", lambda *_args, **_kwargs: pd.DataFrame({"x": [1]}))
     monkeypatch.setattr(probe, "psp_tree_records", lambda *_args, **_kwargs: ([], 0))
     assert probe.main(["--data-dir", str(data), *base]) == 2
+
+
+def test_ingrowth_keyword_builds_natural_regeneration() -> None:
+    """A BEC rate becomes one NATURAL line per species, in TPA."""
+    keyword = ingrowth_keyword(
+        bec="IDFdk3", years=10.0, rates={"IDFdk3": {"FD": 56.6, "PL": 5.1}}, scale=1.0
+    )
+    assert keyword is not None
+    assert keyword.name == "ESTAB"
+    assert [line.name for line in keyword.nested] == ["NATURAL", "NATURAL"]
+    assert keyword.nested[0].parameters == ("1", "FD", "229.1", "100.0")
+    assert keyword.nested[1].parameters == ("1", "PL", "20.6", "100.0")
+
+
+def test_ingrowth_keyword_returns_none_without_a_rate() -> None:
+    """A BEC with no recruitment does not add an empty ESTAB block."""
+    assert ingrowth_keyword(bec="IDFdk3", years=10.0, rates={}) is None
