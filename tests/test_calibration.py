@@ -158,7 +158,11 @@ def test_build_writes_the_tables_and_the_manifest(tmp_path: Path) -> None:
     assert manifest["rows"]["intervals"] == 3
     assert manifest["rows"]["tree_survival"] == 6
     assert manifest["rows"]["species_envelope"] > 0
-    assert manifest["parameters"] == {"min_years": 2, "max_years": 40}
+    assert manifest["parameters"] == {
+        "min_years": 2,
+        "max_years": 40,
+        "include_unsupported": False,
+    }
     assert manifest["archive"] == "psp"
 
 
@@ -238,6 +242,28 @@ def test_the_command_refuses_a_missing_archive(
     code = cli.main(["--psp-dir", str(tmp_path / "absent"), "--out-dir", str(tmp_path / "out")])
     assert code == cli.EXIT_BAD_INPUT
     assert "faib_header.csv" in capsys.readouterr().err
+
+
+def test_all_zones_adds_the_unsupported_zone_to_the_tree_tables(tmp_path: Path) -> None:
+    """The all-zone build reads CWH trees, visits, and envelope rows, not only the counts."""
+    archive = _write_archive(tmp_path)
+    dataset = build_dataset(archive, tmp_path / "out", include_unsupported=True)
+
+    assert "CWHvm1" in set(dataset.visits["BEC"])
+    assert "CWHvm1" in set(dataset.envelope["BEC"])
+    assert dataset.manifest["parameters"]["include_unsupported"] is True
+
+
+def test_the_command_accepts_the_all_zones_flag(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The command exposes the all-zone path."""
+    archive = _write_archive(tmp_path)
+    code = cli.main(["--psp-dir", str(archive), "--out-dir", str(tmp_path / "out"), "--all-zones"])
+    assert code == cli.EXIT_OK
+    manifest = json.loads((tmp_path / "out" / "manifest.json").read_text())
+    assert manifest["parameters"]["include_unsupported"] is True
+    assert "all" not in capsys.readouterr().err.lower()
 
 
 def test_species_crosswalk_accepts_a_frame_with_one_known_code() -> None:

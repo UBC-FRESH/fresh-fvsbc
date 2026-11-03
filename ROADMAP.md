@@ -1549,12 +1549,26 @@ carry their species, site-index, mortality, growth, or BEC tables.
 | W5 independent validation | Does each bundle transfer to held-out sites, TSAs, and years? | Certificates with a claim boundary per domain |
 | W6 calibration release | Can a user select a certified bundle and get provenance? | Release, docs, CLI/API surface, and envelope validator |
 
-W1 is complete: parent issue #289, child issues #290 to #295. W2 is active as
-parent issue #310: W2.1 #311 built the CCISS-informed species/BEC crosswalk,
+W1 is complete: parent issue #289, child issues #290 to #295. W2 is complete:
+parent issue #310; W2.1 #311 built the CCISS-informed species/BEC crosswalk,
 W2.2 #313 audited the pinned source, and W2.3 #315 built and smoke-tested the
-19-subzone patch. The five-zone parameter-development project remains a
-separate decision. The later workstreams are recorded here when their
-predecessor closes.
+19-subzone patch. The 19 subzones ship in `fresh-fvsbc-pyfvs 0.3.12` and
+`fresh-fvsbc 0.21.1`. The five zones are **not** a separate no-go decision; they
+are work packages in the BC-wide deployment below.
+
+### BC-wide deployment
+
+The goal is a runnable, calibrated, validated FVS-BC for **every BC BEC unit and
+every provincial tree species**, with a wheel, provenance, and an envelope
+validator. The plan is `notes/bc-wide-deployment.md`; the parent issue is #326;
+the first task is D1 #327 on `feature/bc-wide-deployment`.
+
+D1 is done: the all-zone PSP build read **7,341 sites, 23,956 visits, 3,205,741
+tree rows**, and produced **17,151 intervals and 1,814,527 tree-survival rows**
+across all **153 BEC variants**. The five zones now have envelope rows and 32
+provisional `BAMAX` candidates in
+`notes/reference/calibration/w2-five-zone-defaults.csv`. Next: D2 parser and
+defaults, D3 species donor aliases, D4 build/smoke, D5 provincial baseline.
 
 ### Web visuals
 
