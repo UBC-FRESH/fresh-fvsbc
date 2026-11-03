@@ -1,6 +1,10 @@
 # D6.3 small-tree output path
 
-Status: the fitted growth is normal; the explosion is in the DBH/output state, not the DG equation
+Status: the fitted growth is normal; the explosion is in the DBH/output state, not the DG equation.
+**D6.4 update:** the bad DBH state is written earlier, in `REGENT`. The SBPS zone took the
+exponential IDF/ICH small-tree height branch and produced `HTGRL=Infinity`; D6.4 fixes the
+`SBS`/`SBPS` model selection. See `d6-sbps-small-tree.md`. The output-path instrument below is
+therefore no longer the next step.
 Date: 2026-11-03
 Issue: #341
 Build: local `fresh-fvsbc-pyfvs 0.4.0` with temporary debug writes, reverted after the run
@@ -61,6 +65,10 @@ same bad state being used by two consumers.
 Instrument `DBH`, `DG`, and `HT` immediately before and after the tripling and `DGBND` calls, and at
 the start of the output write, for the same one-tree case. Compare the original record with the two
 triples. That will name the write that turns a 0.38 increment into 439.
+
+D6.4 found the upstream write: `REGENT` computed `HTGRL=Infinity` for the SBPS small tree, and
+the `SBPS` model-selection fix removes that seed before the output path. The output instrument was
+not run further.
 
 No parameter is changed. The debug writes are not committed; the source is restored after the run.
 

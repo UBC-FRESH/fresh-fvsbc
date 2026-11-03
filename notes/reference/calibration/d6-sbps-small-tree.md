@@ -1,4 +1,4 @@
-# D6 — the SBPS small-tree overflow and its fix
+# D6.4 — the SBPS small-tree overflow and its fix
 
 Status: fixed locally; the fix is banked as `w4-sbps-small-tree.patch.gz` and built as local
 `fresh-fvsbc-pyfvs 0.4.1`. It is **not published** and no wrapper pin moves yet.
