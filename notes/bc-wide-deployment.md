@@ -177,6 +177,16 @@ is not a lever: FVS reports `SITE INDEX IS NOT USED IN THIS VARIANT`, and the `S
 treatment. The reusable probe is `scripts/run_calibration_probe.py`; the report is
 `d7-sbps-readiness.md`. **No parameter changed and no bundle is issued.**
 
+**D7.3 IDFdk readiness result (2026-11-03):** the default `BAMAX 53` is already close on BA, but not
+TPH. On a 100 Mile House TSA spatial holdout (7 intervals; 22 train), the default held-out BA bias is
+**-1.90 / MAE 1.93** (within target), while the TPH bias is **-487.8 / MAE 518.4 (-20.6%)** (outside
+the 15% target). Raising `BAMAX` from 45 to 60 changes held-out TPH by only ~57 trees/ha; the KC v2c
+multipliers are much worse (BA -8.90, TPH -946.2). The only candidate inside the TPH threshold,
+`BAMAX 60` plus `MORTMULT 0.3`, uses mortality below the soft 0.5 range; at `MORTMULT 0.5` the TPH
+bias is -16.3% and fails. **No IDFdk bundle.** The next step is a full-sample fit with `MORTMSB` or
+explicit ingrowth, keeping the 100 Mile House TSA as an untouched holdout and reporting IDFdk3
+separately. See `d7-idfdk-readiness.md`.
+
 ## 5. Data and methods
 
 ### Data
