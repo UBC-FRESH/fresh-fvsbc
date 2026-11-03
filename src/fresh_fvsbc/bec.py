@@ -77,6 +77,16 @@ SUBZONES: tuple[str, ...] = (
     "XH",
     "XK",
     "XM",
+    "DH",
+    "DV",
+    "MV",
+    "VC",
+    "WH",
+    "WV",
+    "XV",
+    "XW",
+    "XX",
+    "UN",
 )
 
 _ZONE_PATTERN: str = "|".join(SUPPORTED_ZONES)

@@ -1,6 +1,6 @@
 # W2 upstream work package
 
-Status: scoped, not started
+Status: W2.3 built and smoke-tested; the five-zone parameter project is not started
 Date: 2026-11-02
 Parent design: `full-domain-design.md`
 Scope: make the BC variant resolve the five zones and the 19 subzones it does not
@@ -72,14 +72,27 @@ The default-BA fallback is 10 m2/ha (`sitset.f` 244–250); it must not be used
 for a new unit. The mortality table is ICH/IDF only; ESSF/MS/PP already default
 to ICH, and SBS to ICH except `SBSdw2` to IDF.
 
-## 1.4 W2.3 patch prepared
+## 1.4 W2.3 patch built and smoke-tested
 
 `w2-subzone-patch.md` carries the bounded patch for the 19 subzones with PSP
-data: `habtyp.f` gains 10 subzone tokens, and `sitset.f` gains a provisional
-`BAMAX` case for each subzone from the PSP p99. The patch applies to the pinned
-source (`git apply --check` passes) and is banked in `w2-subzones.patch.gz`.
-It is **not built or pinned**; the PyFVS fork build and the 19 smoke cases are
-the next step. ESSF/MS still use the V2/ICH mortality default.
+data: `habtyp.f` gains 10 subzone tokens and widens the subzone search loop,
+and `sitset.f` gains a provisional `BAMAX` case for each subzone from the PSP
+p99. The wrapper's `BecCode` now accepts the same 10 tokens. The patch applies
+after the base `fvsbc-patchset.diff.gz` to a clean `ef5fa847` worktree and is
+banked in `w2-subzones.patch.gz`.
+
+The BC variant was built from PyFVS `e95172b` with the three banked patch sets,
+and all 19 smoke cases resolved their code, wrote a database, and echoed the
+expected default BAMAX value. The official case matched its oracle. `run_case`
+now checks the run's `STDINFO BEC=` echo, so a build without the patch raises
+`BecCodeError` instead of silently using `ICHmw2/01`. The build and the echo
+caveat are recorded in `w2-subzone-patch.md`; the per-case evidence is
+`w2-subzone-smoke.csv`.
+
+For ESSF and `MSxv`, the BAMAX line names `MSdk/01` because `BECSET` rewrites
+`BEC%PrettyName` for a subzone without a V2 parameter set; the value is the new
+case and the `STDINFO BEC=` line is correct. ESSF/MS still use the V2/ICH
+mortality default. The five zones and the seven missing species remain out.
 
 ## 2. Work package
 
