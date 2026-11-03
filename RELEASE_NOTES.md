@@ -1,10 +1,21 @@
-# fresh-fvsbc 0.21.3
+# fresh-fvsbc 0.21.4
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.21.3
+
+- **The wrapper accepts the five prototype zones.** `CWH`, `CDF`, `BWBS`, `CMA`, and `MH` join the
+  accepted BEC grammar, along with the subzone tokens `DS`, `MS`, `VH`, `VM`, and `WS`. A case in one
+  of those zones now reaches the W2.5 extension parser instead of being refused by the wrapper.
+- **The `fvs` extra remains `fresh-fvsbc-pyfvs 0.4.1`.** That wheel already carries the five-zone
+  parser; no new extension build is required for this change.
+- **Calibration is not implied.** IDFdk and SBS have unsigned pilot models; CWH is a screening result
+  with a failing BA plane; the five-zone wrapper support is not a certification.
+- **Install:** `pip install "fresh-fvsbc[fvs]==0.21.4"`.
 
 ## What changed since 0.21.2
 

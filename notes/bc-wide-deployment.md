@@ -99,9 +99,8 @@ subzone search matched inside the zone name (`CWH` contains `WH`, `MH` contains 
 search matched a subzone (`CWHms` contains `MS`). The parser is now anchored to the grammar. The
 species smoke is still `FD`; D3 owns the seven donor aliases and species-specific cases. The patch is
 `w2-five-zone.patch.gz` and the D6 `w4-sbps-small-tree.patch.gz` are now applied by the CI/wheel
-recipe, which builds `0.4.1`; that wheel is released in `0.21.3`, but the wrapper still refuses the
-five zones. The build recipe and the wrapper tokens are therefore a release task, not evidence that the
-zones are deployed.
+recipe, which builds `0.4.1`; the wrapper accepts the five zones from `0.21.4`. That is deployment
+plumbing, not evidence that the zones are calibrated.
 
 **Deliverable:** the 32-label prototype; see `w2-five-zone-prototype.md`.
 
@@ -161,7 +160,7 @@ yet**: the residuals are a broad growth underprediction, so `Ba`→`BG` and `Hm`
 D7 candidates only after the shared growth path is tested. See `d6-five-zone-baseline.md`.
 
 **Deliverable:** D6 evidence is complete for the SBPS fix and the five-interval five-zone baseline;
-the SBPS wheel is released in `0.21.3`; the five-zone wrapper tokens remain unreleased.
+the SBPS wheel is released in `0.4.1`; the five-zone wrapper tokens are released in `0.21.4`.
 
 ### Week 4 — D7: calibration and validation
 
@@ -201,9 +200,18 @@ an `ingrowth` section and renders `ESTAB` with provenance. The 100 Mile holdout 
 Kamloops spatial holdout (TPH +14.1%) and a temporal ≤1990 split (TPH +14.7%); both pass the 15%
 bias threshold. Two-cycle establishment writes 8 `NATURAL` events and holds test TPH at -8.6%.
 The all-zone screening improves CWH/BWBS/ICH/IDF/MS TPH bias but over-recruits SBPS/SBS/PP, which
-need domain fits; the five-zone run uses the local parser only. A BA/QMD-binned model improves the
-100 Mile test TPH from -8.7% to -4.3%. This is still a pilot, not a certificate. See
-`d7-consolidation.md`.
+need domain fits. A BA/QMD-binned model improves the 100 Mile test TPH from -8.7% to -4.3%. This is
+still a pilot, not a certificate. See `d7-consolidation.md`.
+
+**D7.7 SBS pilot (2026-11-03):** `MORTMULT 2.0` for FD/PL/SE/HW, no ingrowth, passes the 100 Mile
+House TSA holdout (BA -1.8%, TPH +3.7%); `d7-sbs-bundle.json` is an unsigned pilot.
+
+**D8 five-zone wrapper and CWH screen (2026-11-03):** `CWH`, `CDF`, `BWBS`, `CMA`, and `MH` now
+parse in the wrapper, with the missing subzone tokens. A real CWH run reaches the extension parser;
+no monkeypatch is needed. CWH calibration does **not** pass: baseline test BA is -11.10 m2/ha
+(-17.4%), ingrowth leaves it unchanged, and `MORTMULT 0.25` still leaves -7.00 (-11.0%) while TPH
+passes at -4.4%. The BA miss is growth/capacity, not recruitment; **no CWH bundle** is issued.
+See `d7-cwh-screen.md`.
 
 ## 5. Data and methods
 

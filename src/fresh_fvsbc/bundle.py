@@ -538,8 +538,8 @@ def _domain(record: Mapping[str, object]) -> BundleDomain:
 
 def _parameters(value: object) -> tuple[BundleParameter, ...]:
     """Validate the parameter list."""
-    if not isinstance(value, list) or not value:
-        raise BundleError("parameters must be a non-empty list")
+    if not isinstance(value, list):
+        raise BundleError("parameters must be a list")
     parameters: list[BundleParameter] = []
     for index, item in enumerate(value):
         if not isinstance(item, Mapping):

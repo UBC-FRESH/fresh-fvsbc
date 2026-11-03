@@ -425,6 +425,8 @@ def fit_rates(
     version: str = "0.0.0",
     ba_bins: Sequence[float] = (),
     qmd_bins: Sequence[float] = (),
+    statistic: str = "mean",
+    max_rate: float | None = None,
 ) -> IngrowthModel:
     """Fit mean annual recruitment by BEC, species group, and optional bins.
 
@@ -441,6 +443,13 @@ def fit_rates(
         absent.
     qmd_bins : sequence of float, optional
         Initial-QMD boundaries in cm, low to high.
+    statistic : {"mean", "median"}, optional
+        How to summarize interval rates. The median is robust to a single
+        disturbance interval; the mean remains the default for compatibility.
+    max_rate : float, optional
+        Cap each interval's annual rate before summarizing. Use it when a
+        measured interval is a partial cut or a regeneration event rather than
+        ordinary ingrowth. The cap is in trees per hectare per year.
 
     Returns
     -------
@@ -456,6 +465,10 @@ def fit_rates(
     missing = required - set(table.columns)
     if missing:
         raise ValueError(f"the recruitment table lacks {', '.join(sorted(missing))}")
+    if statistic not in {"mean", "median"}:
+        raise ValueError("statistic must be 'mean' or 'median'")
+    if max_rate is not None and max_rate <= 0:
+        raise ValueError("max_rate must be positive")
     if len(set(ba_bins)) != len(ba_bins) or list(ba_bins) != sorted(ba_bins):
         raise ValueError("ba_bins must be strictly increasing")
     if len(set(qmd_bins)) != len(qmd_bins) or list(qmd_bins) != sorted(qmd_bins):
@@ -464,6 +477,8 @@ def fit_rates(
     groups = ("FD", "PL", "SE", "HW")
     for group in groups:
         frame[f"rate_{group}"] = frame[f"new_{group}"] / frame["years"].where(frame["years"] > 0)
+        if max_rate is not None:
+            frame[f"rate_{group}"] = frame[f"rate_{group}"].clip(upper=max_rate)
     if ba_bins:
         frame["ba_bin"] = pd.cut(frame["ba0"], bins=[*ba_bins, 999.0], right=False, labels=False)
     else:
@@ -474,7 +489,7 @@ def fit_rates(
         frame["qmd_bin"] = 0
     grouped = frame.groupby(["BEC", "ba_bin", "qmd_bin"], sort=True)[
         [f"rate_{group}" for group in groups]
-    ].mean()
+    ].agg(statistic)
     rows: list[dict[str, object]] = []
     for index, values in grouped.iterrows():
         bec, ba_bin, qmd_bin = cast(tuple[str, int, int], index)
@@ -502,9 +517,11 @@ def fit_rates(
                 )
     if not rows:
         raise ValueError("no positive recruitment rate was found")
-    method = "mean annual new-tree TPH by BEC/species"
+    method = f"{statistic} annual new-tree TPH by BEC/species"
     if ba_bins or qmd_bins:
         method += " and initial BA/QMD bin"
+    if max_rate is not None:
+        method += f"; capped at {max_rate:g} TPH/year"
     return IngrowthModel.from_record(
         {
             "model_id": model_id,

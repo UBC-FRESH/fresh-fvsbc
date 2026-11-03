@@ -206,6 +206,40 @@ def test_estab_skips_a_rate_that_rounds_to_zero() -> None:
         model.estab_keyword(bec="IDFdk3", years=1.0, cycles=0)
 
 
+def test_fit_rates_can_use_a_median_and_cap_an_outlier() -> None:
+    """A disturbance interval does not dominate a robust fit."""
+    from fresh_fvsbc.ingrowth import fit_rates
+
+    table = pd.DataFrame(
+        {
+            "BEC": ["IDFdk3", "IDFdk3"],
+            "years": [10.0, 10.0],
+            "ba0": [20.0, 20.0],
+            "qmd": [10.0, 10.0],
+            "new_FD": [100.0, 10.0],
+            "new_PL": [0.0, 0.0],
+            "new_SE": [0.0, 0.0],
+            "new_HW": [0.0, 0.0],
+        }
+    )
+    median = fit_rates(table, statistic="median")
+    capped = fit_rates(table, statistic="median", max_rate=5.0)
+    assert median.selected("IDFdk3", 20.0, 10.0) == {"FD": 5.5}
+    assert capped.selected("IDFdk3", 20.0, 10.0) == {"FD": 3.0}
+
+
+def test_fit_rates_refuses_an_unknown_statistic_or_bad_cap() -> None:
+    """The robust-fit controls are validated before the groupby."""
+    from fresh_fvsbc.ingrowth import fit_rates, recruitment_table
+
+    intervals, trees = _recruitment_frames()
+    table = recruitment_table(intervals, trees)
+    with pytest.raises(ValueError, match="statistic"):
+        fit_rates(table, statistic="mode")
+    with pytest.raises(ValueError, match="max_rate"):
+        fit_rates(table, max_rate=0.0)
+
+
 def test_recruitment_and_fit_refuse_bad_inputs() -> None:
     """The builders name a missing column or an invalid bin order."""
     from fresh_fvsbc.ingrowth import fit_rates, recruitment_table
@@ -218,6 +252,8 @@ def test_recruitment_and_fit_refuse_bad_inputs() -> None:
         fit_rates(table.drop(columns="new_FD"))
     with pytest.raises(ValueError, match="increasing"):
         fit_rates(table, ba_bins=(25.0, 15.0))
+    with pytest.raises(ValueError, match="increasing"):
+        fit_rates(table, qmd_bins=(12.0, 6.0))
 
 
 def test_rates_from_mean_round_trips() -> None:
