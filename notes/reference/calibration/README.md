@@ -40,6 +40,7 @@ outside the repository because they carry site identifiers.
 | `w3-bec-boundary.md` | The W3.1 `KAM`+`MS` boundary finding and fix |
 | `d6-sbps-growth.md` | The D6.1 SBPS diameter-growth diagnosis and next instrument |
 | `d6-small-tree-growth.md` | The D6.2 small-tree growth threshold, one-tree matrix, and corrected build comparison |
+| `d6-small-tree-output.md` | The D6.3 finding that the growth model is normal and the DBH/output state explodes |
 | `w3-habtyp-boundary.patch.gz` | The Habtyp zone-boundary patch, applied after W2.3 |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
