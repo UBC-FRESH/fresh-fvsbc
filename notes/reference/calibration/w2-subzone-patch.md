@@ -7,7 +7,7 @@ Defaults: `w2-subzone-defaults.csv`
 Smoke: `w2-subzone-smoke.csv`
 Audit: `w2-source-audit.md`
 Pins: FVS `ef5fa8470cc89f81ca445e7c906e274f200e80fd`; PyFVS `e95172baec0143bd8ccf2c0d21f9f5ffc62da601`
-Wheel: `fresh-fvsbc-pyfvs 0.3.12` (built, not published; the `fvs` extra remains `0.3.11` until it is)
+Wheel: `fresh-fvsbc-pyfvs 0.3.12` (the `fresh-fvsbc 0.21.0` extra; uploaded before the `v0.21.0` tag)
 
 This is the bounded W2.3 change from the audit. It adds the 19 supported-zone
 subzones with PSP data to the parser and gives each a **provisional** default

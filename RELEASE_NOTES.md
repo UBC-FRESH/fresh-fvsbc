@@ -1,10 +1,44 @@
-# fresh-fvsbc 0.20.0
+# fresh-fvsbc 0.21.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.20.0
+
+- **The web surface now draws the stand.** The `visuals` panel serves a 2D schematic map and a 3D
+  three.js viewer over `FVS_TreeList_Metric` and `FVS_CutList_Metric`, with a year selector, species
+  colours, DBH-sized trees, cut marking, hover values, pan/zoom, and orbit/zoom. FVS writes no x/y, so
+  the layout is schematic; the 3D ground is flat because the per-tree tables carry no terrain. three.js
+  is vendored, and the viewer loads only when chosen: no CDN, no Node build. The endpoint is
+  `GET /api/runs/{id}/visuals?year=`.
+
+- **The BC variant resolves 19 more supported-zone subzones.** `fresh-fvsbc-pyfvs 0.3.12` carries the
+  W2.3 patch: ten subzone tokens, the `HABTYP` loop fix, and provisional maximum-basal-area cases for
+  `ESSFdh1`, `ESSFdv1`, `ESSFmv`–`ESSFmv4`, `ESSFvc`, `ESSFwh1`, `ESSFwv`, `ESSFxv2`, `ICHvc`,
+  `ICHxw`, `IDFdh`, `IDFxw`, `IDFxx2`, `MSxv`, `SBSdh1`, and `SBSun`. **The defaults are PSP p99
+  values, not calibrated parameters.** `run_case` now compares the run's `STDINFO BEC=` echo with the
+  requested code and refuses a silent `ICHmw2/01` fallback.
+
+- **The calibration foundation is in place, but nothing is calibrated.** The release carries the
+  validated BEC input, the provincial PSP ingest, the calibration-bundle contract, the uncalibrated
+  baseline and envelope, the Knife Creek protocol/replication, and the 12-domain design (10
+  calibration-ready, 2 validation-only). No parameter has been fitted and no domain has a certificate;
+  W3–W5 are the next steps.
+
+- **The five missing zones remain out.** `CWH`, `CDF`, `BWBS`, `CMA`, and `MH` need new species and
+  growth/mortality/crown/bark/volume/regeneration tables. The W2.2 audit records them as **no-go
+  without a parameter source**; `CMA` may be a documented non-target.
+
+- **Install:** `pip install "fresh-fvsbc[fvs]==0.21.0"`. The `fvs` extra pins
+  `fresh-fvsbc-pyfvs==0.3.12`; if that wheel is not on your index yet, use the source recipe in
+  `docs/installation.rst`. `fresh-fvsbc-pyfvs` is uploaded before the `v0.21.0` tag.
+
+- **Claim boundary:** the 19 subzone defaults are placeholders, the five zones are not represented, and
+  there is no calibration certificate. A number from this release is FVS-BC's own output with the
+  existing defaults; it is not a calibrated growth-and-yield claim.
 
 ## What changed since 0.19.1
 
@@ -442,16 +476,22 @@ Read from `src/fresh_fvsbc/provenance.py` and from the built extension:
 | PyFVS fork | `UBC-FRESH/PyFVS` at **`e95172b`** |
 | FVS source submodule | **`ef5fa847`** |
 | Variant list | **`BC`**, status `OK` |
+| Patch sets | `pyfvs-patchset`, `fvsbc-patchset`, `w2-subzones` |
 
-The patch sets are banked in `notes/reference/` and are **not pushed to the fork**; ADR 0004 is the
-recipe.
+The patch sets are banked in `notes/reference/` and are **not pushed to the fork**; ADR 0004, ADR 0006,
+and ADR 0013 are the recipe.
 
 ## What is verified
 
-- The variant builds from a clean clone at the pin, both patch sets apply, and `list_variants()` reports
-  `BC` as `OK`. **The build is not byte-reproducible** across machines.
+- The variant builds from a clean clone at the pin, the three patch sets apply, and `list_variants()`
+  reports `BC` as `OK`. **The build is not byte-reproducible** across machines.
 - The suite passes where the extension is built; the two skips are the tests that the extension is
   *absent*, and they invert in an environment without it.
+- **The 19 W2.3 subzones resolve in the built `0.3.12` wheel**: each echoes its own `STDINFO BEC=` and
+  provisional `BAMAX`, writes a database, and the seven existing-zone controls are unchanged.
+- **The web visuals panel was exercised against a real 999-tree run** in headless Chromium: the 2D map
+  drew 14 live and 65 cut trees, hover returned the tree values, and the 3D canvas rendered with no
+  console errors.
 - The build agrees with FVS's own oracle on the first official case: zero differing lines across 164
   rows. **The oracle is a 2022 fixture** (`FS2022.4`), and the comparison covers one of the two official
   cases.
@@ -474,7 +514,7 @@ recipe.
 
 ## Known gaps
 
-Eleven, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
+Fourteen, each with the reason it is open. `notes/triage.md` gives each a disposition and what would reopen
 it.
 
 1. **The reader exposes thirty-one of 44 tables.** The other 13 are classified in
@@ -503,8 +543,16 @@ it.
 9. **At `-O0` the variant writes no database at all**, so the optimiser is not optional.
 10. **The package needs a separately built extension.** Installing it does not build FVS.
 11. **The `nemora` adapter requires `species` and `tree_age`**, and species assignment is out of scope.
+12. **`CWH`, `CDF`, `BWBS`, `CMA`, and `MH` are not represented.** The W2.2 audit records them as no-go
+    without a new parameter source: species, growth, mortality, crown, bark, volume/taper, and
+    regeneration tables. A parser-only change would silently use ICH mortality and the 10 m2/ha fallback.
+13. **The 19 subzone `BAMAX` defaults are provisional.** They are PSP p99 values, not calibrated
+    capacities. The values are recorded with their source and W4 owns the final decision.
+14. **No domain has a calibration certificate.** W1 built the foundation and the design; W3–W5 have not
+    run. A result from this release is not a calibrated growth-and-yield claim.
 
 ## What is not in this release
 
-A PyPI distribution, the standalone `FVSbc` (proven and not adopted, ADR 0008 and ADR 0009), any variant
-other than BC, and real inventory data.
+The five missing zones, fitted calibration parameters or certificates, the standalone `FVSbc` (proven and
+not adopted, ADR 0008 and ADR 0009), any variant other than BC, and real inventory data. Both
+distributions are on PyPI; `fresh-fvsbc-pyfvs 0.3.12` is uploaded before the tag.
