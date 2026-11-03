@@ -75,8 +75,9 @@ species-specific smoke.
   arrays.
 - It does not calibrate the five zones. `BAMAX` is PSP p99, provisional; the mortality/growth defaults
   are the existing BC tables.
-- It is not in a released wheel. `w2-five-zone.patch.gz` is applied by the CI/wheel recipe and builds
-  local `0.4.1`, but that wheel is not published; the wrapper still refuses the five zones.
+- It is not in a released wheel. The wheel recipe applies `w2-five-zone.patch.gz` and builds local
+  `0.4.1`; the CI oracle remains on the supported patch set until it has a five-zone fixture. The
+  wheel is not published and the wrapper still refuses the five zones.
 
 ## 5. Next
 

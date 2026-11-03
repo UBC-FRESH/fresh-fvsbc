@@ -77,8 +77,9 @@ prediction is made for any of the seven.
 
 ## What this does not establish
 
-- The five-zone extension is local. The CI/wheel recipe now builds `0.4.1`, but that wheel is not
-  published and the wrapper still refuses the five zones without a prototype patch.
+- The five-zone extension is local. The wheel recipe builds `0.4.1` with it, but that wheel is not
+  published; CI and the wrapper remain on the supported patch set until a five-zone oracle fixture
+  exists.
 - The site index is the baseline placeholder (`FD,20`); the PSP site index is not joined.
 - The site series is the diagnostic `/01`; the per-plot site series is not in the extract.
 - The sample is BEC-stratified, not random, and `MHwh1` has three intervals rather than five.
