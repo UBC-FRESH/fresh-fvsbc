@@ -98,6 +98,7 @@ jobs:
           gunzip -c notes/reference/pyfvs-patchset.diff.gz > "$RUNNER_TEMP/pyfvs.patch"
           gunzip -c notes/reference/fvsbc-patchset.diff.gz > "$RUNNER_TEMP/fvsbc.patch"
           gunzip -c notes/reference/calibration/w2-subzones.patch.gz > "$RUNNER_TEMP/w2-subzones.patch"
+          gunzip -c notes/reference/calibration/w3-habtyp-boundary.patch.gz > "$RUNNER_TEMP/w3-habtyp-boundary.patch"
           git -C "$RUNNER_TEMP/PyFVS" apply --check "$RUNNER_TEMP/pyfvs.patch"
           git -C "$RUNNER_TEMP/PyFVS" apply "$RUNNER_TEMP/pyfvs.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/fvsbc.patch"
@@ -106,11 +107,15 @@ jobs:
           # compiles but silently falls back to ICHmw2/01 for the 19 new subzones.
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/w2-subzones.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/w2-subzones.patch"
+          # W3.1 fixes the KAM+MS boundary collision: MM matched across the region/zone
+          # boundary before the real subzone was tried.
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/w3-habtyp-boundary.patch"
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/w3-habtyp-boundary.patch"
 
       - name: Build the BC variant
         working-directory: ${{ runner.temp }}/PyFVS
         env:
-          SETUPTOOLS_SCM_PRETEND_VERSION: "0.3.12"
+          SETUPTOOLS_SCM_PRETEND_VERSION: "0.3.13"
         run: |
           python -m pip install --no-build-isolation . \
             --config-settings=setup-args="-Dfvsvariants=bc"

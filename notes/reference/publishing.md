@@ -4,21 +4,16 @@ Two distributions are published, and neither uses an API token.
 
 | Distribution | Workflow | What it is |
 | --- | --- | --- |
-| `fresh-fvsbc` | `release.yaml`, environment `pypi` | this package, pure Python, sdist and wheel |
-| `fresh-fvsbc-pyfvs` | built by `wheels.yml`, uploaded by hand | the built BC variant, four wheels, one per Python |
-
-**The workflow name and the environment names follow PyPI, not this repository.** PyPI was configured
-with `release.yaml` and the environments `pypi` and `testpypi`; the file and the environments are
-named that way so the two cannot drift. `release.yaml` also carries a manual `rehearse` job that
-publishes to TestPyPI under the `testpypi` environment, which is what that pending publisher is for.
-
-**`fresh-fvsbc-pyfvs` is uploaded by hand** when the pin changes, because its version is tied to the
-fork commit and does not change with every release of this package. Automating it needs a second
-trusted publisher on that project, with the same workflow and environment.
+| `fresh-fvsbc` | `release.yaml`, environments `pypi` and `testpypi` | this package, pure Python, sdist and wheel |
+| `fresh-fvsbc-pyfvs` | `wheels.yml`, environments `pypi` and `testpypi` | the built BC variant, four wheels, one per Python |
 
 Both use **trusted publishing**: GitHub mints a short-lived OIDC token, and PyPI accepts it for the
-workflow named in its configuration. Nothing is stored in this repository and nothing has to be
-rotated.
+repository, workflow, and environment named in the project's publisher. Nothing is stored in this
+repository and nothing has to be rotated.
+
+**The binary is versioned separately.** `fresh-fvsbc-pyfvs` is tied to the PyFVS/FVS pin and the
+patch sets; it does not change with every `fresh-fvsbc` release. Its publish jobs are manual, so a
+wrapper tag cannot republish the binary by accident.
 
 ## The one-time setup, which needs the PyPI account
 
@@ -33,42 +28,62 @@ PyPI web interface, signed in as the owner of the project names.
    `fresh-fvsbc-pyfvs` and for `fresh-fvsbc`, or use *Pending publishers* before the first upload.
    The names must be yours before a trusted publisher can be attached to them.
 
-3. **Add a trusted publisher to each project.** *Project → Settings → Publishing → Add a new pending
-   publisher → GitHub*, with these exact values:
+3. **Add a trusted publisher for each project and index.** *Project → Settings → Publishing → Add a
+   new pending publisher → GitHub*, with these exact values:
 
-   | Field | `fresh-fvsbc` | `fresh-fvsbc` (TestPyPI) |
-   | --- | --- | --- |
-   | Owner | `UBC-FRESH` | `UBC-FRESH` |
-   | Repository | `fresh-fvsbc` | `fresh-fvsbc` |
-   | Workflow name | `release.yaml` | `release.yaml` |
-   | Environment | `pypi` | `testpypi` |
+   | Project | Index | Repository | Workflow | Environment |
+   | --- | --- | --- | --- | --- |
+   | `fresh-fvsbc` | PyPI | `UBC-FRESH/fresh-fvsbc` | `release.yaml` | `pypi` |
+   | `fresh-fvsbc` | TestPyPI | `UBC-FRESH/fresh-fvsbc` | `release.yaml` | `testpypi` |
+   | `fresh-fvsbc-pyfvs` | PyPI | `UBC-FRESH/fresh-fvsbc` | `wheels.yml` | `pypi` |
+   | `fresh-fvsbc-pyfvs` | TestPyPI | `UBC-FRESH/fresh-fvsbc` | `wheels.yml` | `testpypi` |
 
-   Add a third, with the same workflow and environment `pypi`, if `fresh-fvsbc-pyfvs` is to be
-   published automatically rather than by hand.
+   The workflow name and the environment are matched exactly. A publisher that names
+   `fresh-fvsbc-pyfvs` as the **repository** does not match this build: the wheels are built in
+   `UBC-FRESH/fresh-fvsbc` by `wheels.yml`.
 
-   The workflow name and the environment are matched exactly. `wheels.yml` and `publish.yml` both
-   declare `environment: pypi`, which is why that field is not blank.
+4. **Create both environments** in the repository's *Settings → Environments*: `pypi` and
+   `testpypi`, with no secrets. They exist so the trusted publisher has something to match, and so
+   an approval rule can be added later without touching the workflows.
 
-4. **Create the `pypi` environment** in the repository's *Settings → Environments*, with no secrets in
-   it. It exists so the trusted publisher has something to match, and so an approval rule can be added
-   later without touching the workflows.
+## Publishing the binary
 
-## Rehearsing
+The wheels are built by `wheels.yml`, then the selected publish job uploads them:
 
-Run `publish.yml` and `wheels.yml` by hand against TestPyPI first, by adding `repository-url:
-https://test.pypi.org/legacy/` to the publish step in a scratch branch. A real rehearsal needs both
-distributions, in that order — `fresh-fvsbc` names `fresh-fvsbc-pyfvs` in its `fvs` extra, and TestPyPI
-does not proxy PyPI.
+```bash
+# TestPyPI first; the version can be uploaded to both indexes.
+gh workflow run wheels.yml -f publish=testpypi
 
-## What happens on a tag
+# Production, after the TestPyPI install has been checked.
+gh workflow run wheels.yml -f publish=pypi
+```
 
-`v*` triggers both workflows. `wheels.yml` builds the four wheels, attaches them to the GitHub release,
-and publishes them; `publish.yml` builds the sdist and wheel of this package and publishes them. The
-fork's publish uses `skip-existing`, because its version is pinned to the commit and does not change
-with every release of this package.
+`publish=testpypi` uses `https://test.pypi.org/legacy/` and `skip-existing`; `publish=pypi` uses
+PyPI and does not skip an existing version. `publish=none`, the default, only builds and keeps the
+artifacts.
 
-## Before the first publish
+A tag still runs the build and the `release` job, which attaches the four wheels to the GitHub
+release; it does not publish them. Publication is always an explicit manual dispatch.
 
-`docs/installation.rst` tells a reader to install from the release URL and from the git tag, because
-neither distribution is on PyPI yet. After the first successful publish, the second line becomes
-`pip install fresh-fvsbc` and nothing else on that page changes.
+## Publishing the wrapper
+
+`v*` triggers `release.yaml`, which builds the sdist and wheel, runs `twine check`, and publishes
+`fresh-fvsbc` under the `pypi` environment. The manual `rehearse` job publishes the same build to
+TestPyPI under `testpypi`.
+
+The `fvs` extra in `pyproject.toml` names the binary version, so publish the binary first and then
+release the wrapper that pins it.
+
+## Checking a TestPyPI install
+
+TestPyPI does not proxy PyPI, so install the binary from TestPyPI and its dependencies from PyPI:
+
+```bash
+python -m pip install \
+  --index-url https://test.pypi.org/simple/ \
+  --extra-index-url https://pypi.org/simple/ \
+  "fresh-fvsbc-pyfvs==0.3.13"
+```
+
+Then check `pyfvs.list_variants()` reports `BC: OK` and run a W2 subzone smoke case before publishing
+the same version to PyPI.

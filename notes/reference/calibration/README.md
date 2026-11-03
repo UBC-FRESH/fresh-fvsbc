@@ -31,10 +31,15 @@ outside the repository because they carry site identifiers.
 | `w2-subzone-defaults.csv` | The 19 subzones, tokens, PSP p99/max, and provisional BAMAX |
 | `w2-subzone-smoke.csv` | The 19 smoke cases: BEC echo, BAMAX label and value, and expected value |
 | `w2-subzones.patch.gz` | The Habtyp/Sitset patch against the pinned source |
+| `w3-bec-boundary.md` | The W3.1 `KAM`+`MS` boundary finding and fix |
+| `w3-habtyp-boundary.patch.gz` | The Habtyp zone-boundary patch, applied after W2.3 |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |
 | `baseline_report.md` | The baseline report and its limits |
+| `baseline_v3.md` | The W3.1 full-domain baseline report |
+| `baseline_summary_v3.csv`, `baseline_by_tsa_v3.csv`, `baseline_by_species_v3.csv`, `baseline_by_dbh_v3.csv`, `baseline_by_ba_v3.csv` | The W3.1 residual tables |
+| `baseline_skipped_becs_v3.csv`, `baseline_skip_reasons_v3.csv` | The W3.1 skip tables |
 
 ## Counts
 

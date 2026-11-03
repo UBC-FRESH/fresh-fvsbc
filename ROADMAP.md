@@ -1570,6 +1570,15 @@ provisional `BAMAX` candidates in
 `notes/reference/calibration/w2-five-zone-defaults.csv`. Next: D2 parser and
 defaults, D3 species donor aliases, D4 build/smoke, D5 provincial baseline.
 
+### W3 supported-domain baseline
+
+W3 is a parallel reference: parent issue #324, starting with W3.1 #325 on
+`feature/w3-baseline`. W3.1 reran the supported-zone baseline on the 0.3.13
+resolver fix: **108 intervals compared, 0 skipped**, against W1.4's 89 compared
+and 19 skipped. It also found the `KAM`+`MS` boundary collision fixed by the
+fourth patch. The all-zone D5 baseline supersedes this sample for provincial
+claims; W3.1 remains the regression and comparison reference.
+
 ### Web visuals
 
 The web surface is a reader over a run's artefacts. This workstream adds a **schematic stand view**,

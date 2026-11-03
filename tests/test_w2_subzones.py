@@ -45,6 +45,50 @@ def _subzones() -> list[tuple[str, float]]:
     return [(row["bec"], float(row["provisional_bamax_m2ha"])) for row in rows]
 
 
+@pytest.mark.parametrize(
+    ("region", "bec"),
+    [
+        ("KAM", "MSxk1"),
+        ("KAM", "MSdm1"),
+        ("KAM", "MSdk"),
+        ("CAR", "MSxk1"),
+    ],
+)
+def test_a_kam_ms_code_does_not_match_the_region_boundary(
+    tmp_path: Path, region: str, bec: str
+) -> None:
+    """``KAM`` + ``MS`` contains ``MM``; the resolver must not pick it as the subzone.
+
+    Parameters
+    ----------
+    tmp_path : Path
+        The run directory.
+    region : str
+        The ``STDINFO`` region field.
+    bec : str
+        The zone, subzone, and variant token.
+    """
+    pytest.importorskip(
+        "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"
+    )
+    records = to_tree_list(synthetic_population(), species="FD", tree_age=60.0)
+    keywords = (
+        Keyword("STDIDENT", (f"BOUNDARY {bec}",)),
+        Keyword("STDINFO", (region, f"{bec}/01", "0", "200", "35", "16")),
+        Keyword("SITECODE", ("FD", "100")),
+        Keyword("INVYEAR", ("0",)),
+        Keyword("DESIGN", ("0", "1", "999", "1", "0", "1", "1")),
+        Keyword("TIMEINT", ("", "10")),
+        Keyword("NUMCYCLE", ("1",)),
+        Keyword("RANNSEED", ("1",)),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run_case(records, keywords, directory=tmp_path / f"{region}-{bec}")
+    report = (result.directory / "run.out").read_text(encoding="latin-1")
+    assert f"BEC={bec}/01" in report
+
+
 @pytest.mark.parametrize(("bec", "expected"), _subzones())
 def test_a_w2_subzone_resolves_and_echoes_its_default(
     tmp_path: Path, bec: str, expected: float

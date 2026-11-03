@@ -1,7 +1,8 @@
 # ADR 0013: The W2.3 subzone patch is a third build-time patch set
 
 Status: accepted on 2026-11-03, when the maintainer chose the patch-set route over a new FVS source
-fork.
+fork. Extended by the W3.1 fourth patch set on 2026-11-03; see
+`notes/reference/calibration/w3-bec-boundary.md`.
 Date: 2026-11-03
 Issues: #315
 Refines: ADR 0006
