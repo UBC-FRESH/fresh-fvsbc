@@ -206,12 +206,13 @@ still a pilot, not a certificate. See `d7-consolidation.md`.
 **D7.7 SBS pilot (2026-11-03):** `MORTMULT 2.0` for FD/PL/SE/HW, no ingrowth, passes the 100 Mile
 House TSA holdout (BA -1.8%, TPH +3.7%); `d7-sbs-bundle.json` is an unsigned pilot.
 
-**D8.1 five-zone wrapper and CWH growth pilot (2026-11-03):** `CWH`, `CDF`, `BWBS`, `CMA`, and
+**D8.2 five-zone wrapper and CWH growth pilot (2026-11-03):** `CWH`, `CDF`, `BWBS`, `CMA`, and
 `MH` parse in the wrapper, with the missing subzone tokens. A real CWH run reaches the extension
-parser; no monkeypatch. CWH now has an unsigned growth pilot: `BAIMULT 6.0` for FD/HW/CW/BG/PW and
-`MORTMULT 0.3` for eleven species, no ingrowth. Three TSA holdouts pass BA ±3 m2/ha and TPH 15%:
-Arrowsmith BA -2.63 / TPH -1.4%, Fraser BA -2.66 / TPH -4.3%, Haida Gwaii BA -0.00 / TPH +6.0%.
-The high multiplier is the claim risk; no certificate and no temporal holdout yet.
+parser; no monkeypatch. CWH now has an unsigned growth pilot: `BAIMULT 7.0` for FD/HW/CW/BG/PW and
+`MORTMULT 0.45` for eleven species, no ingrowth. Three TSA plus one temporal holdout pass BA ±3
+m2/ha and TPH 15%: Arrowsmith BA -2.68 / TPH -2.4%, Fraser -2.46 / -6.6%, Haida Gwaii -0.00 /
++5.1%, temporal >=2000 +0.66 / +14.6% (n=243). The high multiplier and the temporal TPH margin are
+the claim risks; no certificate, no reviewer sign-off, no leave-one-BEC holdout yet.
 See `d7-cwh-screen.md` and `d7-cwh-bundle.json`.
 
 ## 5. Data and methods

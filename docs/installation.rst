@@ -56,7 +56,7 @@ returning a plausible run. The fourth fixes the ``KAM`` + ``MS`` boundary collis
 patched wheel is versioned ``0.4.1`` and is the ``fvs`` extra for ``fresh-fvsbc 0.21.4``. The wrapper
 now accepts the five prototype zones; the binary carries their provisional parser and defaults. That
 is deployment plumbing, not calibration: IDFdk and SBS have passed holdouts, and CWH has a
-three-TSA growth pilot; none is certified.
+three-TSA plus temporal growth pilot; none is certified.
 
 
 What you get
