@@ -38,6 +38,7 @@ outside the repository because they carry site identifiers.
 | `w2-five-zone-species.md` | The seven donor aliases, the species smoke, and the output-code caveat |
 | `w2-five-zone-species-smoke.csv` | One row per missing species: donor, BEC/BAMAX echo, output code, database |
 | `w3-bec-boundary.md` | The W3.1 `KAM`+`MS` boundary finding and fix |
+| `d6-sbps-growth.md` | The D6.1 SBPS diameter-growth diagnosis and next instrument |
 | `w3-habtyp-boundary.patch.gz` | The Habtyp zone-boundary patch, applied after W2.3 |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
