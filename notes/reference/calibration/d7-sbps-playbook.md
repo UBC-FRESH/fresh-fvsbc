@@ -23,6 +23,7 @@ was used, why a result was accepted or retracted, and what the next agent should
 | D7.9 temporal holdout (#366) | train <=1998, test >=2001 | one eligible later interval; BA +33.4% | Not validated; data gap |
 | D7.10 Quesnel capacity (#368) | 39 eligible intervals / 13 sites | `BAMAX 55` pooled BA +8.9%/TPH -14.4%; one dense site BA +151% | No bundle; density stratum needed |
 | D7.11 Quesnel established (#371) | QMD >= 9, 36 intervals / 12 sites | `BAMAX 75` pooled BA +3.6%/TPH -14.5%; worst site BA +35%/TPH -44% | No bundle; site effect needed |
+| D7.12 Quesnel site index (#373) | 13 sites, SI + QMD/BA | SI rank correlation -0.49; no separator | Not sufficient; hierarchical site model next |
 
 The only positive result is the last one. Everything before it is useful evidence, not a calibration.
 
