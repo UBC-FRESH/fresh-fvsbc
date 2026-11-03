@@ -1577,12 +1577,13 @@ then D6 true species tables where the donor residuals justify them.
 
 ### W3 supported-domain baseline
 
-W3 is a parallel reference: parent issue #324, starting with W3.1 #325 on
-`feature/w3-baseline`. W3.1 reran the supported-zone baseline on the 0.3.13
-resolver fix: **108 intervals compared, 0 skipped**, against W1.4's 89 compared
-and 19 skipped. It also found the `KAM`+`MS` boundary collision fixed by the
-fourth patch. The all-zone D5 baseline supersedes this sample for provincial
-claims; W3.1 remains the regression and comparison reference.
+W3 is a parallel reference: parent issue #324. W3.1 #325 is complete in
+`fresh-fvsbc-pyfvs 0.3.13` and `fresh-fvsbc 0.21.2`. It reran the supported-zone
+baseline on the resolver fix: **108 intervals compared, 0 skipped**, against
+W1.4's 89 compared and 19 skipped. It also found the `KAM`+`MS` boundary
+collision fixed by the fourth patch. The all-zone D5 baseline supersedes this
+sample for provincial claims; W3.1 remains the regression and comparison
+reference.
 
 ### Web visuals
 

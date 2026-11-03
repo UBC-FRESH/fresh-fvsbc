@@ -1,6 +1,6 @@
 # W3.1 BEC boundary fix
 
-Status: fixed and built locally as `fresh-fvsbc-pyfvs 0.3.13`; release pending
+Status: fixed; released as `fresh-fvsbc-pyfvs 0.3.13` and pinned by `fresh-fvsbc 0.21.2`
 Date: 2026-11-03
 Patch: `w3-habtyp-boundary.patch.gz` (`sha256:30a00a8c167416d1dd0181953613f72ccec676ce1a20acaa861d95068dac99ab`)
 Issue: #325
@@ -51,9 +51,9 @@ changes one file, 10 lines added and 2 removed.
 
 ## 4. Release boundary
 
-The fixed source is built locally as `fresh-fvsbc-pyfvs 0.3.13`. The published
-`0.3.12` still has the collision. The W3.1 result is not reproducible from the
-published package until `0.3.13` is on PyPI and the wrapper `fvs` extra moves to it.
+The fixed source is released as `fresh-fvsbc-pyfvs 0.3.13`; the published `0.3.12` still
+has the collision. The W3.1 result is reproducible from `0.3.13`, and the wrapper
+`fvs` extra moves to it in `fresh-fvsbc 0.21.2`.
 
 This fix changes BEC resolution only. It does not calibrate a parameter, add a zone,
 or change growth or mortality.

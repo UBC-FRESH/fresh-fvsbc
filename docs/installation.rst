@@ -50,9 +50,9 @@ takes a few minutes:
 The third patch adds the 19 W2.3 subzones and their provisional defaults. Without it the variant still
 builds, but those codes fall back to ``ICHmw2/01``; ``run_case`` refuses that fallback rather than
 returning a plausible run. The fourth fixes the ``KAM`` + ``MS`` boundary collision that made
-``MSxk1`` resolve as ``MSmm``. The patched wheel is versioned ``0.3.13``; once it is published, the
-``fvs`` extra moves to it. If you build from a source checkout before that upload, use the recipe
-above.
+``MSxk1`` resolve as ``MSmm``. The patched wheel is versioned ``0.3.13`` and is the ``fvs`` extra for
+``fresh-fvsbc 0.21.2``; it is published before the ``v0.21.2`` tag. If you build from a source
+checkout, use the recipe above.
 
 
 What you get
