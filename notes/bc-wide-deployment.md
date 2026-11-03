@@ -90,7 +90,17 @@ low and are pilot/validation units, not capacity claims.
 - Add `BAMAX` cases for the five zones from the D1 p99 values; mark them provisional.
 - Add the wrapper `BecCode` tokens and tests.
 
-**Deliverable:** a patch that parses the five zones and the 29 PSP-covered BGC units.
+**D2/D4 result (2026-11-03):** the parser and defaults are built and smoke-tested. `CWH`, `CDF`,
+`BWBS`, `CMA`, and `MH` are in `ZN(12)`; `SZ` is 34 with `DS`, `MS`, `VH`, `VM`, `WS`; `sitset.f` has
+all 32 provisional `BAMAX` cases. A clean `fresh-fvsbc-pyfvs 0.4.0` build reports BC OK, and **32/32
+labels echo their own BEC and provisional BAMAX and write a database** (`w2-five-zone-smoke.csv`). The
+build found three parser defects: the zone loop still stopped at 7, the subzone loop at 29, and the
+subzone search matched inside the zone name (`CWH` contains `WH`, `MH` contains `MH`) and the zone
+search matched a subzone (`CWHms` contains `MS`). The parser is now anchored to the grammar. The
+species smoke is still `FD`; D3 owns the seven donor aliases and species-specific cases. The patch is
+`w2-five-zone.patch.gz`; it is banked, not in `wheels.yml` or a released pin.
+
+**Deliverable:** the 32-label prototype; see `w2-five-zone-prototype.md`.
 
 ### Week 3 — D4: build and smoke
 
