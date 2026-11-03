@@ -99,8 +99,8 @@ subzone search matched inside the zone name (`CWH` contains `WH`, `MH` contains 
 search matched a subzone (`CWHms` contains `MS`). The parser is now anchored to the grammar. The
 species smoke is still `FD`; D3 owns the seven donor aliases and species-specific cases. The patch is
 `w2-five-zone.patch.gz` and the D6 `w4-sbps-small-tree.patch.gz` are now applied by the CI/wheel
-recipe, which builds local `0.4.1`; the wheel is not published and the wrapper still refuses the five
-zones. The build recipe and the wrapper tokens are therefore a release task, not evidence that the
+recipe, which builds `0.4.1`; that wheel is released in `0.21.3`, but the wrapper still refuses the
+five zones. The build recipe and the wrapper tokens are therefore a release task, not evidence that the
 zones are deployed.
 
 **Deliverable:** the 32-label prototype; see `w2-five-zone-prototype.md`.
@@ -144,14 +144,14 @@ the five-zone sample moves to five intervals per BEC before any true species tab
 parameter. `REGENT` selected the hyperbolic SBS/SBPS small-tree height model only when
 `BEC%Zone` contained `SBS`; `SBPS` matched neither and took the exponential IDF/ICH branch with
 SBS-form coefficients, overflowing to `Infinity`. The five `REGENT` model-selection tests now accept
-`SBPS` too. `w4-sbps-small-tree.patch.gz` banks the fix; it is built locally as
+`SBPS` too. `w4-sbps-small-tree.patch.gz` banks the fix; it is released as
 `fresh-fvsbc-pyfvs 0.4.1`. The corrected SBPS baseline is physical but uncalibrated: BA is
 `SBPSdc` 28.0 vs 11.23, `SBPSmc` 48.0 vs 30.65, `SBPSmk` 35.0 vs 32.72, and `SBPSxc` 53.0 vs 34.39.
 The D7 target is the remaining growth residual, not `MORTMULT` or `BAMAX` alone. See
 `d6-sbps-small-tree.md`.
 
 **D6 five-zone result (2026-11-03):** the five-zone baseline at five intervals per BEC ran **153
-intervals, 31 labels, 0 skipped intervals** on the local 0.4.1 build with the prototype wrapper
+intervals, 31 labels, 0 skipped intervals** on the 0.4.1 build with the prototype wrapper
 tokens. Initial BA bias is **-0.78** and MAE **1.14**. End BA is underpredicted in every zone:
 CWH -12.31 / 13.04, CDF -20.45 / 20.45, BWBS -9.47 / 9.47, CMA -5.67 / 5.67, MH -12.46 / 12.80
 (bias / MAE, m2/ha). One interval is above p99 and none above the observed maximum. The donor
@@ -161,7 +161,21 @@ yet**: the residuals are a broad growth underprediction, so `Ba`→`BG` and `Hm`
 D7 candidates only after the shared growth path is tested. See `d6-five-zone-baseline.md`.
 
 **Deliverable:** D6 evidence is complete for the SBPS fix and the five-interval five-zone baseline;
-the five-zone/SBPS wheel and wrapper pin remain unreleased.
+the SBPS wheel is released in `0.21.3`; the five-zone wrapper tokens remain unreleased.
+
+### Week 4 — D7: calibration and validation
+
+**D7.1 SBPS readiness result (2026-11-03):** no global SBPS bundle is identified. The probe evaluates
+a fixed candidate set on **15 eligible intervals** (initial BA >= 15 m2/ha, QMD >= 8 cm, dead BA <=
+40% of initial BA) with a site-grouped holdout. The best training compromise, `BAMAX 45` plus
+`BAIMULT 0.5` for PL/SE, has held-out BA bias **+6.08 / MAE 8.06** and TPH bias **-214.82 / MAE
+214.82**. `BAMAX 55` improves TPH but raises held-out BA bias to **+10.08**; `BAMAX 40` plus
+`MORTMULT 2` lowers BA by over-killing TPH (held-out bias **-1,314.82**). The measured PSP site index
+is not a lever: FVS reports `SITE INDEX IS NOT USED IN THIS VARIANT`, and the `SITECODE PL <SI>` and
+`SITECODE FD,20` runs are identical. `SBPSdc` is already close (baseline BA bias -0.39 / MAE 1.35);
+`SBPSmc` has one eligible interval, and the excluded young/high-mortality stands need structural
+treatment. The reusable probe is `scripts/run_calibration_probe.py`; the report is
+`d7-sbps-readiness.md`. **No parameter changed and no bundle is issued.**
 
 ## 5. Data and methods
 

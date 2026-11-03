@@ -45,6 +45,11 @@ outside the repository because they carry site identifiers.
 | `d6-small-tree-output.md` | The D6.3 finding that the growth model is normal and the DBH/output state explodes |
 | `d6-sbps-small-tree.md` | The D6.4 SBPS overflow finding, patch, corrected baseline, and claim boundary |
 | `d6-sbps-fixed.csv` | The four corrected SBPS baseline rows |
+| `d7-sbps-readiness.md` | The D7.1 SBPS calibration-readiness probe, negative result, and next steps |
+| `d7-sbps-candidates.json` | The fixed D7.1 SBPS candidate set |
+| `d7-sbps-probe-summary.csv` | The D7.1 train/test probe summary |
+| `d7-sbps-probe-by-bec.csv` | The D7.1 probe summary by BEC |
+| `d7-sbps-site-index.csv` | The D7.1 site-index control showing that BC ignores `SITECODE` |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |

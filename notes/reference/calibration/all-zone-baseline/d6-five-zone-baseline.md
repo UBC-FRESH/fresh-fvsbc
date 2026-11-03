@@ -1,6 +1,6 @@
 # D6 — five-zone baseline at five intervals per BEC
 
-Status: measured, not calibrated. Build: local `fresh-fvsbc-pyfvs 0.4.1` (five-zone prototype plus
+Status: measured, not calibrated. Build: `fresh-fvsbc-pyfvs 0.4.1` (five-zone prototype plus
 the D6 SBPS small-tree fix). The wrapper still refuses the five zones; this run uses the prototype
 `bec` tokens at runtime, so it is **not** a released five-zone capability.
 
@@ -77,9 +77,8 @@ prediction is made for any of the seven.
 
 ## What this does not establish
 
-- The five-zone extension is local. The wheel recipe builds `0.4.1` with it, but that wheel is not
-  published; CI and the wrapper remain on the supported patch set until a five-zone oracle fixture
-  exists.
+- The five-zone extension is in `0.4.1` (released as `0.21.3`), but the wrapper still refuses the
+  five zones. CI remains on the supported patch set until a five-zone oracle fixture exists.
 - The site index is the baseline placeholder (`FD,20`); the PSP site index is not joined.
 - The site series is the diagnostic `/01`; the per-plot site series is not in the extract.
 - The sample is BEC-stratified, not random, and `MHwh1` has three intervals rather than five.
