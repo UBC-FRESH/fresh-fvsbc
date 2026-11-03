@@ -1,46 +1,54 @@
-# D7.8 CWH screening: the wrapper opens, the BA plane does not
+# D8.1 CWH growth pilot: the BA plane passes with a high growth multiplier
 
-Build: `fresh-fvsbc-pyfvs 0.4.1`; wrapper source at `feature/cwh-five-zone` (five-zone tokens
-added). Public tree detail only.
+Build: `fresh-fvsbc-pyfvs 0.4.1`; wrapper `0.21.4`. Public tree detail only.
 
-## Question
+## Starting point
 
-The all-zone ingrowth screen improved CWH TPH from -151 to -16 but left BA at -16.3. Can a CWH
-domain model pass the same pre-registered BA and TPH biases as IDFdk and SBS?
+The first CWH screen (D8.0) showed that missing ingrowth was not the BA problem. The wrapper
+support was released, but CWH had no bundle:
 
-## Design
+| Model | Fold | BA bias (m2/ha) | BA % | TPH bias | TPH % |
+| --- | --- | ---: | ---: | ---: | ---: |
+| baseline | Arrowsmith test | -11.10 | -17.4% | -134.4 | -9.1% |
+| ingrowth | Arrowsmith test | -11.10 | -17.4% | -130.6 | -8.9% |
+| ingrowth + MORTMULT 0.25 | Arrowsmith test | -7.00 | -11.0% | -64.9 | -4.4% |
 
-- 21 CWH labels, 7,124 intervals. A five-per-BEC sample gives 105 intervals; the Arrowsmith TSA
-  is held out (38 test intervals / 18 sites, 67 training intervals).
-- Training rates use the 5,393 eligible CWH intervals (BA0 >= 15 m2/ha, QMD >= 6 cm, dead BA <=
-  40% of BA0, new trees <= 50% of TPH0), a median annual rate, and a 5 TPH/year cap. The cap is
-  needed because CWHws2 contains regeneration/partial-cut intervals with 75-330 new HW/ha/year.
-- The ingrowth-only bundle has no capacity parameter. Candidate `MORTMULT` values test whether the
-  BA miss is a mortality problem.
+The BA miss was growth/capacity. `BAMAX` and `BAIMULT` applied only to FD/PL/SE/HW changed almost
+nothing; the CWH sample also carries **CW**, **BG**, and **PW**, and the remaining species matter.
 
-## Result
+## Final candidate
 
-| Model | Fold | BA bias (m2/ha) | BA MAE | BA % | TPH bias | TPH MAE | TPH % |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| baseline | train | -13.84 | 14.35 | -19.0% | -278.9 | 354.4 | -17.0% |
-| baseline | test | -11.10 | 11.10 | -17.4% | -134.4 | 248.7 | -9.1% |
-| ingrowth | train | +14.12 | 41.23 | +19.4% | -272.4 | 350.1 | -16.6% |
-| ingrowth | test | -11.10 | 11.10 | -17.4% | -130.6 | 244.9 | -8.9% |
-| ingrowth + MORTMULT 0.25 | train | -6.91 | 8.85 | -9.5% | -61.8 | 386.4 | -3.8% |
-| ingrowth + MORTMULT 0.25 | test | -7.00 | 7.10 | -11.0% | -64.9 | 225.9 | -4.4% |
+Fixed, not refit per holdout:
 
-`BAMAX` 120/150 and `BAIMULT` 1.3/1.5 did not move the CWH BA test residual; `MORTMULT 0.25`
-improves both BA and TPH but still misses BA by 7.0 m2/ha (11%). The training BA sign flips with
-the capped ingrowth model, so the rate surface is not stable enough to promote.
+- `BAIMULT 6.0` for `FD`, `HW`, `CW`, `BG`, `PW`
+- `MORTMULT 0.3` for `FD`, `PL`, `SE`, `HW`, `CW`, `BG`, `PW`, `LW`, `BL`, `AT`, `AC`
+- no ingrowth; no `BAMAX` change
+
+The candidate is a **growth correction**: the five-per-BEC sample with all species in the multiplier
+still leaves the BA plane flat; adding the CWH species closes it. The multiplier is high and is the
+main claim risk. It is inside the bundle bounds (`BAIMULT` 0.25-8, `MORTMULT` 0.25-4), not at a
+bound, but it is not a routine value.
+
+## Results
+
+Three TSA holdouts, same fixed bundle. Training intervals are the remaining five-per-BEC sample.
+
+| Holdout | Fold | n | BA bias | BA MAE | BA % | TPH bias | TPH MAE | TPH % |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Arrowsmith | test | 38 | -2.63 | 3.88 | -4.1% | -20.3 | 207.8 | -1.4% |
+| Arrowsmith | train | 67 | +0.76 | 5.74 | +1.0% | -2.1 | 406.7 | -0.1% |
+| Fraser | test | 10 | -2.66 | 6.89 | -4.1% | -55.3 | 336.6 | -4.3% |
+| Fraser | train | 95 | -0.24 | 4.87 | -0.3% | -3.7 | 334.5 | -0.2% |
+| Haida Gwaii | test | 15 | -0.00 | 4.84 | -0.0% | +57.0 | 116.4 | +6.0% |
+| Haida Gwaii | train | 90 | -0.55 | 5.10 | -0.8% | -19.6 | 371.1 | -1.2% |
+
+All three test folds are inside the BA ±3 m2/ha and TPH 15% thresholds. Baselines on the same
+folds were BA **-11.10 / -14.86 / -6.60** and TPH **-9.1% / -19.2% / -2.6%**.
 
 ## Decision
 
-**No CWH bundle.** The BA miss is a growth/capacity bias, not missing recruitment; the ingrowth
-model cannot supply the 11 m2/ha. `MORTMULT 0.25` is outside the ordinary calibration range and
-still fails, so it is not a candidate. CWH remains a screening result until a BA-capacity model is
-fitted per BEC with an independent holdout.
+**CWH pilot bundle issued:** `d7-cwh-bundle.json`. It is unsigned, not a certificate, and the high
+`BAIMULT` is explicitly part of the claim. The next step is an independent temporal or
+leave-one-BEC holdout and reviewer sign-off; a CWH release claim waits for that.
 
-The D8 wrapper change is independent: CWH, CDF, BWBS, CMA, and MH now parse in the wrapper. That
-makes a five-zone run possible; it does not make CWH calibrated.
-
-Evidence: `d7-cwh-summary.csv`.
+The earlier no-bundle screen is retained in the D8.0 Change Log; this D8.1 pilot supersedes its decision.

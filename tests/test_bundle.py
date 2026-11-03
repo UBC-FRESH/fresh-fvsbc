@@ -105,6 +105,16 @@ def test_an_ingrowth_only_bundle_has_an_empty_parameter_list(tmp_path: Path) -> 
     assert bundle.render() == ()
 
 
+def test_the_cwh_pilot_bundle_loads_and_renders_all_parameters() -> None:
+    """The CWH growth pilot is a real bundle, not a screening table."""
+    bundle = load_bundle("notes/reference/calibration/d7-cwh-bundle.json")
+    assert bundle.ingrowth is None
+    assert bundle.domain.becs == ("CWH",)
+    assert len(bundle.parameters) == 16
+    assert len(bundle.render()) == 16
+    assert any("not signed off" in warning for warning in bundle.warnings)
+
+
 def test_the_kc_pilot_bundle_loads_and_carries_its_two_warnings() -> None:
     """The KC bundle is unsigned and its PL multiplier sits at its bound."""
     bundle = load_bundle(KC_PILOT)
