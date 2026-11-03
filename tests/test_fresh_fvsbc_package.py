@@ -39,6 +39,20 @@ def test_package_documents_itself() -> None:
     assert fresh_fvsbc.__doc__
 
 
+def test_the_fvs_extra_declares_pyfvs_runtime_dependencies() -> None:
+    """The ``fvs`` extra carries ``six``, which PyFVS imports but its wheel does not declare.
+
+    A clean ``pip install fresh-fvsbc[fvs]`` installed the extension and ``list_variants()``
+    succeeded, while a real run failed at ``from pyfvs import fvs`` with
+    ``ModuleNotFoundError: six``. The extra is the user-facing install, so the dependency belongs
+    here until the PyFVS wheel metadata names it.
+    """
+    with (ROOT / "pyproject.toml").open("rb") as handle:
+        data: dict[str, Any] = tomllib.load(handle)
+    extra = data["project"]["optional-dependencies"]["fvs"]
+    assert any(str(item).split(">=")[0].split("==")[0] == "six" for item in extra)
+
+
 def test_package_exports_only_names_it_defines() -> None:
     """Every name in ``__all__`` exists on the package.
 
