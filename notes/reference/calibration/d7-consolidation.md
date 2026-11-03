@@ -87,6 +87,14 @@ They over-recruit SBPS, SBS, and PP; those domains need their own rates and elig
 five zones (CWH, CDF, BWBS, CMA, MH) ran through the local five-zone parser; the wrapper still
 refuses them, so this is not a released five-zone capability.
 
+D7.7 addendum: a domain-specific SBS test found a different working lever. `d7-sbs-bundle.json` uses
+`MORTMULT 2.0` for FD/PL/SE/HW and no ingrowth; on a five-per-BEC SBS sample with the 100 Mile
+House TSA held out it gives test BA -0.77 / MAE 4.29 (-1.8%) and TPH +109.9 / MAE 489.0 (+3.7%),
+inside both thresholds. Training BA is -2.54 / MAE 6.16 and TPH -98.7 / MAE 428.2. The SBS bundle
+is a pilot and uses a mortality lever, not the IDFdk ingrowth model. The D7.2 SBPS candidate
+(`BAMAX 50`, `MORTMULT 0.5`) passes SBPSdc and SBPSmk but not SBPSxc; SBPSmc remains
+validation-only. PP has only two intervals and is validation-only.
+
 Evidence: `d7-ingrowth-screen-by-zone.csv`, `d7-ingrowth-screen-by-bec.csv`,
 `d7-all-zone-ingrowth.json`.
 
@@ -115,7 +123,7 @@ The five follow-ups are complete for the IDFdk pilot:
 1. bundle/provenance: done;
 2. second spatial and temporal holdouts: done, all pass bias thresholds;
 3. periodic establishment: done and exercised;
-4. other domains: screened; CWH/BWBS/ICH/IDF/MS improve, SBPS/SBS/PP need domain-specific rates;
+4. other domains: screened; CWH/BWBS/ICH/IDF/MS improve, SBS now has a MORTMULT pilot, SBPSdc/mk have the D7.2 candidate, PP is validation-only;
 5. density/QMD refinement: done and improves the holdout.
 
 The next release step is to make the binned model the canonical bundle, add the same holdout

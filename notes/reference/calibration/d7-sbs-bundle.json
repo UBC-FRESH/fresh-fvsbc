@@ -1,0 +1,105 @@
+{
+  "bundle_id": "sbs-mortmult2-pilot-2026-11-03",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": [
+      "CAR",
+      "KAM",
+      "NEL"
+    ],
+    "becs": [
+      "SBS"
+    ],
+    "species_groups": [],
+    "dbh_classes": [],
+    "management": [
+      "untreated"
+    ]
+  },
+  "parameters": [
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "FD",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "PL",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "SE",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "HW",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 4.0
+      }
+    }
+  ],
+  "training": {
+    "data_checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "split": "SBS 5-per-BEC, 100 Mile House TSA held out",
+    "objective": "held-out BA/TPH bias",
+    "convergence": {
+      "iterations": 1,
+      "method": "fixed candidate"
+    }
+  },
+  "review": {
+    "reviewer": "D7.6 pilot, not signed off",
+    "date": "2026-11-03",
+    "signed_off": false
+  },
+  "claim": "SBS pilot: MORTMULT 2.0 for FD/PL/SE/HW; one TSA holdout; not a certificate."
+}
