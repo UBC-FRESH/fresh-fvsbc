@@ -19,7 +19,8 @@ was used, why a result was accepted or retracted, and what the next agent should
 | D7.5 SBPS ingrowth (#354) | pure 100 Mile TSA holdout | Baseline BA +50.8%; ingrowth does not transfer | D7.3 retracted |
 | D7.6 100 Mile capacity (#357) | 7 eligible intervals, 2 test | `bamax30` test pass, unstable | No bundle |
 | D7.7 100 Mile LOSO (#360) | 6 site folds over 7 intervals | `BAMAX 25` BA pass/TPH fail; `BAMAX 30` opposite | No capacity-only bundle |
-| D7.8 100 Mile candidate (#362) | 6 site folds, site-specific ingrowth | `BAMAX 25` + 100 Mile ingrowth: BA +8.4%, TPH -13.1% | **Candidate**, temporal holdout next |
+| D7.8 100 Mile candidate (#362) | 6 site folds, site-specific ingrowth | `BAMAX 25` + 100 Mile ingrowth: BA +8.4%, TPH -13.1% | **Candidate** |
+| D7.9 temporal holdout (#366) | train <=1998, test >=2001 | one eligible later interval; BA +33.4% | Not validated; data gap |
 
 The only positive result is the last one. Everything before it is useful evidence, not a calibration.
 
@@ -169,10 +170,10 @@ The test site lists are site identifiers. Keep them in `runtime/`; do not commit
 
 ## 6. Next steps
 
-1. **Temporal holdout:** train rates on earlier 100 Mile intervals, test on later intervals.
+1. **Temporal holdout (D7.9):** the later visits have only **one eligible interval**; it fails BA (+33.4%). The candidate remains **unvalidated temporally**. Do not issue a bundle until newer/extra 100 Mile data or a second TSA supplies a usable split.
 2. Freeze the canonical rates and record the training interval list and checksum.
 3. Add an `ESTAB`/ingrowth section to the calibration-bundle schema and provenance.
-4. If the temporal holdout passes, issue a **100 Mile candidate bundle** with the claim boundary.
+4. If a usable temporal holdout passes, issue a **100 Mile candidate bundle** with the claim boundary.
 5. Then repeat the same playbook for SBPSdc (Quesnel) and the other SBPS TSAs; do not transfer the
    100 Mile rates.
 

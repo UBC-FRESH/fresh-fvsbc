@@ -205,6 +205,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d7-100mile-loocv.md` | The D7.7 leave-one-site-out capacity result |
 | `d7-100mile-candidate.md` | The D7.8 100 Mile-specific ingrowth candidate that passes both biases |
 | `d7-sbps-playbook.md` | Consolidated D7 SBPS record: false starts, LOSO lessons, candidate, and next steps |
+| `d7-100mile-temporal.md` | The D7.9 temporal holdout attempt and data-gap result |
+| `d7-100mile-temporal.json`, `d7-100mile-temporal-summary.csv` | The D7.9 rates and split summary |
 | `d7-100mile-ingrowth.json`, `d7-100mile-ingrowth-loso-summary.csv`, `d7-100mile-ingrowth-candidates.json` | The D7.8 rates, LOSO result, and candidate |
 | `d7-100mile-loocv-summary.csv`, `d7-100mile-loocv-candidates.json` | The D7.7 LOSO tables and candidate list |
 | `d7-100mile-summary.csv`, `d7-100mile-candidates.json` | The D7.6 screening tables and candidate list |
