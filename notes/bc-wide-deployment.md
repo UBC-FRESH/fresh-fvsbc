@@ -187,6 +187,15 @@ bias is -16.3% and fails. **No IDFdk bundle.** The next step is a full-sample fi
 explicit ingrowth, keeping the 100 Mile House TSA as an untouched holdout and reporting IDFdk3
 separately. See `d7-idfdk-readiness.md`.
 
+**D7.4 IDFdk ingrowth result (2026-11-03):** the TPH failure was **missing ingrowth**, not mortality.
+Public tree detail shows the 100 Mile IDFdk3 stands gain 1,022–2,165 new trees/ha in the next visit,
+mostly FD; FVS had no natural-regeneration block. A BEC × species annual recruitment model fitted on
+**712 intervals / 282 sites** outside the 100 Mile TSA, rendered as an `ESTAB`/`NATURAL` block, passes
+the same spatial holdout: BA **-1.90 / MAE 1.93 (-6.0%)**, TPH **-207.4 / MAE 370.1 (-8.7%)**, both
+inside the D7 thresholds with `BAMAX 53` unchanged and no mortality multiplier. Training TPH is +9.0%.
+This is a **pilot model**, not a released bundle; the bundle contract still needs an ingrowth section
+and a second spatial/temporal holdout. See `d7-idfdk-ingrowth.md`.
+
 ## 5. Data and methods
 
 ### Data

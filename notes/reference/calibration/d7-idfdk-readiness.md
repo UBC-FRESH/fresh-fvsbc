@@ -1,8 +1,6 @@
 # D7.3 IDFdk calibration readiness
 
-Status: probe complete; **no IDFdk bundle is issued**. The default capacity/growth is close on BA,
-but the held-out TPH bias is outside the pre-registered threshold and the only candidates that
-close it use mortality below the soft bound.
+Status: probe complete; **D7.4 found and tested the fix** — the TPH failure is missing ingrowth, and a public-data recruitment model passes the spatial holdout. No released bundle yet.
 Date: 2026-11-03
 Build: `fresh-fvsbc-pyfvs 0.4.1` (pinned by `fresh-fvsbc 0.21.3`)
 Data: all-zone calibration dataset; IDFdk has 915 intervals
@@ -68,7 +66,13 @@ not a final set.
 
 ## 5. Decision
 
-**No IDFdk bundle.** The default `BAMAX 53` is retained as the baseline. The next IDFdk work is:
+**D7.4 update:** the TPH failure was missing ingrowth, not a mortality parameter. The D7.4 pilot adds
+a public-data BEC × species recruitment model through `ESTAB` and passes the same spatial holdout:
+BA -1.90 / MAE 1.93 (-6.0%) and TPH -207.4 / MAE 370.1 (-8.7%). See `d7-idfdk-ingrowth.md`. A bundle
+is still not released; the next step is packaging the ingrowth section and adding a second holdout.
+
+**No IDFdk bundle from the capacity/mortality candidates.** The default `BAMAX 53` is retained as the
+baseline. The next IDFdk work is:
 
 1. Fit on the full IDFdk sample (915 intervals) rather than the 29-interval probe, with the same
    site-grouped split.

@@ -1,0 +1,76 @@
+{
+  "model_id": "idfdk-ingrowth-2026-11-03",
+  "version": "0.1.0",
+  "source": "FAIB PSP tree_detail; all IDFdk intervals except 100 Mile House TSA",
+  "training": {
+    "intervals": 712,
+    "sites": 282,
+    "excluded_tsa": "100 Mile House TSA",
+    "rate": "mean new-tree TPH per year by BEC and species group",
+    "groups": [
+      "FD",
+      "PL",
+      "SE",
+      "HW"
+    ]
+  },
+  "rates": {
+    "IDFdk": {
+      "FD": 8.4898,
+      "PL": 0.288,
+      "HW": 0.2468
+    },
+    "IDFdk1": {
+      "FD": 52.0557,
+      "PL": 10.3405,
+      "SE": 2.9982,
+      "HW": 3.3285
+    },
+    "IDFdk2": {
+      "FD": 59.6945,
+      "PL": 12.7077,
+      "SE": 1.7947,
+      "HW": 4.6001
+    },
+    "IDFdk3": {
+      "FD": 56.6039,
+      "PL": 5.0718,
+      "SE": 2.6954,
+      "HW": 3.1923
+    },
+    "IDFdk4": {
+      "FD": 124.1754,
+      "PL": 4.0107,
+      "HW": 0.7779
+    },
+    "IDFdk5": {
+      "FD": 19.5218,
+      "PL": 2.1616,
+      "SE": 1.1385,
+      "HW": 0.7974
+    }
+  },
+  "claim": "Public-data recruitment rate for a D7 pilot; not a province-wide calibration.",
+  "build": {
+    "pyfvs": "fresh-fvsbc-pyfvs 0.4.1",
+    "wrapper": "fresh-fvsbc 0.21.3",
+    "variant": "bc"
+  },
+  "parameters": {
+    "bamax_m2ha": 53.0,
+    "baimult": 1.0,
+    "mortmult": 1.0
+  },
+  "validation": {
+    "holdout": "100 Mile House TSA",
+    "test_intervals": 7,
+    "train_intervals": 22,
+    "ba_bias": -1.9,
+    "ba_mae": 1.93,
+    "ba_percent": -6.0,
+    "tph_bias": -207.4,
+    "tph_mae": 370.1,
+    "tph_percent": -8.7,
+    "thresholds_met": true
+  }
+}

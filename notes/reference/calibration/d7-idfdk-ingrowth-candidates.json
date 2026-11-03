@@ -1,0 +1,8 @@
+[
+  {
+    "label": "bamax53-ingrowth",
+    "bamax": 53.0,
+    "baimult": {"FD": 1.0, "SE": 1.0, "PL": 1.0, "HW": 1.0},
+    "mortmult": {"FD": 1.0, "SE": 1.0, "PL": 1.0, "HW": 1.0}
+  }
+]

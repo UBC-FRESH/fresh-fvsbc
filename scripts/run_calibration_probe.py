@@ -33,6 +33,7 @@ from fresh_fvsbc.backtest import (
 )
 from fresh_fvsbc.calibration_probe import (
     eligible_intervals,
+    ingrowth_keyword,
     insert_parameters,
     parameter_keywords,
     summarise_probe,
@@ -67,6 +68,10 @@ def _parser() -> argparse.ArgumentParser:
         help="Comma-separated SITE_IDENTIFIER values to hold out; empty means no split",
     )
     parser.add_argument("--candidates", required=True, type=Path, metavar="FILE")
+    parser.add_argument(
+        "--ingrowth", type=Path, metavar="FILE", help="optional BEC/species rate JSON"
+    )
+    parser.add_argument("--ingrowth-scale", type=float, default=1.0, metavar="MULT")
     parser.add_argument("--tree-age", type=float, default=60.0, metavar="YEARS")
     return parser
 
@@ -100,7 +105,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         intervals = pd.read_csv(args.data_dir / "intervals.csv")
         visits = pd.read_csv(args.data_dir / "visits.csv")
         candidates = _candidates(args.candidates)
-    except (OSError, ValueError, json.JSONDecodeError) as error:
+        ingrowth = (
+            json.loads(args.ingrowth.read_text(encoding="utf-8"))["rates"]
+            if args.ingrowth is not None
+            else {}
+        )
+    except (OSError, ValueError, json.JSONDecodeError, KeyError) as error:
         print(f"run_calibration_probe: {error}")
         return EXIT_BAD_INPUT
     domain = intervals[intervals["BEC"].astype(str).str.startswith(args.domain)].copy()
@@ -151,7 +161,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                 & (visits["VISIT_NUMBER"] == interval["visit1"])
                 & (visits["PLOT"] == interval["PLOT"])
             ].iloc[0]
-            keywords = insert_parameters(keywords_for(interval), parameters)
+            ingrowth_keyword_value = ingrowth_keyword(
+                bec=str(interval["BEC"]),
+                years=float(interval["years"]),
+                rates=ingrowth,
+                scale=args.ingrowth_scale,
+            )
+            block = (*parameters, ingrowth_keyword_value) if ingrowth_keyword_value else parameters
+            keywords = insert_parameters(keywords_for(interval), block)
             run_dir = (
                 args.out_dir / "runs" / f"{label}-{str(interval['interval_id']).replace('|', '_')}"
             )
@@ -197,6 +214,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "min_qmd": args.min_qmd,
                 "test_sites": sorted(test_sites),
                 "candidates": candidates,
+                "ingrowth": str(args.ingrowth) if args.ingrowth is not None else "",
+                "ingrowth_scale": args.ingrowth_scale,
                 "intervals": int(frame["interval_id"].nunique()),
                 "rows": len(frame),
             },
