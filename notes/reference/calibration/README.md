@@ -35,6 +35,8 @@ outside the repository because they carry site identifiers.
 | `w2-five-zone.patch.gz` | The five-zone parser/defaults patch, applied after the W3.1 boundary fix |
 | `w2-five-zone-prototype.md` | The 32-label build/smoke result and the parser defects it found |
 | `w2-five-zone-smoke.csv` | One row per five-zone label: expected/echoed BAMAX and database |
+| `w2-five-zone-species.md` | The seven donor aliases, the species smoke, and the output-code caveat |
+| `w2-five-zone-species-smoke.csv` | One row per missing species: donor, BEC/BAMAX echo, output code, database |
 | `w3-bec-boundary.md` | The W3.1 `KAM`+`MS` boundary finding and fix |
 | `w3-habtyp-boundary.patch.gz` | The Habtyp zone-boundary patch, applied after W2.3 |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |

@@ -1570,8 +1570,10 @@ provisional `BAMAX` candidates in
 `notes/reference/calibration/w2-five-zone-defaults.csv`. D2/D4 are built and
 smoke-tested: **32/32 five-zone labels** echo their own BEC and provisional
 BAMAX in a local `0.4.0` wheel (`w2-five-zone-prototype.md`). The five-zone
-patch is applied after the W3.1 boundary fix. Next: D3 species donor aliases
-and species-specific smoke, then D5 provincial baseline.
+patch is applied after the W3.1 boundary fix. D3 is done: the wrapper's
+`DONOR_SPECIES` maps the seven missing species to explicit donors and **7/7
+species smoke pass** (`w2-five-zone-species.md`). Next: D5 provincial baseline,
+then D6 true species tables where the donor residuals justify them.
 
 ### W3 supported-domain baseline
 

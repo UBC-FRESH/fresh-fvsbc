@@ -12,6 +12,7 @@ import re
 
 import pytest
 
+from fresh_fvsbc.nemora import to_tree_list
 from fresh_fvsbc.treelist import (
     BC_TREFMT,
     FIA_CODES,
@@ -32,6 +33,7 @@ from fresh_fvsbc.treelist import (
     write_tree_list,
     write_tree_record,
 )
+from nemora_fixtures import synthetic_population
 
 # The contract page's field table, transcribed. The writer's own list must agree with it.
 CONTRACT_FIELDS: tuple[str, ...] = (
@@ -322,3 +324,27 @@ def test_float_coercion_accepts_the_number_types_and_refuses_the_rest() -> None:
         _to_float(False)
     with pytest.raises(TypeError, match="is not a number"):
         _to_float(None)
+
+
+@pytest.mark.parametrize(
+    ("code", "donor"),
+    [
+        ("SS", "SE"),
+        ("SB", "SE"),
+        ("BA", "BG"),
+        ("HM", "HW"),
+        ("YC", "CW"),
+        ("DR", "AT"),
+        ("MB", "AC"),
+    ],
+)
+def test_the_seven_missing_species_resolve_to_donors(code: str, donor: str) -> None:
+    """The W2.1 species have an explicit donor until their true tables land."""
+    assert resolve_species(code) == donor
+    assert resolve_species(code.lower()) == donor
+
+
+def test_a_donor_alias_writes_the_donor_code_to_the_record() -> None:
+    """The tree list carries the donor, which is what the Fortran variant can run."""
+    fields = to_tree_list(synthetic_population(), species="SS", tree_age=60.0)
+    assert {record["species"] for record in fields} == {"SE"}
