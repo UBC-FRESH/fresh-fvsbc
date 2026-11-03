@@ -23,7 +23,8 @@ was used, why a result was accepted or retracted, and what the next agent should
 | D7.9 temporal holdout (#366) | train <=1998, test >=2001 | one eligible later interval; BA +33.4% | Not validated; data gap |
 | D7.10 Quesnel capacity (#368) | 39 eligible intervals / 13 sites | `BAMAX 55` pooled BA +8.9%/TPH -14.4%; one dense site BA +151% | No bundle; density stratum needed |
 | D7.11 Quesnel established (#371) | QMD >= 9, 36 intervals / 12 sites | `BAMAX 75` pooled BA +3.6%/TPH -14.5%; worst site BA +35%/TPH -44% | No bundle; site effect needed |
-| D7.12 Quesnel site index (#373) | 13 sites, SI + QMD/BA | SI rank correlation -0.49; no separator | Not sufficient; hierarchical site model next |
+| D7.12 Quesnel site index (#373) | 13 sites, SI + QMD/BA | SI rank correlation -0.49; no separator | Not sufficient; site model failed |
+| D7.13 Quesnel high-QMD (#376) | QMD >= 13, 20 intervals / 6 sites | `BAMAX 75`: BA -2.1%, TPH -6.3%; every site fold passes | **Candidate**; temporal next |
 
 The only positive result is the last one. Everything before it is useful evidence, not a calibration.
 
@@ -177,9 +178,9 @@ The test site lists are site identifiers. Keep them in `runtime/`; do not commit
 2. Freeze the canonical rates and record the training interval list and checksum.
 3. Add an `ESTAB`/ingrowth section to the calibration-bundle schema and provenance.
 4. If a usable temporal holdout passes, issue a **100 Mile candidate bundle** with the claim boundary.
-5. SBPSdc/Quesnel is screened: `BAMAX 55` passes pooled, but one dense small-tree site fails by
-   151%. The next experiment is a density-stratified capacity, not another pooled BAMAX. Do not
-   transfer the 100 Mile rates.
+5. SBPSdc/Quesnel: the full and site-index models fail, but the `QMD >= 13` domain has a candidate:
+   `BAMAX 75` with every site fold passing. The `QMD < 13` sites remain validation-only. Do not
+   transfer the 100 Mile rates or fold the mid/dense sites into this claim.
 
 ## 7. Claim boundary
 
