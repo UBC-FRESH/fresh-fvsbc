@@ -96,6 +96,15 @@ def test_a_valid_bundle_loads_and_renders(tmp_path: Path) -> None:
     assert bundle.warnings == ()
 
 
+def test_an_ingrowth_only_bundle_has_an_empty_parameter_list(tmp_path: Path) -> None:
+    """CWH and other domain models can carry rates without a capacity override."""
+    record = _record()
+    record["parameters"] = []
+    bundle = load_bundle(_write(tmp_path, record))
+    assert bundle.parameters == ()
+    assert bundle.render() == ()
+
+
 def test_the_kc_pilot_bundle_loads_and_carries_its_two_warnings() -> None:
     """The KC bundle is unsigned and its PL multiplier sits at its bound."""
     bundle = load_bundle(KC_PILOT)
@@ -299,7 +308,7 @@ def test_a_json_list_is_refused(tmp_path: Path) -> None:
         (lambda r: r["domain"].update(dbh_classes={}), "dbh_classes"),
         (lambda r: r["domain"].update(dbh_classes=[[0]]), "min, max"),
         (lambda r: r["domain"].update(dbh_classes=[[10, 0]]), "min must be below max"),
-        (lambda r: r.update(parameters=[]), "non-empty list"),
+        (lambda r: r.update(parameters={}), "must be a list"),
         (lambda r: r.update(parameters=[1]), "must be an object"),
         (lambda r: r["parameters"][0].update(fields="53"), "list of strings"),
         (lambda r: r["parameters"][0].update(value_index=-1), "non-negative"),

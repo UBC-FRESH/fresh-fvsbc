@@ -166,8 +166,8 @@ def test_build_writes_the_tables_and_the_manifest(tmp_path: Path) -> None:
     assert manifest["archive"] == "psp"
 
 
-def test_coverage_counts_the_unsupported_zone_without_tree_tables(tmp_path: Path) -> None:
-    """CWH is counted as a site and a visit, but it contributes no interval."""
+def test_coverage_counts_a_prototype_zone_without_tree_tables(tmp_path: Path) -> None:
+    """CWH is supported now, and still contributes no interval without a tree table."""
     archive = _write_archive(tmp_path)
     dataset = build_dataset(archive, tmp_path / "out")
     coverage = dataset.coverage.set_index("BEC")
@@ -178,7 +178,7 @@ def test_coverage_counts_the_unsupported_zone_without_tree_tables(tmp_path: Path
     assert int(_number(coverage.loc["IDFdk3", "repeat_sites"])) == 1
     assert int(_number(coverage.loc["IDFdk3", "intervals"])) == 2
     assert int(_number(coverage.loc["IDFdk3", "damaged_trees"])) == 1
-    assert bool(coverage.loc["CWHvm1", "supported"]) is False
+    assert bool(coverage.loc["CWHvm1", "supported"]) is True
     assert int(_number(coverage.loc["CWHvm1", "visits"])) == 1
     assert int(_number(coverage.loc["CWHvm1", "intervals"])) == 0
 
@@ -199,10 +199,10 @@ def test_intervals_separate_dead_from_missing(tmp_path: Path) -> None:
 
 
 def test_envelope_is_built_from_supported_visits(tmp_path: Path) -> None:
-    """CWH has no tree table, so it has no envelope row."""
+    """Every supported visit reaches the envelope, even when it has no tree table."""
     archive = _write_archive(tmp_path)
     dataset = build_dataset(archive, tmp_path / "out")
-    assert set(dataset.envelope["BEC"]) == {"IDFdk3", "SBSmc2"}
+    assert set(dataset.envelope["BEC"]) == {"CWHvm1", "IDFdk3", "SBSmc2"}
     assert dataset.envelope["ba_p99"].notna().all()
     assert set(dataset.species_envelope["group"]) == {"FD", "HW", "PL", "SE", "UNKNOWN"}
 

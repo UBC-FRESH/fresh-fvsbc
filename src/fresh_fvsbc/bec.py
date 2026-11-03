@@ -17,11 +17,11 @@ The source is the authority
 ----------------------------
 
 The accepted regions are ``CAR``, ``KAM``, and ``NEL``; the zones are ``ESSF``,
-``ICH``, ``IDF``, ``MS``, ``PP``, ``SBS``, and ``SBPS``; and the subzones are the
-two-letter list in ``HABTYP``. The zone list is also the list ``sitset.f``
-assigns default maximum basal area for. ``CWH``, ``CDF``, ``BWBS``, ``CMA``, and
-``MH`` are **not** represented by the BC variant, so a code in one of those zones
-is refused rather than silently defaulted.
+``ICH``, ``IDF``, ``MS``, ``PP``, ``SBS``, ``SBPS``, ``CWH``, ``CDF``, ``BWBS``,
+``CMA``, and ``MH``; and the subzones are the two-letter list in ``HABTYP``. The
+zone list is also the list ``sitset.f`` assigns default maximum basal area for.
+The five prototype zones are carried by the W2.5 extension; a build without that
+extension echoes a different BEC and the run refuses it.
 
 The grammar is the working form the FVS source accepts, made explicit::
 
@@ -50,11 +50,24 @@ __all__ = [
 REGIONS: tuple[str, ...] = ("CAR", "KAM", "NEL")
 
 #: The BEC zones the BC variant resolves, in ``HABTYP``'s order.
-SUPPORTED_ZONES: tuple[str, ...] = ("ESSF", "ICH", "IDF", "MS", "PP", "SBS", "SBPS")
+SUPPORTED_ZONES: tuple[str, ...] = (
+    "ESSF",
+    "ICH",
+    "IDF",
+    "MS",
+    "PP",
+    "SBS",
+    "SBPS",
+    "CWH",
+    "CDF",
+    "BWBS",
+    "CMA",
+    "MH",
+)
 
-#: The BC zones the variant does **not** resolve. They are named so the refusal can
-#: say why the code did not work, rather than only that it did not parse.
-UNSUPPORTED_ZONES: tuple[str, ...] = ("CWH", "CDF", "BWBS", "CMA", "MH")
+#: Retained for callers that imported the old refusal list. Empty after the W2.5
+#: extension added the five prototype zones.
+UNSUPPORTED_ZONES: tuple[str, ...] = ()
 
 #: The two-letter subzone tokens ``HABTYP`` accepts, without duplicates. The source
 #: lists ``WM`` twice; a set does not need the duplicate.
@@ -87,6 +100,11 @@ SUBZONES: tuple[str, ...] = (
     "XW",
     "XX",
     "UN",
+    "DS",
+    "MS",
+    "VH",
+    "VM",
+    "WS",
 )
 
 _ZONE_PATTERN: str = "|".join(SUPPORTED_ZONES)
@@ -247,14 +265,6 @@ class BecCode:
                 subzone=f"{match.group('subzone')}{variant}".lower(),
                 series=match.group("series").lower(),
             )
-        upper = compact.upper()
-        for zone in UNSUPPORTED_ZONES:
-            if zone in upper:
-                raise BecCodeError(
-                    f"the BC variant does not represent the {zone} BEC zone, and FVS "
-                    "would silently fall back to ICHmw2/01; the supported zones are "
-                    f"{', '.join(SUPPORTED_ZONES)}"
-                )
         raise BecCodeError(
             f"{text!r} is not a BC BEC code. Write the region in the first STDINFO field "
             f"and the zone, subzone, and site series in the second, as in "

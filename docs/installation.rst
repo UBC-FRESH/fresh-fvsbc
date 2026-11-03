@@ -53,8 +53,9 @@ The third patch adds the 19 W2.3 subzones and their provisional defaults. Withou
 builds, but those codes fall back to ``ICHmw2/01``; ``run_case`` refuses that fallback rather than
 returning a plausible run. The fourth fixes the ``KAM`` + ``MS`` boundary collision that made
 ``MSxk1`` resolve as ``MSmm``. The final two patches add the five-zone prototype and fix the SBPS small-tree height branch. The
-patched wheel is versioned ``0.4.1`` and is the ``fvs`` extra for ``fresh-fvsbc 0.21.3``. The wrapper
-still refuses the five zones; the binary can run them through the prototype path.
+patched wheel is versioned ``0.4.1`` and is the ``fvs`` extra for ``fresh-fvsbc 0.21.4``. The wrapper
+now accepts the five prototype zones; the binary carries their provisional parser and defaults. That
+is deployment plumbing, not calibration: only the IDFdk and SBS pilots have passed a holdout.
 
 
 What you get

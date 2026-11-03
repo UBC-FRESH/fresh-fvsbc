@@ -72,11 +72,19 @@ def test_a_code_that_would_not_resolve_is_refused(text: str) -> None:
         BecCode.parse(text)
 
 
-@pytest.mark.parametrize("zone", ["CWH", "CDF", "BWBS", "CMA", "MH"])
-def test_an_unsupported_zone_names_the_zone_and_the_supported_list(zone: str) -> None:
-    """The five zones the variant does not represent are refused for that reason."""
-    with pytest.raises(BecCodeError, match=zone):
-        BecCode.parse(f"CAR {zone}vm1/01")
+@pytest.mark.parametrize(
+    ("text", "zone"),
+    [
+        ("CAR CWHvm1/01", "CWH"),
+        ("CAR CDFmm/01", "CDF"),
+        ("CAR BWBSdk/01", "BWBS"),
+        ("CAR CMAunp/01", "CMA"),
+        ("CAR MHmm1/01", "MH"),
+    ],
+)
+def test_the_five_prototype_zones_parse(text: str, zone: str) -> None:
+    """The W2.5 extension carries the five zones and their subzones."""
+    assert BecCode.parse(text).zone == zone
 
 
 def test_the_legacy_stdinfo_string_names_the_silent_default() -> None:
@@ -96,10 +104,10 @@ def test_a_direct_constructor_refuses_an_unsupported_region() -> None:
         BecCode(region="USA", zone="IDF", subzone="dk3", series="01")
 
 
-def test_a_direct_constructor_refuses_an_unsupported_zone() -> None:
-    """The value object cannot be built with a zone the variant does not represent."""
+def test_a_direct_constructor_refuses_an_unknown_zone() -> None:
+    """The value object cannot be built with a zone the source does not accept."""
     with pytest.raises(BecCodeError, match="zone"):
-        BecCode(region="CAR", zone="CWH", subzone="vm1", series="01")
+        BecCode(region="CAR", zone="XXX", subzone="vm1", series="01")
 
 
 @pytest.mark.parametrize(
