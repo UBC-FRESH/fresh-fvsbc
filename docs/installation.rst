@@ -48,8 +48,9 @@ takes a few minutes:
 
 The third patch adds the 19 W2.3 subzones and their provisional defaults. Without it the variant still
 builds, but those codes fall back to ``ICHmw2/01``; ``run_case`` refuses that fallback rather than
-returning a plausible run. The patched wheel is versioned ``0.3.12``; until it is published, the
-``fvs`` extra still resolves ``0.3.11``, which does not carry W2.3.
+returning a plausible run. The patched wheel is versioned ``0.3.12`` and is the ``fvs`` extra for
+``fresh-fvsbc 0.21.0``; it is uploaded before the ``v0.21.0`` tag. If you build from a source checkout
+before that upload, use the recipe above.
 
 
 What you get

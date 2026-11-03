@@ -12,7 +12,7 @@ tests in the same change set, and the gates configured in ``pyproject.toml`` cov
 
 from __future__ import annotations
 
-__version__ = "0.20.0"
+__version__ = "0.21.0"
 
 from fresh_fvsbc.bec import BecCode, BecCodeError
 from fresh_fvsbc.bundle import BundleError, CalibrationBundle, load_bundle
