@@ -46,6 +46,11 @@ outside the repository because they carry site identifiers.
 | `baseline_v3.md` | The W3.1 full-domain baseline report |
 | `baseline_summary_v3.csv`, `baseline_by_tsa_v3.csv`, `baseline_by_species_v3.csv`, `baseline_by_dbh_v3.csv`, `baseline_by_ba_v3.csv` | The W3.1 residual tables |
 | `baseline_skipped_becs_v3.csv`, `baseline_skip_reasons_v3.csv` | The W3.1 skip tables |
+| `all-zone-baseline/d5-all-zone-baseline.md` | The D5 provincial baseline report |
+| `all-zone-baseline/baseline_by_zone.csv` | D5 residual summary by BEC zone |
+| `all-zone-baseline/baseline_five_zone.csv` | D5 five-zone per-BEC residuals |
+| `all-zone-baseline/baseline_outliers.csv` | The 12 largest BA deviations, aggregate-safe columns |
+| `all-zone-baseline/baseline_summary.csv`, `baseline_by_*.csv` | The D5 per-BEC and grouped residual tables |
 
 ## Counts
 

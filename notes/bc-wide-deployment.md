@@ -123,7 +123,17 @@ tables are D6.
 - Compare initial and next-measurement BA/TPH; build the residual atlas.
 - Decide which donor aliases are good enough for Stage B and which need true species tables.
 
-**Deliverable:** the first all-zone residual atlas and a ranked list of species/zone failures.
+**D5 result (2026-11-03):** the all-zone baseline ran **139 BEC strata, 139 intervals, 0 skipped** on
+the 0.4.0 five-zone build. The initial stand is reproduced (BA bias -0.69, MAE 0.84). Excluding SBPS
+and envelope-flagged rows, the end-of-interval BA bias is **-5.27 m2/ha** and MAE **8.45** (n=130).
+The five zones have **no envelope flags** and moderate BA MAE (CWH 11.75, BWBS 7.93, CDF 18.85, CMA
+3.46, MH 11.94). **SBPS is the supported-zone failure**: `SBPSmc` predicts 457,348 m2/ha against
+30.65 observed, with `SBPSdc` and `SBPSmk` also above max. The donor aliases produced **0 skips**, so
+the species layer works. D6 priority is SBPS small-tree density/mortality, not the coastal donors;
+the five-zone sample moves to five intervals per BEC before any true species table is promoted.
+`d5-all-zone-baseline.md` is the report.
+
+**Deliverable:** done; the residual atlas is in `notes/reference/calibration/all-zone-baseline/`.
 
 ## 5. Data and methods
 
