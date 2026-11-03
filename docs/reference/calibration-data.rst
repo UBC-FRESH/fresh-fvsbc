@@ -165,6 +165,8 @@ missing subzones, and the `w2-species-bec-crosswalk.csv` / `w2-bec-gap.csv`
 working tables. `w2-source-audit.md` reads the pinned Fortran and records the
 go/no-go: 18 subzones are a bounded extension, while the five zones need a
 separate parameter-development project; site index is not used by the variant.
+`w2-subzone-patch.md` carries the W2.3 patch for the 19 subzones and its
+provisional PSP-p99 defaults; it is prepared and apply-checked, not yet built.
 
 What it does not do
 -------------------

@@ -27,6 +27,9 @@ outside the repository because they carry site identifiers.
 | `w2-crosswalk.md` | The W2.1 method, counts, and claim boundary |
 | `w2-source-audit.md` | The W2.2 pinned-source audit and go/no-go |
 | `w2-source-gaps.csv` | The component-by-component source gap matrix |
+| `w2-subzone-patch.md` | The W2.3 subzone patch, 19 provisional defaults, and build plan |
+| `w2-subzone-defaults.csv` | The 19 subzones, tokens, PSP p99/max, and provisional BAMAX |
+| `w2-subzones.patch.gz` | The Habtyp/Sitset patch against the pinned source |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |

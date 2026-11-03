@@ -72,6 +72,15 @@ The default-BA fallback is 10 m2/ha (`sitset.f` 244–250); it must not be used
 for a new unit. The mortality table is ICH/IDF only; ESSF/MS/PP already default
 to ICH, and SBS to ICH except `SBSdw2` to IDF.
 
+## 1.4 W2.3 patch prepared
+
+`w2-subzone-patch.md` carries the bounded patch for the 19 subzones with PSP
+data: `habtyp.f` gains 10 subzone tokens, and `sitset.f` gains a provisional
+`BAMAX` case for each subzone from the PSP p99. The patch applies to the pinned
+source (`git apply --check` passes) and is banked in `w2-subzones.patch.gz`.
+It is **not built or pinned**; the PyFVS fork build and the 19 smoke cases are
+the next step. ESSF/MS still use the V2/ICH mortality default.
+
 ## 2. Work package
 
 ### 2.1 Source audit
