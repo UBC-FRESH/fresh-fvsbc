@@ -180,3 +180,6 @@ python scripts/build_calibration_dataset.py \
 The command prints the manifest's row counts and writes the six tables plus the
 manifest. The SHA-256 values in `manifest.json` identify the snapshot; a different
 snapshot with the same row counts still needs a new manifest.
+
+| `d7-sbps-capacity.md` | The D7.2 per-BEC SBPS capacity probe and no-bundle result |
+| `d7-per-bec-summary.csv`, `d7-per-bec-by-bec.csv`, `d7-per-bec-candidates.json` | The D7.2 per-BEC probe tables and candidate list |
