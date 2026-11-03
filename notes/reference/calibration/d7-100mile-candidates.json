@@ -1,0 +1,26 @@
+[
+  {
+    "label": "bamax30",
+    "bamax": 30.0
+  },
+  {
+    "label": "bamax35",
+    "bamax": 35.0
+  },
+  {
+    "label": "bamax40",
+    "bamax": 40.0
+  },
+  {
+    "label": "bamax45",
+    "bamax": 45.0
+  },
+  {
+    "label": "bamax50",
+    "bamax": 50.0
+  },
+  {
+    "label": "bamax55",
+    "bamax": 55.0
+  }
+]
