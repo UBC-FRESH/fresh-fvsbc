@@ -1,0 +1,62 @@
+{
+  "bundle_id": "sbpsdc-quesnel-highqmd-2026-11-03",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": [
+      "CAR"
+    ],
+    "becs": [
+      "SBPSdc"
+    ],
+    "species_groups": [
+      "PL",
+      "SE",
+      "BL",
+      "FD",
+      "HW"
+    ],
+    "dbh_classes": [
+      [
+        0,
+        999
+      ]
+    ],
+    "management": [
+      "untreated"
+    ]
+  },
+  "parameters": [
+    {
+      "keyword": "BAMAX",
+      "fields": [
+        "75"
+      ],
+      "units": "m2/ha",
+      "value_index": 0,
+      "bounds": {
+        "min": 25.0,
+        "max": 89.0
+      }
+    }
+  ],
+  "training": {
+    "data_checksum": "sha256:d9f609cd42dd32d0d9e3cac19a6b654771ad2b1e2642c97452a6328143a4c910",
+    "split": "QMD>=13; site-grouped and temporal (train <=1981, test >=1990)",
+    "objective": "minimise BA and TPH bias on the high-QMD Quesnel stratum",
+    "convergence": {
+      "iterations": 0,
+      "max_parameter_change": 0.0
+    }
+  },
+  "review": {
+    "reviewer": "unreviewed",
+    "date": "2026-11-03",
+    "signed_off": false
+  },
+  "claim": "Unsigned candidate for Quesnel SBPSdc stands with initial QMD >=13. The QMD restriction is not enforced by the current bundle schema. Not a certificate."
+}

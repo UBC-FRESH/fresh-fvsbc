@@ -24,7 +24,8 @@ was used, why a result was accepted or retracted, and what the next agent should
 | D7.10 Quesnel capacity (#368) | 39 eligible intervals / 13 sites | `BAMAX 55` pooled BA +8.9%/TPH -14.4%; one dense site BA +151% | No bundle; density stratum needed |
 | D7.11 Quesnel established (#371) | QMD >= 9, 36 intervals / 12 sites | `BAMAX 75` pooled BA +3.6%/TPH -14.5%; worst site BA +35%/TPH -44% | No bundle; site effect needed |
 | D7.12 Quesnel site index (#373) | 13 sites, SI + QMD/BA | SI rank correlation -0.49; no separator | Not sufficient; site model failed |
-| D7.13 Quesnel high-QMD (#376) | QMD >= 13, 20 intervals / 6 sites | `BAMAX 75`: BA -2.1%, TPH -6.3%; every site fold passes | **Candidate**; temporal next |
+| D7.13 Quesnel high-QMD (#376) | QMD >= 13, 20 intervals / 6 sites | `BAMAX 75`: BA -2.1%, TPH -6.3%; every site fold passes | Candidate |
+| D7.14 Quesnel temporal (#378) | train <=1981, test >=1990 | test BA +5.4%, TPH +3.8%; both pass | **Candidate bundle**, unsigned |
 
 The only positive result is the last one. Everything before it is useful evidence, not a calibration.
 

@@ -1,6 +1,6 @@
 # D7.13 Quesnel high-QMD capacity candidate
 
-Status: **candidate passes every site fold inside a QMD >= 13 domain**; not a bundle or certificate
+Status: **candidate passes every site fold and the temporal holdout**; unsigned candidate bundle, not a certificate
 Date: 2026-11-03
 Issue: #376
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.3`
@@ -43,9 +43,9 @@ D7.11's mid-QMD sites failed at BAMAX75. Do not fold them into this claim.
 
 ## 4. Next
 
-1. Temporal holdout on the six high-QMD sites.
-2. Freeze `BAMAX 75` for that domain; add the domain and claim boundary to the bundle schema.
-3. If temporal passes, issue a **Quesnel high-QMD candidate bundle**.
+1. Temporal holdout: passed (D7.14).
+2. `BAMAX 75` is in the unsigned `d7-quesnel-highqmd-bundle.json`.
+3. Add a QMD domain field before treating the bundle as self-contained.
 4. Keep `QMD < 13` validation-only until it has its own capacity/recruitment model.
 
 ## 5. Claim boundary
