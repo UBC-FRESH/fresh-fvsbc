@@ -63,7 +63,7 @@ outside the repository because they carry site identifiers.
 | `d7-consolidation.md` | The D7.6 bundle, holdout, periodic, domain, and density results |
 | `d7-idfdk-bundle.json` | The D7.4/D7.6 pilot bundle with the ingrowth section |
 | `d7-sbs-bundle.json`, `d7-sbs-summary.csv` | The D7.7 SBS MORTMULT 2.0 pilot and spatial holdout |
-| `d7-cwh-screen.md`, `d7-cwh-summary.csv`, `d7-cwh-bundle.json` | The D8.1 CWH growth pilot: three TSA holdouts, high BAIMULT; unsigned |
+| `d7-cwh-screen.md`, `d7-cwh-summary.csv`, `d7-cwh-bundle.json` | The D8.2 CWH growth pilot: three TSA + temporal holdouts, high BAIMULT; unsigned |
 | `d7-idfdk-binned-bundle.json` | The density/QMD-binned IDFdk pilot bundle |
 | `d7-idfdk-bundle-summary.csv`, `d7-idfdk-kamloops-summary.csv`, `d7-idfdk-temporal1990-summary.csv`, `d7-idfdk-binned-summary.csv`, `d7-idfdk-periodic-summary.csv` | The D7.6 validation summaries |
 | `d7-ingrowth-screen-by-zone.csv`, `d7-ingrowth-screen-by-bec.csv`, `d7-all-zone-ingrowth.json` | The all-zone domain screening tables and rates |

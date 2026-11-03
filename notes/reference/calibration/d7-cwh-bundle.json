@@ -27,7 +27,7 @@
       "fields": [
         "1",
         "FD",
-        "6.0000"
+        "7.0000"
       ],
       "units": "multiplier",
       "value_index": 2,
@@ -41,7 +41,7 @@
       "fields": [
         "1",
         "HW",
-        "6.0000"
+        "7.0000"
       ],
       "units": "multiplier",
       "value_index": 2,
@@ -55,7 +55,7 @@
       "fields": [
         "1",
         "CW",
-        "6.0000"
+        "7.0000"
       ],
       "units": "multiplier",
       "value_index": 2,
@@ -69,7 +69,7 @@
       "fields": [
         "1",
         "BG",
-        "6.0000"
+        "7.0000"
       ],
       "units": "multiplier",
       "value_index": 2,
@@ -83,7 +83,7 @@
       "fields": [
         "1",
         "PW",
-        "6.0000"
+        "7.0000"
       ],
       "units": "multiplier",
       "value_index": 2,
@@ -97,7 +97,7 @@
       "fields": [
         "1",
         "FD",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -113,7 +113,7 @@
       "fields": [
         "1",
         "PL",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -129,7 +129,7 @@
       "fields": [
         "1",
         "SE",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -145,7 +145,7 @@
       "fields": [
         "1",
         "HW",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -161,7 +161,7 @@
       "fields": [
         "1",
         "CW",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -177,7 +177,7 @@
       "fields": [
         "1",
         "BG",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -193,7 +193,7 @@
       "fields": [
         "1",
         "PW",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -209,7 +209,7 @@
       "fields": [
         "1",
         "LW",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -225,7 +225,7 @@
       "fields": [
         "1",
         "BL",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -241,7 +241,7 @@
       "fields": [
         "1",
         "AT",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -257,7 +257,7 @@
       "fields": [
         "1",
         "AC",
-        "0.3000",
+        "0.4500",
         "0",
         "999"
       ],
@@ -271,7 +271,7 @@
   ],
   "training": {
     "data_checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-    "split": "CWH five-per-BEC sample; Arrowsmith, Fraser, and Haida Gwaii TSA holdouts",
+    "split": "CWH five-per-BEC sample; Arrowsmith, Fraser, and Haida Gwaii TSA holdouts; temporal >=2000 holdout",
     "objective": "held-out BA/TPH bias",
     "convergence": {
       "iterations": 1,
@@ -283,5 +283,5 @@
     "date": "2026-11-03",
     "signed_off": false
   },
-  "claim": "CWH pilot: BAIMULT 6.0 for FD/HW/CW/BG/PW and MORTMULT 0.3 for eleven species; three TSA holdouts; high growth multiplier; not a certificate."
+  "claim": "CWH pilot: BAIMULT 7.0 for FD/HW/CW/BG/PW and MORTMULT 0.45 for eleven species; three TSA and one temporal holdout; high growth multiplier; not a certificate."
 }
