@@ -201,6 +201,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d7-sbps-tph.md` | The D7.3 SBPS TPH/MORTMULT probe and candidate parameter set |
 | `d7-sbps-ingrowth.md` | The D7.5 SBPS ingrowth TSA-holdout failure and D7.3 retraction |
 | `d7-100mile-capacity.md` | The D7.6 100 Mile TSA capacity screening and no-bundle result |
+| `d7-100mile-loocv.md` | The D7.7 leave-one-site-out capacity result |
+| `d7-100mile-loocv-summary.csv`, `d7-100mile-loocv-candidates.json` | The D7.7 LOSO tables and candidate list |
 | `d7-100mile-summary.csv`, `d7-100mile-candidates.json` | The D7.6 screening tables and candidate list |
 | `d7-sbps-ingrowth.json`, `d7-sbps-ingrowth-summary.csv`, `d7-sbps-ingrowth-candidates.json` | The D7.5 recruitment rates, holdout results, and candidates |
 | `d7-tph-summary.csv`, `d7-tph-by-bec.csv`, `d7-tph-candidates.json` | The D7.3 probe tables and candidate list |
