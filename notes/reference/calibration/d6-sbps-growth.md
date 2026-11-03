@@ -47,23 +47,18 @@ The evidence narrows it to **diameter growth**:
 - A single cycle drives QMD and BA far above any density explanation; the per-tree DBH is the
   exploded quantity.
 
-The 0.4.0 five-zone build also gives a larger explosion than the 0.3.13 supported build on the same
-interval: the W3.1 summary predicted 11,214 m²/ha, the 0.4.0 summary 457,348. The five-zone patch
-changes only `HABTYP` and `SITSET`, so the next comparison is a clean 0.3.13 versus 0.4.0 run with the
-same tree list. If the tree lists are identical, the difference is a build or BEC-state effect; if
-they differ, the patch changed how the stand is read.
+**Correction:** the 11,214 m²/ha figure came from an incomplete tree-list read in the W3.1
+supported baseline (its initial BA was 21.0, not 31.1). A clean full-stand run gives 457,348 on both
+0.3.13 and 0.4.0. The five-zone patch did not cause the explosion. `d6-small-tree-growth.md` records
+the corrected comparison.
 
 ## 4. Next instrument
 
-A one-tree, one-cycle sensitivity run, at fixed species (`SE`, `PL`), DBH (10, 20, 40 cm), and age
-(60 and the measured age where available), with `SITECODE` fixed and `BAMAX` held constant:
-
-- read `DG`, `HtG`, and the summary after one cycle;
-- vary one input at a time;
-- compare the 0.3.13 and 0.4.0 builds on the same tree list.
-
-That separates a unit conversion from a growth-equation response. No parameter is changed until the
-mechanism is named.
+A one-tree, one-cycle sensitivity run, at fixed species (`SE`, `PL`), DBH, and age, with `SITECODE`
+fixed and `BAMAX` held constant. `d6-small-tree-growth.md` carries the result: the explosion is a
+small-tree threshold (DBH below 8 for diameter, below 11 for height), not a unit conversion and not
+density. The next step is to read the small-tree branches in `canada/bc/dgf.f` and the height-growth
+routine.
 
 ## 5. Limits
 
