@@ -1,10 +1,21 @@
-# fresh-fvsbc 0.21.0
+# fresh-fvsbc 0.21.1
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.21.0
+
+- **The `fvs` extra now installs `six`.** `fresh-fvsbc-pyfvs 0.3.12` imports `six` but its wheel
+  metadata does not declare it, so a clean `pip install "fresh-fvsbc[fvs]==0.21.0"` installed the
+  extension and `list_variants()` worked, while a real run failed at `from pyfvs import fvs` with
+  `ModuleNotFoundError: six`. The `fvs` extra now names `six>=1.16`; the pin remains
+  `fresh-fvsbc-pyfvs==0.3.12`. The 0.21.0 content is unchanged.
+
+- **Packaging test:** `tests/test_fresh_fvsbc_package.py` asserts the `fvs` extra carries `six`, so the
+  missing runtime dependency cannot return silently.
 
 ## What changed since 0.20.0
 
