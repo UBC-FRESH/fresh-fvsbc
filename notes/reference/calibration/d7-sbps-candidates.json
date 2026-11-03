@@ -1,0 +1,32 @@
+[
+  {
+    "label": "bamax50",
+    "bamax": 50.0,
+    "baimult": {"PL": 1.0, "SE": 1.0},
+    "mortmult": {"PL": 1.0, "SE": 1.0}
+  },
+  {
+    "label": "bamax45-baimult0.5",
+    "bamax": 45.0,
+    "baimult": {"PL": 0.5, "SE": 0.5},
+    "mortmult": {"PL": 1.0, "SE": 1.0}
+  },
+  {
+    "label": "bamax48-baimult0.5",
+    "bamax": 48.0,
+    "baimult": {"PL": 0.5, "SE": 0.5},
+    "mortmult": {"PL": 1.0, "SE": 1.0}
+  },
+  {
+    "label": "bamax55",
+    "bamax": 55.0,
+    "baimult": {"PL": 1.0, "SE": 1.0},
+    "mortmult": {"PL": 1.0, "SE": 1.0}
+  },
+  {
+    "label": "bamax40-mort2",
+    "bamax": 40.0,
+    "baimult": {"PL": 1.0, "SE": 1.0},
+    "mortmult": {"PL": 2.0, "SE": 2.0}
+  }
+]

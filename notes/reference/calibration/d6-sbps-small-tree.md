@@ -78,7 +78,7 @@ SETUPTOOLS_SCM_PRETEND_VERSION=0.4.1 \
 `pyfvs.list_variants()` reports `{'BC': {'lib': 'pyfvs.fvsbc', 'status': 'OK'}}`.
 
 The regression test is `tests/test_d6_sbps.py`: a dense 10-tree PL stand below the 4.5-inch
-small-tree threshold in `SBPSmc`. On the local 0.4.1 build it passes (end BA below 200 m2/ha); on
+small-tree threshold in `SBPSmc`. On the 0.4.1 build it passes (end BA below 200 m2/ha); on
 the pre-fix 0.4.0 wheel it fails with an end BA of **36,077 m2/ha**. The test skips when the
 extension is absent, like the other extension cases.
 
@@ -116,8 +116,8 @@ alias layer (`Ba` -> `BG` rather than the D5 `BL`), so it is not a byte-for-byte
 
 ## What this does not establish
 
-- The build is local. The CI/wheel recipe now applies `w4-sbps-small-tree.patch.gz` and builds
-  `fresh-fvsbc-pyfvs 0.4.1`; the wrapper pin moves to it in `0.21.3`.
+- The build is published: `0.21.3` pins `fresh-fvsbc-pyfvs 0.4.1`, which carries
+  `w4-sbps-small-tree.patch.gz`.
 - The wrapper source still refuses `CWH`, `CDF`, `BWBS`, `CMA`, and `MH`; the five-zone baseline
   uses the prototype parser patch at runtime. That is a separate release task.
 - The fix does not prove the SBPS growth, mortality, or regeneration coefficients are calibrated.
