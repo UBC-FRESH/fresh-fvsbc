@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+from types import SimpleNamespace
+
 import pandas as pd
 import pytest
 
+import run_calibration_probe as probe
 from fresh_fvsbc.calibration_probe import (
     eligible_intervals,
     insert_parameters,
@@ -82,3 +87,136 @@ def test_summarise_probe_reports_bias_and_mae() -> None:
     assert first["bias_ba"] == 2.0
     assert first["mae_ba"] == 2.0
     assert first["bias_tph"] == 100.0
+
+
+def test_probe_main_writes_a_summary_with_a_mocked_extension(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The CLI wiring is covered without a Fortran run."""
+    data = tmp_path / "data"
+    data.mkdir()
+    pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 1,
+                "CLSTR_ID": "1-PSP",
+                "visit0": 1,
+                "visit1": 2,
+                "PLOT": 1,
+                "ba0": 30.0,
+                "dead_ba": 2.0,
+                "qmd": 12.0,
+                "BEC": "SBPSmk",
+                "TSA_DESC": "Quesnel TSA",
+                "year0": 2000,
+                "year1": 2010,
+                "years": 10,
+                "interval_id": "1|1|2000|2010",
+            }
+        ]
+    ).to_csv(data / "intervals.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 1,
+                "VISIT_NUMBER": 2,
+                "PLOT": 1,
+                "ba": 32.0,
+                "tph": 900.0,
+            }
+        ]
+    ).to_csv(data / "visits.csv", index=False)
+    candidates = tmp_path / "candidates.json"
+    candidates.write_text(json.dumps([{"label": "base", "bamax": 50.0}]), encoding="utf-8")
+    monkeypatch.setattr(probe, "_read_trees", lambda *_args, **_kwargs: pd.DataFrame({"x": [1]}))
+    monkeypatch.setattr(
+        probe, "psp_tree_records", lambda *_args, **_kwargs: ([{"species": "PL"}], 0)
+    )
+    monkeypatch.setattr(
+        probe,
+        "run_case",
+        lambda *_args, **_kwargs: SimpleNamespace(database=tmp_path / "FVSOut.db"),
+    )
+    monkeypatch.setattr(
+        probe, "summary_for_year", lambda *_args, **_kwargs: {"ba": 31.0, "tph": 950.0}
+    )
+    status = probe.main(
+        [
+            "--data-dir",
+            str(data),
+            "--psp-dir",
+            str(tmp_path / "psp"),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--domain",
+            "SBPS",
+            "--candidates",
+            str(candidates),
+        ]
+    )
+    assert status == 0
+    summary = pd.read_csv(tmp_path / "out" / "probe_summary.csv")
+    assert summary.loc[0, "candidate"] == "base"
+    assert summary.loc[0, "bias_ba"] == -1.0
+
+
+def test_candidates_refuses_empty_and_unlabelled_lists(tmp_path: Path) -> None:
+    """A candidate file that cannot name a row is refused."""
+    path = tmp_path / "candidates.json"
+    path.write_text("[]", encoding="utf-8")
+    with pytest.raises(ValueError, match="non-empty"):
+        probe._candidates(path)
+    path.write_text('[{"bamax": 50.0}]', encoding="utf-8")
+    with pytest.raises(ValueError, match="label"):
+        probe._candidates(path)
+
+
+def test_probe_main_refuses_missing_data_and_empty_tree_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The CLI reports a bad input without trying to run FVS."""
+    candidates = tmp_path / "candidates.json"
+    candidates.write_text('[{"label": "base", "bamax": 50.0}]', encoding="utf-8")
+    base = [
+        "--psp-dir",
+        str(tmp_path / "psp"),
+        "--out-dir",
+        str(tmp_path / "out"),
+        "--domain",
+        "SBPS",
+        "--candidates",
+        str(candidates),
+    ]
+    assert probe.main(["--data-dir", str(tmp_path / "missing"), *base]) == 2
+
+    data = tmp_path / "data"
+    data.mkdir()
+    pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 1,
+                "CLSTR_ID": "1-PSP",
+                "visit0": 1,
+                "visit1": 2,
+                "PLOT": 1,
+                "ba0": 30.0,
+                "dead_ba": 2.0,
+                "qmd": 12.0,
+                "BEC": "SBPSmk",
+                "TSA_DESC": "Quesnel TSA",
+                "year0": 2000,
+                "year1": 2010,
+                "years": 10,
+                "interval_id": "1|1|2000|2010",
+            }
+        ]
+    ).to_csv(data / "intervals.csv", index=False)
+    pd.DataFrame(
+        [{"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 2, "PLOT": 1, "ba": 32.0, "tph": 900.0}]
+    ).to_csv(data / "visits.csv", index=False)
+    monkeypatch.setattr(probe, "_read_trees", lambda *_args, **_kwargs: pd.DataFrame())
+    assert probe.main(["--data-dir", str(data), *base]) == 2
+
+    monkeypatch.setattr(probe, "_read_trees", lambda *_args, **_kwargs: pd.DataFrame({"x": [1]}))
+    monkeypatch.setattr(probe, "psp_tree_records", lambda *_args, **_kwargs: ([], 0))
+    assert probe.main(["--data-dir", str(data), *base]) == 2
