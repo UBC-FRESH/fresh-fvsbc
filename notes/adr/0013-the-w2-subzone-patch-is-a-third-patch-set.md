@@ -1,7 +1,8 @@
 # ADR 0013: The W2.3 subzone patch is a third build-time patch set
 
 Status: accepted on 2026-11-03, when the maintainer chose the patch-set route over a new FVS source
-fork.
+fork. Publication route updated on 2026-11-03: `fresh-fvsbc-pyfvs` uses trusted publishing through
+`wheels.yml`, not a hand upload.
 Date: 2026-11-03
 Issues: #315
 Refines: ADR 0006
@@ -42,8 +43,10 @@ The wrapper does **not** accept the 19 subzones until `fresh-fvsbc-pyfvs 0.3.12`
   second patch inside the FVS submodule.
 - The FVS source pin is unchanged. A reader can reproduce the build from the base pin plus the three
   patch files.
-- The wheel version moves to `0.3.12`. The `fvs` extra in `pyproject.toml` stays at `0.3.11` until
-  `0.3.12` is published; that is a release action, not part of W2.3.
+- The wheel version moves to `0.3.12`. It is published through `wheels.yml` trusted publishing, with
+  `publish=testpypi` first and `publish=pypi` after the TestPyPI install is checked. The `fvs` extra
+  in `pyproject.toml` stays at `0.3.11` until `0.3.12` is live; that is a release action, not part
+  of W2.3.
 - The 19 subzones resolve and match their provisional `BAMAX` in a built wheel. The defaults remain
   provisional and W4 owns the final capacity decision.
 - The five zones and the seven missing species remain out of scope.
