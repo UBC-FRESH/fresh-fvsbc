@@ -18,7 +18,7 @@ validated, deployable layer.
 | 1 | Bundle/provenance ingrowth section | Done: `IngrowthModel` in bundle; pilot bundle runs and provenance names it |
 | 2 | Second spatial and temporal holdouts | Done: Kamloops +14.1% TPH, temporal ≤1990 +14.7% TPH; both inside 15% |
 | 3 | Periodic establishment | Done: two-cycle run, 8 establishment events, test TPH -8.6% |
-| 4 | Reuse on the other domains | Screened: all-zone rates; CWH/BWBS/ICH/IDF/MS improve; SBPS/SBS/PP need domain fits |
+| 4 | Reuse on the other domains | Screened: all-zone rates; CWH/BWBS/ICH/IDF/MS improve; SBS has a MORTMULT pilot; SBPSdc/mk candidate; PP validation-only |
 | 5 | Density/age-dependent recruitment | Done: binned BA/QMD model, test TPH -4.3% vs -8.7% |
 
 ## Sequence
