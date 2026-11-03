@@ -20,6 +20,8 @@ on:
       - "notes/reference/fvsbc-patchset.diff.gz"
       - "notes/reference/calibration/w2-subzones.patch.gz"
       - "notes/reference/calibration/w3-habtyp-boundary.patch.gz"
+      - "notes/reference/calibration/w2-five-zone.patch.gz"
+      - "notes/reference/calibration/w4-sbps-small-tree.patch.gz"
       - ".github/workflows/wheels.yml"
   workflow_dispatch:
     inputs:
@@ -68,6 +70,8 @@ jobs:
           gunzip -c notes/reference/fvsbc-patchset.diff.gz > ${{ runner.temp }}/fvsbc.patch
           gunzip -c notes/reference/calibration/w2-subzones.patch.gz > ${{ runner.temp }}/w2-subzones.patch
           gunzip -c notes/reference/calibration/w3-habtyp-boundary.patch.gz > ${{ runner.temp }}/w3-habtyp-boundary.patch
+          gunzip -c notes/reference/calibration/w2-five-zone.patch.gz > ${{ runner.temp }}/w2-five-zone.patch
+          gunzip -c notes/reference/calibration/w4-sbps-small-tree.patch.gz > ${{ runner.temp }}/w4-sbps-small-tree.patch
           git -C ${{ runner.temp }}/PyFVS apply --check ${{ runner.temp }}/pyfvs.patch
           git -C ${{ runner.temp }}/PyFVS apply ${{ runner.temp }}/pyfvs.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/fvsbc.patch
@@ -76,6 +80,10 @@ jobs:
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w2-subzones.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w3-habtyp-boundary.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w3-habtyp-boundary.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w2-five-zone.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w2-five-zone.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w4-sbps-small-tree.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w4-sbps-small-tree.patch
 
       - name: Build the wheel and repair it to manylinux
         run: |
@@ -87,7 +95,7 @@ jobs:
           # meson itself, not only the backend: --no-build-isolation means pip installs no build
           # requirements, so the executable has to be here.
           $PY/pip install -q meson meson-python ninja numpy setuptools_scm auditwheel
-          SETUPTOOLS_SCM_PRETEND_VERSION=0.3.13 $PY/pip wheel \
+          SETUPTOOLS_SCM_PRETEND_VERSION=0.4.1 $PY/pip wheel \
             --no-build-isolation --no-deps ${{ runner.temp }}/PyFVS \
             --config-settings=setup-args="-Dfvsvariants=bc" -w dist
           # Without this the wheel only runs where gfortran is installed, which is the problem it

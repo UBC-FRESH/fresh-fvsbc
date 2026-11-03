@@ -75,11 +75,12 @@ species-specific smoke.
   arrays.
 - It does not calibrate the five zones. `BAMAX` is PSP p99, provisional; the mortality/growth defaults
   are the existing BC tables.
-- It is not in a released wheel. `w2-five-zone.patch.gz` is banked but not applied in `wheels.yml`; the
-  wrapper still refuses the five zones.
+- It is not in a released wheel. `w2-five-zone.patch.gz` is applied by the CI/wheel recipe and builds
+  local `0.4.1`, but that wheel is not published; the wrapper still refuses the five zones.
 
 ## 5. Next
 
 1. D3: species alias layer and one smoke per missing species.
-2. D4: add the five-zone patch to the build recipe, build, and record the pin.
+2. D4: add the five-zone patch to the build recipe, build, and record the pin. The recipe now builds
+   local `0.4.1`; publication and the wrapper pin are still open.
 3. D5: all-zone baseline; this is where the five-zone coefficients get measured.
