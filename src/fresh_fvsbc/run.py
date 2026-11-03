@@ -443,8 +443,20 @@ def _species_groups(records: Sequence[TreeListFields]) -> tuple[str, ...]:
 
 
 def _management(keywords: Sequence[Keyword]) -> str:
-    """Return whether a treatment keyword is present."""
-    return "managed" if any(keyword.name == "MANAGED" for keyword in keywords) else "untreated"
+    """Return the management regime a run declares.
+
+    ``MANAGED`` is present in the baseline set with a zero first field; that is
+    an untreated run, not a treatment. A non-zero field is managed.
+    """
+    for keyword in keywords:
+        if keyword.name != "MANAGED":
+            continue
+        value = keyword.parameters[0] if keyword.parameters else "0"
+        try:
+            return "untreated" if float(value) == 0.0 else "managed"
+        except ValueError:
+            return "managed"
+    return "untreated"
 
 
 def _bec_of(keywords: Sequence[Keyword]) -> BecCode:

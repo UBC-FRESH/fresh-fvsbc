@@ -1,6 +1,6 @@
 # D7.4 IDFdk ingrowth pilot — the TPH fix
 
-Status: **pilot candidate passes the spatial holdout**; no release bundle yet
+Status: **pilot candidate passes the spatial holdout**; D7.6 adds the bundle, two more holdouts, periodic establishment, cross-domain screening, and a binned model. See `d7-consolidation.md`. No release certificate yet.
 Date: 2026-11-03
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.3`
 Data: public FAIB PSP tree detail and the all-zone interval table
