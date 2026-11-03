@@ -31,7 +31,7 @@ From source
 -----------
 
 If there is no wheel for your platform, the build recipe is ADR 0004, ADR 0006, and ADR 0013: clone the pinned
-fork, apply three patch sets, and build. It needs `gfortran`, `meson`, `ninja` and `patchelf`, and it
+fork, apply four patch sets, and build. It needs `gfortran`, `meson`, `ninja` and `patchelf`, and it
 takes a few minutes:
 
 .. code-block:: console
@@ -42,15 +42,17 @@ takes a few minutes:
    $ gunzip -c notes/reference/pyfvs-patchset.diff.gz  | git -C PyFVS apply -
    $ gunzip -c notes/reference/fvsbc-patchset.diff.gz   | git -C PyFVS/fvs apply -
    $ gunzip -c notes/reference/calibration/w2-subzones.patch.gz | git -C PyFVS/fvs apply -
-   $ SETUPTOOLS_SCM_PRETEND_VERSION=0.3.12 pip install --no-build-isolation ./PyFVS \
+   $ gunzip -c notes/reference/calibration/w3-habtyp-boundary.patch.gz | git -C PyFVS/fvs apply -
+   $ SETUPTOOLS_SCM_PRETEND_VERSION=0.3.13 pip install --no-build-isolation ./PyFVS \
        --config-settings=setup-args="-Dfvsvariants=bc"
    $ pip install fresh-fvsbc
 
 The third patch adds the 19 W2.3 subzones and their provisional defaults. Without it the variant still
 builds, but those codes fall back to ``ICHmw2/01``; ``run_case`` refuses that fallback rather than
-returning a plausible run. The patched wheel is versioned ``0.3.12`` and is the ``fvs`` extra for
-``fresh-fvsbc 0.21.0``; it is uploaded before the ``v0.21.0`` tag. If you build from a source checkout
-before that upload, use the recipe above.
+returning a plausible run. The fourth fixes the ``KAM`` + ``MS`` boundary collision that made
+``MSxk1`` resolve as ``MSmm``. The patched wheel is versioned ``0.3.13``; once it is published, the
+``fvs`` extra moves to it. If you build from a source checkout before that upload, use the recipe
+above.
 
 
 What you get

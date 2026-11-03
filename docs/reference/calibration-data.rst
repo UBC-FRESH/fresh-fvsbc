@@ -173,6 +173,8 @@ and the official case matched its oracle. `w2-subzone-smoke.csv` carries the
 per-case evidence. ESSF and ``MSxv`` print ``MSdk/01`` on the BAMAX line because
 ``BECSET`` rewrites the pretty name for a subzone without a V2 parameter set;
 the value is still the new case and the ``STDINFO BEC=`` line is correct.
+`w3-bec-boundary.md` records the W3.1 follow-up: the ``KAM``+``MS`` boundary made
+``MSxk1`` resolve as ``MSmm``, and the fourth patch fixes it.
 
 What it does not do
 -------------------
