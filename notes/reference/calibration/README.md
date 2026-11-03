@@ -31,6 +31,10 @@ outside the repository because they carry site identifiers.
 | `w2-subzone-defaults.csv` | The 19 subzones, tokens, PSP p99/max, and provisional BAMAX |
 | `w2-subzone-smoke.csv` | The 19 smoke cases: BEC echo, BAMAX label and value, and expected value |
 | `w2-subzones.patch.gz` | The Habtyp/Sitset patch against the pinned source |
+| `w2-five-zone-defaults.csv` | The 32 five-zone `BAMAX` candidates from the all-zone build, with confidence |
+| `w2-five-zone.patch.gz` | The five-zone parser/defaults patch, applied after the W3.1 boundary fix |
+| `w2-five-zone-prototype.md` | The 32-label build/smoke result and the parser defects it found |
+| `w2-five-zone-smoke.csv` | One row per five-zone label: expected/echoed BAMAX and database |
 | `w3-bec-boundary.md` | The W3.1 `KAM`+`MS` boundary finding and fix |
 | `w3-habtyp-boundary.patch.gz` | The Habtyp zone-boundary patch, applied after W2.3 |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |

@@ -1561,14 +1561,17 @@ are work packages in the BC-wide deployment below.
 The goal is a runnable, calibrated, validated FVS-BC for **every BC BEC unit and
 every provincial tree species**, with a wheel, provenance, and an envelope
 validator. The plan is `notes/bc-wide-deployment.md`; the parent issue is #326;
-the first task is D1 #327 on `feature/bc-wide-deployment`.
+D1 is #327; D2-D4 run on `feature/five-zone-parser`.
 
 D1 is done: the all-zone PSP build read **7,341 sites, 23,956 visits, 3,205,741
 tree rows**, and produced **17,151 intervals and 1,814,527 tree-survival rows**
 across all **153 BEC variants**. The five zones now have envelope rows and 32
 provisional `BAMAX` candidates in
-`notes/reference/calibration/w2-five-zone-defaults.csv`. Next: D2 parser and
-defaults, D3 species donor aliases, D4 build/smoke, D5 provincial baseline.
+`notes/reference/calibration/w2-five-zone-defaults.csv`. D2/D4 are built and
+smoke-tested: **32/32 five-zone labels** echo their own BEC and provisional
+BAMAX in a local `0.4.0` wheel (`w2-five-zone-prototype.md`). The five-zone
+patch is applied after the W3.1 boundary fix. Next: D3 species donor aliases
+and species-specific smoke, then D5 provincial baseline.
 
 ### W3 supported-domain baseline
 
