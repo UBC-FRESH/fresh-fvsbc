@@ -1,7 +1,7 @@
 # D6.4 — the SBPS small-tree overflow and its fix
 
-Status: fixed locally; the fix is banked as `w4-sbps-small-tree.patch.gz` and built as local
-`fresh-fvsbc-pyfvs 0.4.1`. It is **not published** and no wrapper pin moves yet.
+Status: fixed and published as `fresh-fvsbc-pyfvs 0.4.1`; the wrapper `fvs` extra moves to it in
+`fresh-fvsbc 0.21.3`.
 
 Evidence: `d6-sbps-fixed.csv`, and the four SBPS runs under
 `.opencode/tmp/opencode/d6-sbps-fixed-default/` (local run directory).
@@ -117,8 +117,7 @@ alias layer (`Ba` -> `BG` rather than the D5 `BL`), so it is not a byte-for-byte
 ## What this does not establish
 
 - The build is local. The CI/wheel recipe now applies `w4-sbps-small-tree.patch.gz` and builds
-  `fresh-fvsbc-pyfvs 0.4.1`, but that wheel is not published and the wrapper pin still points at
-  `0.3.13`.
+  `fresh-fvsbc-pyfvs 0.4.1`; the wrapper pin moves to it in `0.21.3`.
 - The wrapper source still refuses `CWH`, `CDF`, `BWBS`, `CMA`, and `MH`; the five-zone baseline
   uses the prototype parser patch at runtime. That is a separate release task.
 - The fix does not prove the SBPS growth, mortality, or regeneration coefficients are calibrated.

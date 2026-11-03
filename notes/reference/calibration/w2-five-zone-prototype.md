@@ -1,9 +1,9 @@
 # Five-zone prototype: parser, defaults, and 32-label smoke
 
-Status: built and smoke-tested on 2026-11-03; **not pinned, not released**
+Status: built, smoke-tested, and published in `fresh-fvsbc-pyfvs 0.4.1`; the wrapper still refuses the five zones
 Base pins: PyFVS `e95172baec0143bd8ccf2c0d21f9f5ffc62da601`; FVS `ef5fa8470cc89f81ca445e7c906e274f200e80fd`
 Patches: `w2-subzones.patch.gz` (the 19 supported-zone subzones), then `w2-five-zone.patch.gz`
-Wheel: `fresh-fvsbc-pyfvs 0.4.0` (local build)
+Wheel: `fresh-fvsbc-pyfvs 0.4.1` (published)
 
 This is the runnable prototype for the five zones. It adds `CWH`, `CDF`, `BWBS`, `CMA`, and `MH` to the
 BEC parser and gives the 32 PSP labels a provisional `BAMAX`. Species are the existing 15 `JSP` codes;
@@ -30,7 +30,7 @@ Built from the pinned fork with the base patch sets, `w2-subzones.patch.gz`, and
 `w2-five-zone.patch.gz`:
 
 ```bash
-SETUPTOOLS_SCM_PRETEND_VERSION=0.4.0 \
+SETUPTOOLS_SCM_PRETEND_VERSION=0.4.1 \
   python -m pip wheel --no-build-isolation --no-deps . \
   --config-settings=setup-args="-Dfvsvariants=bc"
 ```
@@ -77,11 +77,11 @@ species-specific smoke.
   are the existing BC tables.
 - It is not in a released wheel. The wheel recipe applies `w2-five-zone.patch.gz` and builds local
   `0.4.1`; the CI oracle remains on the supported patch set until it has a five-zone fixture. The
-  wheel is not published and the wrapper still refuses the five zones.
+  wheel is published as `0.4.1`; the wrapper still refuses the five zones.
 
 ## 5. Next
 
 1. D3: species alias layer and one smoke per missing species.
-2. D4: add the five-zone patch to the build recipe, build, and record the pin. The recipe now builds
-   local `0.4.1`; publication and the wrapper pin are still open.
+2. D4: the five-zone patch is in the build recipe and published as `0.4.1`; the wrapper pin moves in
+   `0.21.3`. The wrapper still refuses the five zones.
 3. D5: all-zone baseline; this is where the five-zone coefficients get measured.

@@ -1,10 +1,24 @@
-# fresh-fvsbc 0.21.2
+# fresh-fvsbc 0.21.3
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
 run.
 
 Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.21.2
+
+- **The `fvs` extra moves to `fresh-fvsbc-pyfvs 0.4.1`.** The new wheel fixes the SBPS small-tree
+  overflow: `REGENT` selected the SBS height form with `INDEX(BEC%Zone,'SBS')`, which does not match
+  `SBPS`; SBPS therefore took the exponential form with SBS-form coefficients and produced an
+  infinite small-tree diameter. The five condition tests now accept `SBS` or `SBPS`.
+
+- **Corrected SBPS baseline:** the four SBPS intervals in the D5 sample now end at 28–53 m²/ha
+  rather than 10–457,348. The catastrophe is gone; the residuals are still above the observed
+  values and are D7 calibration targets, not a calibration claim.
+
+- **Install:** `pip install "fresh-fvsbc[fvs]==0.21.3"`. The `fvs` extra pins
+  `fresh-fvsbc-pyfvs==0.4.1`.
 
 ## What changed since 0.21.1
 
