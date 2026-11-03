@@ -207,6 +207,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d7-sbps-playbook.md` | Consolidated D7 SBPS record: false starts, LOSO lessons, candidate, and next steps |
 | `d7-100mile-temporal.md` | The D7.9 temporal holdout attempt and data-gap result |
 | `d7-sbpsdc-quesnel.md` | The D7.10 Quesnel capacity screen and dense-site failure |
+| `d7-quesnel-established.md` | The D7.11 established-stand boundary and site-fold failure |
+| `d7-quesnel-established-summary.csv` | The D7.11 pooled and worst-site summary |
 | `d7-sbpsdc-capacity-summary.csv` | The D7.10 BAMAX grid summary |
 | `d7-100mile-temporal.json`, `d7-100mile-temporal-summary.csv` | The D7.9 rates and split summary |
 | `d7-100mile-ingrowth.json`, `d7-100mile-ingrowth-loso-summary.csv`, `d7-100mile-ingrowth-candidates.json` | The D7.8 rates, LOSO result, and candidate |
