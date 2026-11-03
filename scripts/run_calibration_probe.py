@@ -31,6 +31,7 @@ from fresh_fvsbc.backtest import (
     select_intervals,
     summary_for_year,
 )
+from fresh_fvsbc.bundle import CalibrationBundle, load_bundle
 from fresh_fvsbc.calibration_probe import (
     eligible_intervals,
     ingrowth_keyword,
@@ -38,6 +39,7 @@ from fresh_fvsbc.calibration_probe import (
     parameter_keywords,
     summarise_probe,
 )
+from fresh_fvsbc.keywords import Keyword
 from fresh_fvsbc.run import run_case
 from run_baseline_backtest import _read_trees
 
@@ -72,6 +74,11 @@ def _parser() -> argparse.ArgumentParser:
         "--ingrowth", type=Path, metavar="FILE", help="optional BEC/species rate JSON"
     )
     parser.add_argument("--ingrowth-scale", type=float, default=1.0, metavar="MULT")
+    parser.add_argument(
+        "--bundle", type=Path, metavar="FILE", help="calibration bundle with an ingrowth model"
+    )
+    parser.add_argument("--cycles", type=int, default=1, metavar="N")
+    parser.add_argument("--cycle-years", type=float, default=None, metavar="YEARS")
     parser.add_argument("--tree-age", type=float, default=60.0, metavar="YEARS")
     return parser
 
@@ -110,6 +117,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             if args.ingrowth is not None
             else {}
         )
+        bundle: CalibrationBundle | None = load_bundle(args.bundle) if args.bundle else None
+        if args.cycles < 1:
+            raise ValueError("cycles must be at least one")
     except (OSError, ValueError, json.JSONDecodeError, KeyError) as error:
         print(f"run_calibration_probe: {error}")
         return EXIT_BAD_INPUT
@@ -161,18 +171,45 @@ def main(argv: Sequence[str] | None = None) -> int:
                 & (visits["VISIT_NUMBER"] == interval["visit1"])
                 & (visits["PLOT"] == interval["PLOT"])
             ].iloc[0]
-            ingrowth_keyword_value = ingrowth_keyword(
-                bec=str(interval["BEC"]),
-                years=float(interval["years"]),
-                rates=ingrowth,
-                scale=args.ingrowth_scale,
+            cycle_years = (
+                args.cycle_years
+                if args.cycle_years is not None
+                else float(interval["years"]) / args.cycles
             )
+            if args.cycles > 1 and bundle is None:
+                raise ValueError("more than one cycle needs a bundle ingrowth model")
+            if bundle is not None:
+                ingrowth_keyword_value = bundle.ingrowth_keyword(
+                    bec=str(interval["BEC"]),
+                    years=float(interval["years"]),
+                    ba=float(interval["ba0"]),
+                    qmd=float(interval["qmd"]),
+                    cycles=args.cycles,
+                    cycle_years=cycle_years,
+                )
+            else:
+                ingrowth_keyword_value = ingrowth_keyword(
+                    bec=str(interval["BEC"]),
+                    years=float(interval["years"]),
+                    rates=ingrowth,
+                    scale=args.ingrowth_scale,
+                )
             block = (*parameters, ingrowth_keyword_value) if ingrowth_keyword_value else parameters
-            keywords = insert_parameters(keywords_for(interval), block)
+            base_keywords = list(keywords_for(interval))
+            if args.cycles > 1:
+                base_keywords = [
+                    Keyword("TIMEINT", ("", f"{cycle_years:g}"))
+                    if keyword.name == "TIMEINT"
+                    else Keyword("NUMCYCLE", (str(args.cycles),))
+                    if keyword.name == "NUMCYCLE"
+                    else keyword
+                    for keyword in base_keywords
+                ]
+            keywords = insert_parameters(base_keywords, block)
             run_dir = (
                 args.out_dir / "runs" / f"{label}-{str(interval['interval_id']).replace('|', '_')}"
             )
-            result = run_case(records, keywords, directory=run_dir)
+            result = run_case(records, keywords, directory=run_dir, calibration=bundle)
             predicted = summary_for_year(result.database, int(interval["year1"]))
             rows.append(
                 {
@@ -216,6 +253,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "candidates": candidates,
                 "ingrowth": str(args.ingrowth) if args.ingrowth is not None else "",
                 "ingrowth_scale": args.ingrowth_scale,
+                "bundle": str(args.bundle) if args.bundle is not None else "",
+                "cycles": args.cycles,
+                "cycle_years": args.cycle_years,
                 "intervals": int(frame["interval_id"].nunique()),
                 "rows": len(frame),
             },

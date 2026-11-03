@@ -59,6 +59,12 @@ outside the repository because they carry site identifiers.
 | `d7-idfdk-ingrowth-candidates.json` | The D7.4 candidate with the default `BAMAX 53` |
 | `d7-idfdk-ingrowth-probe-summary.csv` | The D7.4 train/test ingrowth probe summary |
 | `d7-idfdk-ingrowth-probe-by-bec.csv` | The D7.4 ingrowth probe summary by BEC |
+| `d7-consolidation-plan.md` | The five-work-package D7 consolidation plan and status |
+| `d7-consolidation.md` | The D7.6 bundle, holdout, periodic, domain, and density results |
+| `d7-idfdk-bundle.json` | The D7.4/D7.6 pilot bundle with the ingrowth section |
+| `d7-idfdk-binned-bundle.json` | The density/QMD-binned IDFdk pilot bundle |
+| `d7-idfdk-bundle-summary.csv`, `d7-idfdk-kamloops-summary.csv`, `d7-idfdk-temporal1990-summary.csv`, `d7-idfdk-binned-summary.csv`, `d7-idfdk-periodic-summary.csv` | The D7.6 validation summaries |
+| `d7-ingrowth-screen-by-zone.csv`, `d7-ingrowth-screen-by-bec.csv`, `d7-all-zone-ingrowth.json` | The all-zone domain screening tables and rates |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |

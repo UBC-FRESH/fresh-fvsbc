@@ -196,6 +196,15 @@ inside the D7 thresholds with `BAMAX 53` unchanged and no mortality multiplier. 
 This is a **pilot model**, not a released bundle; the bundle contract still needs an ingrowth section
 and a second spatial/temporal holdout. See `d7-idfdk-ingrowth.md`.
 
+**D7.6 consolidation (2026-11-03):** the five follow-ups are implemented. The bundle now carries
+an `ingrowth` section and renders `ESTAB` with provenance. The 100 Mile holdout is joined by a
+Kamloops spatial holdout (TPH +14.1%) and a temporal ≤1990 split (TPH +14.7%); both pass the 15%
+bias threshold. Two-cycle establishment writes 8 `NATURAL` events and holds test TPH at -8.6%.
+The all-zone screening improves CWH/BWBS/ICH/IDF/MS TPH bias but over-recruits SBPS/SBS/PP, which
+need domain fits; the five-zone run uses the local parser only. A BA/QMD-binned model improves the
+100 Mile test TPH from -8.7% to -4.3%. This is still a pilot, not a certificate. See
+`d7-consolidation.md`.
+
 ## 5. Data and methods
 
 ### Data

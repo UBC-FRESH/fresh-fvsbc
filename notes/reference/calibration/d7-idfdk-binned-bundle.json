@@ -1,0 +1,1110 @@
+{
+  "bundle_id": "idfdk-ingrowth-binned-2026-11-03",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": [
+      "CAR",
+      "KAM",
+      "NEL"
+    ],
+    "becs": [
+      "IDFdk",
+      "IDFdk1",
+      "IDFdk2",
+      "IDFdk3",
+      "IDFdk4",
+      "IDFdk5"
+    ],
+    "species_groups": [],
+    "dbh_classes": [],
+    "management": [
+      "untreated"
+    ]
+  },
+  "parameters": [
+    {
+      "keyword": "BAMAX",
+      "fields": [
+        "53.0"
+      ],
+      "units": "m2/ha",
+      "value_index": 0,
+      "bounds": {
+        "min": 25.0,
+        "max": 89.0
+      }
+    }
+  ],
+  "ingrowth": {
+    "model_id": "idfdk-ingrowth-binned-2026-11-03",
+    "version": "0.1.0",
+    "method": "mean annual new-tree TPH by BEC/species and initial BA/QMD bin",
+    "scale": 1.0,
+    "rates": [
+      {
+        "bec": "IDFDK",
+        "species": "FD",
+        "rate": 3.7023741082683896,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK",
+        "species": "FD",
+        "rate": 12.9913853898429,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK",
+        "species": "HW",
+        "rate": 0.9255935270670974,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK",
+        "species": "FD",
+        "rate": 39.46709497846502,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK",
+        "species": "PL",
+        "rate": 2.0568745045935497,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK",
+        "species": "FD",
+        "rate": 0.20576131687242835,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK",
+        "species": "PL",
+        "rate": 0.08230452674897133,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK",
+        "species": "HW",
+        "rate": 0.041152263374485666,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "FD",
+        "rate": 98.75056299553746,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "PL",
+        "rate": 1.5511568182754292,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "SE",
+        "rate": 2.70771808932872,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "HW",
+        "rate": 2.856903658988704,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "FD",
+        "rate": 51.81093510963888,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "PL",
+        "rate": 20.19322498535579,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "SE",
+        "rate": 1.4709402726614493,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "HW",
+        "rate": 4.426020435833915,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "FD",
+        "rate": 49.23941738425892,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "PL",
+        "rate": 4.914807520803354,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "SE",
+        "rate": 0.17902268359198145,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "FD",
+        "rate": 28.014744504716777,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "PL",
+        "rate": 6.82903419087085,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "SE",
+        "rate": 10.56505239168821,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "HW",
+        "rate": 6.465479908845275,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "FD",
+        "rate": 52.452871691250195,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "PL",
+        "rate": 7.736309779323397,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "SE",
+        "rate": 0.5385480145480138,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "HW",
+        "rate": 2.1533930911713752,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "FD",
+        "rate": 12.45492974137393,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "PL",
+        "rate": 0.7876998078047184,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "SE",
+        "rate": 4.689673870473294,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "FD",
+        "rate": 45.903027905111124,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "PL",
+        "rate": 12.330201938077098,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "SE",
+        "rate": 2.2170342980342332,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "HW",
+        "rate": 13.053429662353377,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "FD",
+        "rate": 21.640640328200085,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "PL",
+        "rate": 0.5907748558535388,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "SE",
+        "rate": 0.14633889756001542,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "HW",
+        "rate": 0.8135960159571386,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "FD",
+        "rate": 2.76761297229968,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "PL",
+        "rate": 0.24311722463108593,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "SE",
+        "rate": 0.15236107441433702,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK1",
+        "species": "HW",
+        "rate": 0.984624759755898,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "FD",
+        "rate": 48.11600582577152,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "PL",
+        "rate": 121.57792321845812,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "SE",
+        "rate": 1.2307809496948725,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "HW",
+        "rate": 7.13852950823026,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "FD",
+        "rate": 109.20919390826388,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "PL",
+        "rate": 10.885094012197827,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "SE",
+        "rate": 5.765292974665191,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "HW",
+        "rate": 11.761720437721534,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "FD",
+        "rate": 78.33303160572959,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "PL",
+        "rate": 5.543464361318315,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "SE",
+        "rate": 0.0617062351378065,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "HW",
+        "rate": 0.307862425076781,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "FD",
+        "rate": 68.27665305342865,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "PL",
+        "rate": 11.205856118409113,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "SE",
+        "rate": 1.6318877186251148,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "HW",
+        "rate": 3.932497613005153,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "FD",
+        "rate": 48.21822567765956,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "PL",
+        "rate": 4.97936404047618,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "SE",
+        "rate": 0.4865483191143916,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "HW",
+        "rate": 1.7701121613276374,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "FD",
+        "rate": 16.569187038563257,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "PL",
+        "rate": 0.49971470291095327,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "SE",
+        "rate": 0.6340679074040589,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "HW",
+        "rate": 7.3536667834220975,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "FD",
+        "rate": 53.6980816692395,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "PL",
+        "rate": 11.280017397571601,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "SE",
+        "rate": 4.18278886837902,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "HW",
+        "rate": 8.026511701525454,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "FD",
+        "rate": 11.829422479986125,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "PL",
+        "rate": 0.12260439588804697,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "SE",
+        "rate": 0.017123908865319965,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "HW",
+        "rate": 0.8286211477245489,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "FD",
+        "rate": 21.913827590679553,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "PL",
+        "rate": 0.10303936891573047,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "SE",
+        "rate": 0.13021292513461427,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK2",
+        "species": "HW",
+        "rate": 0.39696569831691025,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "FD",
+        "rate": 105.50294432691616,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "PL",
+        "rate": 11.858666061043392,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "SE",
+        "rate": 0.4869550388102809,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "HW",
+        "rate": 3.616394257815538,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "FD",
+        "rate": 53.89329669897039,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "PL",
+        "rate": 5.441798789133684,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "SE",
+        "rate": 3.0293572375594207,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "HW",
+        "rate": 2.194687957018401,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "FD",
+        "rate": 44.42731182740457,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "PL",
+        "rate": 1.601140931641796,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "SE",
+        "rate": 3.2435848509516423,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "FD",
+        "rate": 2.349425792251092,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "SE",
+        "rate": 1.1154516908507335,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "HW",
+        "rate": 0.10418496154591457,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "FD",
+        "rate": 56.44981138643853,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "PL",
+        "rate": 1.0001756308407799,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "FD",
+        "rate": 25.20996611433139,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "HW",
+        "rate": 0.04465069780539196,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK3",
+        "species": "FD",
+        "rate": 2.703278562124438,
+        "ba_min": 35.0,
+        "ba_max": 999.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK4",
+        "species": "FD",
+        "rate": 35.94889876131234,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK4",
+        "species": "PL",
+        "rate": 5.27671069062165,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK4",
+        "species": "FD",
+        "rate": 3.332581860127555,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "FD",
+        "rate": 3.8914091812091356,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "PL",
+        "rate": 1.148478026843239,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "SE",
+        "rate": 0.6265793925719351,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "HW",
+        "rate": 1.7050605347063905,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "FD",
+        "rate": 7.884376322403732,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "PL",
+        "rate": 0.39782818575995876,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "SE",
+        "rate": 0.7697975394455203,
+        "ba_min": 15.0,
+        "ba_max": 25.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "FD",
+        "rate": 49.364988110245186,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 6.0,
+        "qmd_max": 12.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "FD",
+        "rate": 31.939759224982645,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "PL",
+        "rate": 1.6181222892716915,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "SE",
+        "rate": 0.953539764155735,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "HW",
+        "rate": 0.6156231951056789,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 12.0,
+        "qmd_max": 20.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "FD",
+        "rate": 8.507183587599233,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "PL",
+        "rate": 1.2664540278853322,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "SE",
+        "rate": 4.565204383153025,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      },
+      {
+        "bec": "IDFDK5",
+        "species": "HW",
+        "rate": 1.1589559207672533,
+        "ba_min": 25.0,
+        "ba_max": 35.0,
+        "qmd_min": 20.0,
+        "qmd_max": 999.0
+      }
+    ]
+  },
+  "training": {
+    "data_checksum": "sha256:29db109a8aaa66ecb591930c22b9d5973b46b3992c909f77fc3055a73495c52f",
+    "split": "IDFdk public tree detail; 100 Mile House TSA held out; BA bins 15/25/35, QMD bins 6/12/20",
+    "objective": "held-out BA/TPH bias with ESTAB natural regeneration",
+    "convergence": {
+      "iterations": 1,
+      "method": "closed-form mean annual recruitment"
+    }
+  },
+  "review": {
+    "reviewer": "D7.4 pilot, not signed off",
+    "date": "2026-11-03",
+    "signed_off": false
+  },
+  "claim": "IDFdk pilot: binned public-data BEC x species recruitment through ESTAB; one spatial holdout; not a certificate."
+}

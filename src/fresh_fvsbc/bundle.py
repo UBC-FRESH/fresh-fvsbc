@@ -43,6 +43,7 @@ from typing import cast
 
 from fresh_fvsbc.bec import REGIONS, BecCode
 from fresh_fvsbc.calibration import SPECIES_GROUPS
+from fresh_fvsbc.ingrowth import IngrowthError, IngrowthModel
 from fresh_fvsbc.keywords import (
     Keyword,
     KeywordSet,
@@ -189,6 +190,8 @@ class CalibrationBundle:
         The claim boundary, in one sentence.
     warnings : tuple of str
         Non-fatal findings, such as a parameter at a bound or an unsigned bundle.
+    ingrowth : IngrowthModel, optional
+        The natural-regeneration model the bundle carries, if any.
     """
 
     bundle_id: str
@@ -200,6 +203,54 @@ class CalibrationBundle:
     review: Mapping[str, object]
     claim: str
     warnings: tuple[str, ...] = ()
+    ingrowth: IngrowthModel | None = None
+
+    def ingrowth_keyword(
+        self,
+        *,
+        bec: str,
+        years: float,
+        ba: float | None = None,
+        qmd: float | None = None,
+        cycles: int = 1,
+        cycle_years: float | None = None,
+        cycle: int = 1,
+    ) -> Keyword | None:
+        """Return the bundle's ``ESTAB`` block for a stand, if it has one.
+
+        Parameters
+        ----------
+        bec : str
+            The stand's BEC label.
+        years : float
+            The total interval length, in years.
+        ba : float or None, optional
+            The stand's initial BA, in m2/ha.
+        qmd : float or None, optional
+            The stand's initial QMD, in cm.
+        cycles : int, optional
+            The number of establishment cycles.
+        cycle_years : float or None, optional
+            The length of each cycle.
+        cycle : int, optional
+            The first cycle number.
+
+        Returns
+        -------
+        Keyword or None
+            The block, or ``None`` when the bundle carries no ingrowth model.
+        """
+        if self.ingrowth is None:
+            return None
+        return self.ingrowth.estab_keyword(
+            bec=bec,
+            years=years,
+            ba=ba,
+            qmd=qmd,
+            cycles=cycles,
+            cycle_years=cycle_years,
+            cycle=cycle,
+        )
 
     def render(self) -> tuple[Keyword, ...]:
         """Return the keywords the bundle applies, in contract order.
@@ -356,6 +407,15 @@ class CalibrationBundle:
         training = _training(_mapping(record, "training"))
         review = _review(_mapping(record, "review"))
         claim = _string(record, "claim")
+        ingrowth_raw = record.get("ingrowth")
+        ingrowth = None
+        if ingrowth_raw is not None:
+            if not isinstance(ingrowth_raw, Mapping):
+                raise BundleError("ingrowth must be an object")
+            try:
+                ingrowth = IngrowthModel.from_record(ingrowth_raw)
+            except IngrowthError as error:
+                raise BundleError(str(error)) from error
         warnings: list[str] = []
         if not cast(bool, review["signed_off"]):
             warnings.append(f"{bundle_id} is not signed off; use it as a pilot, not a certificate")
@@ -379,6 +439,7 @@ class CalibrationBundle:
             review=dict(review),
             claim=claim,
             warnings=tuple(warnings),
+            ingrowth=ingrowth,
         )
 
 

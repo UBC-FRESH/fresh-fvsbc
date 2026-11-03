@@ -223,10 +223,11 @@ def ingrowth_keyword(
     lines: list[Keyword] = []
     for species, rate in rates.get(bec, {}).items():
         tph = float(rate) * years * scale
-        if tph <= 0:
+        tpa = tph * 0.404686
+        if tpa < 0.05:
             continue
         # NATURAL reads trees per acre; 1 TPH = 0.404686 TPA.
-        lines.append(Keyword("NATURAL", ("1", species, f"{tph * 0.404686:.1f}", "100.0")))
+        lines.append(Keyword("NATURAL", ("1", species, f"{tpa:.1f}", "100.0")))
     if not lines:
         return None
     return Keyword("ESTAB", nested=tuple(lines))

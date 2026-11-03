@@ -1,0 +1,176 @@
+{
+  "bundle_id": "idfdk-ingrowth-pilot-2026-11-03",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": [
+      "CAR",
+      "KAM",
+      "NEL"
+    ],
+    "becs": [
+      "IDFdk",
+      "IDFdk1",
+      "IDFdk2",
+      "IDFdk3",
+      "IDFdk4",
+      "IDFdk5"
+    ],
+    "species_groups": [],
+    "dbh_classes": [],
+    "management": [
+      "untreated"
+    ]
+  },
+  "parameters": [
+    {
+      "keyword": "BAMAX",
+      "fields": [
+        "53.0"
+      ],
+      "units": "m2/ha",
+      "value_index": 0,
+      "bounds": {
+        "min": 25.0,
+        "max": 89.0
+      }
+    }
+  ],
+  "ingrowth": {
+    "model_id": "idfdk-ingrowth-2026-11-03",
+    "version": "0.1.0",
+    "method": "mean new-tree TPH per year by BEC and species group",
+    "scale": 1.0,
+    "rates": [
+      {
+        "bec": "IDFdk",
+        "species": "FD",
+        "rate": 8.4898
+      },
+      {
+        "bec": "IDFdk",
+        "species": "PL",
+        "rate": 0.288
+      },
+      {
+        "bec": "IDFdk",
+        "species": "HW",
+        "rate": 0.2468
+      },
+      {
+        "bec": "IDFdk1",
+        "species": "FD",
+        "rate": 52.0557
+      },
+      {
+        "bec": "IDFdk1",
+        "species": "PL",
+        "rate": 10.3405
+      },
+      {
+        "bec": "IDFdk1",
+        "species": "SE",
+        "rate": 2.9982
+      },
+      {
+        "bec": "IDFdk1",
+        "species": "HW",
+        "rate": 3.3285
+      },
+      {
+        "bec": "IDFdk2",
+        "species": "FD",
+        "rate": 59.6945
+      },
+      {
+        "bec": "IDFdk2",
+        "species": "PL",
+        "rate": 12.7077
+      },
+      {
+        "bec": "IDFdk2",
+        "species": "SE",
+        "rate": 1.7947
+      },
+      {
+        "bec": "IDFdk2",
+        "species": "HW",
+        "rate": 4.6001
+      },
+      {
+        "bec": "IDFdk3",
+        "species": "FD",
+        "rate": 56.6039
+      },
+      {
+        "bec": "IDFdk3",
+        "species": "PL",
+        "rate": 5.0718
+      },
+      {
+        "bec": "IDFdk3",
+        "species": "SE",
+        "rate": 2.6954
+      },
+      {
+        "bec": "IDFdk3",
+        "species": "HW",
+        "rate": 3.1923
+      },
+      {
+        "bec": "IDFdk4",
+        "species": "FD",
+        "rate": 124.1754
+      },
+      {
+        "bec": "IDFdk4",
+        "species": "PL",
+        "rate": 4.0107
+      },
+      {
+        "bec": "IDFdk4",
+        "species": "HW",
+        "rate": 0.7779
+      },
+      {
+        "bec": "IDFdk5",
+        "species": "FD",
+        "rate": 19.5218
+      },
+      {
+        "bec": "IDFdk5",
+        "species": "PL",
+        "rate": 2.1616
+      },
+      {
+        "bec": "IDFdk5",
+        "species": "SE",
+        "rate": 1.1385
+      },
+      {
+        "bec": "IDFdk5",
+        "species": "HW",
+        "rate": 0.7974
+      }
+    ]
+  },
+  "training": {
+    "data_checksum": "sha256:29db109a8aaa66ecb591930c22b9d5973b46b3992c909f77fc3055a73495c52f",
+    "split": "IDFdk public tree detail; 712 intervals / 282 sites; 100 Mile House TSA held out",
+    "objective": "held-out BA/TPH bias with ESTAB natural regeneration",
+    "convergence": {
+      "iterations": 1,
+      "method": "closed-form mean annual recruitment"
+    }
+  },
+  "review": {
+    "reviewer": "D7.4 pilot, not signed off",
+    "date": "2026-11-03",
+    "signed_off": false
+  },
+  "claim": "IDFdk pilot: public-data BEC x species recruitment through ESTAB; one spatial holdout; not a certificate."
+}
