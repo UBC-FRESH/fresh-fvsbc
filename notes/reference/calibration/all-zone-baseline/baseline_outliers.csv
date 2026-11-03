@@ -1,0 +1,13 @@
+BEC,TSA,species_group,dbh_class,ba_class,years,observed_ba0,predicted_ba0,observed_ba1,predicted_ba1,bias_ba,observed_tph1,predicted_tph1,bias_tph,flag_observed,flag_predicted
+SBPSmc,Quesnel TSA,SE,<10,30-40,11.0,31.141,31.0,30.649,457348.0,457317.351,4452.992,2762.0,-1690.992,ok,above_max
+SBPSdc,Quesnel TSA,SE,<10,<20,18.0,19.347,19.0,11.225,4705.0,4693.775,1889.92,691.0,-1198.92,ok,above_max
+SBPSmk,100 Mile House TSA,PL,10-25,30-40,5.0,34.66,34.0,32.724,3531.0,3498.276,620.109,635.0,14.891,ok,above_max
+ESSFmv2,Dawson Creek TSA,BL,<10,<20,27.0,8.645,8.0,42.434,8.0,-34.434,9935.304,5720.0,-4215.304,ok,ok
+ESSFmv4,Dawson Creek TSA,PL,10-25,<20,25.0,18.127,18.0,47.389,14.0,-33.389,1650.195,938.0,-712.195,ok,ok
+SBSdk,Lakes TSA,PL,10-25,40-50,15.0,49.437,50.0,20.258,51.0,30.742,583.314,1418.0,834.686,ok,ok
+SBSmc3,Prince George TSA,SE,<10,40-50,18.0,43.896,43.0,26.402,57.0,30.598,2876.933,4003.0,1126.067,ok,above_max
+SBPSxc,Williams Lake TSA,SE,10-25,40-50,14.0,48.117,47.0,34.389,10.0,-24.389,2776.866,360.0,-2416.866,ok,ok
+MSdk,Cranbrook TSA,PL,10-25,<20,10.0,11.346,11.0,34.136,10.0,-24.136,6762.745,990.0,-5772.745,ok,ok
+CWHvm,Kalum TSA,HW,25-40,50+,15.0,71.054,71.0,37.886,62.0,24.114,222.324,454.0,231.676,ok,ok
+ESSFmv3,MacKenzie TSA,PL,10-25,30-40,13.0,36.833,36.0,4.91,29.0,24.09,665.494,1208.0,542.506,ok,ok
+ESSFdc2,Kamloops TSA,BL,10-25,30-40,24.0,30.31,30.0,48.406,25.0,-23.406,3697.537,1487.0,-2210.537,ok,ok

@@ -1572,8 +1572,11 @@ smoke-tested: **32/32 five-zone labels** echo their own BEC and provisional
 BAMAX in a local `0.4.0` wheel (`w2-five-zone-prototype.md`). The five-zone
 patch is applied after the W3.1 boundary fix. D3 is done: the wrapper's
 `DONOR_SPECIES` maps the seven missing species to explicit donors and **7/7
-species smoke pass** (`w2-five-zone-species.md`). Next: D5 provincial baseline,
-then D6 true species tables where the donor residuals justify them.
+species smoke pass** (`w2-five-zone-species.md`). D5 is done: the all-zone
+baseline ran **139 BEC strata, 139 intervals, 0 skipped**; five-zone MAE is
+moderate and unflagged, while **SBPS is the supported-zone failure**
+(`SBPSmc` 457,348 m2/ha) and is first in D6. The five-zone sample moves to five
+intervals per BEC before any true species table is promoted.
 
 ### W3 supported-domain baseline
 
