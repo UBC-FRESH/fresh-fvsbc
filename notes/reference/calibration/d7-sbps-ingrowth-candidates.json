@@ -1,0 +1,14 @@
+[
+  {
+    "label": "bamax50",
+    "bamax": 50.0
+  },
+  {
+    "label": "bamax50-mort0.5",
+    "bamax": 50.0,
+    "mortmult": {
+      "PL": 0.5,
+      "SE": 0.5
+    }
+  }
+]

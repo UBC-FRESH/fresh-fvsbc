@@ -1,0 +1,39 @@
+{
+  "model_id": "sbps-ingrowth-2026-11-03",
+  "version": "0.1.0",
+  "source": "FAIB PSP tree_detail; all SBPS intervals except 100 Mile House TSA",
+  "training": {
+    "intervals": 630,
+    "sites": 116,
+    "excluded_tsa": "100 Mile House TSA",
+    "rate": "mean new-tree TPH per year by BEC and species group"
+  },
+  "rates": {
+    "SBPSdc": {
+      "HW": 1.91445,
+      "PL": 56.074764,
+      "SE": 11.320787
+    },
+    "SBPSmc": {
+      "PL": 1.137128
+    },
+    "SBPSmk": {
+      "BL": 4.980419,
+      "FD": 5.264624,
+      "HW": 0.379051,
+      "PL": 47.664111,
+      "SE": 9.67936
+    },
+    "SBPSxc": {
+      "HW": 24.107324,
+      "PL": 22.485239,
+      "SE": 10.955037
+    }
+  },
+  "claim": "Public-data recruitment rate for a D7 pilot; not a province-wide calibration.",
+  "build": {
+    "pyfvs": "fresh-fvsbc-pyfvs 0.4.1",
+    "wrapper": "fresh-fvsbc 0.21.3",
+    "variant": "bc"
+  }
+}

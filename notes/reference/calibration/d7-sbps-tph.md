@@ -1,6 +1,6 @@
 # D7.3 SBPS TPH component
 
-Status: candidate parameter set passes the D7 probe holdout; **not a bundle or certificate**
+Status: **retracted as a bundle candidate** by the D7.5 pure TSA holdout; see `d7-sbps-ingrowth.md`
 Date: 2026-11-03
 Issue: #351
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.3`
@@ -43,18 +43,13 @@ intercept of zero.
 
 ## 3. Decision
 
-The candidate set is **promoted to D7.4 validation**, not to a bundle and not to a certificate:
+The candidate set is **not promoted**; D7.5 tested a pure TSA holdout and it failed on BA. The earlier result was an every-third-site split, not a spatial holdout.
 
 - `BAMAX=50`
 - `MORTMULT=0.5` for `PL` and `SE`
 - domain: `SBPSdc` and `SBPSmk`, untreated
 
-D7.4 must:
-
-1. check calibration slope and intercept, not only bias;
-2. test more independent sites, especially `SBPSdc`, which has 13;
-3. keep `SBPSxc` out and `SBPSmc` validation-only;
-4. issue a signed bundle only after review, with the parameter bounds and claim boundary.
+D7.5 result: the 100 Mile House TSA holdout has baseline BA +50.8%; no BAMAX, MORTMULT, or ingrowth candidate meets the BA threshold. The SBPS next step is a TSA/stratum-specific fit, not a global set.
 
 ## 4. Claim boundary
 
