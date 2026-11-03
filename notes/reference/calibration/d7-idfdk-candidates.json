@@ -1,0 +1,488 @@
+[
+  {
+    "label": "bamax53",
+    "bamax": 53.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    }
+  },
+  {
+    "label": "kc-v2c",
+    "bamax": 53.0,
+    "baimult": {
+      "FD": 1.2,
+      "SE": 1.3948,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 2.8,
+      "SE": 3.8261,
+      "PL": 8.0,
+      "HW": 1.2012
+    }
+  },
+  {
+    "label": "kc-v2c-pl3",
+    "bamax": 53.0,
+    "baimult": {
+      "FD": 1.2,
+      "SE": 1.3948,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 2.8,
+      "SE": 3.8261,
+      "PL": 3.0,
+      "HW": 1.2012
+    }
+  },
+  {
+    "label": "bamax50",
+    "bamax": 50.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    }
+  },
+  {
+    "label": "bamax45",
+    "bamax": 45.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    }
+  },
+  {
+    "label": "bamax53-mort0.5",
+    "bamax": 53.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.5,
+      "SE": 0.5,
+      "PL": 0.5,
+      "HW": 0.5
+    }
+  },
+  {
+    "label": "bamax53-mort0.75",
+    "bamax": 53.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.75,
+      "SE": 0.75,
+      "PL": 0.75,
+      "HW": 0.75
+    }
+  },
+  {
+    "label": "bamax55",
+    "bamax": 55.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    }
+  },
+  {
+    "label": "bamax60",
+    "bamax": 60.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    }
+  },
+  {
+    "label": "bamax53-baimult1.1",
+    "bamax": 53.0,
+    "baimult": {
+      "FD": 1.1,
+      "SE": 1.1,
+      "PL": 1.1,
+      "HW": 1.1
+    },
+    "mortmult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    }
+  },
+  {
+    "label": "bamax53-mort0.4",
+    "bamax": 53.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.4,
+      "SE": 0.4,
+      "PL": 0.4,
+      "HW": 0.4
+    }
+  },
+  {
+    "label": "bamax53-mort0.3",
+    "bamax": 53.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.3,
+      "SE": 0.3,
+      "PL": 0.3,
+      "HW": 0.3
+    }
+  },
+  {
+    "label": "bamax55-mort0.3",
+    "bamax": 55.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.3,
+      "SE": 0.3,
+      "PL": 0.3,
+      "HW": 0.3
+    }
+  },
+  {
+    "label": "bamax55-mort0.35",
+    "bamax": 55.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.35,
+      "SE": 0.35,
+      "PL": 0.35,
+      "HW": 0.35
+    }
+  },
+  {
+    "label": "bamax55-mort0.4",
+    "bamax": 55.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.4,
+      "SE": 0.4,
+      "PL": 0.4,
+      "HW": 0.4
+    }
+  },
+  {
+    "label": "bamax60-mort0.3",
+    "bamax": 60.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.3,
+      "SE": 0.3,
+      "PL": 0.3,
+      "HW": 0.3
+    }
+  },
+  {
+    "label": "bamax60-mort0.35",
+    "bamax": 60.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.35,
+      "SE": 0.35,
+      "PL": 0.35,
+      "HW": 0.35
+    }
+  },
+  {
+    "label": "bamax60-mort0.4",
+    "bamax": 60.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.4,
+      "SE": 0.4,
+      "PL": 0.4,
+      "HW": 0.4
+    }
+  },
+  {
+    "label": "bamax60-mort0.5",
+    "bamax": 60.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.5,
+      "SE": 0.5,
+      "PL": 0.5,
+      "HW": 0.5
+    }
+  },
+  {
+    "label": "bamax65-mort0.5",
+    "bamax": 65.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.5,
+      "SE": 0.5,
+      "PL": 0.5,
+      "HW": 0.5
+    }
+  },
+  {
+    "label": "bamax65-mort0.55",
+    "bamax": 65.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.55,
+      "SE": 0.55,
+      "PL": 0.55,
+      "HW": 0.55
+    }
+  },
+  {
+    "label": "bamax70-mort0.5",
+    "bamax": 70.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.5,
+      "SE": 0.5,
+      "PL": 0.5,
+      "HW": 0.5
+    }
+  },
+  {
+    "label": "bamax65-mort0.6",
+    "bamax": 65.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.6,
+      "SE": 0.6,
+      "PL": 0.6,
+      "HW": 0.6
+    }
+  },
+  {
+    "label": "bamax55-mort-PL0.3",
+    "bamax": 55.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "PL": 0.3
+    }
+  },
+  {
+    "label": "bamax55-mort-PL0.5",
+    "bamax": 55.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "PL": 0.5
+    }
+  },
+  {
+    "label": "bamax55-mort-FD0.3",
+    "bamax": 55.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.3
+    }
+  },
+  {
+    "label": "bamax55-mort-FD0.5",
+    "bamax": 55.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.5
+    }
+  },
+  {
+    "label": "bamax60-mort-PL0.3",
+    "bamax": 60.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "PL": 0.3
+    }
+  },
+  {
+    "label": "bamax60-mort-PL0.5",
+    "bamax": 60.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "PL": 0.5
+    }
+  },
+  {
+    "label": "bamax60-mort-FD0.3",
+    "bamax": 60.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.3
+    }
+  },
+  {
+    "label": "bamax60-mort-FD0.5",
+    "bamax": 60.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "FD": 0.5
+    }
+  },
+  {
+    "label": "bamax55-mort-PLFD0.5",
+    "bamax": 55.0,
+    "baimult": {
+      "FD": 1.0,
+      "SE": 1.0,
+      "PL": 1.0,
+      "HW": 1.0
+    },
+    "mortmult": {
+      "PL": 0.5,
+      "FD": 0.5
+    }
+  }
+]

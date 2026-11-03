@@ -50,6 +50,10 @@ outside the repository because they carry site identifiers.
 | `d7-sbps-probe-summary.csv` | The D7.1 train/test probe summary |
 | `d7-sbps-probe-by-bec.csv` | The D7.1 probe summary by BEC |
 | `d7-sbps-site-index.csv` | The D7.1 site-index control showing that BC ignores `SITECODE` |
+| `d7-idfdk-readiness.md` | The D7.3 IDFdk calibration-readiness probe, spatial holdout, and no-bundle result |
+| `d7-idfdk-candidates.json` | The fixed D7.3 IDFdk candidate set |
+| `d7-idfdk-probe-summary.csv` | The D7.3 train/test probe summary |
+| `d7-idfdk-probe-by-bec.csv` | The D7.3 probe summary by BEC |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |
