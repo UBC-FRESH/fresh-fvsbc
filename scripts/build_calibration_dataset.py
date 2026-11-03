@@ -49,6 +49,12 @@ def _parser() -> argparse.ArgumentParser:
         metavar="DIR",
         help="where the tables and manifest are written",
     )
+    parser.add_argument(
+        "--all-zones",
+        action="store_true",
+        dest="all_zones",
+        help="read every site, including zones the current variant does not resolve",
+    )
     return parser
 
 
@@ -69,7 +75,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
     try:
-        dataset = build_dataset(args.psp_dir, args.out_dir)
+        dataset = build_dataset(args.psp_dir, args.out_dir, include_unsupported=args.all_zones)
     except CalibrationDataError as error:
         print(f"build_calibration_dataset: {error}", file=sys.stderr)
         return EXIT_BAD_INPUT

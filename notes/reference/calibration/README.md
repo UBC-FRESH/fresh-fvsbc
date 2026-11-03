@@ -111,6 +111,23 @@ weights, species filters, and interval construction are the same as the audit's.
 It is not a calibration and it is not independent of the archive: both read the
 same PSP snapshot.
 
+## All-zone build (2026-11-03)
+
+The `--all-zones` build reads every PSP site instead of only the seven supported zones. It covers **7,341
+sites, 23,956 visits, 3,205,741 tree rows, 17,151 intervals, and 1,814,527 tree-survival rows** across all
+**153 BEC variants**. The five previously excluded zones now have envelope rows:
+
+| Zone | Labels | Sites | Repeat sites | Intervals | BA p99 range | BA max |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `CWH` | 22 | 2,335 | 2,178 | 7,124 | 88.5–165.7 | 230.2 |
+| `CDF` | 1 | 26 | 21 | 94 | 111.9 | 153.1 |
+| `BWBS` | 5 | 534 | 336 | 710 | 51.4–69.6 | 71.6 |
+| `CMA` | 1 | 3 | 2 | 6 | 93.2 | 93.2 |
+| `MH` | 3 | 13 | 12 | 31 | 83.8–122.5 | 123.6 |
+
+The tree-level all-zone tables stay outside the repository. The aggregate tables are in `all-zone/`, and
+`w2-five-zone-defaults.csv` gives each label a provisional `BAMAX` (PSP p99) and a confidence tier.
+
 ## Known limits
 
 - The envelope is empirical. A high p99 in a data-thin variant is a sample

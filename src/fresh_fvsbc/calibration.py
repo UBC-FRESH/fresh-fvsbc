@@ -124,7 +124,7 @@ class Manifest(TypedDict):
 
     inputs: dict[str, dict[str, object]]
     rows: dict[str, int]
-    parameters: dict[str, int]
+    parameters: dict[str, object]
     supported_zones: list[str]
     unsupported_zones: list[str]
     source: str
@@ -247,8 +247,11 @@ def _visits(psp_dir: Path) -> pd.DataFrame:
     return visits.drop_duplicates(["SITE_IDENTIFIER", "CLSTR_ID", "VISIT_NUMBER"])
 
 
-def _trees(psp_dir: Path, supported_ids: set[object]) -> pd.DataFrame:
-    """Read the supported stands' trees in chunks and normalise the weights."""
+def _trees(psp_dir: Path, site_ids: set[object] | None) -> pd.DataFrame:
+    """Read the selected stands' trees in chunks and normalise the weights.
+
+    ``site_ids=None`` reads every site, which is the all-zone path.
+    """
     columns = [
         "SITE_IDENTIFIER",
         "CLSTR_ID",
@@ -273,7 +276,8 @@ def _trees(psp_dir: Path, supported_ids: set[object]) -> pd.DataFrame:
     for chunk in pd.read_csv(
         psp_dir / "faib_tree_detail.csv", usecols=columns, chunksize=500_000, low_memory=False
     ):
-        chunk = chunk[chunk["SITE_IDENTIFIER"].isin(supported_ids)]
+        if site_ids is not None:
+            chunk = chunk[chunk["SITE_IDENTIFIER"].isin(site_ids)]
         if chunk.empty:
             continue
         chunk = chunk.dropna(subset=["DBH", "LV_D", "PHF_TREE"])
@@ -309,7 +313,7 @@ def _trees(psp_dir: Path, supported_ids: set[object]) -> pd.DataFrame:
             ]
         )
     if not chunks:
-        raise CalibrationDataError("the tree file holds no rows for the supported zones")
+        raise CalibrationDataError("the tree file holds no rows for the requested sites")
     trees = pd.concat(chunks, ignore_index=True)
     trees["VISIT_NUMBER"] = trees["VISIT_NUMBER"].astype(int)
     trees["PLOT"] = trees["PLOT"].astype(int)
@@ -606,6 +610,7 @@ def _manifest(
     envelope: pd.DataFrame,
     species_envelope_frame: pd.DataFrame,
     species: pd.DataFrame,
+    include_unsupported: bool,
 ) -> Manifest:
     """Build the input and output manifest, without a machine-specific path."""
     return {
@@ -629,7 +634,11 @@ def _manifest(
             "species_envelope": int(species_envelope_frame.shape[0]),
             "species": int(species.shape[0]),
         },
-        "parameters": {"min_years": MIN_YEARS, "max_years": MAX_YEARS},
+        "parameters": {
+            "min_years": MIN_YEARS,
+            "max_years": MAX_YEARS,
+            "include_unsupported": include_unsupported,
+        },
         "supported_zones": list(SUPPORTED_ZONES),
         "unsupported_zones": list(UNSUPPORTED_ZONES),
         "source": "FAIB PSP compilation",
@@ -637,7 +646,9 @@ def _manifest(
     }
 
 
-def build_dataset(psp_dir: str | Path, out_dir: str | Path) -> CalibrationDataset:
+def build_dataset(
+    psp_dir: str | Path, out_dir: str | Path, *, include_unsupported: bool = False
+) -> CalibrationDataset:
     """Build the calibration dataset and write it to ``out_dir``.
 
     Parameters
@@ -647,6 +658,9 @@ def build_dataset(psp_dir: str | Path, out_dir: str | Path) -> CalibrationDatase
     out_dir : str or Path
         Where the tables and the manifest are written. The tree-level tables
         carry site identifiers; keep them outside the tracked tree.
+    include_unsupported : bool, optional
+        Read every site, including the zones the current variant does not
+        resolve. The default keeps the supported-zone dataset unchanged.
 
     Returns
     -------
@@ -672,7 +686,8 @@ def build_dataset(psp_dir: str | Path, out_dir: str | Path) -> CalibrationDatase
         low_memory=False,
     ).drop_duplicates()
     supported_ids = set(header.index[header["supported"]])
-    trees = _trees(source, supported_ids)
+    site_ids = None if include_unsupported else supported_ids
+    trees = _trees(source, site_ids)
     visits = _visit_table(trees, visits_meta, header)
     intervals, tree_survival = _intervals(visits, trees)
     coverage = _coverage(header, visits_meta, intervals, tree_survival)
@@ -693,6 +708,7 @@ def build_dataset(psp_dir: str | Path, out_dir: str | Path) -> CalibrationDatase
         envelope,
         species_envelope_frame,
         species,
+        include_unsupported,
     )
 
     outputs = {
