@@ -208,6 +208,7 @@ snapshot with the same row counts still needs a new manifest.
 | `d7-100mile-temporal.md` | The D7.9 temporal holdout attempt and data-gap result |
 | `d7-sbpsdc-quesnel.md` | The D7.10 Quesnel capacity screen and dense-site failure |
 | `d7-quesnel-established.md` | The D7.11 established-stand boundary and site-fold failure |
+| `d7-quesnel-siteindex.md` | The D7.12 site-index covariate screen and its insufficiency |
 | `d7-quesnel-established-summary.csv` | The D7.11 pooled and worst-site summary |
 | `d7-sbpsdc-capacity-summary.csv` | The D7.10 BAMAX grid summary |
 | `d7-100mile-temporal.json`, `d7-100mile-temporal-summary.csv` | The D7.9 rates and split summary |
