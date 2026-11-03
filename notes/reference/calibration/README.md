@@ -191,4 +191,6 @@ manifest. The SHA-256 values in `manifest.json` identify the snapshot; a differe
 snapshot with the same row counts still needs a new manifest.
 
 | `d7-sbps-capacity.md` | The D7.2 per-BEC SBPS capacity probe and no-bundle result |
+| `d7-sbps-tph.md` | The D7.3 SBPS TPH/MORTMULT probe and candidate parameter set |
+| `d7-tph-summary.csv`, `d7-tph-by-bec.csv`, `d7-tph-candidates.json` | The D7.3 probe tables and candidate list |
 | `d7-per-bec-summary.csv`, `d7-per-bec-by-bec.csv`, `d7-per-bec-candidates.json` | The D7.2 per-BEC probe tables and candidate list |
