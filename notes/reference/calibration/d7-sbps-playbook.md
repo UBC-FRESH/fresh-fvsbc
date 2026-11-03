@@ -21,6 +21,7 @@ was used, why a result was accepted or retracted, and what the next agent should
 | D7.7 100 Mile LOSO (#360) | 6 site folds over 7 intervals | `BAMAX 25` BA pass/TPH fail; `BAMAX 30` opposite | No capacity-only bundle |
 | D7.8 100 Mile candidate (#362) | 6 site folds, site-specific ingrowth | `BAMAX 25` + 100 Mile ingrowth: BA +8.4%, TPH -13.1% | **Candidate** |
 | D7.9 temporal holdout (#366) | train <=1998, test >=2001 | one eligible later interval; BA +33.4% | Not validated; data gap |
+| D7.10 Quesnel capacity (#368) | 39 eligible intervals / 13 sites | `BAMAX 55` pooled BA +8.9%/TPH -14.4%; one dense site BA +151% | No bundle; density stratum needed |
 
 The only positive result is the last one. Everything before it is useful evidence, not a calibration.
 
@@ -174,8 +175,9 @@ The test site lists are site identifiers. Keep them in `runtime/`; do not commit
 2. Freeze the canonical rates and record the training interval list and checksum.
 3. Add an `ESTAB`/ingrowth section to the calibration-bundle schema and provenance.
 4. If a usable temporal holdout passes, issue a **100 Mile candidate bundle** with the claim boundary.
-5. Then repeat the same playbook for SBPSdc (Quesnel) and the other SBPS TSAs; do not transfer the
-   100 Mile rates.
+5. SBPSdc/Quesnel is screened: `BAMAX 55` passes pooled, but one dense small-tree site fails by
+   151%. The next experiment is a density-stratified capacity, not another pooled BAMAX. Do not
+   transfer the 100 Mile rates.
 
 ## 7. Claim boundary
 
