@@ -1,6 +1,6 @@
 # D6.1 SBPS growth diagnosis
 
-Status: first diagnosis; root cause not yet fixed
+Status: first diagnosis; fixed in D6.4 (`d6-sbps-small-tree.md`)
 Date: 2026-11-03
 Issue: #336
 Build: local `fresh-fvsbc-pyfvs 0.4.0` (five-zone prototype)

@@ -99,6 +99,7 @@ jobs:
           gunzip -c notes/reference/fvsbc-patchset.diff.gz > "$RUNNER_TEMP/fvsbc.patch"
           gunzip -c notes/reference/calibration/w2-subzones.patch.gz > "$RUNNER_TEMP/w2-subzones.patch"
           gunzip -c notes/reference/calibration/w3-habtyp-boundary.patch.gz > "$RUNNER_TEMP/w3-habtyp-boundary.patch"
+          gunzip -c notes/reference/calibration/w4-sbps-small-tree.patch.gz > "$RUNNER_TEMP/w4-sbps-small-tree.patch"
           git -C "$RUNNER_TEMP/PyFVS" apply --check "$RUNNER_TEMP/pyfvs.patch"
           git -C "$RUNNER_TEMP/PyFVS" apply "$RUNNER_TEMP/pyfvs.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/fvsbc.patch"
@@ -111,11 +112,19 @@ jobs:
           # boundary before the real subzone was tried.
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/w3-habtyp-boundary.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/w3-habtyp-boundary.patch"
+          # W2.5 and the five prototype zones are wheel-only for now: the upstream
+          # oracle fixture predates the five-zone build and would need a separate
+          # fixture before it can gate CI. The wheel recipe still applies it.
+          # D6 keeps SBPS on the SBS/SBPS small-tree height model instead of the
+          # exponential IDF/ICH branch. This patch is source-compatible with the
+          # existing oracle because its branches are SBPS/SBS-only.
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/w4-sbps-small-tree.patch"
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/w4-sbps-small-tree.patch"
 
       - name: Build the BC variant
         working-directory: ${{ runner.temp }}/PyFVS
         env:
-          SETUPTOOLS_SCM_PRETEND_VERSION: "0.3.13"
+          SETUPTOOLS_SCM_PRETEND_VERSION: "0.4.1"
         run: |
           python -m pip install --no-build-isolation . \
             --config-settings=setup-args="-Dfvsvariants=bc"

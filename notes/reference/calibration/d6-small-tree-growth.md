@@ -1,6 +1,6 @@
 # D6.2 small-tree growth threshold
 
-Status: isolated to the small-tree diameter and height growth path; not fixed
+Status: isolated to the small-tree diameter and height growth path; fixed in D6.4 (`d6-sbps-small-tree.md`)
 Date: 2026-11-03
 Issue: #338
 Builds: `fresh-fvsbc-pyfvs 0.3.13` and `0.4.0`; both give the same result
@@ -52,15 +52,11 @@ factor, not the per-tree growth. This is not a density-dependent growth response
 
 ## 4. Next instrument
 
-The threshold points at the BC small-tree branches in `canada/bc/dgf.f` and the height-growth
-routine, not at mortality. The next step is to read:
-
-- the small/large-tree threshold used by each routine;
-- the DBH, height, and age units at the branch entry;
-- the coefficient and exponent values for `PL` and `SE`.
-
-A fine DBH sweep at 7.0, 7.4, 7.5, 7.6, 8.0, 10.0, 10.5, and 11.0, with the same tree and cycle,
-will pin the branch. No parameter is changed until the source expression and its units are named.
+The threshold pointed at the BC small-tree branches in `canada/bc/dgf.f` and the height-growth
+routine, not at mortality. D6.4 found the branch in `canada/bc/regent.f`: the `SBS`/`SBPS` model
+selector tested only `SBS`, so `SBPS` took the exponential IDF/ICH form with SBS coefficients and
+overflowed. `d6-sbps-small-tree.md` has the fix; the next step is the D7 calibration of the
+corrected residual, not another source branch hunt.
 
 ## 5. Limits
 

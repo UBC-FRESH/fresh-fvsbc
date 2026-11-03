@@ -38,10 +38,13 @@ outside the repository because they carry site identifiers.
 | `w2-five-zone-species.md` | The seven donor aliases, the species smoke, and the output-code caveat |
 | `w2-five-zone-species-smoke.csv` | One row per missing species: donor, BEC/BAMAX echo, output code, database |
 | `w3-bec-boundary.md` | The W3.1 `KAM`+`MS` boundary finding and fix |
+| `w3-habtyp-boundary.patch.gz` | The Habtyp zone-boundary patch, applied after W2.3 |
+| `w4-sbps-small-tree.patch.gz` | The SBPS small-tree height-model selection fix, applied after W3.1 |
 | `d6-sbps-growth.md` | The D6.1 SBPS diameter-growth diagnosis and next instrument |
 | `d6-small-tree-growth.md` | The D6.2 small-tree growth threshold, one-tree matrix, and corrected build comparison |
 | `d6-small-tree-output.md` | The D6.3 finding that the growth model is normal and the DBH/output state explodes |
-| `w3-habtyp-boundary.patch.gz` | The Habtyp zone-boundary patch, applied after W2.3 |
+| `d6-sbps-small-tree.md` | The D6.4 SBPS overflow finding, patch, corrected baseline, and claim boundary |
+| `d6-sbps-fixed.csv` | The four corrected SBPS baseline rows |
 | `baseline_summary.csv` | The uncalibrated backtest, one row per BEC |
 | `baseline_by_tsa.csv`, `baseline_by_species.csv`, `baseline_by_dbh.csv`, `baseline_by_ba.csv` | The same backtest grouped by TSA, species group, DBH class, and BA class |
 | `baseline_skipped_becs.csv`, `baseline_skip_reasons.csv` | The intervals the variant could not resolve |
@@ -54,6 +57,10 @@ outside the repository because they carry site identifiers.
 | `all-zone-baseline/baseline_five_zone.csv` | D5 five-zone per-BEC residuals |
 | `all-zone-baseline/baseline_outliers.csv` | The 12 largest BA deviations, aggregate-safe columns |
 | `all-zone-baseline/baseline_summary.csv`, `baseline_by_*.csv` | The D5 per-BEC and grouped residual tables |
+| `all-zone-baseline/d6-five-zone-baseline.md` | The D6 five-interval-per-BEC five-zone baseline, residuals, and species decision |
+| `all-zone-baseline/d6-five-zone-summary.csv` | The D6 five-zone per-BEC residual summary |
+| `all-zone-baseline/d6-five-zone-by-species.csv` | The D6 five-zone residuals by dominant species group |
+| `all-zone-baseline/d6-all-zone-summary.csv` | The D6 all-zone per-BEC rerun after the SBPS fix |
 
 ## Counts
 

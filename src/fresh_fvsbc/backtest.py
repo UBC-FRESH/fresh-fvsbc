@@ -26,7 +26,12 @@ from fresh_fvsbc.envelope import envelope_flags
 from fresh_fvsbc.keywords import Keyword
 from fresh_fvsbc.outputs import read_table
 from fresh_fvsbc.run import run_case
-from fresh_fvsbc.treelist import SpeciesError, TreeListFields, resolve_species
+from fresh_fvsbc.treelist import (
+    DONOR_SPECIES,
+    SpeciesError,
+    TreeListFields,
+    resolve_species,
+)
 
 __all__ = [
     "CROWN_BY_CLASS",
@@ -45,14 +50,15 @@ __all__ = [
 CROWN_BY_CLASS: dict[str, int] = {"D": 8, "C": 6, "I": 4, "S": 2}
 
 #: PSP species spellings that are aliases of one of BC's 15. A code outside
-#: this map and outside the 15 is skipped rather than forced into a group.
+#: this map and outside the 15 is skipped rather than forced into a group. The
+#: donor aliases are the same layer the tree-list writer uses, so a baseline
+#: and a run of the same stand resolve ``Ba``, ``Hm``, ``Yc``, ``Dr``, and
+#: ``Mb`` the same way.
 SPECIES_ALIASES: dict[str, str] = {
     "SX": "SE",
     "SW": "SE",
-    "SS": "SE",
-    "BA": "BL",
-    "YC": "CW",
     "W": "OH",
+    **DONOR_SPECIES,
 }
 
 

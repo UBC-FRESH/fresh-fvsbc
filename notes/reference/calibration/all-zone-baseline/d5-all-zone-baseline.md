@@ -10,6 +10,12 @@ This is the first provincial measurement. It grows each interval from its first 
 with no cut and no calibration. It is not a certificate, and it does not support a growth-and-yield,
 legal, AAC, or whole-block claim.
 
+**D6 update (2026-11-03):** the SBPS rows in this report are superseded by
+`d6-sbps-small-tree.md`. D6 found and fixed the `REGENT` model-selection defect, and the corrected
+all-zone run has **139 intervals, 0 skipped, initial BA bias -0.69 / MAE 0.84, end BA bias -4.17 /
+MAE 8.65**. The corrected SBPS rows are physically plausible but not calibrated; the D5
+`457,348 m2/ha` row is the pre-fix overflow, not a model result to fit.
+
 ## 1. Overall
 
 - **Initial stand:** BA bias **-0.69 m2/ha**, median **-0.49**, MAE **0.84 m2/ha**.
