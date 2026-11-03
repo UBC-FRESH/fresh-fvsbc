@@ -1,6 +1,6 @@
 # D7.12 Quesnel site-index covariate
 
-Status: **site index is informative but not sufficient**; no Quesnel bundle
+Status: **site index is informative but not sufficient**; no site-index rule. D7.13 finds a QMD >= 13 domain candidate.
 Date: 2026-11-03
 Issue: #373
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.3`
@@ -34,7 +34,8 @@ The full site table is kept in runtime because it carries site identifiers.
 ## 3. Decision
 
 **No site-index-only Quesnel rule.** SI is not a substitute for a site-level effect; it is one
-covariate among QMD, BA, and unmeasured disturbance/ingrowth.
+covariate among QMD, BA, and unmeasured disturbance/ingrowth. D7.13 narrows the domain instead and
+finds a candidate for `QMD >= 13`.
 
 The site-to-site variation remains the block. The next model is **site-level/hierarchical capacity**:
 
