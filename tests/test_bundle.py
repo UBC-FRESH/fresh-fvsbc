@@ -157,6 +157,16 @@ def test_the_cwh_4cm_bundle_loads_and_renders_regdmul() -> None:
     assert any("not signed off" in warning for warning in bundle.warnings)
 
 
+def test_the_cwh_4cm_bundle_enforces_its_dbh_domain() -> None:
+    """The 4 cm CWH pilot refuses a tree below the calibration limit."""
+    bundle = load_bundle("notes/reference/calibration/d7-cwh-4cm-bundle.json")
+    assert bundle.domain.dbh_classes == ((4.0, 999.0),)
+    assert bundle.pins["wrapper_version"] == __version__
+    bundle.check_domain(BecCode.parse("CAR CWHvm1/01"), (), "untreated", dbh_values=(4.0, 20.0))
+    with pytest.raises(BundleDomainError, match="DBH"):
+        bundle.check_domain(BecCode.parse("CAR CWHvm1/01"), (), "untreated", dbh_values=(3.9, 20.0))
+
+
 def test_the_kc_pilot_bundle_loads_and_carries_its_two_warnings() -> None:
     """The KC bundle is unsigned and its PL multiplier sits at its bound."""
     bundle = load_bundle(KC_PILOT)
