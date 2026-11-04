@@ -157,6 +157,18 @@ def a_fake_drive(
     return drive
 
 
+def test_the_qmd_is_expansion_weighted() -> None:
+    """QMD uses tree_count, so a heavy tree moves it more than a light one."""
+    light = a_tree()
+    heavy = a_tree()
+    heavy["tree_num"] = 2
+    heavy["diam"] = 40.0
+    heavy["tree_count"] = 3.0
+    qmd = run._qmd([light, heavy])
+    assert qmd is not None
+    assert qmd == pytest.approx(((20.0**2 + 40.0**2 * 3.0) / 4.0) ** 0.5)
+
+
 def test_the_tree_file_is_lowercase_and_shares_the_keyword_files_base() -> None:
     """PyFVS checks for ``.tre`` and refuses to start without it, so the case is not a choice."""
     assert run.tree_file_name("run.key") == Path("run.tre")

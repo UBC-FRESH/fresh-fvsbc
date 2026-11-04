@@ -29,7 +29,7 @@ Fields
    * - ``pins``
      - ``pyfvs_commit``, ``fvs_source_commit``, and ``variant``. The loader refuses a bundle whose pins do not match the package.
    * - ``domain``
-     - ``regions``, ``becs``, ``species_groups``, ``dbh_classes``, and ``management``. An empty list means no restriction; ``dbh_classes`` is a list of inclusive ``[min, max]`` ranges in centimetres.
+     - ``regions``, ``becs``, ``species_groups``, ``dbh_classes``, ``management``, and optional ``qmd_min``. An empty list means no restriction; ``dbh_classes`` is a list of inclusive ``[min, max]`` ranges in centimetres.
    * - ``parameters``
      - The keyword records: ``keyword``, ``fields``, ``units``, ``value_index``, and optional ``bounds``.
    * - ``training``

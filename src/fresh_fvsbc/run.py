@@ -51,6 +51,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import math
 import os
 import subprocess
 import sys
@@ -442,6 +443,27 @@ def _species_groups(records: Sequence[TreeListFields]) -> tuple[str, ...]:
     )
 
 
+def _qmd(records: Sequence[TreeListFields]) -> float | None:
+    """Return the expansion-weighted QMD of a tree list, or ``None`` when empty.
+
+    Parameters
+    ----------
+    records : Sequence of TreeListFields
+        The trees handed to FVS.
+
+    Returns
+    -------
+    float or None
+        The initial quadratic mean diameter in centimetres, or ``None`` when
+        the tree list has no expansion weight.
+    """
+    total = sum(float(record["tree_count"]) for record in records)
+    if total <= 0:
+        return None
+    squares = sum(float(record["diam"]) ** 2 * float(record["tree_count"]) for record in records)
+    return math.sqrt(squares / total)
+
+
 def _management(keywords: Sequence[Keyword]) -> str:
     """Return the management regime a run declares.
 
@@ -620,6 +642,7 @@ def run_case(
             _species_groups(records),
             _management(keywords),
             dbh_values=tuple(float(record["diam"]) for record in records),
+            qmd=_qmd(records),
         )
         missing = [keyword for keyword in calibration.render() if keyword not in keywords]
         if missing:

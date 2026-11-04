@@ -41,9 +41,8 @@ This is the first Quesnel domain with both a site-grouped and a temporal pass.
 
 `load_bundle` accepts it and renders the BAMAX keyword.
 
-**Schema limit:** the current bundle domain has no `QMD` field. The `QMD >= 13` boundary is in the
-claim and note, not enforced by the loader. A caller must enforce it, or the schema needs a
-`qmd_min` field before this is a self-contained bundle.
+**Schema status:** D7.15 adds `domain.qmd_min`; the candidate bundle now carries `qmd_min: 13.0`
+and the loader enforces it.
 
 ## 4. What this is not
 

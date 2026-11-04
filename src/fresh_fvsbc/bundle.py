@@ -113,6 +113,8 @@ class BundleDomain:
         Inclusive DBH ranges in centimetres.
     management : tuple of str
         ``untreated``, ``managed``, or both.
+    qmd_min : float, optional
+        The minimum initial quadratic mean diameter, in centimetres.
     """
 
     regions: tuple[str, ...] = ()
@@ -120,6 +122,7 @@ class BundleDomain:
     species_groups: tuple[str, ...] = ()
     dbh_classes: tuple[tuple[float, float], ...] = ()
     management: tuple[str, ...] = ()
+    qmd_min: float | None = None
 
 
 class BundleDomainError(BundleError):
@@ -282,6 +285,7 @@ class CalibrationBundle:
         species_groups: Sequence[str],
         management: str = "untreated",
         dbh_values: Sequence[float] | None = None,
+        qmd: float | None = None,
     ) -> None:
         """Refuse a run outside the bundle's declared domain.
 
@@ -296,6 +300,9 @@ class CalibrationBundle:
         dbh_values : Sequence of float, optional
             The DBHs present in the run. Required when the domain names DBH
             classes.
+        qmd : float, optional
+            The initial quadratic mean diameter, in centimetres. Required when
+            the domain names ``qmd_min``.
 
         Raises
         ------
@@ -324,6 +331,17 @@ class CalibrationBundle:
             raise BundleDomainError(
                 f"{self.bundle_id} covers management {', '.join(regimes)}, not {management}"
             )
+        if self.domain.qmd_min is not None:
+            if qmd is None:
+                raise BundleDomainError(
+                    f"{self.bundle_id} needs the initial QMD to check qmd_min "
+                    f"{self.domain.qmd_min:.1f} cm"
+                )
+            if qmd < self.domain.qmd_min:
+                raise BundleDomainError(
+                    f"{self.bundle_id} covers QMD at least "
+                    f"{self.domain.qmd_min:.1f} cm, not {qmd:.1f}"
+                )
         if self.domain.dbh_classes:
             if dbh_values is None:
                 raise BundleDomainError(
@@ -527,12 +545,21 @@ def _domain(record: Mapping[str, object]) -> BundleDomain:
         if low >= high:
             raise BundleError(f"domain.dbh_classes[{index}] min must be below max")
         dbh_classes.append((low, high))
+    qmd_raw = record.get("qmd_min")
+    qmd_min: float | None = None
+    if qmd_raw is not None:
+        if not isinstance(qmd_raw, (int, float)):
+            raise BundleError("domain.qmd_min must be a number")
+        qmd_min = float(qmd_raw)
+        if qmd_min <= 0:
+            raise BundleError("domain.qmd_min must be positive")
     return BundleDomain(
         regions=regions,
         becs=becs,
         species_groups=species_groups,
         dbh_classes=tuple(dbh_classes),
         management=management,
+        qmd_min=qmd_min,
     )
 
 
