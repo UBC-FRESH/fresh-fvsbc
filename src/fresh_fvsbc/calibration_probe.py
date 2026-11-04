@@ -119,6 +119,8 @@ def parameter_keywords(
     baimult: Mapping[str, float] | None = None,
     mortmult: Mapping[str, float] | None = None,
     htgmul: Mapping[str, float] | None = None,
+    regdmul: Mapping[str, float] | None = None,
+    reghmul: Mapping[str, float] | None = None,
 ) -> tuple[Keyword, ...]:
     """Return the keyword records for one candidate.
 
@@ -132,6 +134,10 @@ def parameter_keywords(
         Species code to mortality multiplier.
     htgmul : Mapping of str to float, optional
         Species code to height growth multiplier.
+    regdmul : Mapping of str to float, optional
+        Species code to small-tree diameter growth multiplier.
+    reghmul : Mapping of str to float, optional
+        Species code to small-tree height growth multiplier.
 
     Returns
     -------
@@ -141,7 +147,13 @@ def parameter_keywords(
     keywords: list[Keyword] = []
     if bamax is not None:
         keywords.append(Keyword("BAMAX", (f"{bamax:g}",)))
-    for name, values in (("BAIMULT", baimult), ("MORTMULT", mortmult), ("HTGMULT", htgmul)):
+    for name, values in (
+        ("BAIMULT", baimult),
+        ("MORTMULT", mortmult),
+        ("HTGMULT", htgmul),
+        ("REGDMULT", regdmul),
+        ("REGHMULT", reghmul),
+    ):
         for species, value in (values or {}).items():
             fields: tuple[str, ...]
             if name == "MORTMULT":

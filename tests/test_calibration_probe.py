@@ -78,6 +78,14 @@ def test_interval_checksum_is_order_independent() -> None:
     assert interval_checksum(frame).startswith("sha256:")
 
 
+def test_parameter_keywords_render_small_tree_growth_multipliers() -> None:
+    """Small-tree growth is a separate calibration lever, not another BAIMULT."""
+    records = parameter_keywords(regdmul={"CW": 2.0}, reghmul={"CW": 1.5})
+    assert [record.name for record in records] == ["REGDMULT", "REGHMULT"]
+    assert records[0].parameters == ("1", "CW", "2.0000")
+    assert records[1].parameters == ("1", "CW", "1.5000")
+
+
 def test_insert_parameters_places_records_before_process() -> None:
     """The calibration records are read before the projection starts."""
     base = (Keyword("STDINFO", ("CAR", "SBPSmc/01")), Keyword("PROCESS"), Keyword("STOP"))

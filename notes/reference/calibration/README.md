@@ -71,6 +71,7 @@ outside the repository because they carry site identifiers.
 | `d9-faib-nonpsp-catalogue.md`, `d9-faib-nonpsp-coverage.csv` | D9.1 FAIB non-PSP catalogue: temporary VRI and independent repeat cohort |
 | `d9-faib-nonpsp-external.csv` | D9.2 non-PSP external validation of IDFdk/SBS/CWH/BWBS |
 | `d9-faib-dbh-standard.md` | D9.3–D9.5 DBH-limit audit, 4+ cm denominator, and CWH 4 cm refit |
+| `d9-cwh-4cm-refit.md`, `d7-cwh-4cm-bundle.json`, `d7-cwh-4cm-summary.csv` | D9.6 CWH 4 cm pilot with REGDMULT |
 | `d7-idfdk-binned-bundle.json` | The density/QMD-binned IDFdk pilot bundle |
 | `d7-idfdk-bundle-summary.csv`, `d7-idfdk-kamloops-summary.csv`, `d7-idfdk-temporal1990-summary.csv`, `d7-idfdk-binned-summary.csv`, `d7-idfdk-periodic-summary.csv` | The D7.6 validation summaries |
 | `d7-ingrowth-screen-by-zone.csv`, `d7-ingrowth-screen-by-bec.csv`, `d7-all-zone-ingrowth.json` | The all-zone domain screening tables and rates |
