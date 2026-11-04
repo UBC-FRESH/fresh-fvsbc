@@ -114,3 +114,20 @@ The 4+ rebuild does **not** rescue SBS: its pilot is still worse than baseline o
 holdout and the independent cohort. CWH remains the only bundle with external skill at 4+; its
 `BAIMULT 7.0` risk is unchanged. The next calibration pass must refit at the chosen DBH target, not
 just rerun a 2+ bundle.
+
+## CWH 4 cm refit: no bundle
+
+A 12-point global grid (`BAIMULT` 5–8, `MORTMULT` 0.30–0.60) was run on the PSP 4 cm
+five-per-BEC sample. Training selection preferred `BAIMULT 6.0 / MORTMULT 0.30`:
+Arrowsmith test BA -2.63 / TPH -1.4%, training BA +0.56 / TPH +1.5%, and non-PSP external BA
+-1.72 / TPH +1.4% (n=209). But the same fixed candidate **fails the Fraser TSA**:
+BA -4.10 (-6.2%), TPH -110 (-6.1%), outside the BA ±3 m2/ha band.
+
+`BAIMULT 8.0 / MORTMULT 0.45` passes Fraser (BA -2.10, -3.2%) and Arrowsmith, but 8.0 is the
+bundle upper bound and the candidate is at the bound; training BA is +1.14. That is not acceptable
+under the protocol. A high multiplier is again doing structural work.
+
+**No 4 cm CWH bundle.** The 2 cm CWH pilot remains the only CWH pilot; its 4 cm external comparison
+is a sensitivity check, not a 4 cm calibration. The 4 cm target must be refit with a
+Fraser-aware, site-grouped selection and a different growth parameterisation, not a higher global
+`BAIMULT`.
