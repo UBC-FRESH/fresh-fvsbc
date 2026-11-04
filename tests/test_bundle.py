@@ -206,6 +206,18 @@ def test_domain_enforces_qmd_min(tmp_path: Path) -> None:
         bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,))
 
 
+def test_domain_enforces_ba_min(tmp_path: Path) -> None:
+    """A BA boundary is enforced when the domain declares one."""
+    record = _record()
+    record["domain"]["ba_min"] = 20.0
+    bundle = load_bundle(_write(tmp_path, record))
+    bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,), ba=20.0)
+    with pytest.raises(BundleDomainError, match="BA"):
+        bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,), ba=19.9)
+    with pytest.raises(BundleDomainError, match="needs the initial BA"):
+        bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,))
+
+
 def test_a_wrong_pin_is_refused(tmp_path: Path) -> None:
     """A bundle is valid only for the build it names."""
     record = _record()
@@ -357,6 +369,8 @@ def test_a_json_list_is_refused(tmp_path: Path) -> None:
         (lambda r: r["domain"].update(dbh_classes=[[0]]), "min, max"),
         (lambda r: r["domain"].update(dbh_classes=[[10, 0]]), "min must be below max"),
         (lambda r: r["domain"].update(qmd_min="13"), "qmd_min"),
+        (lambda r: r["domain"].update(ba_min="20"), "ba_min"),
+        (lambda r: r["domain"].update(ba_min=-1), "ba_min"),
         (lambda r: r.update(parameters={}), "must be a list"),
         (lambda r: r.update(parameters=[1]), "must be an object"),
         (lambda r: r["parameters"][0].update(fields="53"), "list of strings"),

@@ -443,6 +443,14 @@ def _species_groups(records: Sequence[TreeListFields]) -> tuple[str, ...]:
     )
 
 
+def _ba(records: Sequence[TreeListFields]) -> float:
+    """Return the expansion-weighted basal area of a tree list, in m2/ha."""
+    return sum(
+        float(record["tree_count"]) * math.pi / 4.0 * (float(record["diam"]) / 100.0) ** 2
+        for record in records
+    )
+
+
 def _qmd(records: Sequence[TreeListFields]) -> float | None:
     """Return the expansion-weighted QMD of a tree list, or ``None`` when empty.
 
@@ -637,6 +645,7 @@ def run_case(
     """
     bec = _bec_of(keywords)
     qmd = _qmd(records)
+    ba = _ba(records)
     if calibration is not None:
         calibration.check_domain(
             bec,
@@ -644,6 +653,7 @@ def run_case(
             _management(keywords),
             dbh_values=tuple(float(record["diam"]) for record in records),
             qmd=qmd,
+            ba=ba,
         )
         missing = [keyword for keyword in calibration.render() if keyword not in keywords]
         if missing:
@@ -676,6 +686,8 @@ def run_case(
         bec=str(bec),
         qmd=qmd,
         qmd_min=calibration.domain.qmd_min if calibration is not None else None,
+        ba=ba,
+        ba_min=calibration.domain.ba_min if calibration is not None else None,
         calibration_id=calibration.bundle_id if calibration is not None else "",
         variant_list=driven.variants,
         random_seed=_seed_of(handoff),
