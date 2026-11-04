@@ -8,6 +8,8 @@ these functions only select intervals and build the keyword records.
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Mapping, Sequence
 
 import pandas as pd
@@ -18,6 +20,7 @@ __all__ = [
     "eligible_intervals",
     "ingrowth_keyword",
     "insert_parameters",
+    "interval_checksum",
     "parameter_keywords",
     "summarise_probe",
 ]
@@ -76,6 +79,40 @@ def eligible_intervals(
     return frame[keep].reset_index(drop=True)
 
 
+def interval_checksum(frame: pd.DataFrame) -> str:
+    """Return a stable checksum of the interval sample.
+
+    The checksum covers the identifiers and the initial/final stand values, not
+    the pandas float formatting, so two environments hash the same sample the
+    same way.
+
+    Parameters
+    ----------
+    frame : pandas.DataFrame
+        The interval sample. It must carry ``interval_id`` and the stand values
+        used by the caller.
+
+    Returns
+    -------
+    str
+        ``sha256:`` followed by the digest.
+    """
+    columns = [
+        column
+        for column in ("interval_id", "BEC", "TSA_DESC", "ba0", "qmd", "tph0", "years", "dead_ba")
+        if column in frame.columns
+    ]
+    records = []
+    for row in frame.sort_values("interval_id")[columns].to_dict("records"):
+        normalized = {
+            key: round(float(value), 6) if isinstance(value, (int, float)) else str(value)
+            for key, value in row.items()
+        }
+        records.append(normalized)
+    payload = json.dumps(records, sort_keys=True, separators=(",", ":"))
+    return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def parameter_keywords(
     *,
     bamax: float | None = None,
@@ -103,7 +140,7 @@ def parameter_keywords(
     """
     keywords: list[Keyword] = []
     if bamax is not None:
-        keywords.append(Keyword("BAMAX", (f"{bamax:.1f}",)))
+        keywords.append(Keyword("BAMAX", (f"{bamax:g}",)))
     for name, values in (("BAIMULT", baimult), ("MORTMULT", mortmult), ("HTGMULT", htgmul)):
         for species, value in (values or {}).items():
             fields: tuple[str, ...]

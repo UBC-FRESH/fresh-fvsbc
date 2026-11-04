@@ -36,6 +36,7 @@ from fresh_fvsbc.calibration_probe import (
     eligible_intervals,
     ingrowth_keyword,
     insert_parameters,
+    interval_checksum,
     parameter_keywords,
     summarise_probe,
 )
@@ -67,7 +68,14 @@ def _parser() -> argparse.ArgumentParser:
         "--test-sites",
         default="",
         metavar="IDS",
-        help="Comma-separated SITE_IDENTIFIER values to hold out; empty means no split",
+        help="Comma-separated SITE_IDENTIFIER values to hold out; empty means no site split",
+    )
+    parser.add_argument(
+        "--test-year-from",
+        type=int,
+        default=None,
+        metavar="YEAR",
+        help="hold out intervals whose year0 is at or after this year",
     )
     parser.add_argument("--candidates", required=True, type=Path, metavar="FILE")
     parser.add_argument(
@@ -220,7 +228,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             rows.append(
                 {
                     "candidate": label,
-                    "fold": "test" if str(interval["SITE_IDENTIFIER"]) in test_sites else "train",
+                    "fold": (
+                        "test"
+                        if str(interval["SITE_IDENTIFIER"]) in test_sites
+                        or (
+                            args.test_year_from is not None
+                            and int(interval["year0"]) >= args.test_year_from
+                        )
+                        else "train"
+                    ),
                     "BEC": interval["BEC"],
                     "interval_id": interval["interval_id"],
                     "ba0": round(float(interval["ba0"]), 3),
@@ -240,6 +256,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if frame.empty:
         print("run_calibration_probe: no interval was compared")
         return EXIT_BAD_INPUT
+    data_checksum = interval_checksum(sample)
     frame.to_csv(args.out_dir / "probe.csv", index=False)
     summary = summarise_probe(frame)
     summary.to_csv(args.out_dir / "probe_summary.csv", index=False)
@@ -256,6 +273,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "max_mortality_fraction": args.max_mortality_fraction,
                 "min_qmd": args.min_qmd,
                 "test_sites": sorted(test_sites),
+                "test_year_from": args.test_year_from,
+                "data_checksum": data_checksum,
                 "candidates": candidates,
                 "ingrowth": str(args.ingrowth) if args.ingrowth is not None else "",
                 "ingrowth_scale": args.ingrowth_scale,

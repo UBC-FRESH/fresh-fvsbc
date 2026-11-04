@@ -14,6 +14,7 @@ from fresh_fvsbc.calibration_probe import (
     eligible_intervals,
     ingrowth_keyword,
     insert_parameters,
+    interval_checksum,
     parameter_keywords,
     summarise_probe,
 )
@@ -53,10 +54,28 @@ def test_parameter_keywords_render_bounds_and_species() -> None:
         htgmul={"PL": 0.75},
     )
     assert [record.name for record in records] == ["BAMAX", "BAIMULT", "MORTMULT", "HTGMULT"]
-    assert records[0].parameters == ("45.0",)
+    assert records[0].parameters == ("45",)
     assert records[1].parameters == ("1", "PL", "0.5000")
     assert records[2].parameters == ("1", "SE", "2.0000", "0", "999")
     assert records[3].parameters == ("1", "PL", "0.7500")
+
+
+def test_interval_checksum_is_order_independent() -> None:
+    """The checksum identifies the sample, not the pandas row order."""
+    frame = pd.DataFrame(
+        {
+            "interval_id": ["b", "a"],
+            "BEC": ["SBPSmk", "SBPSmk"],
+            "TSA_DESC": ["Quesnel TSA", "Quesnel TSA"],
+            "ba0": [20.0, 25.0],
+            "qmd": [18.0, 19.0],
+            "tph0": [800.0, 900.0],
+            "years": [10.0, 10.0],
+            "dead_ba": [1.0, 2.0],
+        }
+    )
+    assert interval_checksum(frame) == interval_checksum(frame.iloc[::-1])
+    assert interval_checksum(frame).startswith("sha256:")
 
 
 def test_insert_parameters_places_records_before_process() -> None:
@@ -153,12 +172,19 @@ def test_probe_main_writes_a_summary_with_a_mocked_extension(
             "SBPS",
             "--candidates",
             str(candidates),
+            "--test-year-from",
+            "1995",
         ]
     )
     assert status == 0
     summary = pd.read_csv(tmp_path / "out" / "probe_summary.csv")
     assert summary.loc[0, "candidate"] == "base"
     assert summary.loc[0, "bias_ba"] == -1.0
+    probe_rows = pd.read_csv(tmp_path / "out" / "probe.csv")
+    assert probe_rows["fold"].tolist() == ["test"]
+    metadata = json.loads((tmp_path / "out" / "probe.json").read_text())
+    assert metadata["test_year_from"] == 1995
+    assert metadata["data_checksum"].startswith("sha256:")
 
 
 def test_candidates_refuses_empty_and_unlabelled_lists(tmp_path: Path) -> None:

@@ -5,7 +5,8 @@ Date: 2026-11-04
 Issue: #393
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
 Bundle: `d7-sbpsmk-mature-bundle.json`
-Evidence: `d7-sbpsmk-mature-loso-summary.csv`, `d7-sbpsmk-mature-temporal-summary.csv`
+Evidence: `d7-sbpsmk-mature-loso-summary.csv`, `d7-sbpsmk-mature-temporal-summary.csv`,
+`d7-sbpsmk-mature-bundle-temporal-summary.csv`
 
 The D7.18 screen left four low-QMD, high-productivity SBPSmk sites failing. Narrowing to a mature,
 closed-canopy stratum identifies a domain that passes site-grouped and temporal validation.
@@ -39,9 +40,14 @@ intervals, so this is a temporal check, not a site-independent one.
 | Fold | Intervals | Sites | BA | TPH |
 | --- | ---: | ---: | ---: | ---: |
 | Train | 25 | 14 | -5.60% | -5.62% |
-| **Test** | **23** | **23** | **-3.31%** | **+0.17%** |
+| **Test (train-only rates)** | **23** | **23** | **-3.31%** | **+0.17%** |
+| **Test (bundle as shipped)** | **23** | **23** | **-3.43%** | **-1.01%** |
 
-Every test interval is within BA ±10% and TPH ±15%; the worst test site is BA -8.4% / TPH +5.7%.
+Every test interval is within BA ±10% and TPH ±15%.
+
+The table uses train-only rates. The bundle ships rates fit on all 48; rerunning the bundle with
+`--test-year-from 1990` gives test **BA -3.43%, TPH -1.01%**, 23/23 sites passing, worst BA
+8.72% / TPH 8.10%. That is the shipped fit; it is still a post-hoc comparison.
 
 ## 4. Site-grouped LOSO
 
@@ -71,9 +77,40 @@ validation of that set.
 The bundle schema enforces the TSA, QMD, and BA boundaries, so a stand outside either is refused
 before the run. Provenance records the stand values and the bundle minima.
 
-## 6. Limits
+## 6. Reproduce
+
+Temporal, bundle as shipped:
+
+```bash
+python scripts/run_calibration_probe.py \
+  --data-dir runtime/sbpsmk-quesnel --psp-dir "$FAIB_PSP_DIR" \
+  --out-dir runtime/d7-sbpsmk-mature-bundle-temporal --domain SBPSmk \
+  --per-bec 1000 --min-qmd 17 --min-ba0 20 \
+  --candidates notes/reference/calibration/d7-sbpsmk-mature-candidates.json \
+  --bundle notes/reference/calibration/d7-sbpsmk-mature-bundle.json \
+  --test-year-from 1990
+```
+
+`probe.json` records `test_year_from` and a checksum over the interval identifiers and initial/final
+values; the checksum matches the bundle's `training.data_checksum`.
+
+The 25-fold LOSO loop is tracked:
+
+```bash
+python scripts/run_site_grouped_probe.py \
+  --data-dir runtime/sbpsmk-quesnel --psp-dir "$FAIB_PSP_DIR" \
+  --out-dir runtime/d7-sbpsmk-mature-loso --domain SBPSmk \
+  --per-bec 1000 --min-qmd 17 --min-ba0 20 \
+  --candidates notes/reference/calibration/d7-sbpsmk-mature-candidates.json
+```
+
+It fits ingrowth on the training sites for each held-out site and writes `loso-summary.csv`;
+the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
+
+## 7. Limits
 
 - The domain and parameters are post-hoc; only ingrowth was held out.
+- The bundle checksum covers interval identifiers and initial/final values, not pandas float formatting.
 - The domain covers one TSA / one BEC.
 - The four low-QMD, high-productivity sites are excluded; they still have no working model.
 - 25 sites and 48 intervals are enough for a candidate, not a certificate.
@@ -83,7 +120,7 @@ before the run. Provenance records the stand values and the bundle minima.
 - There is no independent third TSA or independent reviewer.
 - This does not pool with the SBPSdc/Quesnel candidate.
 
-## 7. Review checklist
+## 8. Review checklist
 
 - [ ] Accept the post-hoc QMD/BA domain as defensible for mature SBPSmk stands.
 - [ ] Confirm `QMD >= 17` and `BA >= 20` are enforced in the bundle and provenance.
@@ -95,7 +132,7 @@ before the run. Provenance records the stand values and the bundle minima.
 - [ ] Confirm the claim says candidate, not certificate.
 - [ ] Decide whether a second TSA is required before any deployment.
 
-## 8. Claim boundary
+## 9. Claim boundary
 
 This is an unsigned, post-hoc candidate. The parameters and domain were not held out; only the
 ingrowth refit was. It does not support a yield, AAC, legal, or whole-block claim, and it is not a
