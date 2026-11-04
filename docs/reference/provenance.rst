@@ -37,6 +37,10 @@ A record has these fields.
      - The full variant list the build produced, so a mistaken build is visible
    * - ``bec``
      - The validated BEC the run used, such as ``CAR IDFdk3/01``
+   * - ``qmd``
+     - The expansion-weighted initial QMD, in centimetres
+   * - ``qmd_min``
+     - The bundle's minimum QMD, when it declares one
    * - ``calibration_id``
      - The calibration bundle the run used, when it used one
    * - ``keyword_set_hash``

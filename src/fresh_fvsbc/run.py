@@ -636,13 +636,14 @@ def run_case(
         If the projection ends badly, or the run recorded no case.
     """
     bec = _bec_of(keywords)
+    qmd = _qmd(records)
     if calibration is not None:
         calibration.check_domain(
             bec,
             _species_groups(records),
             _management(keywords),
             dbh_values=tuple(float(record["diam"]) for record in records),
-            qmd=_qmd(records),
+            qmd=qmd,
         )
         missing = [keyword for keyword in calibration.render() if keyword not in keywords]
         if missing:
@@ -673,6 +674,8 @@ def run_case(
         case_id=case_id,
         run_datetime=run_datetime,
         bec=str(bec),
+        qmd=qmd,
+        qmd_min=calibration.domain.qmd_min if calibration is not None else None,
         calibration_id=calibration.bundle_id if calibration is not None else "",
         variant_list=driven.variants,
         random_seed=_seed_of(handoff),
