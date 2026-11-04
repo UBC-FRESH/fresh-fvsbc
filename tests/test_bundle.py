@@ -218,6 +218,22 @@ def test_domain_enforces_ba_min(tmp_path: Path) -> None:
         bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,))
 
 
+def test_domain_enforces_tsa(tmp_path: Path) -> None:
+    """A TSA boundary is enforced when the domain declares one."""
+    record = _record()
+    record["domain"]["tsas"] = ["Quesnel TSA"]
+    bundle = load_bundle(_write(tmp_path, record))
+    bundle.check_domain(
+        BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,), tsa="Quesnel TSA"
+    )
+    with pytest.raises(BundleDomainError, match="TSAs"):
+        bundle.check_domain(
+            BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,), tsa="100 Mile House TSA"
+        )
+    with pytest.raises(BundleDomainError, match="needs the TSA"):
+        bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,))
+
+
 def test_a_wrong_pin_is_refused(tmp_path: Path) -> None:
     """A bundle is valid only for the build it names."""
     record = _record()
@@ -371,6 +387,7 @@ def test_a_json_list_is_refused(tmp_path: Path) -> None:
         (lambda r: r["domain"].update(qmd_min="13"), "qmd_min"),
         (lambda r: r["domain"].update(ba_min="20"), "ba_min"),
         (lambda r: r["domain"].update(ba_min=-1), "ba_min"),
+        (lambda r: r["domain"].update(tsas="Quesnel TSA"), "tsas"),
         (lambda r: r.update(parameters={}), "must be a list"),
         (lambda r: r.update(parameters=[1]), "must be an object"),
         (lambda r: r["parameters"][0].update(fields="53"), "list of strings"),
