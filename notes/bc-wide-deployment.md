@@ -249,7 +249,13 @@ YSM/CMI/NFI/SUP. The temporary plots are one-time and cannot calibrate growth, m
 recruitment; they can validate initial conditions, tree-list construction, envelope, and BEC/species
 coverage. The repeated non-PSP cohort has **1,919 raw intervals / 1,302 eligible**, zero site-ID
 overlap with PSP, and is the first-choice independent external validation set. See
-`d9-faib-nonpsp-catalogue.md`.
+`d9-faib-nonpsp-catalogue.md`.`d9-faib-nonpsp-catalogue.md`.
+
+**D9.3 DBH-limit audit (2026-11-04):** the +79% temporary-VRI TPH difference is the **PSP 2.0 cm
+subplot vs CMI/YSM/VRI 4.0 cm tree-detail limit**, not bad counting. PSP mean live TPH is 1,959.8
+(>=2 cm), 1,706.8 (>=4 cm), and 1,148.0 (>=9 cm); temporary VRI +79% at >=4 cm falls to +0.4% at
+>=9 cm. The D9.2 external table is provisional and must be rerun at a common >=4 cm target. See
+`d9-faib-dbh-standard.md`.
 
 ## 5. Data and methods
 

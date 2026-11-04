@@ -115,11 +115,9 @@ validation pass.
 ### Temporary VRI tree lists
 
 A preliminary comparison of temporary VRI tree detail with the compiled plot summaries matched
-**7,080 visits**. Live BA from the tree list had bias **+2.79 m2/ha (+1.8%)** but MAE **30.9**;
-live TPH had bias **+2,759 (+79%)** and MAE **2,956**. The tree expansion/small-tree protocol is not
-directly comparable to the compiled stems, so temporary VRI plots require a weight and DBH-limit
-harmonization before they can even validate initial conditions. They are **not** a drop-in
-calibration boost.
+**7,080 visits**. The original +79% TPH difference is a **DBH-limit/aggregation effect**, not a weight
+error: it disappears at the 9 cm main-tree limit (TPH +0.4%). See `d9-faib-dbh-standard.md`. The raw
+external tables in D9.2 are therefore provisional until the DBH target is harmonized.
 
 ## Independent non-PSP external validation
 
@@ -138,7 +136,8 @@ these bundles.
 | BWBS | baseline | 53 | -6.93 | -21.4% | 7.90 | -79.0 | -3.2% | 375.1 |
 | BWBS | pilot | 53 | +0.36 | +1.1% | 5.09 | +235.4 | +9.5% | 450.9 |
 
-**CWH is the only pilot that improves both bias and MAE on this independent cohort.** IDFdk, SBS,
+**CWH is the only pilot that improves both bias and MAE in the raw 4+ cm comparison.** This table is
+not denominator-compatible with PSP 2+ cm calibration and must be rerun after harmonization. IDFdk, SBS,
 and BWBS pass some absolute bands but are worse than baseline on TPH MAE and/or bias. The IDFdk and
 SBS pilots have no demonstrated external skill here. This does not erase their PSP holdouts, but it
 prevents treating them as general BC-wide calibrations.
