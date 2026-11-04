@@ -1,6 +1,6 @@
 {
   "bundle_id": "sbpsmk-quesnel-mature-2026-11-04",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "pins": {
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
@@ -165,7 +165,7 @@
   },
   "training": {
     "data_checksum": "sha256:18c06dbe62005eee6aebee08074ad4477326a94811f56672d1a30c96586ec0f4",
-    "split": "SBPSmk/Quesnel QMD>=17, BA>=20; site-grouped LOSO (25 sites) and temporal (train 1970/1980, test 1990)",
+    "split": "Post-hoc domain (selected on all 48 intervals); site-grouped LOSO and temporal checks refit ingrowth only. TSA, QMD, and BA enforced.",
     "objective": "minimise BA and TPH bias on the mature SBPSmk/Quesnel stratum",
     "convergence": {
       "iterations": 0,
@@ -177,5 +177,5 @@
     "date": "2026-11-04",
     "signed_off": false
   },
-  "claim": "Unsigned candidate for SBPSmk/Quesnel mature stands with initial QMD >=17 cm and BA >=20 m2/ha. The TSA, QMD, and BA boundaries are enforced by the bundle schema. The domain was selected after the D7.18 residual screen; site-grouped LOSO (25 sites) and temporal (23 test intervals) passed. Not a certificate."
+  "claim": "Unsigned POST-HOC candidate for SBPSmk/Quesnel mature stands with initial QMD >=17 cm and BA >=20 m2/ha. BAMAX, BAIMULT, and the domain were selected on all 48 intervals; the LOSO and temporal checks hold out ingrowth only. TSA, QMD, and BA boundaries are enforced. Not an independent validation and not a certificate."
 }

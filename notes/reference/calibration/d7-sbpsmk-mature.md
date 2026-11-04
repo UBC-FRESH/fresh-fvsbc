@@ -1,6 +1,6 @@
 # D7.19 SBPSmk/Quesnel mature closed-canopy candidate
 
-Status: **site-grouped and temporal pass; unsigned candidate**
+Status: **post-hoc candidate; ingrowth-only holdout**
 Date: 2026-11-04
 Issue: #393
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
@@ -19,7 +19,9 @@ closed-canopy stratum identifies a domain that passes site-grouped and temporal 
 - `QMD < 17` and `BA < 20` are **outside** the claim; they remain validation-only.
 
 This domain is **post-hoc**: it was selected after the D7.18 residual screen, not fixed in advance.
-That is a review point, not a hidden success.
+`BAMAX 75`, `BAIMULT 1.25`, and the QMD/BA thresholds were selected using all 48 intervals (and the
+wider D7.18 screen). The site-grouped and temporal checks below refit **ingrowth only**; they do not
+hold out the parameters or the domain. That is the central limitation of this candidate.
 
 ## 2. Parameters
 
@@ -30,7 +32,9 @@ That is a review point, not a hidden success.
 
 ## 3. Temporal check
 
-Split by measurement year: train 1970/1980, test 1990.
+Split by measurement year: train 1970/1980, test 1990. The ingrowth rates are train-only; BAMAX,
+BAIMULT, and the domain are fixed from all data. Twelve of the 23 test sites also contribute train
+intervals, so this is a temporal check, not a site-independent one.
 
 | Fold | Intervals | Sites | BA | TPH |
 | --- | ---: | ---: | ---: | ---: |
@@ -41,7 +45,8 @@ Every test interval is within BA ±10% and TPH ±15%; the worst test site is BA 
 
 ## 4. Site-grouped LOSO
 
-25 folds, one held-out site each; ingrowth refit without the held-out site.
+25 folds, one held-out site each; ingrowth refit without the held-out site. BAMAX, BAIMULT, and the
+domain are fixed from all data, so this validates the ingrowth refit, not those choices.
 
 | Check | Result |
 | --- | ---: |
@@ -51,7 +56,8 @@ Every test interval is within BA ±10% and TPH ±15%; the worst test site is BA 
 | Worst-site TPH | 13.66% |
 | Sites passing | **25 / 25** |
 
-The pooled and every-site checks pass.
+The pooled and every-site checks pass for the fixed parameter set. They are not an independent
+validation of that set.
 
 ## 5. Candidate bundle
 
@@ -62,15 +68,17 @@ The pooled and every-site checks pass.
 - Quesnel ingrowth;
 - reviewer unreviewed, `signed_off: false`.
 
-The bundle schema now enforces both the QMD and BA boundaries, so a stand below either is refused
-before the run. Provenance records both the stand values and the bundle minima.
+The bundle schema enforces the TSA, QMD, and BA boundaries, so a stand outside either is refused
+before the run. Provenance records the stand values and the bundle minima.
 
 ## 6. Limits
 
-- The domain is post-hoc and covers one TSA / one BEC.
+- The domain and parameters are post-hoc; only ingrowth was held out.
+- The domain covers one TSA / one BEC.
 - The four low-QMD, high-productivity sites are excluded; they still have no working model.
 - 25 sites and 48 intervals are enough for a candidate, not a certificate.
-- The temporal test has 23 intervals, all from one later measurement decade.
+- The temporal test has 23 intervals from one later measurement decade; 12 test sites also have
+  training intervals.
 - Requires `fresh-fvsbc 0.21.4`; `0.21.3` loads the bundle but ignores the QMD and BA fields.
 - There is no independent third TSA or independent reviewer.
 - This does not pool with the SBPSdc/Quesnel candidate.
@@ -82,10 +90,13 @@ before the run. Provenance records both the stand values and the bundle minima.
 - [ ] Confirm `BAMAX 75` and `BAIMULT 1.25` are inside declared bounds.
 - [ ] Confirm the temporal split is time-based.
 - [ ] Confirm the LOSO rates are fold-specific.
+- [ ] Confirm the test sites were not used to select BAMAX, BAIMULT, or the domain. **Currently not
+      satisfied;** this is a post-hoc candidate.
 - [ ] Confirm the claim says candidate, not certificate.
 - [ ] Decide whether a second TSA is required before any deployment.
 
 ## 8. Claim boundary
 
-This is an unsigned candidate. It does not support a yield, AAC, legal, or whole-block claim, and
-it is not a certificate.
+This is an unsigned, post-hoc candidate. The parameters and domain were not held out; only the
+ingrowth refit was. It does not support a yield, AAC, legal, or whole-block claim, and it is not a
+certificate.
