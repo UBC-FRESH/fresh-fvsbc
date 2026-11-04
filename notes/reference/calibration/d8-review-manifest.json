@@ -1,0 +1,33 @@
+{
+  "packet_id": "d8-review-2026-11-04",
+  "signed_off": false,
+  "reviewer": null,
+  "decision": "pending",
+  "bundles": [
+    {
+      "domain": "IDFdk",
+      "path": "notes/reference/calibration/d7-idfdk-binned-bundle.json",
+      "sha256": "sha256:7191541751e0346294d17ed1dffae12f9ac5cc377fca85020865c2148ba40171",
+      "bytes": 24725
+    },
+    {
+      "domain": "SBS",
+      "path": "notes/reference/calibration/d7-sbs-bundle.json",
+      "sha256": "sha256:a4adb846e79a14d46ebebbbef65c595196e8bdeb696108e1de2f13ec397e2af5",
+      "bytes": 1955
+    },
+    {
+      "domain": "CWH",
+      "path": "notes/reference/calibration/d7-cwh-bundle.json",
+      "sha256": "sha256:4d5dfa46b4a80bfe6cdd200f6fb29cf90c0f3832c41b548eb3ac11312581bf2b",
+      "bytes": 5092
+    }
+  ],
+  "required_checks": [
+    "confirm bundle checksum",
+    "confirm domain and QMD/BEC boundary",
+    "confirm holdout table matches summary CSV",
+    "confirm unsigned status is stated",
+    "sign or reject"
+  ]
+}
