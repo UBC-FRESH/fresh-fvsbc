@@ -37,6 +37,8 @@ CONTRACT_FIELDS: tuple[str, ...] = (
     "variant",
     "variant_list",
     "bec",
+    "qmd",
+    "qmd_min",
     "calibration_id",
     "keyword_set_hash",
     "treelist_hash",
@@ -95,6 +97,8 @@ def a_provenance() -> Provenance:
         case_id=case_id,
         run_datetime=run_datetime,
         bec="CAR IDFdk3/01",
+        qmd=21.4,
+        qmd_min=13.0,
         calibration_id="test-bundle",
         variant_list=built_variants(REAL_VARIANT_REPORT),
         random_seed=1,
@@ -137,6 +141,13 @@ def test_the_record_carries_no_path_and_no_credential() -> None:
     assert "password" not in text.lower()
     assert "token" not in text.lower()
     assert '"bec": "CAR IDFdk3/01"' in text
+
+
+def test_the_record_carries_the_qmd_boundary() -> None:
+    """A bundle boundary is visible beside the stand's initial QMD."""
+    record = a_provenance().as_record()
+    assert record["qmd"] == 21.4
+    assert record["qmd_min"] == 13.0
 
 
 def test_the_hashes_are_named_with_their_algorithm() -> None:
@@ -238,6 +249,8 @@ def test_a_record_for_the_whole_chain_from_the_fixture_to_the_database() -> None
         case_id=case_id,
         run_datetime=run_datetime,
         bec="CAR IDFdk3/01",
+        qmd=21.4,
+        qmd_min=13.0,
         calibration_id="test-bundle",
         variant_list=built_variants(REAL_VARIANT_REPORT),
         random_seed=1,

@@ -295,6 +295,8 @@ def test_a_bundle_is_recorded_in_provenance(
     result = run.run_case([a_tree()], keywords, directory=tmp_path / "run", calibration=bundle)
     assert result.provenance.calibration_id == "bc-pilot-2026-11-02"
     assert result.provenance.as_record()["calibration_id"] == "bc-pilot-2026-11-02"
+    assert result.provenance.qmd is not None
+    assert result.provenance.qmd_min is None
 
 
 def test_a_bundle_refuses_a_set_without_its_keywords(tmp_path: Path) -> None:
@@ -348,6 +350,8 @@ def test_the_run_writes_the_inputs_the_record_and_the_result(
     assert record["case_id"] == "case-0"
     assert record["variant"] == "bc"
     assert record["bec"] == "CAR IDFdk3/01"
+    assert record["qmd"] == pytest.approx(20.0)
+    assert record["qmd_min"] is None
     assert record["variant_list"] == ["BC"]
     assert record["keyword_set_hash"] == KeywordSet(run.with_tree_handoff(given)).digest
     assert result.provenance.treelist_hash == result.provenance.as_record()["treelist_hash"]
