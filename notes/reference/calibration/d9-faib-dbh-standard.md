@@ -92,3 +92,25 @@ recruitment, mortality, and QMD.
 
 This is a data-standard correction, not a model retune. It must be fixed before the next
 full-BC calibration pass.
+
+## 4+ cm fixed-bundle check
+
+The dataset builder and probe now carry `min_dbh`; the PSP reference was rebuilt at `min_dbh=4.0`
+(17,132 intervals, 139 BEC labels) and compared with the 4+ non-PSP cohort. The existing bundles
+were **not refit**; this is a denominator-sensitivity check, not a 4+ calibration.
+
+| Domain | Holdout | Model | n | BA bias | BA % | TPH bias | TPH % |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| CWH | Arrowsmith TSA | baseline | 38 | -11.10 | -17.4% | -134.4 | -9.1% |
+| CWH | Arrowsmith TSA | pilot | 38 | -2.68 | -4.2% | -35.5 | -2.4% |
+| CWH | non-PSP external | baseline | 209 | -10.10 | -19.4% | -184.4 | -8.4% |
+| CWH | non-PSP external | pilot | 209 | -1.29 | -2.5% | +1.7 | +0.1% |
+| SBS | Prince George TSA | baseline | 19 | -0.40 | -1.0% | -33.4 | -2.5% |
+| SBS | Prince George TSA | pilot | 19 | -3.09 | -8.0% | -235.4 | -12.9% |
+| SBS | non-PSP external | baseline | 253 | +0.05 | +0.2% | -127.3 | -6.5% |
+| SBS | non-PSP external | pilot | 253 | -1.37 | -4.4% | -204.2 | -10.4% |
+
+The 4+ rebuild does **not** rescue SBS: its pilot is still worse than baseline on both the PSP
+holdout and the independent cohort. CWH remains the only bundle with external skill at 4+; its
+`BAIMULT 7.0` risk is unchanged. The next calibration pass must refit at the chosen DBH target, not
+just rerun a 2+ bundle.
