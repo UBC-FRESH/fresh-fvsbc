@@ -241,7 +241,15 @@ North Island 1977-1985; validation-only, no bundle. See `d8-mh-cma-screen.md`.Se
 packet (`d8-review-packet.md`, `d8-review-manifest.json`) with bundle checksums and a checklist. SBS
 also has a second spatial holdout: Prince George TSA, 19 test intervals, BA -2.94 (-7.6%) / TPH
 -265.9 (-10.8%), inside both thresholds. The packet remains `signed_off: false`; a named reviewer
-must sign. See `d8-sbs-second-holdout.csv`.
+must sign. See `d8-sbs-second-holdout.csv`.See `d8-sbs-second-holdout.csv`.
+
+**D9.1 FAIB non-PSP catalogue (2026-11-04):** the public FAIB catalogue contains **7,581 temporary
+visits** (7,200 VRI phase-2 temporary clusters, plus SUP/VLT) and **4,370 repeated visits** in
+YSM/CMI/NFI/SUP. The temporary plots are one-time and cannot calibrate growth, mortality, or
+recruitment; they can validate initial conditions, tree-list construction, envelope, and BEC/species
+coverage. The repeated non-PSP cohort has **1,919 raw intervals / 1,302 eligible**, zero site-ID
+overlap with PSP, and is the first-choice independent external validation set. See
+`d9-faib-nonpsp-catalogue.md`.
 
 ## 5. Data and methods
 
