@@ -46,8 +46,9 @@ intervals, so this is a temporal check, not a site-independent one.
 Every test interval is within BA ±10% and TPH ±15%.
 
 The table uses train-only rates. The bundle ships rates fit on all 48; rerunning the bundle with
-`--test-year-from 1990` gives test **BA -3.43%, TPH -1.01%**, 23/23 sites passing, worst BA
-8.72% / TPH 8.10%. That is the shipped fit; it is still a post-hoc comparison.
+`--test-year-from 1990` gives test **BA -3.43%, TPH -1.01%**, 23/23 sites passing. The worst
+absolute BA is 8.72% and the worst absolute TPH is 8.10%; they are different sites. That is the
+shipped fit; it is still a post-hoc comparison.
 
 ## 4. Site-grouped LOSO
 
@@ -58,8 +59,8 @@ domain are fixed from all data, so this validates the ingrowth refit, not those 
 | --- | ---: |
 | Pooled BA | -4.71% |
 | Pooled TPH | -3.93% |
-| Worst-site BA | 8.72% |
-| Worst-site TPH | 13.66% |
+| Worst-site BA (signed) | -8.72% |
+| Worst-site TPH (signed) | -13.66% |
 | Sites passing | **25 / 25** |
 
 The pooled and every-site checks pass for the fixed parameter set. They are not an independent
@@ -111,6 +112,8 @@ the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
 
 - The domain and parameters are post-hoc; only ingrowth was held out.
 - The bundle checksum covers interval identifiers and initial/final values, not pandas float formatting.
+- The BA gate uses the unrounded tree list; FVS writes tree counts `F6.0`. Two of the 48 accepted
+  intervals start at FVS BA 19, so the gate is not exact at the 20 m2/ha boundary.
 - The domain covers one TSA / one BEC.
 - The four low-QMD, high-productivity sites are excluded; they still have no working model.
 - 25 sites and 48 intervals are enough for a candidate, not a certificate.

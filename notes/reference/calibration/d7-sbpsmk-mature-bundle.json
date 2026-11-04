@@ -1,6 +1,6 @@
 {
   "bundle_id": "sbpsmk-quesnel-mature-2026-11-04",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "pins": {
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
@@ -177,5 +177,5 @@
     "date": "2026-11-04",
     "signed_off": false
   },
-  "claim": "Unsigned POST-HOC candidate for SBPSmk/Quesnel mature stands with initial QMD >=17 cm and BA >=20 m2/ha. BAMAX, BAIMULT, and the domain were selected on all 48 intervals; the LOSO and temporal checks hold out ingrowth only. TSA, QMD, and BA boundaries are enforced. Not an independent validation and not a certificate."
+  "claim": "Unsigned POST-HOC candidate for SBPSmk/Quesnel mature stands with initial QMD >=17 cm and BA >=20 m2/ha. BAMAX, BAIMULT, and the domain were selected on all 48 intervals; the LOSO and temporal checks hold out ingrowth only. TSA, QMD, and BA boundaries are enforced; BA is checked on the unrounded tree list, and two accepted intervals start at FVS BA 19. Not an independent validation and not a certificate."
 }
