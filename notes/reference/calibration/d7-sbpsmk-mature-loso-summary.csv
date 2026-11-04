@@ -1,2 +1,2 @@
-folds,intervals,ba_percent,tph_percent,worst_site_ba_percent,worst_site_tph_percent,sites_pass
-25,48,-4.712472756649431,-3.9308333633504358,8.717480602464628,13.657520562793565,25
+folds,intervals,data_checksum,ba_percent,tph_percent,worst_site_ba_percent,worst_site_tph_percent,sites_pass
+25,48,sha256:9a00d80cd91ac441c87cd44765de265c1b76006a4c61d4103103326d6cf4fb9f,-4.712472756649431,-3.9308333633504358,8.717480602464628,13.657520562793565,25

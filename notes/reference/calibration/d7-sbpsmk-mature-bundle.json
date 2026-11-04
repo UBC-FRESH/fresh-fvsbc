@@ -1,6 +1,6 @@
 {
   "bundle_id": "sbpsmk-quesnel-mature-2026-11-04",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "pins": {
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
@@ -164,8 +164,8 @@
     ]
   },
   "training": {
-    "data_checksum": "sha256:18c06dbe62005eee6aebee08074ad4477326a94811f56672d1a30c96586ec0f4",
-    "split": "Post-hoc domain (selected on all 48 intervals); site-grouped LOSO and temporal checks refit ingrowth only. TSA, QMD, and BA enforced.",
+    "data_checksum": "sha256:9a00d80cd91ac441c87cd44765de265c1b76006a4c61d4103103326d6cf4fb9f",
+    "split": "SBPSmk/Quesnel, QMD>=17, BA>=20, mortality_fraction<=0.4; checksum from interval IDs plus initial/final values. Post-hoc domain; LOSO/temporal refit ingrowth only.",
     "objective": "minimise BA and TPH bias on the mature SBPSmk/Quesnel stratum",
     "convergence": {
       "iterations": 0,
