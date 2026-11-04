@@ -65,6 +65,13 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-mortality-fraction", type=float, default=0.4, metavar="FRACTION")
     parser.add_argument("--min-qmd", type=float, default=6.0, metavar="CM")
     parser.add_argument(
+        "--min-dbh",
+        type=float,
+        default=0.0,
+        metavar="CM",
+        help="common lower DBH limit for tree list and observations; 4.0 for cross-program work",
+    )
+    parser.add_argument(
         "--test-sites",
         default="",
         metavar="IDS",
@@ -128,6 +135,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         bundle: CalibrationBundle | None = load_bundle(args.bundle) if args.bundle else None
         if args.cycles < 1:
             raise ValueError("cycles must be at least one")
+        if args.min_dbh < 0:
+            raise ValueError("min_dbh must not be negative")
     except (OSError, ValueError, json.JSONDecodeError, KeyError) as error:
         print(f"run_calibration_probe: {error}")
         return EXIT_BAD_INPUT
@@ -147,6 +156,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return EXIT_BAD_INPUT
     sample = select_intervals(eligible, per_bec=args.per_bec)
     trees = _read_trees(args.psp_dir, sample)
+    if args.min_dbh > 0 and "DBH" in trees.columns:
+        trees = trees[trees["DBH"] >= args.min_dbh].copy()
     if trees.empty:
         print("run_calibration_probe: no tree rows for the eligible sample")
         return EXIT_BAD_INPUT
@@ -272,6 +283,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "min_ba0": args.min_ba0,
                 "max_mortality_fraction": args.max_mortality_fraction,
                 "min_qmd": args.min_qmd,
+                "min_dbh": args.min_dbh,
                 "test_sites": sorted(test_sites),
                 "test_year_from": args.test_year_from,
                 "data_checksum": data_checksum,

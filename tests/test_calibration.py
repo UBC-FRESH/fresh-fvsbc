@@ -162,8 +162,21 @@ def test_build_writes_the_tables_and_the_manifest(tmp_path: Path) -> None:
         "min_years": 2,
         "max_years": 40,
         "include_unsupported": False,
+        "min_dbh": 0.0,
     }
     assert manifest["archive"] == "psp"
+
+
+def test_build_applies_a_common_minimum_dbh(tmp_path: Path) -> None:
+    """The tree detail cutoff changes the observed TPH denominator."""
+    archive = _write_archive(tmp_path)
+    full = build_dataset(archive, tmp_path / "full")
+    cut = build_dataset(archive, tmp_path / "cut", min_dbh=16.0)
+
+    assert cut.intervals["tph0"].sum() < full.intervals["tph0"].sum()
+    assert cut.intervals["ba0"].sum() < full.intervals["ba0"].sum()
+    manifest = json.loads((cut.directory / "manifest.json").read_text())
+    assert manifest["parameters"]["min_dbh"] == 16.0
 
 
 def test_coverage_counts_a_prototype_zone_without_tree_tables(tmp_path: Path) -> None:

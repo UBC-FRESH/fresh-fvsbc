@@ -247,11 +247,14 @@ def _visits(psp_dir: Path) -> pd.DataFrame:
     return visits.drop_duplicates(["SITE_IDENTIFIER", "CLSTR_ID", "VISIT_NUMBER"])
 
 
-def _trees(psp_dir: Path, site_ids: set[object] | None) -> pd.DataFrame:
+def _trees(psp_dir: Path, site_ids: set[object] | None, *, min_dbh: float = 0.0) -> pd.DataFrame:
     """Read the selected stands' trees in chunks and normalise the weights.
 
-    ``site_ids=None`` reads every site, which is the all-zone path.
+    ``site_ids=None`` reads every site, which is the all-zone path. ``min_dbh``
+    applies the common DBH denominator before BA/TPH and survival are built.
     """
+    if min_dbh < 0:
+        raise ValueError("min_dbh must not be negative")
     columns = [
         "SITE_IDENTIFIER",
         "CLSTR_ID",
@@ -281,6 +284,7 @@ def _trees(psp_dir: Path, site_ids: set[object] | None) -> pd.DataFrame:
         if chunk.empty:
             continue
         chunk = chunk.dropna(subset=["DBH", "LV_D", "PHF_TREE"])
+        chunk = chunk[chunk["DBH"] >= min_dbh]
         chunk = chunk[chunk["LV_D"].isin(["L", "D"])]
         chunk = chunk[chunk["PHF_TREE"] > 0]
         if chunk.empty:
@@ -611,6 +615,7 @@ def _manifest(
     species_envelope_frame: pd.DataFrame,
     species: pd.DataFrame,
     include_unsupported: bool,
+    min_dbh: float,
 ) -> Manifest:
     """Build the input and output manifest, without a machine-specific path."""
     return {
@@ -638,6 +643,7 @@ def _manifest(
             "min_years": MIN_YEARS,
             "max_years": MAX_YEARS,
             "include_unsupported": include_unsupported,
+            "min_dbh": min_dbh,
         },
         "supported_zones": list(SUPPORTED_ZONES),
         "unsupported_zones": list(UNSUPPORTED_ZONES),
@@ -647,7 +653,11 @@ def _manifest(
 
 
 def build_dataset(
-    psp_dir: str | Path, out_dir: str | Path, *, include_unsupported: bool = False
+    psp_dir: str | Path,
+    out_dir: str | Path,
+    *,
+    include_unsupported: bool = False,
+    min_dbh: float = 0.0,
 ) -> CalibrationDataset:
     """Build the calibration dataset and write it to ``out_dir``.
 
@@ -661,6 +671,11 @@ def build_dataset(
     include_unsupported : bool, optional
         Read every site, including the zones the current variant does not
         resolve. The default keeps the supported-zone dataset unchanged.
+    min_dbh : float, optional
+        The common lower DBH limit, in cm. FAIB programs do not share one
+        tree-detail limit: PSP subplots start at 2.0 cm while CMI/YSM/VRI/NFI
+        tree detail starts at 4.0 cm. Set this explicitly for cross-program
+        comparisons. Defaults to 0.0 for compatibility.
 
     Returns
     -------
@@ -687,7 +702,7 @@ def build_dataset(
     ).drop_duplicates()
     supported_ids = set(header.index[header["supported"]])
     site_ids = None if include_unsupported else supported_ids
-    trees = _trees(source, site_ids)
+    trees = _trees(source, site_ids, min_dbh=min_dbh)
     visits = _visit_table(trees, visits_meta, header)
     intervals, tree_survival = _intervals(visits, trees)
     coverage = _coverage(header, visits_meta, intervals, tree_survival)
@@ -709,6 +724,7 @@ def build_dataset(
         species_envelope_frame,
         species,
         include_unsupported,
+        min_dbh,
     )
 
     outputs = {

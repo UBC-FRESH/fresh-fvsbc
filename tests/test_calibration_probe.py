@@ -109,6 +109,27 @@ def test_summarise_probe_reports_bias_and_mae() -> None:
     assert first["bias_tph"] == 100.0
 
 
+def test_probe_parser_carries_the_common_minimum_dbh() -> None:
+    """A 4+ cm cross-program run is explicit on the command line."""
+    args = probe._parser().parse_args(
+        [
+            "--data-dir",
+            "data",
+            "--psp-dir",
+            "psp",
+            "--out-dir",
+            "out",
+            "--domain",
+            "CWH",
+            "--candidates",
+            "candidates.json",
+            "--min-dbh",
+            "4",
+        ]
+    )
+    assert args.min_dbh == 4.0
+
+
 def test_probe_main_writes_a_summary_with_a_mocked_extension(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
