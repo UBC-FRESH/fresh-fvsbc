@@ -25,8 +25,8 @@
     {
       "domain": "CWH-4cm",
       "path": "notes/reference/calibration/d7-cwh-4cm-bundle.json",
-      "sha256": "sha256:e4b0c57e13dcab4ed09233f5fe91588cae6ba44ee24191c7cf37568324c3323c",
-      "bytes": 6430
+      "sha256": "sha256:a61dd73cab986dd48276a19925a65e470e9549e5bf76c054c0c1ea0ad19bc399",
+      "bytes": 6487
     }
   ],
   "required_checks": [
