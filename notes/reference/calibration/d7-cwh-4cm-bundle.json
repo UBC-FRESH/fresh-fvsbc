@@ -1,6 +1,6 @@
 {
   "bundle_id": "cwh-growth-4cm-pilot-2026-11-04",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "pins": {
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
@@ -359,5 +359,5 @@
     "date": "2026-11-04",
     "signed_off": false
   },
-  "claim": "CWH 4cm pilot: BAIMULT 7, MORTMULT 0.3, REGDMULT 2; three spatial and temporal PSP holdouts plus non-PSP external; high growth multiplier; not a certificate; the bundle enforces DBH >=4 cm."
+  "claim": "CWH 4cm pilot: BAIMULT 7, MORTMULT 0.3, REGDMULT 2; three spatial and temporal PSP holdouts plus non-PSP external; high growth multiplier; not a certificate; BA/TPH pass, but top height and volume fail validation. The bundle enforces DBH >=4 cm."
 }

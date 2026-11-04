@@ -248,3 +248,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d7-sbps-ingrowth.json`, `d7-sbps-ingrowth-summary.csv`, `d7-sbps-ingrowth-candidates.json` | The D7.5 recruitment rates, holdout results, and candidates |
 | `d7-tph-summary.csv`, `d7-tph-by-bec.csv`, `d7-tph-candidates.json` | The D7.3 probe tables and candidate list |
 | `d7-per-bec-summary.csv`, `d7-per-bec-by-bec.csv`, `d7-per-bec-candidates.json` | The D7.2 per-BEC probe tables and candidate list |
+
+| `d7-cwh-4cm-bundle.json` | The unsigned CWH 4 cm pilot |
+| `d9-cwh-4cm-validation.md` | The D9.8 QMD/height/volume validation of the CWH 4 cm pilot |
+| `d9-cwh-4cm-validation-summary.csv` | The D9.8 holdout metrics |
+| `d9-bec-coverage.md` | The D9.9 BEC coverage and status matrix |
+| `d9-bec-coverage.csv` | The D9.9 per-BEC counts and status |
