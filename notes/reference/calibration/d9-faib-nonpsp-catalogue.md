@@ -120,3 +120,28 @@ live TPH had bias **+2,759 (+79%)** and MAE **2,956**. The tree expansion/small-
 directly comparable to the compiled stems, so temporary VRI plots require a weight and DBH-limit
 harmonization before they can even validate initial conditions. They are **not** a drop-in
 calibration boost.
+
+## Independent non-PSP external validation
+
+The prototype repeated non-PSP cohort was run as an external test. All four bundles were fixed; no
+parameters were changed. The test intervals are not in the PSP data and were not used to fit any of
+these bundles.
+
+| Domain | Model | n | BA bias | BA % | BA MAE | TPH bias | TPH % | TPH MAE |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| IDFdk | baseline | 50 | -0.50 | -1.9% | 3.21 | -55.1 | -3.6% | 211.4 |
+| IDFdk | pilot | 50 | -0.58 | -2.2% | 3.29 | +193.6 | +12.7% | 265.5 |
+| CWH | baseline | 209 | -10.10 | -19.4% | 10.65 | -184.4 | -8.4% | 301.6 |
+| CWH | pilot | 209 | -1.29 | -2.5% | 5.53 | +1.7 | +0.1% | 274.1 |
+| SBS | baseline | 253 | +0.05 | +0.2% | 6.77 | -127.3 | -6.5% | 280.7 |
+| SBS | pilot | 253 | -1.37 | -4.4% | 6.60 | -204.2 | -10.4% | 322.1 |
+| BWBS | baseline | 53 | -6.93 | -21.4% | 7.90 | -79.0 | -3.2% | 375.1 |
+| BWBS | pilot | 53 | +0.36 | +1.1% | 5.09 | +235.4 | +9.5% | 450.9 |
+
+**CWH is the only pilot that improves both bias and MAE on this independent cohort.** IDFdk, SBS,
+and BWBS pass some absolute bands but are worse than baseline on TPH MAE and/or bias. The IDFdk and
+SBS pilots have no demonstrated external skill here. This does not erase their PSP holdouts, but it
+prevents treating them as general BC-wide calibrations.
+
+CWH's independent result is real but still carries the high `BAIMULT 7.0` risk and needs the
+protocol-bound review before promotion.
