@@ -230,7 +230,12 @@ See `d8-bwbs-screen.md`.See `d8-bwbs-screen.md`.
 sites. The all-interval candidate reduces BA from -10.47 to -2.27, but the predeclared site fold 0
 misses BA at **-6.80**; `BAIMULT 12` fixes the fold but is not acceptable and training BA exceeds
 +3.5. **No CDF bundle.** CDF remains a screening result until an independent TSA or a site-level
-covariate exists. See `d8-cdf-screen.md`.
+covariate exists. See `d8-cdf-screen.md`.See `d8-cdf-screen.md`.
+
+**D8.6 MH/CMA screens (2026-11-04):** MH has 31 intervals / 5 TSAs. The CWH-style candidate
+passes Sunshine Coast, Fraser, North Island, and Arrowsmith, but **GBR North fails** at BA +7.22
+(+8.5%) and TPH -811.5 (-22.0%) on three intervals. **No MH bundle.** CMA has six intervals, all
+North Island 1977-1985; validation-only, no bundle. See `d8-mh-cma-screen.md`.
 
 ## 5. Data and methods
 
