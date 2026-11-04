@@ -45,6 +45,8 @@ A record has these fields.
      - The expansion-weighted initial basal area, in square metres per hectare
    * - ``ba_min``
      - The bundle's minimum BA, when it declares one
+   * - ``tsa``
+     - The TSA the run was checked against, when one was supplied
    * - ``calibration_id``
      - The calibration bundle the run used, when it used one
    * - ``keyword_set_hash``

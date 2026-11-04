@@ -41,6 +41,7 @@ CONTRACT_FIELDS: tuple[str, ...] = (
     "qmd_min",
     "ba",
     "ba_min",
+    "tsa",
     "calibration_id",
     "keyword_set_hash",
     "treelist_hash",
@@ -103,6 +104,7 @@ def a_provenance() -> Provenance:
         qmd_min=13.0,
         ba=28.5,
         ba_min=20.0,
+        tsa="Quesnel TSA",
         calibration_id="test-bundle",
         variant_list=built_variants(REAL_VARIANT_REPORT),
         random_seed=1,
@@ -154,6 +156,7 @@ def test_the_record_carries_the_qmd_boundary() -> None:
     assert record["qmd_min"] == 13.0
     assert record["ba"] == 28.5
     assert record["ba_min"] == 20.0
+    assert record["tsa"] == "Quesnel TSA"
 
 
 def test_the_hashes_are_named_with_their_algorithm() -> None:
@@ -259,6 +262,7 @@ def test_a_record_for_the_whole_chain_from_the_fixture_to_the_database() -> None
         qmd_min=13.0,
         ba=28.5,
         ba_min=20.0,
+        tsa="Quesnel TSA",
         calibration_id="test-bundle",
         variant_list=built_variants(REAL_VARIANT_REPORT),
         random_seed=1,

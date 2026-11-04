@@ -209,7 +209,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             run_dir = (
                 args.out_dir / "runs" / f"{label}-{str(interval['interval_id']).replace('|', '_')}"
             )
-            result = run_case(records, keywords, directory=run_dir, calibration=bundle)
+            result = run_case(
+                records,
+                keywords,
+                directory=run_dir,
+                calibration=bundle,
+                tsa=str(interval["TSA_DESC"]),
+            )
             predicted = summary_for_year(result.database, int(interval["year1"]))
             rows.append(
                 {

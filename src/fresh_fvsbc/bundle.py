@@ -105,6 +105,8 @@ class BundleDomain:
     ----------
     regions : tuple of str
         The accepted BC regions.
+    tsas : tuple of str
+        The accepted TSA names, such as ``Quesnel TSA``.
     becs : tuple of str
         The accepted BEC labels, such as ``IDFdk3`` or a zone such as ``IDF``.
     species_groups : tuple of str
@@ -120,6 +122,7 @@ class BundleDomain:
     """
 
     regions: tuple[str, ...] = ()
+    tsas: tuple[str, ...] = ()
     becs: tuple[str, ...] = ()
     species_groups: tuple[str, ...] = ()
     dbh_classes: tuple[tuple[float, float], ...] = ()
@@ -290,6 +293,7 @@ class CalibrationBundle:
         dbh_values: Sequence[float] | None = None,
         qmd: float | None = None,
         ba: float | None = None,
+        tsa: str | None = None,
     ) -> None:
         """Refuse a run outside the bundle's declared domain.
 
@@ -310,6 +314,9 @@ class CalibrationBundle:
         ba : float, optional
             The initial basal area, in square metres per hectare. Required when
             the domain names ``ba_min``.
+        tsa : str, optional
+            The TSA name, such as ``Quesnel TSA``. Required when the domain names
+            ``tsas``.
 
         Raises
         ------
@@ -321,6 +328,16 @@ class CalibrationBundle:
             raise BundleDomainError(
                 f"{self.bundle_id} covers regions {', '.join(regions)}, not {bec.region}"
             )
+        tsas = self.domain.tsas
+        if tsas:
+            if tsa is None:
+                raise BundleDomainError(
+                    f"{self.bundle_id} needs the TSA to check tsas {', '.join(tsas)}"
+                )
+            if tsa.strip() not in tsas:
+                raise BundleDomainError(
+                    f"{self.bundle_id} covers TSAs {', '.join(tsas)}, not {tsa.strip()}"
+                )
         becs = self.domain.becs
         label = f"{bec.zone}{bec.subzone}"
         if becs and label not in becs and bec.zone not in becs:
@@ -536,6 +553,7 @@ def _strings(record: Mapping[str, object], key: str) -> tuple[str, ...]:
 def _domain(record: Mapping[str, object]) -> BundleDomain:
     """Validate the domain block."""
     regions = _strings(record, "regions")
+    tsas = _strings(record, "tsas")
     becs = _strings(record, "becs")
     species_groups = _strings(record, "species_groups")
     management = _strings(record, "management")
@@ -581,6 +599,7 @@ def _domain(record: Mapping[str, object]) -> BundleDomain:
             raise BundleError("domain.ba_min must be positive")
     return BundleDomain(
         regions=regions,
+        tsas=tsas,
         becs=becs,
         species_groups=species_groups,
         dbh_classes=tuple(dbh_classes),

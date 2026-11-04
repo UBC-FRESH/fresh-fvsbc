@@ -588,6 +588,7 @@ def run_case(
     variant: str = "bc",
     key_name: str = KEYWORD_FILE_NAME,
     calibration: CalibrationBundle | None = None,
+    tsa: str | None = None,
 ) -> RunResult:
     """Run one case: write the inputs, drive BC, read the outputs, and record the provenance.
 
@@ -615,6 +616,9 @@ def run_case(
         A bundle the run uses. The caller renders the bundle into ``keywords``;
         the run checks the domain and refuses a set that does not carry the
         bundle's keywords. The bundle id is recorded in provenance.
+    tsa : str, optional
+        The TSA name, when a bundle domain declares one. It is recorded in
+        provenance and checked against the bundle.
 
     Returns
     -------
@@ -654,6 +658,7 @@ def run_case(
             dbh_values=tuple(float(record["diam"]) for record in records),
             qmd=qmd,
             ba=ba,
+            tsa=tsa,
         )
         missing = [keyword for keyword in calibration.render() if keyword not in keywords]
         if missing:
@@ -688,6 +693,7 @@ def run_case(
         qmd_min=calibration.domain.qmd_min if calibration is not None else None,
         ba=ba,
         ba_min=calibration.domain.ba_min if calibration is not None else None,
+        tsa=tsa,
         calibration_id=calibration.bundle_id if calibration is not None else "",
         variant_list=driven.variants,
         random_seed=_seed_of(handoff),

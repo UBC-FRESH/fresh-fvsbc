@@ -10,6 +10,9 @@
     "regions": [
       "CAR"
     ],
+    "tsas": [
+      "Quesnel TSA"
+    ],
     "becs": [
       "SBPSmk"
     ],
@@ -173,5 +176,5 @@
     "date": "2026-11-04",
     "signed_off": false
   },
-  "claim": "Unsigned candidate for SBPSmk/Quesnel mature stands with initial QMD >=17 cm and BA >=20 m2/ha. The QMD and BA boundaries are enforced by the bundle schema. The domain was selected after the D7.18 residual screen; site-grouped LOSO (25 sites) and temporal (23 test intervals) passed. Not a certificate."
+  "claim": "Unsigned candidate for SBPSmk/Quesnel mature stands with initial QMD >=17 cm and BA >=20 m2/ha. The TSA, QMD, and BA boundaries are enforced by the bundle schema. The domain was selected after the D7.18 residual screen; site-grouped LOSO (25 sites) and temporal (23 test intervals) passed. Not a certificate."
 }

@@ -169,6 +169,8 @@ class Provenance:
         The expansion-weighted initial basal area, in square metres per hectare.
     ba_min : float, optional
         The bundle's minimum BA, when it declares one.
+    tsa : str, optional
+        The TSA name the run was checked against, when one was supplied.
     calibration_id : str, optional
         The id of the calibration bundle the run used, when it used one.
     fresh_fvsbc_version : str, optional
@@ -193,6 +195,7 @@ class Provenance:
     qmd_min: float | None = None
     ba: float | None = None
     ba_min: float | None = None
+    tsa: str | None = None
     calibration_id: str = ""
     fresh_fvsbc_version: str = __version__
     pyfvs_commit: str = PYFVS_COMMIT
@@ -220,6 +223,7 @@ class Provenance:
             "qmd_min": self.qmd_min,
             "ba": self.ba,
             "ba_min": self.ba_min,
+            "tsa": self.tsa,
             "calibration_id": self.calibration_id,
             "keyword_set_hash": self.keyword_set_hash,
             "treelist_hash": self.treelist_hash,
