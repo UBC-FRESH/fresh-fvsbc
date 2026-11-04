@@ -55,8 +55,8 @@ returning a plausible run. The fourth fixes the ``KAM`` + ``MS`` boundary collis
 ``MSxk1`` resolve as ``MSmm``. The final two patches add the five-zone prototype and fix the SBPS small-tree height branch. The
 patched wheel is versioned ``0.4.1`` and is the ``fvs`` extra for ``fresh-fvsbc 0.21.4``. The wrapper
 now accepts the five prototype zones; the binary carries their provisional parser and defaults. That
-is deployment plumbing, not calibration: IDFdk and SBS have passed holdouts, and CWH has a
-three-TSA plus temporal growth pilot; none is certified.
+is deployment plumbing, not calibration: IDFdk and SBS have passed holdouts; CWH and BWBS have
+unsigned growth pilots; none is certified.
 
 
 What you get

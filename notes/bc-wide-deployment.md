@@ -213,7 +213,14 @@ parser; no monkeypatch. CWH now has an unsigned growth pilot: `BAIMULT 7.0` for 
 m2/ha and TPH 15%: Arrowsmith BA -2.68 / TPH -2.4%, Fraser -2.46 / -6.6%, Haida Gwaii -0.00 /
 +5.1%, temporal >=2000 +0.66 / +14.6% (n=243). The high multiplier and the temporal TPH margin are
 the claim risks; no certificate, no reviewer sign-off, no leave-one-BEC holdout yet.
-See `d7-cwh-screen.md` and `d7-cwh-bundle.json`.
+See `d7-cwh-screen.md` and `d7-cwh-bundle.json`.See `d7-cwh-screen.md` and `d7-cwh-bundle.json`.
+
+**D8.3 BWBS growth pilot (2026-11-04):** BWBS has an unsigned pilot on a 20-per-BEC sample:
+`BAIMULT 5.5` and `MORTMULT 0.2` for nine species, no ingrowth. Dawson Creek test BA +2.09 /
+TPH +11.7% (n=38), Cassiar +1.58 / +6.6% (n=4), Fort St. John -1.74 / -14.7% (n=13); all are
+inside BA ±3 m2/ha and TPH 15%. Baselines were BA -10.88 / -4.67 / -13.28. The high growth
+multiplier, low mortality, four-interval Cassiar test, and Fort St. John TPH margin are claim risks.
+A temporal/leave-one-BEC holdout and review remain. See `d8-bwbs-screen.md`.
 
 ## 5. Data and methods
 

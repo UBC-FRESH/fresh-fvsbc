@@ -115,6 +115,16 @@ def test_the_cwh_pilot_bundle_loads_and_renders_all_parameters() -> None:
     assert any("not signed off" in warning for warning in bundle.warnings)
 
 
+def test_the_bwbs_pilot_bundle_loads_and_renders_all_parameters() -> None:
+    """The BWBS growth pilot is a real bundle, not a screening table."""
+    bundle = load_bundle("notes/reference/calibration/d8-bwbs-bundle.json")
+    assert bundle.ingrowth is None
+    assert bundle.domain.becs == ("BWBS",)
+    assert len(bundle.parameters) == 18
+    assert len(bundle.render()) == 18
+    assert any("not signed off" in warning for warning in bundle.warnings)
+
+
 def test_the_kc_pilot_bundle_loads_and_carries_its_two_warnings() -> None:
     """The KC bundle is unsigned and its PL multiplier sits at its bound."""
     bundle = load_bundle(KC_PILOT)
