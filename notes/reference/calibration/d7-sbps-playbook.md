@@ -27,6 +27,7 @@ was used, why a result was accepted or retracted, and what the next agent should
 | D7.13 Quesnel high-QMD (#376) | QMD >= 13, 20 intervals / 6 sites | `BAMAX 75`: BA -2.1%, TPH -6.3%; every site fold passes | Candidate |
 | D7.14 Quesnel temporal (#378) | train <=1981, test >=1990 | test BA +5.4%, TPH +3.8%; both pass | **Candidate bundle**, unsigned |
 | D7.17 SBPSmk/Quesnel (#387) | QMD >= 13, 113 intervals / 43 sites | pooled BA -6.1%/TPH -10.2%; 29/43 sites pass; worst BA +30.6%/TPH +64.6% | No bundle; not transferable |
+| D7.19 SBPSmk/Quesnel (#393) | QMD >= 17, BA >= 20; 48 intervals / 25 sites | LOSO BA -4.7%/TPH -3.9%, 25/25 sites; temporal test BA -3.3%/TPH +0.2% | **Unsigned candidate**, post-hoc domain |
 
 The only positive result is the last one. Everything before it is useful evidence, not a calibration.
 

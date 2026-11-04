@@ -115,6 +115,8 @@ class BundleDomain:
         ``untreated``, ``managed``, or both.
     qmd_min : float, optional
         The minimum initial quadratic mean diameter, in centimetres.
+    ba_min : float, optional
+        The minimum initial basal area, in square metres per hectare.
     """
 
     regions: tuple[str, ...] = ()
@@ -123,6 +125,7 @@ class BundleDomain:
     dbh_classes: tuple[tuple[float, float], ...] = ()
     management: tuple[str, ...] = ()
     qmd_min: float | None = None
+    ba_min: float | None = None
 
 
 class BundleDomainError(BundleError):
@@ -286,6 +289,7 @@ class CalibrationBundle:
         management: str = "untreated",
         dbh_values: Sequence[float] | None = None,
         qmd: float | None = None,
+        ba: float | None = None,
     ) -> None:
         """Refuse a run outside the bundle's declared domain.
 
@@ -303,6 +307,9 @@ class CalibrationBundle:
         qmd : float, optional
             The initial quadratic mean diameter, in centimetres. Required when
             the domain names ``qmd_min``.
+        ba : float, optional
+            The initial basal area, in square metres per hectare. Required when
+            the domain names ``ba_min``.
 
         Raises
         ------
@@ -341,6 +348,17 @@ class CalibrationBundle:
                 raise BundleDomainError(
                     f"{self.bundle_id} covers QMD at least "
                     f"{self.domain.qmd_min:.1f} cm, not {qmd:.1f}"
+                )
+        if self.domain.ba_min is not None:
+            if ba is None:
+                raise BundleDomainError(
+                    f"{self.bundle_id} needs the initial BA to check ba_min "
+                    f"{self.domain.ba_min:.1f} m2/ha"
+                )
+            if ba < self.domain.ba_min:
+                raise BundleDomainError(
+                    f"{self.bundle_id} covers BA at least "
+                    f"{self.domain.ba_min:.1f} m2/ha, not {ba:.1f}"
                 )
         if self.domain.dbh_classes:
             if dbh_values is None:
@@ -553,6 +571,14 @@ def _domain(record: Mapping[str, object]) -> BundleDomain:
         qmd_min = float(qmd_raw)
         if qmd_min <= 0:
             raise BundleError("domain.qmd_min must be positive")
+    ba_raw = record.get("ba_min")
+    ba_min: float | None = None
+    if ba_raw is not None:
+        if not isinstance(ba_raw, (int, float)):
+            raise BundleError("domain.ba_min must be a number")
+        ba_min = float(ba_raw)
+        if ba_min <= 0:
+            raise BundleError("domain.ba_min must be positive")
     return BundleDomain(
         regions=regions,
         becs=becs,
@@ -560,6 +586,7 @@ def _domain(record: Mapping[str, object]) -> BundleDomain:
         dbh_classes=tuple(dbh_classes),
         management=management,
         qmd_min=qmd_min,
+        ba_min=ba_min,
     )
 
 

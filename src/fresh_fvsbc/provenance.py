@@ -165,6 +165,10 @@ class Provenance:
         The expansion-weighted initial QMD, in centimetres.
     qmd_min : float, optional
         The bundle's minimum QMD, when it declares one.
+    ba : float, optional
+        The expansion-weighted initial basal area, in square metres per hectare.
+    ba_min : float, optional
+        The bundle's minimum BA, when it declares one.
     calibration_id : str, optional
         The id of the calibration bundle the run used, when it used one.
     fresh_fvsbc_version : str, optional
@@ -187,6 +191,8 @@ class Provenance:
     bec: str = ""
     qmd: float | None = None
     qmd_min: float | None = None
+    ba: float | None = None
+    ba_min: float | None = None
     calibration_id: str = ""
     fresh_fvsbc_version: str = __version__
     pyfvs_commit: str = PYFVS_COMMIT
@@ -212,6 +218,8 @@ class Provenance:
             "bec": self.bec,
             "qmd": self.qmd,
             "qmd_min": self.qmd_min,
+            "ba": self.ba,
+            "ba_min": self.ba_min,
             "calibration_id": self.calibration_id,
             "keyword_set_hash": self.keyword_set_hash,
             "treelist_hash": self.treelist_hash,

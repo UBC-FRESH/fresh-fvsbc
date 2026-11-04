@@ -220,6 +220,10 @@ snapshot with the same row counts still needs a new manifest.
 | `d7-sbpsmk-quesnel-summary.csv` | The D7.17 BAMAX grid and site-pass counts |
 | `d7-sbpsmk-growth.md` | The D7.18 growth-multiplier and ingrowth screen |
 | `d7-sbpsmk-growth-summary.csv` | The D7.18 candidate grid and site-pass counts |
+| `d7-sbpsmk-mature.md` | The D7.19 mature SBPSmk/Quesnel candidate and validation |
+| `d7-sbpsmk-mature-bundle.json` | The unsigned SBPSmk/Quesnel mature candidate bundle |
+| `d7-sbpsmk-mature-loso-summary.csv` | The D7.19 site-grouped LOSO aggregate |
+| `d7-sbpsmk-mature-temporal-summary.csv` | The D7.19 temporal train/test aggregate |
 | `d7-quesnel-highqmd-temporal-summary.csv`, `d7-quesnel-highqmd-bundle.json` | The D7.14 temporal table and candidate bundle |
 | `d7-quesnel-highqmd-summary.csv` | The D7.13 BAMAX 70/75/80 domain summary |
 | `d7-quesnel-established-summary.csv` | The D7.11 pooled and worst-site summary |
