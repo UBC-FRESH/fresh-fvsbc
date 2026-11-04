@@ -224,7 +224,13 @@ A temporal holdout now exists and **fails TPH**: 75 eligible intervals starting 
 -1.15 (-2.9%) and TPH +410.2 (+18.1%); the site folds pass but a global multiplier cannot satisfy
 both. The bundle remains site-grouped pilot evidence, not a certificate. The next lever is a
 BEC/TSA or species-specific mortality term.
-See `d8-bwbs-screen.md`.
+See `d8-bwbs-screen.md`.See `d8-bwbs-screen.md`.
+
+**D8.5 CDF screen (2026-11-04):** CDF has one label and one TSA (Arrowsmith), 94 intervals / 21
+sites. The all-interval candidate reduces BA from -10.47 to -2.27, but the predeclared site fold 0
+misses BA at **-6.80**; `BAIMULT 12` fixes the fold but is not acceptable and training BA exceeds
++3.5. **No CDF bundle.** CDF remains a screening result until an independent TSA or a site-level
+covariate exists. See `d8-cdf-screen.md`.
 
 ## 5. Data and methods
 
