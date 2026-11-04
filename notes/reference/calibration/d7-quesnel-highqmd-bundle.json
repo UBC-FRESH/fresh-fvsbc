@@ -28,7 +28,8 @@
     ],
     "management": [
       "untreated"
-    ]
+    ],
+    "qmd_min": 13.0
   },
   "parameters": [
     {

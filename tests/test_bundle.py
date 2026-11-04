@@ -168,6 +168,18 @@ def test_domain_refuses_the_wrong_management(tmp_path: Path) -> None:
         bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "managed", (20.0,))
 
 
+def test_domain_enforces_qmd_min(tmp_path: Path) -> None:
+    """A QMD boundary is enforced when the domain declares one."""
+    record = _record()
+    record["domain"]["qmd_min"] = 13.0
+    bundle = load_bundle(_write(tmp_path, record))
+    bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,), 13.0)
+    with pytest.raises(BundleDomainError, match="QMD"):
+        bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,), 12.0)
+    with pytest.raises(BundleDomainError, match="needs the initial QMD"):
+        bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,))
+
+
 def test_a_wrong_pin_is_refused(tmp_path: Path) -> None:
     """A bundle is valid only for the build it names."""
     record = _record()
@@ -318,6 +330,7 @@ def test_a_json_list_is_refused(tmp_path: Path) -> None:
         (lambda r: r["domain"].update(dbh_classes={}), "dbh_classes"),
         (lambda r: r["domain"].update(dbh_classes=[[0]]), "min, max"),
         (lambda r: r["domain"].update(dbh_classes=[[10, 0]]), "min must be below max"),
+        (lambda r: r["domain"].update(qmd_min="13"), "qmd_min"),
         (lambda r: r.update(parameters={}), "must be a list"),
         (lambda r: r.update(parameters=[1]), "must be an object"),
         (lambda r: r["parameters"][0].update(fields="53"), "list of strings"),
