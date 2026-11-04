@@ -1,9 +1,9 @@
 # D7.13 Quesnel high-QMD capacity candidate
 
-Status: **candidate passes every site fold and the temporal holdout**; unsigned candidate bundle, not a certificate
+Status: **post-hoc candidate**; site and temporal checks pass for a fixed BAMAX, not independently validated
 Date: 2026-11-03
 Issue: #376
-Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.3`
+Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
 Data: `SBPSdc` / `Quesnel TSA`; 20 intervals / 6 sites with initial QMD >= 13
 Evidence: `d7-quesnel-highqmd-summary.csv`
 
@@ -17,9 +17,10 @@ an established, high-QMD Quesnel stratum.
 - Excluded: the mid/dense `QMD < 13` sites, including the D7.10 dense site; they remain
   validation-only.
 - `BAMAX 75`; no `BAIMULT`, `MORTMULT`, or `HTGMULT`.
+- TSA: Quesnel, enforced by the bundle.
 
-This is a claim boundary, not a post-hoc rescue: the high-QMD stratum is the part of Quesnel the
-current model can represent.
+This is a post-hoc domain: the high-QMD stratum was selected after the lower-QMD sites failed. The
+site folds test transfer of a fixed `BAMAX`; they do not hold out the choice of `BAMAX` or the domain.
 
 ## 2. Result
 
@@ -30,13 +31,14 @@ current model can represent.
 | 80 | -1.8% | -6.1% | 8.7% | 9.8% |
 
 All six site folds are inside the pre-registered bands (BA 10%, TPH 15%). `BAMAX 75` is the
-candidate; 70 and 80 are effectively equivalent on this sample.
+candidate; 70 and 80 are effectively equivalent on this sample. The grid was evaluated on the same
+six sites, so this is not an independent selection.
 
 ## 3. What this is
 
 - The **first Quesnel candidate with every site fold passing**.
 - A **high-QMD domain** candidate: it does not cover the mid/dense Quesnel sites.
-- A **site-grouped** result; the temporal holdout is still required.
+- A **site-grouped** result with a fixed parameter set; the temporal check is in D7.14.
 
 `QMD < 13` Quesnel remains a separate problem: D7.10's dense site failed BA by 151% at BAMAX55, and
 D7.11's mid-QMD sites failed at BAMAX75. Do not fold them into this claim.
@@ -45,10 +47,12 @@ D7.11's mid-QMD sites failed at BAMAX75. Do not fold them into this claim.
 
 1. Temporal holdout: passed (D7.14).
 2. `BAMAX 75` is in the unsigned `d7-quesnel-highqmd-bundle.json`.
-3. Add a QMD domain field before treating the bundle as self-contained.
+3. The QMD and TSA domains are now enforced; the claim is post-hoc.
 4. Keep `QMD < 13` validation-only until it has its own capacity/recruitment model.
 
 ## 5. Claim boundary
 
-This is a candidate for Quesnel SBPSdc stands with initial QMD at least 13 m2/ha. It is not a
-Quesnel-wide calibration, not a provincial model, and not a yield, AAC, legal, or whole-block claim.
+This is a post-hoc candidate for Quesnel SBPSdc stands with initial QMD at least 13 cm. `BAMAX 75`
+was selected on the same sites, so the site and temporal checks do not independently validate it. It
+is not a Quesnel-wide calibration, not a provincial model, and not a yield, AAC, legal, or whole-block
+claim.

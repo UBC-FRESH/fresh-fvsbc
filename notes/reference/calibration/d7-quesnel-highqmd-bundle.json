@@ -1,14 +1,18 @@
 {
   "bundle_id": "sbpsdc-quesnel-highqmd-2026-11-03",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "pins": {
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
-    "variant": "bc"
+    "variant": "bc",
+    "wrapper_version": "0.21.4"
   },
   "domain": {
     "regions": [
       "CAR"
+    ],
+    "tsas": [
+      "Quesnel TSA"
     ],
     "becs": [
       "SBPSdc"
@@ -47,7 +51,7 @@
   ],
   "training": {
     "data_checksum": "sha256:d9f609cd42dd32d0d9e3cac19a6b654771ad2b1e2642c97452a6328143a4c910",
-    "split": "QMD>=13; site-grouped and temporal (train <=1981, test >=1990)",
+    "split": "QMD>=13 on all 20 intervals; BAMAX selected on the same sites. Site-grouped and temporal (train <=1981, test >=1990); temporal test is not site-independent.",
     "objective": "minimise BA and TPH bias on the high-QMD Quesnel stratum",
     "convergence": {
       "iterations": 0,
@@ -59,5 +63,5 @@
     "date": "2026-11-03",
     "signed_off": false
   },
-  "claim": "Unsigned candidate for Quesnel SBPSdc stands with initial QMD >=13. The QMD restriction is not enforced by the current bundle schema. Not a certificate."
+  "claim": "Unsigned POST-HOC candidate for Quesnel SBPSdc stands with initial QMD >=13 cm. TSA (Quesnel) and QMD are enforced. BAMAX 75 was selected on the same 20 intervals, and the temporal test reuses the same sites; this is not an independent validation. Evidence excludes intervals with dead BA/initial BA >0.4; the bundle cannot enforce that filter. Not a certificate."
 }
