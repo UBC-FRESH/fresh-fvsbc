@@ -1,6 +1,6 @@
 # D9.6 CWH 4 cm refit with small-tree growth
 
-Status: **BA/TPH pilot; height and volume fail validation (D9.8)**
+Status: **pilot; BA/TPH and matched top height pass; external volume unresolved**
 
 Build: `fresh-fvsbc-pyfvs 0.4.1`; wrapper `0.21.4`; dataset `min_dbh=4.0`.
 
@@ -46,9 +46,9 @@ Every fold is inside BA ±3 m2/ha and TPH 15%. The temporal TPH margin is close 
 Fraser TPH MAE remains high. The large `BAIMULT` is still a structural correction; `REGDMULT 2.0`
 is what fixes Fraser.
 
-**D9.8 validation:** QMD is close, but top height is underpredicted by 13–20% on every hold and
-volume by 3–19%. The candidate is a BA/TPH pilot, not production-ready. See
-`d9-cwh-4cm-validation.md`.
+**D9.8 validation:** QMD and matched top height pass; PSP volume is within 8%, but the non-PSP
+external volume is -18.7% and unresolved. The candidate remains a pilot. See
+`d9-cwh-4cm-validation.md` and `d9-cwh-topheight-correction.md`.
 
 ## Decision
 
@@ -60,7 +60,7 @@ Known risks:
 
 - `BAIMULT 7.0` is high; `REGDMULT 2.0` is also a structural multiplier.
 - The candidate was selected after seeing spatial folds; non-PSP external is the independent check.
-- BA/TPH pass; QMD is close, but top height and volume fail validation (D9.8).
+- BA/TPH and matched top height pass; PSP volume is close; non-PSP external volume is unresolved.
 - The bundle enforces `DBH >= 4 cm`; the caller must still supply a 4 cm tree list and the 4 cm calibration domain.
 - No reviewer signature.
 
