@@ -41,6 +41,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
+from fresh_fvsbc import __version__ as installed_version
 from fresh_fvsbc.bec import REGIONS, BecCode
 from fresh_fvsbc.calibration import SPECIES_GROUPS
 from fresh_fvsbc.ingrowth import IngrowthError, IngrowthModel
@@ -442,6 +443,16 @@ class CalibrationBundle:
             "fvs_source_commit": _string(pins_raw, "fvs_source_commit"),
             "variant": _string(pins_raw, "variant"),
         }
+        wrapper_pin = pins_raw.get("wrapper_version")
+        if wrapper_pin is not None:
+            if not isinstance(wrapper_pin, str) or not wrapper_pin.strip():
+                raise BundleError("pins.wrapper_version must be a non-empty string")
+            if wrapper_pin.strip() != installed_version:
+                raise BundleError(
+                    f"pins.wrapper_version {wrapper_pin!r} is not the wrapper's version "
+                    f"{installed_version!r}; a bundle is valid only for the build it names"
+                )
+            pins["wrapper_version"] = wrapper_pin.strip()
         for key, expected in (
             ("pyfvs_commit", PYFVS_COMMIT),
             ("fvs_source_commit", FVS_SOURCE_COMMIT),
