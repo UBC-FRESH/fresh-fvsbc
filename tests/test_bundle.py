@@ -8,6 +8,7 @@ reader will copy.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Callable
 from pathlib import Path
@@ -123,6 +124,21 @@ def test_the_bwbs_pilot_bundle_loads_and_renders_all_parameters() -> None:
     assert len(bundle.parameters) == 18
     assert len(bundle.render()) == 18
     assert any("not signed off" in warning for warning in bundle.warnings)
+
+
+def test_the_review_manifest_matches_its_bundles_and_is_unsigned() -> None:
+    """The review packet cannot drift from the bundle bytes it names."""
+    manifest = json.loads(
+        Path("notes/reference/calibration/d8-review-manifest.json").read_text(encoding="utf-8")
+    )
+    assert manifest["signed_off"] is False
+    assert manifest["reviewer"] is None
+    assert manifest["decision"] == "pending"
+    assert len(manifest["bundles"]) == 3
+    for item in manifest["bundles"]:
+        data = Path(item["path"]).read_bytes()
+        assert item["sha256"] == "sha256:" + hashlib.sha256(data).hexdigest()
+        assert item["bytes"] == len(data)
 
 
 def test_the_kc_pilot_bundle_loads_and_carries_its_two_warnings() -> None:

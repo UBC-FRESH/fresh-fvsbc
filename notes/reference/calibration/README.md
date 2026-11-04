@@ -67,6 +67,7 @@ outside the repository because they carry site identifiers.
 | `d8-bwbs-screen.md`, `d8-bwbs-summary.csv`, `d8-bwbs-bundle.json` | The D8.3 BWBS growth pilot: three TSA holdouts, high BAIMULT and low MORTMULT; unsigned |
 | `d8-cdf-screen.md` | The D8.5 CDF screen: one TSA, site fold 0 fails BA; no bundle |
 | `d8-mh-cma-screen.md` | The D8.6 MH/CMA screens: GBR North fails; CMA validation-only; no bundle |
+| `d8-review-packet.md`, `d8-review-manifest.json`, `d8-sbs-second-holdout.csv` | D8.7 review packet for IDFdk/SBS/CWH; SBS Prince George second holdout |
 | `d7-idfdk-binned-bundle.json` | The density/QMD-binned IDFdk pilot bundle |
 | `d7-idfdk-bundle-summary.csv`, `d7-idfdk-kamloops-summary.csv`, `d7-idfdk-temporal1990-summary.csv`, `d7-idfdk-binned-summary.csv`, `d7-idfdk-periodic-summary.csv` | The D7.6 validation summaries |
 | `d7-ingrowth-screen-by-zone.csv`, `d7-ingrowth-screen-by-bec.csv`, `d7-all-zone-ingrowth.json` | The all-zone domain screening tables and rates |

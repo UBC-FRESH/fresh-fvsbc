@@ -235,7 +235,13 @@ covariate exists. See `d8-cdf-screen.md`.See `d8-cdf-screen.md`.
 **D8.6 MH/CMA screens (2026-11-04):** MH has 31 intervals / 5 TSAs. The CWH-style candidate
 passes Sunshine Coast, Fraser, North Island, and Arrowsmith, but **GBR North fails** at BA +7.22
 (+8.5%) and TPH -811.5 (-22.0%) on three intervals. **No MH bundle.** CMA has six intervals, all
-North Island 1977-1985; validation-only, no bundle. See `d8-mh-cma-screen.md`.
+North Island 1977-1985; validation-only, no bundle. See `d8-mh-cma-screen.md`.See `d8-mh-cma-screen.md`.
+
+**D8.7 review packet (2026-11-04):** IDFdk, SBS, and CWH now have a consolidated unsigned review
+packet (`d8-review-packet.md`, `d8-review-manifest.json`) with bundle checksums and a checklist. SBS
+also has a second spatial holdout: Prince George TSA, 19 test intervals, BA -2.94 (-7.6%) / TPH
+-265.9 (-10.8%), inside both thresholds. The packet remains `signed_off: false`; a named reviewer
+must sign. See `d8-sbs-second-holdout.csv`.
 
 ## 5. Data and methods
 
