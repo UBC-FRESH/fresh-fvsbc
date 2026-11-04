@@ -171,6 +171,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             baimult=candidate.get("baimult"),  # type: ignore[arg-type]
             mortmult=candidate.get("mortmult"),  # type: ignore[arg-type]
             htgmul=candidate.get("htgmul"),  # type: ignore[arg-type]
+            regdmul=candidate.get("regdmul"),  # type: ignore[arg-type]
+            reghmul=candidate.get("reghmul"),  # type: ignore[arg-type]
         )
         for raw in sample.to_dict("records"):
             interval = {str(key): value for key, value in raw.items()}

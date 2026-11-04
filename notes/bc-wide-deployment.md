@@ -255,7 +255,13 @@ overlap with PSP, and is the first-choice independent external validation set. S
 subplot vs CMI/YSM/VRI 4.0 cm tree-detail limit**, not bad counting. PSP mean live TPH is 1,959.8
 (>=2 cm), 1,706.8 (>=4 cm), and 1,148.0 (>=9 cm); temporary VRI +79% at >=4 cm falls to +0.4% at
 >=9 cm. The D9.2 external table is provisional and must be rerun at a common >=4 cm target. See
-`d9-faib-dbh-standard.md`.
+`d9-faib-dbh-standard.md`.`d9-faib-dbh-standard.md`.
+
+**D9.6 CWH 4 cm refit (2026-11-04):** adding the small-tree growth lever fixes the Fraser failure.
+`BAIMULT 7.0`, `MORTMULT 0.30`, and `REGDMULT 2.0`, no ingrowth, pass Arrowsmith, Fraser, Haida
+Gwaii, temporal >=2000, and the non-PSP external cohort; all BA/TPH biases are inside the bands.
+`d7-cwh-4cm-bundle.json` is an unsigned pilot. The large BAIMULT and unvalidated QMD/height/volume
+remain risks. See `d9-cwh-4cm-refit.md`.
 
 ## 5. Data and methods
 

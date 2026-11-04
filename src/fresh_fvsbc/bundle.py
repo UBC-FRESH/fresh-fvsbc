@@ -76,6 +76,8 @@ CALIBRATION_KEYWORDS: frozenset[str] = frozenset(
         "BAIMULT",
         "MORTMULT",
         "HTGMULT",
+        "REGDMULT",
+        "REGHMULT",
         "DGSTDEV",
         "CRNMULT",
         "FIXMORT",

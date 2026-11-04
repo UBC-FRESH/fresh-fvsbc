@@ -127,7 +127,7 @@ BA -4.10 (-6.2%), TPH -110 (-6.1%), outside the BA ±3 m2/ha band.
 bundle upper bound and the candidate is at the bound; training BA is +1.14. That is not acceptable
 under the protocol. A high multiplier is again doing structural work.
 
-**No 4 cm CWH bundle.** The 2 cm CWH pilot remains the only CWH pilot; its 4 cm external comparison
+**No 4 cm CWH bundle at the time of D9.5.** D9.6 later found that `REGDMULT` fixes the Fraser failure and issued a separate 4 cm pilot; the 2 cm CWH pilot remains a separate artifact; its 4 cm external comparison
 is a sensitivity check, not a 4 cm calibration. The 4 cm target must be refit with a
 Fraser-aware, site-grouped selection and a different growth parameterisation, not a higher global
 `BAIMULT`.

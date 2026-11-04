@@ -135,11 +135,26 @@ def test_the_review_manifest_matches_its_bundles_and_is_unsigned() -> None:
     assert manifest["signed_off"] is False
     assert manifest["reviewer"] is None
     assert manifest["decision"] == "pending"
-    assert len(manifest["bundles"]) == 3
+    assert len(manifest["bundles"]) == 4
     for item in manifest["bundles"]:
         data = Path(item["path"]).read_bytes()
         assert item["sha256"] == "sha256:" + hashlib.sha256(data).hexdigest()
         assert item["bytes"] == len(data)
+
+
+def test_the_cwh_4cm_bundle_loads_and_renders_regdmul() -> None:
+    """The 4 cm CWH pilot carries large- and small-tree growth levers."""
+    bundle = load_bundle("notes/reference/calibration/d7-cwh-4cm-bundle.json")
+    assert bundle.ingrowth is None
+    assert bundle.domain.becs == ("CWH",)
+    assert len(bundle.parameters) == 21
+    assert {parameter.keyword for parameter in bundle.parameters} == {
+        "BAIMULT",
+        "MORTMULT",
+        "REGDMULT",
+    }
+    assert len(bundle.render()) == 21
+    assert any("not signed off" in warning for warning in bundle.warnings)
 
 
 def test_the_kc_pilot_bundle_loads_and_carries_its_two_warnings() -> None:
