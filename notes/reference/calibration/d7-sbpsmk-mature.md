@@ -3,7 +3,7 @@
 Status: **site-grouped and temporal pass; unsigned candidate**
 Date: 2026-11-04
 Issue: #393
-Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.3`
+Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
 Bundle: `d7-sbpsmk-mature-bundle.json`
 Evidence: `d7-sbpsmk-mature-loso-summary.csv`, `d7-sbpsmk-mature-temporal-summary.csv`
 
@@ -71,6 +71,7 @@ before the run. Provenance records both the stand values and the bundle minima.
 - The four low-QMD, high-productivity sites are excluded; they still have no working model.
 - 25 sites and 48 intervals are enough for a candidate, not a certificate.
 - The temporal test has 23 intervals, all from one later measurement decade.
+- Requires `fresh-fvsbc 0.21.4`; `0.21.3` loads the bundle but ignores the QMD and BA fields.
 - There is no independent third TSA or independent reviewer.
 - This does not pool with the SBPSdc/Quesnel candidate.
 

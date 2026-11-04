@@ -19,6 +19,7 @@ from typing import Any
 
 import pytest
 
+from fresh_fvsbc import __version__
 from fresh_fvsbc.bec import BecCode
 from fresh_fvsbc.bundle import (
     BundleBoundsError,
@@ -232,6 +233,17 @@ def test_domain_enforces_tsa(tmp_path: Path) -> None:
         )
     with pytest.raises(BundleDomainError, match="needs the TSA"):
         bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,))
+
+
+def test_a_wrapper_pin_must_match(tmp_path: Path) -> None:
+    """A bundle that names a wrapper version is valid only for that version."""
+    record = _record()
+    record["pins"]["wrapper_version"] = __version__
+    bundle = load_bundle(_write(tmp_path, record))
+    assert bundle.pins["wrapper_version"] == __version__
+    record["pins"]["wrapper_version"] = "0.0.0"
+    with pytest.raises(BundleError, match="wrapper's version"):
+        load_bundle(_write(tmp_path, record))
 
 
 def test_a_wrong_pin_is_refused(tmp_path: Path) -> None:

@@ -27,7 +27,7 @@ Fields
    * - ``version``
      - A semantic version, such as ``0.1.0``
    * - ``pins``
-     - ``pyfvs_commit``, ``fvs_source_commit``, and ``variant``. The loader refuses a bundle whose pins do not match the package.
+     - ``pyfvs_commit``, ``fvs_source_commit``, and ``variant``, plus optional ``wrapper_version``. The loader refuses a bundle whose pins do not match the package.
    * - ``domain``
      - ``regions``, ``tsas``, ``becs``, ``species_groups``, ``dbh_classes``, ``management``, and optional ``qmd_min`` and ``ba_min``. An empty list means no restriction; ``dbh_classes`` is a list of inclusive ``[min, max]`` ranges in centimetres; ``qmd_min`` is in centimetres and ``ba_min`` in square metres per hectare.
    * - ``parameters``
