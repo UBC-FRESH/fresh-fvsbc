@@ -229,6 +229,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d7-sbpsmk-mature-temporal-summary.csv` | The D7.19 temporal train/test aggregate |
 | `d7-sbpsmk-mature-bundle-temporal-summary.csv` | The shipped bundle temporal train/test aggregate |
 | `d7-sbpsmk-mature-candidates.json` | The D7.19 candidate parameters for bundle replay |
+| `d7-sbpsmk-nested.md` | The D7.22 nested-selection failure and decision |
+| `d7-sbpsmk-nested-summary.csv` | The D7.22 held-out aggregate |
+| `d7-sbpsmk-nested-folds.csv` | The D7.22 per-fold selected parameters and test metrics |
 | `d7-quesnel-highqmd-temporal-summary.csv`, `d7-quesnel-highqmd-bundle.json` | The D7.14 temporal table and candidate bundle |
 | `d7-quesnel-highqmd-summary.csv` | The D7.13 BAMAX 70/75/80 domain summary |
 | `d7-quesnel-established-summary.csv` | The D7.11 pooled and worst-site summary |
