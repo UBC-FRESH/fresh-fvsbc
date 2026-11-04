@@ -214,6 +214,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d7-quesnel-highqmd.md` | The D7.13 high-QMD Quesnel candidate, where every site fold passes |
 | `d7-quesnel-bundle.md` | The D7.14 temporal pass and unsigned candidate bundle |
 | `d7-quesnel-review.md` | The independent-review packet for the Quesnel candidate bundle |
+| `d7-sbpsmk-quesnel.md` | The D7.17 SBPSmk/Quesnel second-domain check and site-fold failure |
+| `d7-sbpsmk-quesnel-summary.csv` | The D7.17 BAMAX grid and site-pass counts |
 | `d7-quesnel-highqmd-temporal-summary.csv`, `d7-quesnel-highqmd-bundle.json` | The D7.14 temporal table and candidate bundle |
 | `d7-quesnel-highqmd-summary.csv` | The D7.13 BAMAX 70/75/80 domain summary |
 | `d7-quesnel-established-summary.csv` | The D7.11 pooled and worst-site summary |
