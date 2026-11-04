@@ -220,7 +220,11 @@ See `d7-cwh-screen.md` and `d7-cwh-bundle.json`.See `d7-cwh-screen.md` and `d7-c
 TPH +11.7% (n=38), Cassiar +1.58 / +6.6% (n=4), Fort St. John -1.74 / -14.7% (n=13); all are
 inside BA ±3 m2/ha and TPH 15%. Baselines were BA -10.88 / -4.67 / -13.28. The high growth
 multiplier, low mortality, four-interval Cassiar test, and Fort St. John TPH margin are claim risks.
-A temporal/leave-one-BEC holdout and review remain. See `d8-bwbs-screen.md`.
+A temporal holdout now exists and **fails TPH**: 75 eligible intervals starting >=2000 give BA
+-1.15 (-2.9%) and TPH +410.2 (+18.1%); the site folds pass but a global multiplier cannot satisfy
+both. The bundle remains site-grouped pilot evidence, not a certificate. The next lever is a
+BEC/TSA or species-specific mortality term.
+See `d8-bwbs-screen.md`.
 
 ## 5. Data and methods
 

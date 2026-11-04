@@ -39,3 +39,21 @@ This is a **growth/mortality** pilot, not an ingrowth model. The previous BWBS a
 screen over-recruited the domain and is not used.
 
 Evidence: `d8-bwbs-summary.csv`.
+
+## Temporal holdout
+
+The fixed site pilot was run on every eligible BWBS interval starting in 2000 or later: **75 test
+intervals**, 87 sites, no refit.
+
+| Fold | n | BA bias | BA % | TPH bias | TPH % |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| temporal >= 2000 | 75 | -1.15 | -2.9% | +410.2 | **+18.1%** |
+| baseline | 75 | -9.89 | -24.8% | +31.3 | +1.4% |
+
+BA passes; TPH fails at +18.1%. The global `MORTMULT 0.2` that makes the three spatial folds pass
+leaves too many trees in the later stands. Raising mortality enough to fix the temporal TPH drives
+the Fort St. John spatial fold below -15%, so a single global multiplier cannot satisfy both.
+
+**The BWBS bundle remains site-grouped pilot evidence only.** It is not temporally validated and is
+not a certificate. The next lever is a BEC/TSA or species-specific mortality term, not another global
+multiplier.
