@@ -55,7 +55,7 @@ Known risks:
 - `BAIMULT 7.0` is high; `REGDMULT 2.0` is also a structural multiplier.
 - The candidate was selected after seeing spatial folds; non-PSP external is the independent check.
 - Only BA/TPH were evaluated; QMD, height, and volume are not yet validated.
-- The bundle does not enforce `min_dbh`; the caller must use a 4 cm tree list.
+- The bundle enforces `DBH >= 4 cm`; the caller must still supply a 4 cm tree list and the 4 cm calibration domain.
 - No reviewer signature.
 
 Evidence: `d7-cwh-4cm-summary.csv`, `d8-review-manifest.json`.

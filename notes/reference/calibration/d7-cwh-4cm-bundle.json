@@ -4,7 +4,8 @@
   "pins": {
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
-    "variant": "bc"
+    "variant": "bc",
+    "wrapper_version": "0.21.4"
   },
   "domain": {
     "regions": [
@@ -16,7 +17,12 @@
       "CWH"
     ],
     "species_groups": [],
-    "dbh_classes": [],
+    "dbh_classes": [
+      [
+        4.0,
+        999.0
+      ]
+    ],
     "management": [
       "untreated"
     ]
@@ -353,5 +359,5 @@
     "date": "2026-11-04",
     "signed_off": false
   },
-  "claim": "CWH 4cm pilot: BAIMULT 7, MORTMULT 0.3, REGDMULT 2; three spatial and temporal PSP holdouts plus non-PSP external; high growth multiplier; not a certificate."
+  "claim": "CWH 4cm pilot: BAIMULT 7, MORTMULT 0.3, REGDMULT 2; three spatial and temporal PSP holdouts plus non-PSP external; high growth multiplier; not a certificate; the bundle enforces DBH >=4 cm."
 }
