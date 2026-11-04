@@ -1,6 +1,6 @@
 # D7.19 SBPSmk/Quesnel mature closed-canopy candidate
 
-Status: **post-hoc candidate; nested selection fails the every-site criterion**
+Status: **post-hoc candidate; nested selection and external screen fail**
 Date: 2026-11-04
 Issue: #393
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
@@ -73,7 +73,14 @@ procedure selected BAMAX 80 / BAIMULT 1.25 in all folds; held-out sites gave BA 
 with **25 of 28 sites passing**. The worst site is BA 25.1% / TPH 63.4%. This **fails** the
 every-site criterion; the candidate is not upgraded. See `d7-sbpsmk-nested.md`.
 
-## 6. Candidate bundle
+## 6. External screen (D7.23)
+
+The fixed candidate was applied without refitting to 4 Williams Lake and 3 100 Mile House SBPSmk
+intervals at QMD >= 17 / BA >= 20. Pooled BA is **+11.03%**, TPH **+7.97%**; only 3 of 7 sites pass.
+Williams Lake is BA +16.2%; 100 Mile House is TPH +15.5%. This is a screen, not a validation, but it
+fails the BA band. The candidate remains Quesnel-only. See `d7-sbpsmk-external.md`.
+
+## 7. Candidate bundle
 
 `d7-sbpsmk-mature-bundle.json` is an **unsigned candidate**:
 
@@ -85,7 +92,7 @@ every-site criterion; the candidate is not upgraded. See `d7-sbpsmk-nested.md`.
 The bundle schema enforces the TSA, QMD, and BA boundaries, so a stand outside either is refused
 before the run. Provenance records the stand values and the bundle minima.
 
-## 7. Reproduce
+## 8. Reproduce
 
 Temporal, bundle as shipped:
 
@@ -115,10 +122,12 @@ python scripts/run_site_grouped_probe.py \
 It fits ingrowth on the training sites for each held-out site and writes `loso-summary.csv`;
 the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
 
-## 8. Limits
+## 9. Limits
 
 - The domain and parameters are post-hoc; only ingrowth was held out.
 - Nested parameter/domain selection fails the every-site criterion (25/28 sites).
+- The external Williams Lake / 100 Mile screen fails BA (+11.03% pooled); the candidate is
+  Quesnel-only.
 - The bundle checksum covers interval identifiers and initial/final values, not pandas float formatting.
 - The BA gate uses the unrounded tree list; FVS writes tree counts `F6.0`. Two of the 48 accepted
   intervals start at FVS BA 19, so the gate is not exact at the 20 m2/ha boundary.
@@ -131,7 +140,7 @@ the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
 - There is no independent third TSA or independent reviewer.
 - This does not pool with the SBPSdc/Quesnel candidate.
 
-## 9. Review checklist
+## 10. Review checklist
 
 - [ ] Accept the post-hoc QMD/BA domain as defensible for mature SBPSmk stands.
 - [ ] Confirm `QMD >= 17` and `BA >= 20` are enforced in the bundle and provenance.
@@ -143,8 +152,8 @@ the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
 - [ ] Confirm the claim says candidate, not certificate.
 - [ ] Decide whether a second TSA is required before any deployment.
 
-## 10. Claim boundary
+## 11. Claim boundary
 
-This is an unsigned, post-hoc candidate. The parameters and domain were not held out, and the
-nested selection check fails 3 of 28 sites. It does not support a yield, AAC, legal, or whole-block
-claim, and it is not a certificate.
+This is an unsigned, post-hoc candidate. The parameters and domain were not held out, the nested
+selection check fails 3 of 28 sites, and the external screen fails BA. It does not support a yield,
+AAC, legal, or whole-block claim, and it is not a certificate.
