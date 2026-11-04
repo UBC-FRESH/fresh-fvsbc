@@ -1,6 +1,6 @@
 # D7.19 SBPSmk/Quesnel mature closed-canopy candidate
 
-Status: **post-hoc candidate; ingrowth-only holdout**
+Status: **post-hoc candidate; nested selection fails the every-site criterion**
 Date: 2026-11-04
 Issue: #393
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
@@ -66,7 +66,14 @@ domain are fixed from all data, so this validates the ingrowth refit, not those 
 The pooled and every-site checks pass for the fixed parameter set. They are not an independent
 validation of that set.
 
-## 5. Candidate bundle
+## 5. Nested selection (D7.22)
+
+Five site-grouped folds; BAMAX/BAIMULT/QMD selected on training sites only, BA fixed at 20. The
+procedure selected BAMAX 80 / BAIMULT 1.25 in all folds; held-out sites gave BA -4.84%, TPH -7.92%,
+with **25 of 28 sites passing**. The worst site is BA 25.1% / TPH 63.4%. This **fails** the
+every-site criterion; the candidate is not upgraded. See `d7-sbpsmk-nested.md`.
+
+## 6. Candidate bundle
 
 `d7-sbpsmk-mature-bundle.json` is an **unsigned candidate**:
 
@@ -78,7 +85,7 @@ validation of that set.
 The bundle schema enforces the TSA, QMD, and BA boundaries, so a stand outside either is refused
 before the run. Provenance records the stand values and the bundle minima.
 
-## 6. Reproduce
+## 7. Reproduce
 
 Temporal, bundle as shipped:
 
@@ -108,9 +115,10 @@ python scripts/run_site_grouped_probe.py \
 It fits ingrowth on the training sites for each held-out site and writes `loso-summary.csv`;
 the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
 
-## 7. Limits
+## 8. Limits
 
 - The domain and parameters are post-hoc; only ingrowth was held out.
+- Nested parameter/domain selection fails the every-site criterion (25/28 sites).
 - The bundle checksum covers interval identifiers and initial/final values, not pandas float formatting.
 - The BA gate uses the unrounded tree list; FVS writes tree counts `F6.0`. Two of the 48 accepted
   intervals start at FVS BA 19, so the gate is not exact at the 20 m2/ha boundary.
@@ -123,7 +131,7 @@ the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
 - There is no independent third TSA or independent reviewer.
 - This does not pool with the SBPSdc/Quesnel candidate.
 
-## 8. Review checklist
+## 9. Review checklist
 
 - [ ] Accept the post-hoc QMD/BA domain as defensible for mature SBPSmk stands.
 - [ ] Confirm `QMD >= 17` and `BA >= 20` are enforced in the bundle and provenance.
@@ -131,12 +139,12 @@ the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
 - [ ] Confirm the temporal split is time-based.
 - [ ] Confirm the LOSO rates are fold-specific.
 - [ ] Confirm the test sites were not used to select BAMAX, BAIMULT, or the domain. **Currently not
-      satisfied;** this is a post-hoc candidate.
+      satisfied;** the nested check in D7.22 fails 3 of 28 sites.
 - [ ] Confirm the claim says candidate, not certificate.
 - [ ] Decide whether a second TSA is required before any deployment.
 
-## 9. Claim boundary
+## 10. Claim boundary
 
-This is an unsigned, post-hoc candidate. The parameters and domain were not held out; only the
-ingrowth refit was. It does not support a yield, AAC, legal, or whole-block claim, and it is not a
-certificate.
+This is an unsigned, post-hoc candidate. The parameters and domain were not held out, and the
+nested selection check fails 3 of 28 sites. It does not support a yield, AAC, legal, or whole-block
+claim, and it is not a certificate.
