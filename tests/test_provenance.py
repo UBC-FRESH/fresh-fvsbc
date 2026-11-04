@@ -149,6 +149,14 @@ def test_the_record_carries_no_path_and_no_credential() -> None:
     assert '"bec": "CAR IDFdk3/01"' in text
 
 
+def test_a_non_finite_value_cannot_be_written_as_json() -> None:
+    """A provenance record with a NaN is refused rather than emitted as bare NaN."""
+    record = a_provenance()
+    object.__setattr__(record, "qmd", float("nan"))
+    with pytest.raises(ValueError, match="JSON compliant"):
+        record.to_json()
+
+
 def test_the_record_carries_the_qmd_boundary() -> None:
     """A bundle boundary is visible beside the stand's initial QMD."""
     record = a_provenance().as_record()

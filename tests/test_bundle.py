@@ -235,6 +235,22 @@ def test_domain_enforces_tsa(tmp_path: Path) -> None:
         bundle.check_domain(BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,))
 
 
+def test_domain_rejects_non_finite_stand_values(tmp_path: Path) -> None:
+    """A NaN or infinite stand value cannot satisfy a boundary."""
+    record = _record()
+    record["domain"]["qmd_min"] = 13.0
+    record["domain"]["ba_min"] = 20.0
+    bundle = load_bundle(_write(tmp_path, record))
+    with pytest.raises(BundleDomainError, match="finite initial QMD"):
+        bundle.check_domain(
+            BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,), qmd=float("nan"), ba=25.0
+        )
+    with pytest.raises(BundleDomainError, match="finite initial BA"):
+        bundle.check_domain(
+            BecCode.parse("CAR IDFdk3/01"), ("FD",), "untreated", (20.0,), qmd=20.0, ba=float("inf")
+        )
+
+
 def test_a_wrapper_pin_must_match(tmp_path: Path) -> None:
     """A bundle that names a wrapper version is valid only for that version."""
     record = _record()
@@ -397,8 +413,14 @@ def test_a_json_list_is_refused(tmp_path: Path) -> None:
         (lambda r: r["domain"].update(dbh_classes=[[0]]), "min, max"),
         (lambda r: r["domain"].update(dbh_classes=[[10, 0]]), "min must be below max"),
         (lambda r: r["domain"].update(qmd_min="13"), "qmd_min"),
+        (lambda r: r["domain"].update(qmd_min=float("nan")), "finite"),
+        (lambda r: r["domain"].update(qmd_min=float("inf")), "finite"),
+        (lambda r: r["domain"].update(qmd_min=True), "qmd_min"),
         (lambda r: r["domain"].update(ba_min="20"), "ba_min"),
         (lambda r: r["domain"].update(ba_min=-1), "ba_min"),
+        (lambda r: r["domain"].update(ba_min=float("nan")), "finite"),
+        (lambda r: r["domain"].update(ba_min=float("inf")), "finite"),
+        (lambda r: r["domain"].update(ba_min=True), "ba_min"),
         (lambda r: r["domain"].update(tsas="Quesnel TSA"), "tsas"),
         (lambda r: r.update(parameters={}), "must be a list"),
         (lambda r: r.update(parameters=[1]), "must be an object"),

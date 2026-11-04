@@ -35,6 +35,7 @@ identify it.
 from __future__ import annotations
 
 import json
+import math
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -356,6 +357,10 @@ class CalibrationBundle:
             raise BundleDomainError(
                 f"{self.bundle_id} covers management {', '.join(regimes)}, not {management}"
             )
+        if qmd is not None and not math.isfinite(qmd):
+            raise BundleDomainError(f"{self.bundle_id} needs a finite initial QMD")
+        if ba is not None and not math.isfinite(ba):
+            raise BundleDomainError(f"{self.bundle_id} needs a finite initial BA")
         if self.domain.qmd_min is not None:
             if qmd is None:
                 raise BundleDomainError(
@@ -595,19 +600,19 @@ def _domain(record: Mapping[str, object]) -> BundleDomain:
     qmd_raw = record.get("qmd_min")
     qmd_min: float | None = None
     if qmd_raw is not None:
-        if not isinstance(qmd_raw, (int, float)):
+        if isinstance(qmd_raw, bool) or not isinstance(qmd_raw, (int, float)):
             raise BundleError("domain.qmd_min must be a number")
         qmd_min = float(qmd_raw)
-        if qmd_min <= 0:
-            raise BundleError("domain.qmd_min must be positive")
+        if not math.isfinite(qmd_min) or qmd_min <= 0:
+            raise BundleError("domain.qmd_min must be a positive finite number")
     ba_raw = record.get("ba_min")
     ba_min: float | None = None
     if ba_raw is not None:
-        if not isinstance(ba_raw, (int, float)):
+        if isinstance(ba_raw, bool) or not isinstance(ba_raw, (int, float)):
             raise BundleError("domain.ba_min must be a number")
         ba_min = float(ba_raw)
-        if ba_min <= 0:
-            raise BundleError("domain.ba_min must be positive")
+        if not math.isfinite(ba_min) or ba_min <= 0:
+            raise BundleError("domain.ba_min must be a positive finite number")
     return BundleDomain(
         regions=regions,
         tsas=tsas,

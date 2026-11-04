@@ -240,7 +240,7 @@ class Provenance:
         str
             The record, formatted for a reader rather than for a machine.
         """
-        return json.dumps(self.as_record(), indent=2) + "\n"
+        return json.dumps(self.as_record(), indent=2, allow_nan=False) + "\n"
 
     def write(self, path: str | Path) -> Path:
         """Write the record beside a run's outputs, as JSON.
