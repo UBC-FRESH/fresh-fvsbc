@@ -257,3 +257,5 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-bec-coverage.csv` | The D9.9 per-BEC counts and status |
 | `d9-ichmw2-screen.md` | The D9.11 ICHmw2 baseline/grid screen |
 | `d9-ichmw2-screen-summary.csv` | The D9.11 candidate grid and site-pass counts |
+| `d9-ichmw2-si.md` | The D9.12 site-index strata screen |
+| `d9-ichmw2-si-summary.csv` | The D9.12 per-class candidate metrics |
