@@ -255,3 +255,5 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-cwh-4cm-validation-summary.csv` | The D9.8 holdout metrics |
 | `d9-bec-coverage.md` | The D9.9 BEC coverage and status matrix |
 | `d9-bec-coverage.csv` | The D9.9 per-BEC counts and status |
+| `d9-ichmw2-screen.md` | The D9.11 ICHmw2 baseline/grid screen |
+| `d9-ichmw2-screen-summary.csv` | The D9.11 candidate grid and site-pass counts |
