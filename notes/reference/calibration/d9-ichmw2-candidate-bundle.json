@@ -1,0 +1,201 @@
+{
+  "bundle_id": "ichmw2-arrow-cascadia-2026-11-06",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc",
+    "wrapper_version": "0.21.4"
+  },
+  "domain": {
+    "regions": [],
+    "tsas": [
+      "Arrow TSA",
+      "Cascadia TSA"
+    ],
+    "becs": [
+      "ICHmw2"
+    ],
+    "species_groups": [],
+    "dbh_classes": [
+      [
+        4.0,
+        999.0
+      ]
+    ],
+    "management": [
+      "untreated"
+    ]
+  },
+  "parameters": [
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "FD",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "HW",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "CW",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "BG",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PW",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PL",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "SE",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "BL",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "LW",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "AT",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "AC",
+        "0.7500"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 2.0
+      }
+    }
+  ],
+  "training": {
+    "data_checksum": "sha256:9ea62944e9939253e44950febdddfd3af8e3bfac67d38fb457467d1c1cdb86f5",
+    "split": "ICHmw2 Arrow/Cascadia, DBH>=4 cm, sites with >=5 intervals (569 intervals / 99 sites); temporal test >=2000 and >=2005; candidate selected on all well-sampled sites",
+    "objective": "minimise BA and TPH bias on well-sampled ICHmw2 Arrow/Cascadia sites",
+    "convergence": {
+      "iterations": 0,
+      "max_parameter_change": 0.0
+    }
+  },
+  "review": {
+    "reviewer": "unreviewed",
+    "date": "2026-11-06",
+    "signed_off": false
+  },
+  "claim": "Unsigned candidate for ICHmw2 in Arrow and Cascadia TSA, DBH >=4 cm, well-sampled sites (>=5 intervals): BAIMULT 0.75. 91/99 sites inside BA +/-10% and TPH +/-15%; BA -0.23%, TPH -3.44%; temporal >=2000 BA +2.0%/TPH -2.0%. Okanagan, Kootenay Lake, and sites below 5 intervals are outside the claim. Not a certificate."
+}

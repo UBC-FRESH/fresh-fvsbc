@@ -259,3 +259,5 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-ichmw2-screen-summary.csv` | The D9.11 candidate grid and site-pass counts |
 | `d9-ichmw2-si.md` | The D9.12 site-index strata screen |
 | `d9-ichmw2-si-summary.csv` | The D9.12 per-class candidate metrics |
+| `d9-ichmw2-candidate.md` | The D9.13 well-sampled ICHmw2 candidate |
+| `d9-ichmw2-candidate-bundle.json` | The unsigned ICHmw2 Arrow/Cascadia candidate bundle |

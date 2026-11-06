@@ -2,7 +2,7 @@ bec,zone,intervals,sites,median_mortality_fraction,high_disturbance_fraction,exi
 CWHvm1,CWH,1535,506,0.0362944608526411,0.0013029315960912,CWH 4 cm pilot: BA/TPH only; height/volume fail
 CWHxm2,CWH,1244,276,0.0417831067727735,0.0056270096463022,CWH 4 cm pilot: BA/TPH only; height/volume fail
 CWHwh1,CWH,1128,414,0.0468362906647764,0.0088652482269503,CWH 4 cm pilot: BA/TPH only; height/volume fail
-ICHmw2,ICH,978,225,0.0713856108789842,0.0153374233128834,SI screen: low-SI helps; no bundle; Okanagan/Kootenay fail
+ICHmw2,ICH,978,225,0.0713856108789842,0.0153374233128834,candidate: Arrow/Cascadia >=5 intervals; Okanagan/Kootenay excluded
 CWHvh,CWH,744,273,0.0505563097327823,0.0161290322580645,CWH 4 cm pilot: BA/TPH only; height/volume fail
 CWHxm1,CWH,645,129,0.0374317217581494,0.0062015503875968,CWH 4 cm pilot: BA/TPH only; height/volume fail
 CWHdm,CWH,616,162,0.0341141336277652,0.0032467532467532,CWH 4 cm pilot: BA/TPH only; height/volume fail
