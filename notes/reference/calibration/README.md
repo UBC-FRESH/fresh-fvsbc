@@ -266,6 +266,7 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-ichmw2-review.md` | The D9.17 independent-review packet |
 | `d9-ichmw2-holdout.md` | The D9.18 Arrow-to-Cascadia spatial holdout |
 | `d9-ichmw2-holdout-summary.csv` | The D9.18 selection and holdout metrics |
+| `ichmw2-review/README.md` | The D9.19 reviewer-facing dossier |
 | `d9-ichmw2-candidates.json` | The replay candidate for the ICHmw2 bundle |
 | `d9-msdm1-screen.md` | The D9.15 MSdm1 screen and no-bundle decision |
 | `d9-msdm1-screen-summary.csv` | The D9.15 candidate grid |
