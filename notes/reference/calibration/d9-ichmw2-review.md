@@ -45,28 +45,34 @@ Temporal fixed-parameter check:
 | year0 >= 2000 | 28 | +2.0% | -1.95% | +4.6% | -1.8% | -2.8% |
 | year0 >= 2005 | 12 | +2.0% | -13.1% | +6.0% | -1.6% | +0.4% |
 
-## 3. Review questions
+## 3. Spatial holdout
+
+`BAIMULT` selected on Arrow only (66 well-sampled sites) chose **0.75** (63/66 pass). Frozen and
+tested on Cascadia (33 sites): **29/33 pass**, BA **+1.1%**, TPH **−3.1%**. See
+`d9-ichmw2-holdout.md`.
+
+## 4. Review questions
 
 - [ ] Is the ICHmw2 / Arrow / Cascadia domain the right claim boundary?
 - [ ] Is `BAIMULT 0.75` inside its bounds and not at a bound?
 - [ ] Is the five-interval evidence limit acceptable, given that the bundle cannot enforce it?
-- [ ] Is the spatial evidence sufficient when both Arrow and Cascadia are in the domain?
+- [x] The Arrow-only selection transfers to Cascadia: 0.75, 29/33 pass.
 - [ ] Is the temporal check strong enough, given that the 2005 test has only 12 intervals?
 - [ ] Are QMD, matched top height, and PSP volume convincing enough to deploy?
 - [ ] Should Okanagan and Kootenay Lake remain excluded?
 - [ ] Should the claim say "candidate," not "calibration" or "certificate"?
 - [ ] Is a third-TSA or independent PSP cohort required before use?
 
-## 4. Known limits
+## 5. Known limits
 
 - The candidate was selected on all well-sampled sites; it is not a pre-registered nested result.
-- Arrow and Cascadia are both in the domain; there is no third-TSA holdout.
+- Arrow selects 0.75 and Cascadia is a true spatial holdout, but there is no third TSA.
 - Okanagan and Kootenay Lake are excluded.
 - The bundle does not enforce the >=5-interval evidence limit.
 - Non-PSP volume is not used because the volume standards differ.
 - The review is unsigned; no certificate.
 
-## 5. Sign-off
+## 6. Sign-off
 
 | Field | Value |
 | --- | --- |

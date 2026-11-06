@@ -264,6 +264,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-ichmw2-validation.md` | The D9.14 QMD/height/volume validation |
 | `d9-ichmw2-validation-summary.csv` | The D9.14 holdout metrics |
 | `d9-ichmw2-review.md` | The D9.17 independent-review packet |
+| `d9-ichmw2-holdout.md` | The D9.18 Arrow-to-Cascadia spatial holdout |
+| `d9-ichmw2-holdout-summary.csv` | The D9.18 selection and holdout metrics |
 | `d9-ichmw2-candidates.json` | The replay candidate for the ICHmw2 bundle |
 | `d9-msdm1-screen.md` | The D9.15 MSdm1 screen and no-bundle decision |
 | `d9-msdm1-screen-summary.csv` | The D9.15 candidate grid |
