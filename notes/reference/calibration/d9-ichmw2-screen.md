@@ -1,6 +1,6 @@
 # D9.11 ICHmw2 screen: average improves, site distribution does not
 
-Status: **no bundle; validation-only**
+Status: **no global bundle; superseded for well-sampled Arrow/Cascadia by D9.13**
 Date: 2026-11-05
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
 Data: ICHmw2, 4 cm PSP reference, 978 intervals / 225 sites

@@ -27,6 +27,12 @@
       "path": "notes/reference/calibration/d7-cwh-4cm-bundle.json",
       "sha256": "sha256:a61dd73cab986dd48276a19925a65e470e9549e5bf76c054c0c1ea0ad19bc399",
       "bytes": 6487
+    },
+    {
+      "domain": "ICHmw2-Arrow-Cascadia",
+      "path": "notes/reference/calibration/d9-ichmw2-candidate-bundle.json",
+      "sha256": "sha256:45a5a8accf18a65de6991e5a7dc77a4f50b042be3ece7ce830f2cc5af5c5b64d",
+      "bytes": 3955
     }
   ],
   "required_checks": [

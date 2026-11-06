@@ -135,7 +135,7 @@ def test_the_review_manifest_matches_its_bundles_and_is_unsigned() -> None:
     assert manifest["signed_off"] is False
     assert manifest["reviewer"] is None
     assert manifest["decision"] == "pending"
-    assert len(manifest["bundles"]) == 4
+    assert len(manifest["bundles"]) == 5
     for item in manifest["bundles"]:
         data = Path(item["path"]).read_bytes()
         assert item["sha256"] == "sha256:" + hashlib.sha256(data).hexdigest()
@@ -155,6 +155,29 @@ def test_the_cwh_4cm_bundle_loads_and_renders_regdmul() -> None:
     }
     assert len(bundle.render()) == 21
     assert any("not signed off" in warning for warning in bundle.warnings)
+
+
+def test_the_ichmw2_candidate_is_tsa_and_dbh_scoped() -> None:
+    """The ICHmw2 candidate covers only Arrow/Cascadia and 4 cm trees."""
+    bundle = load_bundle("notes/reference/calibration/d9-ichmw2-candidate-bundle.json")
+    assert bundle.domain.becs == ("ICHmw2",)
+    assert bundle.domain.tsas == ("Arrow TSA", "Cascadia TSA")
+    assert bundle.domain.dbh_classes == ((4.0, 999.0),)
+    bundle.check_domain(
+        BecCode.parse("KAM ICHmw2/01"), (), "untreated", dbh_values=(4.0, 20.0), tsa="Arrow TSA"
+    )
+    with pytest.raises(BundleDomainError, match="TSAs"):
+        bundle.check_domain(
+            BecCode.parse("KAM ICHmw2/01"), (), "untreated", dbh_values=(20.0,), tsa="Okanagan TSA"
+        )
+    with pytest.raises(BundleDomainError, match="DBH"):
+        bundle.check_domain(
+            BecCode.parse("KAM ICHmw2/01"),
+            (),
+            "untreated",
+            dbh_values=(3.9, 20.0),
+            tsa="Cascadia TSA",
+        )
 
 
 def test_the_cwh_4cm_bundle_enforces_its_dbh_domain() -> None:
