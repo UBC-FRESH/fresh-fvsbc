@@ -261,3 +261,5 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-ichmw2-si-summary.csv` | The D9.12 per-class candidate metrics |
 | `d9-ichmw2-candidate.md` | The D9.13 well-sampled ICHmw2 candidate |
 | `d9-ichmw2-candidate-bundle.json` | The unsigned ICHmw2 Arrow/Cascadia candidate bundle |
+| `d9-ichmw2-validation.md` | The D9.14 QMD/height/volume validation |
+| `d9-ichmw2-validation-summary.csv` | The D9.14 holdout metrics |
