@@ -1,6 +1,6 @@
 {
   "bundle_id": "ichmw2-arrow-cascadia-2026-11-06",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "pins": {
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
@@ -197,5 +197,5 @@
     "date": "2026-11-06",
     "signed_off": false
   },
-  "claim": "Unsigned candidate for ICHmw2 in Arrow and Cascadia TSA, DBH >=4 cm, well-sampled sites (>=5 intervals): BAIMULT 0.75. 91/99 sites inside BA +/-10% and TPH +/-15%; BA -0.23%, TPH -3.44%; temporal >=2000 BA +2.0%/TPH -2.0%. Okanagan, Kootenay Lake, and sites below 5 intervals are outside the claim. Not a certificate."
+  "claim": "Unsigned candidate for ICHmw2 in Arrow and Cascadia TSA, DBH >=4 cm, well-sampled sites (>=5 intervals): BAIMULT 0.75. BA -0.23%, TPH -3.44%, QMD +2.3%, matched top height -0.6%, PSP volume -7.5%; 91/99 sites pass BA/TPH. Temporal >=2000 BA +2.0%/TPH -2.0%/volume -2.8%. Okanagan, Kootenay Lake, and sites below 5 intervals are outside the claim. Not a certificate."
 }

@@ -1,6 +1,6 @@
 # D9.13 ICHmw2 Arrow/Cascadia well-sampled candidate
 
-Status: **unsigned candidate; well-sampled sites only**
+Status: **unsigned candidate; BA/TPH/QMD/height/volume pass on well-sampled PSP sites**
 Date: 2026-11-06
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
 Bundle: `d9-ichmw2-candidate-bundle.json`
@@ -61,10 +61,15 @@ The 2005 sample is small but remains inside the TPH band.
   pre-registered nested selection.
 - The bundle does not enforce >=5 intervals.
 - Okanagan/Kootenay are excluded because they lack sufficient well-sampled sites.
-- Only BA/TPH are validated; QMD, height, and volume are not.
+- D9.14 validates QMD, matched top height, and PSP merchantable volume; all are inside ±10%.
 - The candidate is not a production or yield claim.
 
-## 6. Claim boundary
+## 6. Validation
+
+D9.14: QMD +2.3%, matched top height -0.6%, volume -7.5%; temporal >=2000 volume -2.8%. See
+`d9-ichmw2-validation.md`.
+
+## 7. Claim boundary
 
 This is an unsigned candidate for well-sampled ICHmw2 Arrow/Cascadia stands. It does not support a
 yield, AAC, legal, or whole-block claim, and it is not a certificate.

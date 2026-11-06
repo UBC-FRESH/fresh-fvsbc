@@ -31,8 +31,8 @@
     {
       "domain": "ICHmw2-Arrow-Cascadia",
       "path": "notes/reference/calibration/d9-ichmw2-candidate-bundle.json",
-      "sha256": "sha256:45a5a8accf18a65de6991e5a7dc77a4f50b042be3ece7ce830f2cc5af5c5b64d",
-      "bytes": 3955
+      "sha256": "sha256:0d2d92290c6b0ea74b06aafa4f107a350dc863632b12f5c8c2706d30820a572c",
+      "bytes": 4003
     }
   ],
   "required_checks": [
