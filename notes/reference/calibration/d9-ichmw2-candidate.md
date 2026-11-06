@@ -69,7 +69,12 @@ The 2005 sample is small but remains inside the TPH band.
 D9.14: QMD +2.3%, matched top height -0.6%, volume -7.5%; temporal >=2000 volume -2.8%. See
 `d9-ichmw2-validation.md`.
 
-## 7. Claim boundary
+## 7. Spatial holdout
+
+Arrow-only selection chooses 0.75 and transfers to Cascadia: 29/33 sites, BA +1.1%, TPH -3.1%.
+See `d9-ichmw2-holdout.md`.
+
+## 8. Claim boundary
 
 This is an unsigned candidate for well-sampled ICHmw2 Arrow/Cascadia stands. It does not support a
 yield, AAC, legal, or whole-block claim, and it is not a certificate.
