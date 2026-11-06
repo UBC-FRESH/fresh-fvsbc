@@ -265,3 +265,5 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-ichmw2-validation-summary.csv` | The D9.14 holdout metrics |
 | `d9-msdm1-screen.md` | The D9.15 MSdm1 screen and no-bundle decision |
 | `d9-msdm1-screen-summary.csv` | The D9.15 candidate grid |
+| `d9-sbsmw-screen.md` | The D9.16 SBSmw screen and stop decision |
+| `d9-sbsmw-screen-summary.csv` | The D9.16 candidate grid |
