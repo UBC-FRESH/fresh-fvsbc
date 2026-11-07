@@ -102,7 +102,7 @@ The event tables
      - an ``ATRTLIST`` keyword **and a removal** — it is the after-treatment listing
    * - ``FVS_Regen_Tally_Metric``, ``FVS_Regen_SitePrep``
      - ``REGREPTS``
-     - an ``ESTAB`` block with a ``PLANT`` or ``NATURAL`` line **carrying stems per acre**; a line
+     - an ``ESTAB`` block with a ``PLANT`` or ``NATURAL`` line **carrying trees per hectare**; a line
        with zero is refused and takes the whole keyword set with it
 
 The blocks

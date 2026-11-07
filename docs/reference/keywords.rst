@@ -160,7 +160,7 @@ Some keywords are the exception, because they read records of their own rather t
   are keywords now: ``MISTPINF        0        1       0.5`` reaches ``MISIN`` as species ``PW`` and
   proportion ``0.50``, neither of which was written.
 
-  ``ESTAB``'s ``NATURAL`` and ``PLANT`` lines still need **stems per acre**: ``esin.f`` refuses the line —
+  ``ESTAB``'s ``NATURAL`` and ``PLANT`` lines still need **trees per hectare**: ``esin.f`` refuses the line —
   and the whole set with it — when that field is zero. ``RDIN`` needs ``RRINIT`` (or ``RRTREIN``) or it
   refuses the whole set at its ``END`` with "NEITHER TREELIST OR MANUAL INITIALIZATION SPECIFIED", and
   ``RRDOUT`` adds the detail table. The dwarf-mistletoe tables need an **infection** as well as the

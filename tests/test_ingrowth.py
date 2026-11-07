@@ -40,11 +40,18 @@ def test_model_selects_the_density_row() -> None:
 
 
 def test_estab_keyword_renders_one_cycle() -> None:
-    """The block carries the rate as TPA for the selected interval."""
+    """The block carries the rate as trees per hectare for the selected interval."""
     keyword = _model().estab_keyword(bec="IDFdk3", years=10.0, ba=20.0, qmd=10.0)
     assert keyword is not None
     assert keyword.name == "ESTAB"
-    assert keyword.nested[0].parameters == ("1", "FD", "229.1", "100.0")
+    assert keyword.nested[0].parameters == ("1", "FD", "566.0", "100.0")
+
+
+def test_estab_keyword_uses_trees_per_hectare() -> None:
+    """The BC metric reader expects TPH, not TPA."""
+    keyword = _model().estab_keyword(bec="IDFdk3", years=10.0, ba=20.0, qmd=10.0)
+    assert keyword is not None
+    assert keyword.nested[0].parameters[2] == "566.0"
 
 
 def test_estab_keyword_renders_periodic_cycles() -> None:

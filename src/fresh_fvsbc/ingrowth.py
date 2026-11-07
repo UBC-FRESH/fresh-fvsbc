@@ -6,8 +6,8 @@ range; that is how the density/age refinement is expressed without a new model
 class. The rows are data, not code, and the bundle can carry them.
 
 FVS reads natural regeneration through an ``ESTAB`` block and a ``NATURAL``
-line. The line's stems field is trees per acre, so the rate is multiplied by the
-interval length and by 0.404686. ``NATURAL`` also implies ``NOINGROW`` and
+line. In the BC metric build the stems field is trees per hectare, so the rate is
+multiplied only by the interval length. ``NATURAL`` also implies ``NOINGROW`` and
 ``NOAUTALY``; it replaces the automatic establishment for that stand, which is
 the intended behaviour here.
 """
@@ -23,9 +23,6 @@ import pandas as pd
 from fresh_fvsbc.keywords import Keyword
 
 __all__ = ["IngrowthModel", "IngrowthRate"]
-
-#: 1 tree per hectare is this many trees per acre.
-TPH_TO_TPA: float = 0.404686
 
 
 class IngrowthError(ValueError):
@@ -275,11 +272,10 @@ class IngrowthModel:
             cycle_number = cycle + offset
             for species, rate in selected.items():
                 tph = rate * length * self.scale
-                tpa = tph * TPH_TO_TPA
-                if tpa < 0.05:
+                if tph < 0.05:
                     continue
                 lines.append(
-                    Keyword("NATURAL", (str(cycle_number), species, f"{tpa:.1f}", "100.0"))
+                    Keyword("NATURAL", (str(cycle_number), species, f"{tph:.1f}", "100.0"))
                 )
         if not lines:
             return None
