@@ -260,6 +260,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-ingrowth-unit-impact.md` | The D9.26 re-run under corrected NATURAL units |
 | `d9-idfdk-refit.md` | The D9.27 IDFdk recruitment re-fit after the unit fix |
 | `d9-idfdk-refit-summary.csv` | The D9.27 re-fit results |
+| `d9-bcingr-prototype.md` | The D9.28 BCINGR hurdle prototype and TSA-transfer failure |
+| `bcingr_prototype.py` | The D9.28 prototype code |
+| `d9-bcingr-prototype-summary.csv` | The D9.28 train/test metrics |
 | `fvs-mortality-lore.md` | D9.25 annotated FVS mortality/ingress literature review |
 | `fvs-mortality-code.md` | D9.25 FVS-BC mortality/ingress source map and pseudocode |
 | `fvs-mortality-ingress-upgrades.md` | D9.25 cross-model design and core-function upgrades |
