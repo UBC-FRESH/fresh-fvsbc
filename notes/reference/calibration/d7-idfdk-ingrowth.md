@@ -1,6 +1,8 @@
+> **D9.24 correction:** the old TPH result used a pre-conversion that delivered 2.471x too few NATURAL trees. Corrected: test BA -5.6%/TPH +8.6%; train TPH +37.4%. See `d9-ingrowth-unit-impact.md`.
+
 # D7.4 IDFdk ingrowth pilot — the TPH fix
 
-Status: **pilot candidate passes the spatial holdout**; D7.6 adds the bundle, two more holdouts, periodic establishment, cross-domain screening, and a binned model. See `d7-consolidation.md`. No release certificate yet.
+Status: **pilot only; corrected unit passes the spatial test but overshoots training**; not a clean bundle
 Date: 2026-11-03
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.3`
 Data: public FAIB PSP tree detail and the all-zone interval table

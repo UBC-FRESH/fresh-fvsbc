@@ -1,6 +1,8 @@
+> **D9.24 correction:** the old candidate used a pre-conversion that delivered 2.471x too few NATURAL trees. The corrected run fails. See `d9-ingrowth-unit-impact.md`.
+
 # D7.8 100 Mile-specific ingrowth candidate
 
-Status: **candidate passes the site-grouped LOSO**; temporal holdout D7.9 failed/unavailable; not a bundle or certificate
+Status: **retracted by the D9.24 unit fix**; corrected run BA +13.0%/TPH +10.5%, 0/6 sites; not a bundle
 Date: 2026-11-03
 Issue: #362
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.3`

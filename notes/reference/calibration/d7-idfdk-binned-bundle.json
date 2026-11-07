@@ -1,6 +1,6 @@
 {
   "bundle_id": "idfdk-ingrowth-binned-2026-11-03",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "pins": {
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
@@ -1106,5 +1106,5 @@
     "date": "2026-11-03",
     "signed_off": false
   },
-  "claim": "IDFdk pilot: binned public-data BEC x species recruitment through ESTAB; one spatial holdout; not a certificate."
+  "claim": "IDFdk binned pilot: public-data BEC x species recruitment through ESTAB; evidence predates the D9.24 unit fix and is stale; pilot only, not a certificate."
 }
