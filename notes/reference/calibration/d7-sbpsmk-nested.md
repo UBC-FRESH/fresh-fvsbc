@@ -1,6 +1,6 @@
 # D7.22 nested selection for the mature SBPSmk candidate
 
-Status: **nested selection fails the every-site criterion**; no claim upgrade
+Status: **corrected units: 31/38 sites pass; every-site criterion still fails**
 Date: 2026-11-04
 Issue: #413
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
@@ -28,19 +28,20 @@ BAMAX 80 and BAIMULT 1.25 were selected in all five folds; QMD was 15 in two fol
 
 | Fold | Held-out sites | Test intervals | BA | TPH | Sites pass |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| 0 | 8 | 16 | -4.14% | -17.81% | 5 / 8 |
-| 1 | 3 | 5 | -5.78% | -0.03% | 3 / 3 |
-| 2 | 6 | 16 | -5.43% | -7.45% | 6 / 6 |
-| 3 | 6 | 18 | -4.81% | -1.50% | 6 / 6 |
-| 4 | 5 | 6 | -4.50% | -2.18% | 5 / 5 |
-| **Overall** | **28** | **61** | **-4.84%** | **-7.92%** | **25 / 28** |
+| 0 | 8 | 16 | -3.41% | -13.62% | 5 / 8 |
+| 1 | 8 | 14 | +0.25% | +1.80% | 6 / 8 |
+| 2 | 8 | 22 | -2.14% | +4.23% | 8 / 8 |
+| 3 | 6 | 18 | -3.39% | +5.34% | 6 / 6 |
+| 4 | 8 | 16 | -0.73% | +5.28% | 6 / 8 |
+| **Overall** | **38** | **86** | **-1.99%** | **+0.61%** | **31 / 38** |
 
-Worst held-out site: BA 25.1%, TPH 63.4%, both in fold 0. Three sites fail; one fails badly.
+Worst held-out site: BA 25.1%, TPH 61.6%, both in fold 0. Seven sites fail.
 
 ## 3. Decision
 
-The nested selection **fails the every-site criterion**. The pooled result is acceptable, but the
-candidate cannot be upgraded. The fixed-parameter 25/25 LOSO in D7.19 was selected on all sites and
+The corrected-unit nested selection **still fails the every-site criterion** (31/38). The pooled
+result is acceptable, but the candidate cannot be upgraded. The fixed-parameter LOSO/temporal checks
+pass; the selection procedure does not. The fixed-parameter 25/25 LOSO in D7.19 was selected on all sites and
 does not establish that the selection procedure transfers.
 
 The candidate remains:

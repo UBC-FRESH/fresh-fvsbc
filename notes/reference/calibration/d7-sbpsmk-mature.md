@@ -2,7 +2,7 @@
 
 # D7.19 SBPSmk/Quesnel mature closed-canopy candidate
 
-Status: **post-hoc candidate; unit-corrected in-sample passes; nested/temporal rerun pending**
+Status: **post-hoc candidate; corrected units pass fixed-parameter LOSO/temporal, nested selection still fails 7/38**
 Date: 2026-11-04
 Issue: #393
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
@@ -68,7 +68,13 @@ domain are fixed from all data, so this validates the ingrowth refit, not those 
 The pooled and every-site checks pass for the fixed parameter set. They are not an independent
 validation of that set.
 
-## 5. Nested selection (D7.22)
+## 5. Nested selection (D7.22, corrected units)
+
+The corrected-unit nested selection chooses BAMAX80/BAIMULT1.25/QMD15 in four folds and
+BAMAX75/QMD15 in one. Held-out: BA -2.0%, TPH +0.6%, **31/38 sites pass**; worst site BA 25.1% /
+TPH 61.6%. The every-site criterion still fails. The fixed-parameter candidate is not upgraded.
+
+## 6. Nested selection (old units, historical)
 
 Five site-grouped folds; BAMAX/BAIMULT/QMD selected on training sites only, BA fixed at 20. The
 procedure selected BAMAX 80 / BAIMULT 1.25 in all folds; held-out sites gave BA -4.84%, TPH -7.92%,
@@ -127,6 +133,8 @@ the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
 ## 9. Limits
 
 - The domain and parameters are post-hoc; only ingrowth was held out.
+- Corrected units give fixed-parameter LOSO BA -4.17%/TPH -0.77%, 25/25 sites; temporal test BA -2.73%/TPH +4.83%.
+- Corrected nested selection still fails 7/38 held-out sites.
 - Nested parameter/domain selection fails the every-site criterion (25/28 sites).
 - The external Williams Lake / 100 Mile screen fails BA (+11.03% pooled); the candidate is
   Quesnel-only.
