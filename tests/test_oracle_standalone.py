@@ -163,7 +163,7 @@ def _root_disease_case() -> tuple[list[TreeListFields], tuple[Keyword, ...]]:
 
 
 def _regeneration_case() -> tuple[list[TreeListFields], tuple[Keyword, ...]]:
-    """Regeneration: the ``PLANT`` line needs stems per acre, or ``esin.f`` refuses the set."""
+    """Regeneration: the ``PLANT`` line needs trees per hectare, or ``esin.f`` refuses the set."""
     records = to_tree_list(
         synthetic_population(stands=STANDS, trees_per_stand=TREES), species="FD", tree_age=21
     )

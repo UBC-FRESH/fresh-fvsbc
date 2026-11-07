@@ -584,7 +584,7 @@ class Keyword:
 #: The residual-density units a ``THINQFA`` supplemental record may name, and what each means.
 THINQFA_UNITS: dict[str, str] = {
     "0": "basal area per acre",
-    "1": "trees per acre",
+    "1": "trees per hectare (BC metric build)",
     "2": "stand density index",
 }
 

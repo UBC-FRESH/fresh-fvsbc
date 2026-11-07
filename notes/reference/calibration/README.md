@@ -257,6 +257,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-idfdk-screen-summary.csv` | The D9.21 IDFdk2 candidate grid |
 | `d9-structural-diagnostic.md` | The D9.23 MSdm1/SBSmw structural diagnostic |
 | `d9-structural-diagnostic.csv` | The D9.23 initial/end and combination metrics |
+| `fvs-mortality-lore.md` | D9.25 annotated FVS mortality/ingress literature review |
+| `fvs-mortality-code.md` | D9.25 FVS-BC mortality/ingress source map and pseudocode |
+| `fvs-mortality-ingress-upgrades.md` | D9.25 cross-model design and core-function upgrades |
 | `d9-cwh-4cm-validation-summary.csv` | The D9.8 holdout metrics |
 | `d9-bec-coverage.md` | The D9.9 BEC coverage and status matrix |
 | `d9-bec-coverage.csv` | The D9.9 per-BEC counts and status |

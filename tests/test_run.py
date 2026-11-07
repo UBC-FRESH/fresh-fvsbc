@@ -1043,12 +1043,12 @@ def test_rrinit_and_rrdout_write_the_root_disease_tables(tmp_path: Path) -> None
 
 
 def test_an_estab_block_writes_the_regeneration_tables(tmp_path: Path) -> None:
-    """``ESTAB`` is a block, and its ``NATURAL`` line needs the stems per acre or FVS refuses it.
+    """``ESTAB`` is a block, and its ``NATURAL`` line needs the trees per hectare or FVS refuses it.
 
     ``esin.f`` reads the block's sub-keywords; ``NATURAL`` jumps to the shared handler, which
-    reports error 4 unless ``ARRAY(3)`` — the stems per acre — is above zero. A line carrying only
-    the species is refused, and the whole set with it. With the count, the tally and the
-    site-preparation tables are written.
+    reports error 4 unless ``ARRAY(3)`` — trees per hectare — is above zero. A line
+    carrying only the species is refused, and the whole set with it. With the count, the tally and
+    the site-preparation tables are written.
     """
     pytest.importorskip(
         "pyfvs", reason="the BC extension is not built in this environment; ADR 0004 is the recipe"

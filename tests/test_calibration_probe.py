@@ -279,15 +279,15 @@ def test_probe_main_refuses_missing_data_and_empty_tree_rows(
 
 
 def test_ingrowth_keyword_builds_natural_regeneration() -> None:
-    """A BEC rate becomes one NATURAL line per species, in TPA."""
+    """A BEC rate becomes one NATURAL line per species, in trees per hectare."""
     keyword = ingrowth_keyword(
         bec="IDFdk3", years=10.0, rates={"IDFdk3": {"FD": 56.6, "PL": 5.1}}, scale=1.0
     )
     assert keyword is not None
     assert keyword.name == "ESTAB"
     assert [line.name for line in keyword.nested] == ["NATURAL", "NATURAL"]
-    assert keyword.nested[0].parameters == ("1", "FD", "229.1", "100.0")
-    assert keyword.nested[1].parameters == ("1", "PL", "20.6", "100.0")
+    assert keyword.nested[0].parameters == ("1", "FD", "566.0", "100.0")
+    assert keyword.nested[1].parameters == ("1", "PL", "51.0", "100.0")
 
 
 def test_ingrowth_keyword_returns_none_without_a_rate() -> None:
