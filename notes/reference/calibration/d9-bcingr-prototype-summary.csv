@@ -1,0 +1,3 @@
+split,intervals,observed_mean_tph_per_year,predicted_mean_tph_per_year,observed_zero_fraction,predicted_zero_threshold_fraction,rmse,corr
+train,712,69.25,77.29,0.1278,0.0,135.62,0.353
+test,203,88.53,76.24,0.0640,0.0,177.79,0.088
