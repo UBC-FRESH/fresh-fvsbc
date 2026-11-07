@@ -1,0 +1,5 @@
+bec,train_tsa,test_tsa,train_auc,test_auc,test_log_loss,base_log_loss,test_brier,base_brier,test_mean_pred,test_event_rate
+MSdm1,Okanagan TSA,Boundary TSA,0.705,0.721,0.411,0.417,0.1295,0.1268,0.212,0.155
+MSdm1,Boundary TSA,Okanagan TSA,0.776,0.694,0.411,0.442,0.1256,0.1346,0.179,0.160
+SBSmw,Quesnel TSA,Prince George TSA,0.774,0.745,0.390,0.444,0.1216,0.1360,0.155,0.163
+SBSmw,Prince George TSA,Quesnel TSA,0.830,0.710,0.472,0.468,0.1405,0.1476,0.142,0.187
