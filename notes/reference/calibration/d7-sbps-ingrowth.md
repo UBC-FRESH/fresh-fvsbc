@@ -1,3 +1,5 @@
+> **D9.24 correction:** the 100 Mile candidate is retracted; corrected run BA +13.0%/TPH +10.5%, 0/6 sites. See `d9-ingrowth-unit-impact.md`.
+
 # D7.5 SBPS ingrowth on a TSA holdout
 
 Status: **no SBPS candidate survives the TSA holdout**; the D7.3 candidate is retracted as a bundle

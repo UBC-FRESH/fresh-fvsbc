@@ -1,6 +1,8 @@
+> **D9.24 correction:** corrected NATURAL units give in-sample BA -4.2%/TPH -0.8%, 25/25 sites. The old nested/temporal evidence predates the unit fix and must be re-run. See `d9-ingrowth-unit-impact.md`.
+
 # D7.19 SBPSmk/Quesnel mature closed-canopy candidate
 
-Status: **post-hoc candidate; nested selection and external screen fail**
+Status: **post-hoc candidate; unit-corrected in-sample passes; nested/temporal rerun pending**
 Date: 2026-11-04
 Issue: #393
 Build: `fresh-fvsbc-pyfvs 0.4.1`, `fresh-fvsbc 0.21.4`
