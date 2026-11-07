@@ -20,7 +20,8 @@ merchantable volume using the existing FVS runs.
 | Matched top height | -0.61% | 0.86 m |
 | Merchantable volume | -7.54% | 46.1 m3/ha |
 
-All PSP metrics are inside ±10%.
+All PSP metrics are inside ±10%. Volume is robust to the FVS column: `MCuM` −7.5% and
+`TCuM` +9.9%, both inside ±10%. See `d9-volume-metric-audit.md`.
 
 Temporal test:
 

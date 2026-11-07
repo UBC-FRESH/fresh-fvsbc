@@ -8,9 +8,10 @@
 | TPH | -3.44% | 216 TPH |
 | QMD | +2.33% | 1.23 cm |
 | Matched top height | -0.61% | 0.86 m |
-| Merchantable volume | -7.54% | 46.1 m3/ha |
+| Merchantable volume (`MCuM`) | -7.54% | 46.1 m3/ha |
 
-91/99 sites pass BA +/-10% and TPH +/-15%.
+91/99 sites pass BA +/-10% and TPH +/-15%. Volume is robust to the FVS column: `MCuM` -7.5%,
+`TCuM` +9.9%.
 
 ## Temporal checks
 

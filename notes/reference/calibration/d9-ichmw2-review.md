@@ -34,7 +34,7 @@ runtime check.
 | TPH | -3.44% | 216 TPH | ±15% |
 | QMD | +2.33% | 1.23 cm | ±10% |
 | Matched top height | -0.61% | 0.86 m | ±10% |
-| Merchantable volume | -7.54% | 46.1 m3/ha | ±10% |
+| Merchantable volume (`MCuM`; `TCuM` +9.9%) | -7.54% | 46.1 m3/ha | ±10% |
 
 Site pass: **91 / 99** for BA ±10% and TPH ±15%.
 
