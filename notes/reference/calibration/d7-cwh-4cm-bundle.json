@@ -1,6 +1,6 @@
 {
   "bundle_id": "cwh-growth-4cm-pilot-2026-11-04",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "pins": {
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
@@ -359,5 +359,5 @@
     "date": "2026-11-04",
     "signed_off": false
   },
-  "claim": "CWH 4 cm pilot: BAIMULT 7, MORTMULT 0.3, REGDMULT 2; three spatial and temporal PSP holdouts plus non-PSP external; high growth multiplier; BA/TPH and matched top height pass; PSP volume is close, non-PSP external volume is unresolved; unsigned pilot, not a certificate. The bundle enforces DBH >=4 cm."
+  "claim": "CWH 4 cm pilot: BAIMULT 7, MORTMULT 0.3, REGDMULT 2; BA/TPH/QMD/matched top height pass; PSP volume is -7.5% with MCuM, but external volume is -18.7% with MCuM and -0.1% with TCuM, so the volume column is unresolved. The bundle enforces DBH >=4 cm and remains an unsigned pilot, not a certificate."
 }
