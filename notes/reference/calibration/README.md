@@ -253,6 +253,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-cwh-4cm-validation.md` | The D9.8 QMD/height/volume validation of the CWH 4 cm pilot |
 | `d9-cwh-topheight-correction.md` | The D9.10 correction: FVS `TopHt` is not `max(HEIGHT)` |
 | `d9-volume-metric-audit.md` | The D9.20 FVS volume-column audit |
+| `d9-idfdk-screen.md` | The D9.21 IDFdk2/3 remeasurement-depth screen |
+| `d9-idfdk-screen-summary.csv` | The D9.21 IDFdk2 candidate grid |
 | `d9-cwh-4cm-validation-summary.csv` | The D9.8 holdout metrics |
 | `d9-bec-coverage.md` | The D9.9 BEC coverage and status matrix |
 | `d9-bec-coverage.csv` | The D9.9 per-BEC counts and status |
