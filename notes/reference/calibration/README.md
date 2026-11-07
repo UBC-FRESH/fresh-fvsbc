@@ -255,6 +255,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-volume-metric-audit.md` | The D9.20 FVS volume-column audit |
 | `d9-idfdk-screen.md` | The D9.21 IDFdk2/3 remeasurement-depth screen |
 | `d9-idfdk-screen-summary.csv` | The D9.21 IDFdk2 candidate grid |
+| `d9-structural-diagnostic.md` | The D9.23 MSdm1/SBSmw structural diagnostic |
+| `d9-structural-diagnostic.csv` | The D9.23 initial/end and combination metrics |
 | `d9-cwh-4cm-validation-summary.csv` | The D9.8 holdout metrics |
 | `d9-bec-coverage.md` | The D9.9 BEC coverage and status matrix |
 | `d9-bec-coverage.csv` | The D9.9 per-BEC counts and status |

@@ -1,0 +1,13 @@
+bec,scenario,ba_percent,tph_percent,sites_pass,sites_total,worst_ba_percent
+MSdm1,initial_ba0,-2.98,,,,
+MSdm1,initial_tph0,,-1.36,,,
+MSdm1,initial_qmd0,-0.05,,,,
+MSdm1,final_baseline,-27.06,-25.41,,,
+MSdm1,bai4_mort0.5,0.07,-4.85,77,125,27.6
+MSdm1,bai6_mort0.5,7.68,-3.21,50,125,33.2
+SBSmw,initial_ba0,-1.64,,,,
+SBSmw,initial_tph0,,-0.08,,,
+SBSmw,initial_qmd0,-0.01,,,,
+SBSmw,final_baseline,-12.19,-6.37,,,
+SBSmw,bai2_mort0.3,3.46,-2.44,66,109,237.0
+SBSmw,bai2_mort0.5,1.17,-4.77,63,109,213.0
