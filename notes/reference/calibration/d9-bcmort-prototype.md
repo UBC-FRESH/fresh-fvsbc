@@ -89,7 +89,15 @@ directions; it is the strongest tree-level covariate tested. Coverage is 56.4%. 
 intercept still leaves the target mean biased. See `d9-tree-growth.md` and
 `d9-tree-growth-summary.csv`.
 
-## 9. Limits
+## 9. Temporal holdout
+
+Training on intervals ending by 2000 and testing on intervals starting in 2000 or later, growth
+improves AUC/log loss/Brier in both BECs: MSdm1 AUC 0.514 -> 0.617, SBSmw 0.577 -> 0.634. The
+post-2000 event rate is much higher than the model predicts (MSdm1 0.216 vs 0.162; SBSmw 0.358 vs
+0.176), so temporal calibration is still required. See `d9-bcmort-temporal.md` and
+`d9-bcmort-temporal-summary.csv`.
+
+## 10. Limits
 
 - Poisson hazard, not the final cloglog binomial; no exact interval censoring beyond exposure.
 - Tree-level `dead` is a binary outcome, not a known death time.
@@ -97,6 +105,6 @@ intercept still leaves the target mean biased. See `d9-tree-growth.md` and
 - No climate, site index, crown ratio, or recent growth yet.
 - This is a model prototype, not an FVS core change or a bundle.
 
-## 10. Claim boundary
+## 11. Claim boundary
 
 This is a diagnostic prototype. It does not support a yield, AAC, legal, or whole-block claim.
