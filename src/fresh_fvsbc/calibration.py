@@ -8,7 +8,8 @@ turns the public FAIB permanent-sample-plot files into:
 - one row per consecutive visit pair, with the interval's dead basal area and
   trees per hectare;
 - one row per live tree at the start of an interval, with its end status
-  (``live``, ``dead``, or ``missing``);
+  (``live``, ``dead``, or ``missing``), prior live diameter and year, and
+  per-year growth from the previous live measurement;
 - province-wide BEC coverage and basal-area envelope tables.
 
 The tree-level tables carry site identifiers, so they stay in the caller's
@@ -400,6 +401,7 @@ def _intervals(visits: pd.DataFrame, trees: pd.DataFrame) -> tuple[pd.DataFrame,
                 "visit1",
                 "interval_id",
                 "years",
+                "year0",
                 "ba0",
                 "tph0",
                 "BEC",
@@ -418,6 +420,32 @@ def _intervals(visits: pd.DataFrame, trees: pd.DataFrame) -> tuple[pd.DataFrame,
         on=["SITE_IDENTIFIER", "PLOT", "visit1", "TREE_NO"],
         how="left",
     )
+    # Prior live diameter for each tree, from its previous measured visit.
+    history = trees.loc[
+        trees["LV_D"] == "L",
+        ["SITE_IDENTIFIER", "PLOT", "VISIT_NUMBER", "TREE_NO", "DBH"],
+    ].sort_values(["SITE_IDENTIFIER", "PLOT", "TREE_NO", "VISIT_NUMBER"])
+    grouped_history = history.groupby(["SITE_IDENTIFIER", "PLOT", "TREE_NO"], sort=False)
+    history["prior_dbh"] = grouped_history["DBH"].shift(1)
+    history["prior_visit"] = grouped_history["VISIT_NUMBER"].shift(1)
+    visit_year = visits[["SITE_IDENTIFIER", "PLOT", "VISIT_NUMBER", "MEAS_YR"]].rename(
+        columns={"VISIT_NUMBER": "prior_visit", "MEAS_YR": "prior_year"}
+    )
+    history = history.merge(
+        visit_year,
+        on=["SITE_IDENTIFIER", "PLOT", "prior_visit"],
+        how="left",
+    )
+    start = start.merge(
+        history[["SITE_IDENTIFIER", "PLOT", "VISIT_NUMBER", "TREE_NO", "prior_dbh", "prior_year"]],
+        left_on=["SITE_IDENTIFIER", "PLOT", "visit0", "TREE_NO"],
+        right_on=["SITE_IDENTIFIER", "PLOT", "VISIT_NUMBER", "TREE_NO"],
+        how="left",
+    )
+    start["growth"] = (start["DBH"] - start["prior_dbh"]) / (
+        start["year0"] - start["prior_year"]
+    ).replace(0.0, np.nan)
+
     start["status"] = np.select(
         [start["end_status"] == "D", start["end_status"] == "L"],
         ["dead", "live"],
@@ -448,8 +476,11 @@ def _intervals(visits: pd.DataFrame, trees: pd.DataFrame) -> tuple[pd.DataFrame,
             "TSA_DESC",
             "CLSTR_ID",
             "PLOT",
+            "TREE_NO",
+            "species",
             "group",
             "DBH",
+            "HEIGHT",
             "phf",
             "ba",
             "years",
@@ -457,6 +488,9 @@ def _intervals(visits: pd.DataFrame, trees: pd.DataFrame) -> tuple[pd.DataFrame,
             "tph0",
             "damage",
             "status",
+            "prior_dbh",
+            "prior_year",
+            "growth",
         ]
     ].rename(columns={"DBH": "dbh", "phf": "phf", "ba": "ba", "years": "years"})
     tree_survival["dead"] = (tree_survival["status"] == "dead").astype(int)

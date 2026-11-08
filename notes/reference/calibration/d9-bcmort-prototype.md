@@ -81,7 +81,15 @@ George remains worse than uncalibrated and the target mean stays biased. See
 `d9-bcmort-growth-calibration.md`, `d9-bcmort-growth-summary.csv`, and
 `d9-bcmort-calibration-curve-summary.csv`.
 
-## 8. Limits
+## 8. Individual-tree growth
+
+The rebuilt tree-survival table carries `TREE_NO`, prior live diameter and year, and per-year growth.
+Adding growth to the crown + height/DBH model improves AUC, log loss, and Brier in all four TSA
+directions; it is the strongest tree-level covariate tested. Coverage is 56.4%. A local target
+intercept still leaves the target mean biased. See `d9-tree-growth.md` and
+`d9-tree-growth-summary.csv`.
+
+## 9. Limits
 
 - Poisson hazard, not the final cloglog binomial; no exact interval censoring beyond exposure.
 - Tree-level `dead` is a binary outcome, not a known death time.
@@ -89,6 +97,6 @@ George remains worse than uncalibrated and the target mean stays biased. See
 - No climate, site index, crown ratio, or recent growth yet.
 - This is a model prototype, not an FVS core change or a bundle.
 
-## 9. Claim boundary
+## 10. Claim boundary
 
 This is a diagnostic prototype. It does not support a yield, AAC, legal, or whole-block claim.
