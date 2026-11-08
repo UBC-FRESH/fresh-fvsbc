@@ -1,0 +1,6 @@
+model,domain,intervals,sites,ba_bias,ba_pct,ba_pct_low,ba_pct_high,ba_mae,ba_within,ba_sites_pass,tph_bias,tph_pct,tph_pct_low,tph_pct_high,tph_mae,tph_within,tph_sites_pass,verdict
+cwh-4cm,CWH,67,61,0.57,1.15,-4.765,8.5,7.102,True,30/61,9.495,0.461,-4.243,6.249,284.217,True,35/61,passes
+sbs-mortmult2,SBSdry,41,34,-3.804,-11.293,-19.776,-3.139,7.218,False,7/34,-146.387,-7.092,-11.992,-1.903,291.99,True,21/34,fails
+sbs-mortmult2,SBSwet,32,26,0.113,0.344,-9.4,15.899,6.579,True,11/26,-285.06,-14.975,-27.536,-2.837,386.318,True,18/26,leans-pass
+bwbs-pilot,BWBS,23,23,0.22,0.618,-7.237,8.797,6.054,True,5/23,186.728,10.591,-1.36,24.506,352.343,True,12/23,leans-pass
+idfdk-bamax53,IDFdk,18,16,0.711,2.558,-5.718,16.417,3.968,True,9/16,9.969,0.65,-9.639,16.038,245.922,True,11/16,leans-pass

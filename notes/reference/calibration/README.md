@@ -70,6 +70,10 @@ outside the repository because they carry site identifiers.
 | `d8-review-packet.md`, `d8-review-manifest.json`, `d8-sbs-second-holdout.csv` | D8.7 review packet for IDFdk/SBS/CWH; SBS Prince George second holdout |
 | `d9-faib-nonpsp-catalogue.md`, `d9-faib-nonpsp-coverage.csv` | D9.1 FAIB non-PSP catalogue: temporary VRI and independent repeat cohort |
 | `d9-faib-nonpsp-external.csv` | D9.2 non-PSP external validation of IDFdk/SBS/CWH/BWBS |
+| `d9-faib-nonpsp-domain-baseline.md`, `d9-faib-nonpsp-domain-baseline.csv` | D9.55 independent non-PSP screen of the identity default across every calibration domain |
+| `d9-faib-nonpsp-domain-candidates.csv` | D9.55 fixed-bundle comparison on the same non-PSP sample |
+| `d9-tiered-domain-status.csv` | D9.55 tiered domain decision surface: pilot, default, needs-work, insufficient |
+| `nonpsp_domain_baseline.py` | D9.55 reproducible domain summariser and site bootstrap |
 | `d9-faib-dbh-standard.md` | D9.3–D9.5 DBH-limit audit, 4+ cm denominator, and CWH 4 cm refit |
 | `d9-cwh-4cm-refit.md`, `d7-cwh-4cm-bundle.json`, `d7-cwh-4cm-summary.csv` | D9.6 CWH 4 cm pilot with REGDMULT |
 | `d7-idfdk-binned-bundle.json` | The density/QMD-binned IDFdk pilot bundle |
