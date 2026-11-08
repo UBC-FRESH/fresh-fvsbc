@@ -704,3 +704,50 @@ svg.chart .chart-caption { fill: var(--ink); font-weight: 600; }
   letter-spacing: 0;
   text-transform: none;
 }
+
+/* ------------------------------------------------------------ provenance */
+.pin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 10px 0 16px;
+}
+.pin-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 9px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.pin-card strong { font-size: 13px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.hash-list { display: grid; gap: 6px; margin: 8px 0 16px; }
+.hash-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+.hash-label { color: var(--muted); font-size: 11px; flex: 0 0 76px; }
+.hash-row code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.hash-copy { font-size: 11px; padding: 2px 6px; }
+.calibration-callout {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  background: var(--panel);
+  padding: 10px 12px;
+  margin: 8px 0 16px;
+}
+.calibration-callout-head { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.calibration-callout p { margin: 5px 0 0; font-size: 12px; line-height: 1.45; }
+.badge-row { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 16px; }
+.raw-record { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; }
+.raw-record summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+.raw-record pre { max-height: 44vh; margin-top: 8px; }
