@@ -9,6 +9,8 @@ const state = {
   runs: [],
   calibrations: [],
   calibration: null,
+  calibrationQuery: "",
+  calibrationReview: "all",
   oracle: null,
   skin: null,
   run: null,
@@ -571,7 +573,8 @@ async function renderCalibration(body) {
       el("div", {},
         el("h2", {}, "Calibration"),
         el("p", { className: "muted" },
-          "Validated bundle metadata, domain boundaries, parameters, and review warnings. A bundle is not a certificate until its review is signed.",
+          "Bundle metadata, domain boundaries, parameters, and review warnings. "
+            + "A bundle is not a certificate until its review is signed.",
         ),
       ),
       el("button", { type: "button", onclick: loadCalibrations }, "Refresh"),
@@ -586,29 +589,101 @@ async function renderCalibration(body) {
     ));
     return;
   }
-  const grid = el("div", { className: "run-grid" });
-  for (const bundle of state.calibrations) {
+
+  const filterInput = el("input", {
+    id: "calibration-filter",
+    type: "search",
+    value: state.calibrationQuery,
+    placeholder: "Filter bundle id, BEC, TSA, or claim…",
+    "aria-label": "Filter calibration bundles",
+  });
+  const reviewSelect = el("select", {
+    "aria-label": "Filter calibration review state",
+    onchange: (event) => {
+      state.calibrationReview = event.target.value;
+      renderPanel();
+    },
+  },
+    el("option", { value: "all", selected: state.calibrationReview === "all" }, "All reviews"),
+    el("option", { value: "signed", selected: state.calibrationReview === "signed" }, "Signed"),
+    el("option", { value: "unsigned", selected: state.calibrationReview === "unsigned" }, "Unsigned"),
+  );
+  body.append(
+    el("form", {
+      className: "table-toolbar calibration-toolbar",
+      onsubmit: (event) => {
+        event.preventDefault();
+        state.calibrationQuery = filterInput.value.trim();
+        renderPanel();
+      },
+    },
+      filterInput,
+      reviewSelect,
+      el("button", { className: "primary", type: "submit" }, "Apply"),
+      state.calibrationQuery || state.calibrationReview !== "all"
+        ? el("button", {
+            type: "button",
+            onclick: () => {
+              state.calibrationQuery = "";
+              state.calibrationReview = "all";
+              renderPanel();
+            },
+          }, "Clear")
+        : null,
+    ),
+  );
+
+  const query = state.calibrationQuery.toLowerCase();
+  const filtered = state.calibrations.filter((bundle) => {
     const signed = Boolean(bundle.review?.signed_off);
-    const domain = bundle.domain || {};
-    const domainBits = [
-      ...(domain.becs || []),
-      ...(domain.tsas || []),
-      ...(domain.regions || []),
-    ].join(", ");
+    if (state.calibrationReview === "signed" && !signed) return false;
+    if (state.calibrationReview === "unsigned" && signed) return false;
+    if (!query) return true;
+    const haystack = [
+      bundle.bundle_id,
+      bundle.claim,
+      bundle.version,
+      bundleDomainSummary(bundle),
+      bundle.ingrowth?.model_id,
+    ].filter(Boolean).join(" ").toLowerCase();
+    return haystack.includes(query);
+  });
+  body.append(el("p", { className: "muted calibration-count" },
+    `${filtered.length} of ${state.calibrations.length} bundles`
+      + (query ? ` matching “${state.calibrationQuery}”` : ""),
+  ));
+  if (!filtered.length) {
+    body.append(el("div", { className: "empty-state" },
+      el("strong", {}, "No matching bundles"),
+      el("p", { className: "muted" }, "Clear the filter or choose a different review state."),
+    ));
+  }
+
+  const grid = el("div", { className: "run-grid" });
+  for (const bundle of filtered) {
+    const signed = Boolean(bundle.review?.signed_off);
+    const warning = bundle.warnings?.[0];
     grid.append(
-      el("article", { className: "run-card calibration-card" },
+      el("article", { className: "run-card calibration-card", title: bundle.path },
         el("div", { className: "run-card-head" },
           el("strong", {}, bundle.bundle_id),
           badge(signed ? "signed" : "unsigned", signed ? "ok" : "warn"),
         ),
-        el("p", { className: "muted" }, `v${bundle.version} · ${bundle.path}`),
+        el("p", { className: "calibration-domain" }, bundleDomainSummary(bundle)),
         el("div", { className: "run-card-meta" },
-          el("span", {}, domainBits || "domain unrestricted"),
+          el("span", {}, `v${bundle.version}`),
           el("span", {}, `${bundle.parameters.length} parameters`),
+          el("span", {}, bundle.ingrowth ? `${bundle.ingrowth.rates} ingrowth rates` : "no ingrowth"),
         ),
         el("p", { className: "claim" }, bundle.claim),
+        warning
+          ? el("p", { className: "calibration-warning", title: bundle.warnings.join(" ") },
+              `Warning: ${warning}${bundle.warnings.length > 1 ? ` (+${bundle.warnings.length - 1} more)` : ""}`,
+            )
+          : null,
         el("div", { className: "run-card-actions" },
           el("button", { type: "button", onclick: () => { state.calibration = bundle; renderPanel(); } }, "Details"),
+          el("button", { class: "primary", type: "button", onclick: () => openNewRun(bundle.bundle_id) }, "Use in new run"),
         ),
       ),
     );
@@ -637,6 +712,7 @@ async function renderCalibration(body) {
     ["Signed", bundle.review?.signed_off ? "yes" : "no"],
     ["Reviewer", bundle.review?.reviewer ?? "—"],
     ["Date", bundle.review?.date ?? "—"],
+    ["Domain", bundleDomainSummary(bundle)],
     ["Pins", Object.entries(bundle.pins || {}).map(([key, value]) => `${key}=${value}`).join(" · ")],
     ["Training split", bundle.training?.split ?? "—"],
     ["Ingrowth", bundle.ingrowth ? `${bundle.ingrowth.model_id} (${bundle.ingrowth.rates} rates)` : "none"],
