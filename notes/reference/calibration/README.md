@@ -269,6 +269,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-bcmort-si-summary.csv` | The D9.30 site-index screen |
 | `d9-bcmort-local.md` | The D9.32 target-TSA intercept calibration |
 | `d9-bcmort-local-summary.csv` | The D9.32 calibration metrics |
+| `d9-cwh-volume-matched.md` | The D9.33 matched CWH volume audit |
+| `d9-cwh-volume-matched-summary.csv` | The D9.33 matched volume metrics |
+| `cwh_volume_matched.py` | The D9.33 audit code |
 | `bcmort_local_calibration.py` | The D9.32 prototype code |
 | `fvs-mortality-lore.md` | D9.25 annotated FVS mortality/ingress literature review |
 | `fvs-mortality-code.md` | D9.25 FVS-BC mortality/ingress source map and pseudocode |

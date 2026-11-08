@@ -44,9 +44,15 @@ The BC variant's `CFVOL` uses `TOPD = 10 cm` and `DBHMIN = 17.5 cm` (12.5 cm for
 4 cm tree list and includes trees below the FVS merchantability limit. `TCuM` includes total cubic
 volume for those trees, which is why it tracks `VOL_MER` in the 4 cm data.
 
-The −18.7% CWH external gap is therefore a **merchantability-limit mismatch**, not a simple model
-failure. A fully matched comparison must recompute observed volume with the FVS `DBHMIN`/`TOPD`, or
-compare `TCuM` to `VOL_MER` and state the convention.
+The −18.7% CWH external gap is partly a **merchantability-limit mismatch**, not a simple model
+failure. D9.33 recomputed observed volume with the FVS `DBHMIN` (17.5 cm; 12.5 cm PL) and found:
 
-The CWH 4 cm pilot remains a pilot: the volume comparison is not yet a clean like-for-like test, but
-the failure signal is largely the merchantability limit.
+- pooled `MCuM` vs matched observed: **−7.1%** (was −10.3%);
+- non-PSP external: **−12.6%** (was −18.7%);
+- PSP folds: **−1.7% to −5.9%**.
+
+The merchantability limit explains about 3.1 percentage points. The external residual is still
+outside ±10%, so the CWH 4 cm pilot remains a pilot and external volume is unresolved, not passed.
+`TCuM` is not a substitute for a matched comparison because it includes trees below the FVS limit.
+
+See `d9-cwh-volume-matched.md` and `d9-cwh-volume-matched-summary.csv`.

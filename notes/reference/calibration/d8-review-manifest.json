@@ -25,8 +25,8 @@
     {
       "domain": "CWH-4cm",
       "path": "notes/reference/calibration/d7-cwh-4cm-bundle.json",
-      "sha256": "sha256:134f3da8858284939aacc0184bc2351d863bda1a558c6d39c3a389297dc0df59",
-      "bytes": 6482
+      "sha256": "sha256:4c3a068dd3c50445cfa43a541b4a7a3b1903d4f3b05f44ab731d84c6d90bfce5",
+      "bytes": 6451
     },
     {
       "domain": "ICHmw2-Arrow-Cascadia",
