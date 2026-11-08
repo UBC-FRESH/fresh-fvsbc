@@ -789,3 +789,16 @@ svg.chart .chart-caption { fill: var(--ink); font-weight: 600; }
 }
 .table-pager .muted { margin-right: auto; font-size: 11px; }
 .table-pager button { font-size: 12px; }
+
+/* ------------------------------------------------------------ compare runs */
+.compare-pickers {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.compare-kpis { margin-bottom: 10px; }
+svg.chart .line.series-a { stroke: var(--accent); }
+svg.chart .line.series-b { stroke: var(--warn, #e0a44a); }
+svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }

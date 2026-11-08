@@ -7,6 +7,7 @@ them in the dedicated browser job; the Python quality jobs stay browser-free.
 from __future__ import annotations
 
 import json
+import shutil
 import socket
 import sqlite3
 import threading
@@ -97,6 +98,7 @@ def cockpit(tmp_path_factory: pytest.TempPathFactory) -> Iterator[str]:
 
     root = tmp_path_factory.mktemp("browser-runs")
     _make_run(root)
+    shutil.copytree(root / RUN_ID, root / f"{RUN_ID}-b")
     application = webapp.create_app([root], bundles=[BUNDLE])
 
     probe = socket.socket()
@@ -139,8 +141,9 @@ def test_the_cockpit_runs_stand_calibration_and_url_state(cockpit: str) -> None:
         try:
             page.goto(f"{cockpit}/?workspace=runs&run={RUN_ID}", wait_until="networkidle")
             expect(page.get_by_role("heading", name="Runs", exact=True)).to_be_visible()
-            expect(page.locator("article", has_text=RUN_ID)).to_be_visible()
-            page.get_by_role("button", name="Open", exact=True).click()
+            card = page.locator("article").filter(has=page.get_by_text(RUN_ID, exact=True))
+            expect(card).to_be_visible()
+            card.get_by_role("button", name="Open", exact=True).click()
             expect(page.get_by_role("heading", name="Stand", exact=True)).to_be_visible()
             expect(page.locator("canvas.stand-canvas")).to_be_visible()
             expect(page.get_by_role("combobox", name="Stand year")).to_have_value("0")
@@ -184,6 +187,28 @@ def test_the_cockpit_runs_stand_calibration_and_url_state(cockpit: str) -> None:
             expect(page.get_by_role("combobox", name="Stand year")).to_have_value("10")
             assert "year=10" in page.evaluate("window.location.search")
             assert errors == []
+        finally:
+            browser.close()
+
+
+def test_the_compare_workspace_shows_two_run_deltas(cockpit: str) -> None:
+    """Compare defaults to the metric summary and shows A/B deltas, not an empty Cases diff."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}",
+                wait_until="networkidle",
+            )
+            expect(page.get_by_role("heading", name="Compare two runs")).to_be_visible()
+            expect(page.locator("#panel-body")).to_contain_text("Summary comparison")
+            expect(page.locator("#panel-body")).to_contain_text("Year-by-year")
+            expect(page.locator("#panel-body")).to_contain_text("Δ (B - A)")
+            expect(page.locator("#panel-body")).to_contain_text("Row-level table diff")
+            page.get_by_role("button", name="Swap").click()
+            expect(page.locator("#panel-body")).to_contain_text("Summary comparison")
         finally:
             browser.close()
 

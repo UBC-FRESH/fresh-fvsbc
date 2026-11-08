@@ -18,6 +18,7 @@ const state = {
   compareA: null,
   compareB: null,
   compareTable: null,
+  compareMetric: "BA",
   summaryColumn: null,
   tableQuery: "",
   tableOffset: 0,
@@ -1231,6 +1232,95 @@ async function renderProvenance(body) {
   );
 }
 
+function compareRowsByYear(rows) {
+  const map = new Map();
+  for (const row of rows) {
+    const year = Number(row.Year ?? row.year ?? 0);
+    if (Number.isFinite(year)) map.set(year, row);
+  }
+  return map;
+}
+
+function dualChart(years, seriesA, seriesB, name, unit) {
+  const width = 720;
+  const height = 280;
+  const pad = { left: 64, right: 20, top: 34, bottom: 30 };
+  const values = [...seriesA, ...seriesB].filter((value) => Number.isFinite(value));
+  const maxY = Math.max(...values, 1);
+  const minY = Math.min(...values, 0);
+  const spanY = maxY - minY || 1;
+  const stepX = (width - pad.left - pad.right) / Math.max(years.length - 1, 1);
+  const px = (index) => pad.left + index * stepX;
+  const py = (value) => height - pad.bottom - ((value - minY) / spanY) * (height - pad.top - pad.bottom);
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "chart");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `${name}${unit ? ` in ${unit}` : ""} for runs A and B`);
+
+  for (let tick = 0; tick <= 3; tick += 1) {
+    const value = minY + (spanY * tick) / 3;
+    const y = py(value);
+    const grid = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    grid.setAttribute("class", "chart-grid");
+    grid.setAttribute("x1", pad.left);
+    grid.setAttribute("y1", y);
+    grid.setAttribute("x2", width - pad.right);
+    grid.setAttribute("y2", y);
+    svg.append(grid);
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", pad.left - 8);
+    label.setAttribute("y", y + 4);
+    label.setAttribute("text-anchor", "end");
+    label.textContent = fmt(value);
+    svg.append(label);
+  }
+
+  const draw = (valuesForSeries, className) => {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("class", `line ${className}`);
+    path.setAttribute("d", valuesForSeries.map((value, index) =>
+      `${index ? "L" : "M"}${px(index)},${py(Number(value) || 0)}`,
+    ).join(" "));
+    svg.append(path);
+  };
+  draw(seriesA, "series-a");
+  draw(seriesB, "series-b");
+
+  const axis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  axis.setAttribute("class", "axis");
+  axis.setAttribute("x1", pad.left);
+  axis.setAttribute("y1", height - pad.bottom);
+  axis.setAttribute("x2", width - pad.right);
+  axis.setAttribute("y2", height - pad.bottom);
+  svg.append(axis);
+
+  for (let i = 0; i < years.length; i += Math.max(1, Math.ceil(years.length / 8))) {
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", px(i));
+    text.setAttribute("y", height - 8);
+    text.setAttribute("text-anchor", "middle");
+    text.textContent = String(years[i]);
+    svg.append(text);
+  }
+
+  const caption = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  caption.setAttribute("class", "chart-caption");
+  caption.setAttribute("x", pad.left);
+  caption.setAttribute("y", 14);
+  caption.textContent = `${name}${unit ? ` (${unit})` : ""}`;
+  svg.append(caption);
+
+  const legend = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  legend.setAttribute("class", "chart-legend");
+  legend.setAttribute("x", width - pad.right);
+  legend.setAttribute("y", 14);
+  legend.setAttribute("text-anchor", "end");
+  legend.textContent = "A ──   B ──";
+  svg.append(legend);
+  return svg;
+}
+
 async function renderCompare(body) {
   body.append(el("h2", {}, "Compare two runs"));
   const complete = state.runs.filter((run) => run.state === "complete");
@@ -1238,8 +1328,12 @@ async function renderCompare(body) {
     body.append(el("p", { className: "muted" }, "Two complete runs are needed to compare."));
     return;
   }
-  if (!state.compareA) state.compareA = complete[0].id;
-  if (!state.compareB) state.compareB = complete[1].id;
+  if (!state.compareA || !complete.some((run) => run.id === state.compareA)) {
+    state.compareA = complete[0].id;
+  }
+  if (!state.compareB || !complete.some((run) => run.id === state.compareB)) {
+    state.compareB = complete.find((run) => run.id !== state.compareA)?.id ?? complete[1].id;
+  }
 
   const picker = (current, onchange) =>
     el(
@@ -1253,27 +1347,108 @@ async function renderCompare(body) {
   body.append(
     el(
       "div",
-      { className: "controls" },
-      el(
-        "label",
-        {},
-        "A ",
-        picker(state.compareA, (event) => {
-          state.compareA = event.target.value;
+      { className: "compare-pickers" },
+      el("label", {}, "A ", picker(state.compareA, (event) => {
+        state.compareA = event.target.value;
+        renderPanel();
+      })),
+      el("label", {}, "B ", picker(state.compareB, (event) => {
+        state.compareB = event.target.value;
+        renderPanel();
+      })),
+      el("button", {
+        type: "button",
+        onclick: () => {
+          [state.compareA, state.compareB] = [state.compareB, state.compareA];
           renderPanel();
-        }),
-      ),
-      el(
-        "label",
-        {},
-        "B ",
-        picker(state.compareB, (event) => {
-          state.compareB = event.target.value;
-          renderPanel();
-        }),
-      ),
+        },
+      }, "Swap"),
     ),
   );
+
+  const [summaryA, summaryB] = await Promise.all([
+    loadSummaryRows(state.compareA),
+    loadSummaryRows(state.compareB),
+  ]);
+  if (summaryA.metric && summaryB.metric) {
+    const byYearA = compareRowsByYear(summaryA.rows);
+    const byYearB = compareRowsByYear(summaryB.rows);
+    const years = [...byYearA.keys()].filter((year) => byYearB.has(year)).sort((a, b) => a - b);
+    if (!years.length) {
+      body.append(el("p", { className: "muted" }, "The two runs share no summary years."));
+    } else {
+      const latestA = byYearA.get(years[years.length - 1]) ?? {};
+      const latestB = byYearB.get(years[years.length - 1]) ?? {};
+      const metrics = ["BA", "Tph", "QMD", "TopHt", "MCuM"];
+      body.append(el("h3", {}, "Summary comparison"));
+      body.append(el("div", { className: "kpi-grid compare-kpis" },
+        ...metrics.map((key) => {
+          const definition = SUMMARY_METRICS[key];
+          const aValue = Number(latestA[key] ?? 0);
+          const bValue = Number(latestB[key] ?? 0);
+          const delta = bValue - aValue;
+          return el("article", { className: "kpi-card" },
+            el("span", { className: "kpi-label" },
+              definition.label,
+              definition.unit ? el("em", {}, ` ${definition.unit}`) : null,
+            ),
+            el("strong", {}, fmt(bValue)),
+            el("small", {},
+              `A ${fmt(aValue)} · Δ ${delta >= 0 ? "+" : ""}${fmt(delta)}`,
+            ),
+          );
+        }),
+      ));
+      if (!state.compareMetric || !SUMMARY_METRICS[state.compareMetric]) {
+        state.compareMetric = "BA";
+      }
+      const metricSelect = el("select", {
+        onchange: (event) => {
+          state.compareMetric = event.target.value;
+          renderPanel();
+        },
+      }, ...metrics.map((key) =>
+        el("option", { value: key, selected: key === state.compareMetric },
+          SUMMARY_METRICS[key].label,
+        ),
+      ));
+      body.append(el("label", { className: "muted" }, "Series ", metricSelect));
+      const definition = SUMMARY_METRICS[state.compareMetric];
+      body.append(dualChart(
+        years,
+        years.map((year) => Number(byYearA.get(year)?.[state.compareMetric] ?? 0)),
+        years.map((year) => Number(byYearB.get(year)?.[state.compareMetric] ?? 0)),
+        definition.label,
+        definition.unit,
+      ));
+      body.append(el("h3", {}, "Year-by-year"));
+      const header = el("tr", {},
+        el("th", {}, "Year"),
+        el("th", { className: "num" }, `A ${definition.label}`),
+        el("th", { className: "num" }, `B ${definition.label}`),
+        el("th", { className: "num" }, "Δ (B - A)"),
+      );
+      body.append(el("div", { className: "scroll" },
+        el("table", {}, el("thead", {}, header), el("tbody", {},
+          ...years.map((year) => {
+            const aValue = Number(byYearA.get(year)?.[state.compareMetric] ?? 0);
+            const bValue = Number(byYearB.get(year)?.[state.compareMetric] ?? 0);
+            return el("tr", {},
+              el("td", {}, fmt(year)),
+              el("td", { className: "num" }, fmt(aValue)),
+              el("td", { className: "num" }, fmt(bValue)),
+              el("td", { className: "num" }, `${bValue - aValue >= 0 ? "+" : ""}${fmt(bValue - aValue)}`),
+            );
+          }),
+        )),
+      ));
+    }
+  } else {
+    body.append(el("div", { className: "notice" },
+      "Summary comparison needs FVS_Summary_Metric in both runs; "
+        + "the row-level table comparison below is still available.",
+    ));
+  }
 
   const tablesA = await api(`api/runs/${state.compareA}/tables`);
   const tablesB = await api(`api/runs/${state.compareB}/tables`);
@@ -1284,39 +1459,39 @@ async function renderCompare(body) {
     body.append(el("p", { className: "muted" }, "The two runs share no exposed table."));
     return;
   }
-  if (!state.compareTable || !shared.includes(state.compareTable)) state.compareTable = shared[0];
+  if (!state.compareTable || !shared.includes(state.compareTable)) {
+    state.compareTable = ["FVS_Summary_Metric", "FVS_TreeList_Metric", "FVS_CutList_Metric"]
+      .find((name) => shared.includes(name)) ?? shared[0];
+  }
 
-  body.append(
-    el(
-      "label",
-      { className: "muted" },
-      "Table ",
-      el(
-        "select",
-        {
-          onchange: (event) => {
-            state.compareTable = event.target.value;
-            renderPanel();
-          },
-        },
-        ...shared.map((name) =>
-          el("option", { value: name, selected: name === state.compareTable }, name),
-        ),
-      ),
-    ),
-  );
+  body.append(el("h3", {}, "Row-level table diff"));
+  body.append(el("label", { className: "muted" }, "Table ",
+    el("select", {
+      onchange: (event) => {
+        state.compareTable = event.target.value;
+        renderPanel();
+      },
+    }, ...shared.map((name) =>
+      el("option", { value: name, selected: name === state.compareTable }, name),
+    )),
+  ));
 
   const [a, b] = await Promise.all([
     api(`api/runs/${state.compareA}/tables/${encodeURIComponent(state.compareTable)}?limit=5000`),
     api(`api/runs/${state.compareB}/tables/${encodeURIComponent(state.compareTable)}?limit=5000`),
   ]);
-
-  const keyColumns = ["CaseID", "StandID", "Year", "TreeId", "TreeIndex"];
-  const key = keyColumns.filter((column) => a.columns.includes(column));
+  // The database carries a different CaseID per run. Use the table's real identity instead:
+  // Year for the summary, and plot + tree index for the per-tree tables.
+  const keyCandidates = state.compareTable === "FVS_Summary_Metric"
+    ? ["Year"]
+    : state.compareTable.includes("TreeList") || state.compareTable.includes("CutList")
+      ? ["Year", "PtIndex", "TreeIndex"]
+      : ["Year", "TreeId", "TreeIndex"];
+  const keyColumns = keyCandidates.filter((column) => a.columns.includes(column));
+  const key = keyColumns.length ? keyColumns : ["Year"];
   const valueColumns = a.columns.filter(
     (column) => !keyColumns.includes(column) && isNumeric(a.rows, column),
   );
-
   const indexB = new Map(b.rows.map((row) => [key.map((c) => row[c]).join("|"), row]));
   const diffs = [];
   for (const row of a.rows) {
@@ -1334,40 +1509,29 @@ async function renderCompare(body) {
   }
   diffs.sort((left, right) => right.score - left.score);
   const capped = diffs.slice(0, 200);
-
-  body.append(
-    el(
-      "p",
-      { className: "muted" },
-      `${diffs.length} rows matched on ${key.join(", ") || "row order"}; ` +
-        `showing the ${capped.length} with the largest absolute difference. B minus A.`,
-    ),
-  );
+  body.append(el("p", { className: "muted" },
+    `${diffs.length} rows matched on ${key.join(", ") || "row order"}; `
+      + `showing the ${capped.length} with the largest absolute difference. B minus A.`,
+  ));
   if (!capped.length) {
     body.append(el("p", { className: "muted" }, "No rows matched between the two runs."));
     return;
   }
-  const header = el(
-    "tr",
-    {},
+  const header = el("tr", {},
     el("th", {}, key.join(" / ")),
     ...valueColumns.map((column) => el("th", { className: "num" }, column)),
   );
   const rows = capped.map((entry) =>
-    el(
-      "tr",
-      {},
+    el("tr", {},
       el("td", {}, entry.key),
-      ...valueColumns.map((column) => el("td", { className: "num" }, fmt(entry.delta ?? entry.cells[column]))),
+      ...valueColumns.map((column) =>
+        el("td", { className: "num" }, fmt(entry.cells[column])),
+      ),
     ),
   );
-  body.append(
-    el(
-      "div",
-      { className: "scroll" },
-      el("table", {}, el("thead", {}, header), el("tbody", {}, ...rows)),
-    ),
-  );
+  body.append(el("div", { className: "scroll" },
+    el("table", {}, el("thead", {}, header), el("tbody", {}, ...rows)),
+  ));
 }
 
 /* ---------------------------------------------------------------- URL state */
