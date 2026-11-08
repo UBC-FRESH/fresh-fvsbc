@@ -348,6 +348,25 @@ def test_the_service_answers_with_and_without_its_root_path(tmp_path: Path) -> N
     assert client.get(f"{prefix}/").status_code == 200
 
 
+def test_calibration_bundles_are_listed_without_exposing_invalid_json(tmp_path: Path) -> None:
+    """The service lists valid bundles and ignores unrelated JSON in the directory."""
+    bundle_dir = tmp_path / "bundles"
+    bundle_dir.mkdir()
+    source = (
+        Path(__file__).resolve().parents[1] / "notes/reference/calibration/d7-cwh-4cm-bundle.json"
+    )
+    (bundle_dir / "cwh.json").write_bytes(source.read_bytes())
+    (bundle_dir / "not-a-bundle.json").write_text('{"not": "a bundle"}')
+    client = TestClient(webapp.create_app([tmp_path / "runs"], bundles=[bundle_dir]))
+    response = client.get("/api/calibrations")
+    assert response.status_code == 200
+    records = response.json()
+    assert [record["bundle_id"] for record in records] == ["cwh-growth-4cm-pilot-2026-11-04"]
+    assert records[0]["warnings"]
+    assert client.get("/api/calibrations/cwh-growth-4cm-pilot-2026-11-04").status_code == 200
+    assert client.get("/api/calibrations/missing").status_code == 404
+
+
 def test_the_shell_carries_the_visuals_import_map_and_the_vendored_runtime() -> None:
     """The 3D view is local, so the import map and the vendored three.js must ship together."""
     index = (webapp.STATIC_DIRECTORY / "index.html").read_text(encoding="utf-8")

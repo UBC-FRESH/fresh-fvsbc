@@ -7,6 +7,8 @@
 const state = {
   skins: [],
   runs: [],
+  calibrations: [],
+  calibration: null,
   oracle: null,
   skin: null,
   run: null,
@@ -25,6 +27,7 @@ const WORKSPACES = [
   { id: "stand", title: "Stand", panels: ["visuals"] },
   { id: "results", title: "Results", panels: ["summary", "tables", "trees", "compare"] },
   { id: "evidence", title: "Evidence", panels: ["provenance", "keywords"] },
+  { id: "calibration", title: "Calibration", panels: [] },
 ];
 
 const el = (tag, props = {}, ...children) => {
@@ -75,7 +78,7 @@ function workspace_definition(id) {
 function available_workspaces() {
   const panels = new Set(state.skin?.panels ?? []);
   return WORKSPACES.filter(
-    (workspace) => workspace.id === "runs" || workspace.panels.some((panel) => panels.has(panel)),
+    (workspace) => workspace.id === "runs" || workspace.id === "calibration" || workspace.panels.some((panel) => panels.has(panel)),
   );
 }
 
@@ -202,6 +205,10 @@ async function renderPanel() {
 
   if (state.workspace === "runs") {
     await renderRuns(body);
+    return;
+  }
+  if (state.workspace === "calibration") {
+    await renderCalibration(body);
     return;
   }
   if (!state.run) {
@@ -390,6 +397,105 @@ function body_error(error) {
   document.getElementById("panel-body")?.replaceChildren(
     el("p", { className: "no-oracle" }, String(error)),
   );
+}
+
+async function renderCalibration(body) {
+  body.append(
+    el("div", { className: "section-head" },
+      el("div", {},
+        el("h2", {}, "Calibration"),
+        el("p", { className: "muted" },
+          "Validated bundle metadata, domain boundaries, parameters, and review warnings. A bundle is not a certificate until its review is signed.",
+        ),
+      ),
+      el("button", { type: "button", onclick: loadCalibrations }, "Refresh"),
+    ),
+  );
+  if (!state.calibrations.length) {
+    body.append(el("div", { className: "empty-state" },
+      el("strong", {}, "No calibration bundles found"),
+      el("p", { className: "muted" },
+        "Start the service with --bundles pointing at a directory of bundle JSON files.",
+      ),
+    ));
+    return;
+  }
+  const grid = el("div", { className: "run-grid" });
+  for (const bundle of state.calibrations) {
+    const signed = Boolean(bundle.review?.signed_off);
+    const domain = bundle.domain || {};
+    const domainBits = [
+      ...(domain.becs || []),
+      ...(domain.tsas || []),
+      ...(domain.regions || []),
+    ].join(", ");
+    grid.append(
+      el("article", { className: "run-card calibration-card" },
+        el("div", { className: "run-card-head" },
+          el("strong", {}, bundle.bundle_id),
+          badge(signed ? "signed" : "unsigned", signed ? "ok" : "warn"),
+        ),
+        el("p", { className: "muted" }, `v${bundle.version} · ${bundle.path}`),
+        el("div", { className: "run-card-meta" },
+          el("span", {}, domainBits || "domain unrestricted"),
+          el("span", {}, `${bundle.parameters.length} parameters`),
+        ),
+        el("p", { className: "claim" }, bundle.claim),
+        el("div", { className: "run-card-actions" },
+          el("button", { type: "button", onclick: () => { state.calibration = bundle; renderPanel(); } }, "Details"),
+        ),
+      ),
+    );
+  }
+  body.append(grid);
+
+  const bundle = state.calibration;
+  if (!bundle) return;
+  const detail = el("section", { className: "calibration-detail" },
+    el("div", { className: "section-head" },
+      el("div", {},
+        el("h2", {}, bundle.bundle_id),
+        el("p", { className: "muted" }, `version ${bundle.version}`),
+      ),
+      el("button", { type: "button", class: "ghost", onclick: () => { state.calibration = null; renderPanel(); } }, "Close"),
+    ),
+    el("p", { className: "claim" }, bundle.claim),
+  );
+  if (bundle.warnings?.length) {
+    detail.append(el("div", { className: "notice" }, ...bundle.warnings.map((warning) => el("p", {}, warning))));
+  }
+  const facts = [
+    ["Signed", bundle.review?.signed_off ? "yes" : "no"],
+    ["Reviewer", bundle.review?.reviewer ?? "—"],
+    ["Date", bundle.review?.date ?? "—"],
+    ["Pins", Object.entries(bundle.pins || {}).map(([key, value]) => `${key}=${value}`).join(" · ")],
+    ["Training split", bundle.training?.split ?? "—"],
+    ["Ingrowth", bundle.ingrowth ? `${bundle.ingrowth.model_id} (${bundle.ingrowth.rates} rates)` : "none"],
+  ];
+  detail.append(el("div", { className: "grid" },
+    ...facts.map(([label, value]) => el("div", { className: "card" }, el("h3", {}, label), el("p", {}, String(value)))),
+  ));
+  const header = el("tr", {}, el("th", {}, "Keyword"), el("th", {}, "Fields"), el("th", {}, "Units"), el("th", {}, "Bounds"));
+  const rows = bundle.parameters.map((parameter) =>
+    el("tr", {},
+      el("td", {}, parameter.keyword),
+      el("td", {}, parameter.fields.join(", ")),
+      el("td", {}, parameter.units),
+      el("td", {}, parameter.bounds ? parameter.bounds.join(" – ") : "—"),
+    ),
+  );
+  detail.append(el("h3", {}, "Parameters"));
+  detail.append(el("div", { className: "scroll" }, el("table", {}, el("thead", {}, header), el("tbody", {}, ...rows))));
+  body.append(detail);
+}
+
+async function loadCalibrations() {
+  try {
+    state.calibrations = await api("api/calibrations");
+    renderPanel();
+  } catch (error) {
+    body_error(error);
+  }
 }
 
 function oracleNotice(tables) {
@@ -827,14 +933,16 @@ async function boot() {
   document.getElementById("cancel-new-run").addEventListener("click", closeNewRun);
   document.getElementById("new-run-form").addEventListener("submit", submitNewRun);
   try {
-    const [skins, runs, oracle] = await Promise.all([
+    const [skins, runs, oracle, calibrations] = await Promise.all([
       api("api/skins"),
       api("api/runs"),
       api("api/oracle"),
+      api("api/calibrations").catch(() => []),
     ]);
     state.skins = skins;
     state.runs = runs;
     state.oracle = oracle;
+    state.calibrations = calibrations;
     state.skin = skins[0];
     state.workspace = "runs";
     state.panel = null;

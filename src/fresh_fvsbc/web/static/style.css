@@ -404,3 +404,19 @@ button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-
   .form-grid { grid-template-columns: 1fr; }
   .field-wide { grid-column: auto; }
 }
+
+/* ---------------------------------------------------------------- calibration */
+.calibration-card .claim {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.calibration-detail {
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.calibration-detail .grid { margin: 14px 0; }
+.calibration-detail .notice p { margin: 3px 0; }
+.calibration-detail .card p { overflow-wrap: anywhere; }
