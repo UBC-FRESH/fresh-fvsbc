@@ -73,6 +73,7 @@ outside the repository because they carry site identifiers.
 | `d9-faib-nonpsp-domain-baseline.md`, `d9-faib-nonpsp-domain-baseline.csv` | D9.55 independent non-PSP screen of the identity default across every calibration domain |
 | `d9-faib-nonpsp-domain-candidates.csv` | D9.55 fixed-bundle comparison on the same non-PSP sample |
 | `d9-tiered-domain-status.csv` | D9.55 tiered domain decision surface: pilot, default, needs-work, insufficient |
+| `d9-cwh-review-packet.md`, `d9-cwh-review-manifest.json` | D9.56 review packet for the CWH 4 cm pilot; unsigned, external volume blocking |
 | `d9-essf-dry-protocol.md`, `d9-essf-dry-candidates.json` | D9.57 pre-registered ESSFdry direct-calibration protocol and candidate grid |
 | `select_probe_candidate.py` | D9.57 training-fold candidate selector for a pre-registered probe |
 | `d9-essf-dry-screen.md`, `d9-essf-dry-selection.json` | D9.57 ESSFdry negative direct-calibration result and frozen candidate |
