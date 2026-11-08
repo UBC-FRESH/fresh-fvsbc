@@ -276,6 +276,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-multi-tsa-calibration-summary.csv` | The D9.44 base/adaptive metrics |
 | `d9-provincial-temporal.md` | The D9.45 post-2000 provincial validation |
 | `d9-provincial-temporal-summary.csv` | The D9.45 temporal metrics |
+| `d9-mpb-build.md` | The D9.46 BC MPB extension build |
+| `patches/mpblkdbc.f` | BC MPB block data patch |
 | `bcmort_provincial_temporal.py` | The D9.45 temporal prototype |
 | `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
