@@ -33,6 +33,8 @@ const state = {
     mode: "local",
     model: null,
     session: null,
+    history: [],
+    controller: null,
     busy: false,
     enabled: false,
     available: false,
@@ -1861,7 +1863,54 @@ function appendAssistant(role, text, options = {}) {
   }
   log.append(message);
   log.scrollTop = log.scrollHeight;
+  if (options.persist !== false) {
+    state.assistant.history.push({
+      role,
+      text: String(text ?? ""),
+      citations: options.citations ?? [],
+      actions: options.actions ?? [],
+      chips: options.chips ?? [],
+    });
+    state.assistant.history = state.assistant.history.slice(-40);
+    saveAssistantHistory();
+  }
   return message;
+}
+
+function saveAssistantHistory() {
+  try {
+    window.sessionStorage.setItem("fresh-fvsbc.assistant", JSON.stringify({
+      session: state.assistant.session,
+      history: state.assistant.history,
+    }));
+  } catch (_error) {
+    /* storage can be unavailable in private or embedded contexts */
+  }
+}
+
+function restoreAssistantHistory() {
+  let stored = null;
+  try {
+    stored = JSON.parse(window.sessionStorage.getItem("fresh-fvsbc.assistant") || "null");
+  } catch (_error) {
+    stored = null;
+  }
+  if (!stored || !Array.isArray(stored.history) || !stored.history.length) return;
+  state.assistant.session = typeof stored.session === "string" ? stored.session : null;
+  state.assistant.history = stored.history.slice(-40);
+  const log = document.getElementById("assistant-log");
+  if (!log) return;
+  log.replaceChildren();
+  for (const message of state.assistant.history) {
+    appendAssistant(message.role, message.text, {
+      html: message.role === "assistant",
+      citations: message.citations ?? [],
+      actions: message.actions ?? [],
+      chips: message.chips ?? [],
+      persist: false,
+    });
+  }
+  assistantStatus("Conversation restored · Enter sends · Shift+Enter adds a newline.");
 }
 
 function assistantContext() {
@@ -1950,6 +1999,8 @@ function setAssistantBusy(busy) {
   const send = document.getElementById("assistant-send");
   const form = document.getElementById("assistant-form");
   if (send) send.disabled = busy;
+  const stop = document.getElementById("assistant-stop");
+  if (stop) stop.hidden = !busy;
   if (form) form.setAttribute("aria-busy", String(busy));
   document.querySelectorAll("#assistant-quick button").forEach((button) => {
     button.disabled = busy;
@@ -1979,6 +2030,12 @@ function configureAssistant(info) {
 
 function newAssistantChat() {
   state.assistant.session = null;
+  state.assistant.history = [];
+  try {
+    window.sessionStorage.removeItem("fresh-fvsbc.assistant");
+  } catch (_error) {
+    /* storage can be unavailable */
+  }
   const log = document.getElementById("assistant-log");
   if (!log) return;
   log.replaceChildren(
@@ -2026,12 +2083,13 @@ async function sendAssistant(message) {
   const input = document.getElementById("assistant-input");
   input.value = "";
   resizeAssistantInput();
-  const thinking = appendAssistant("assistant", "working…");
+  const thinking = appendAssistant("assistant", "working…", { persist: false });
   thinking?.classList.add("thinking");
   setAssistantBusy(true);
   assistantStatus(state.assistant.mode === "agent"
     ? "The local OpenCode agent is reading the run…"
     : "Reading the run summary…");
+  state.assistant.controller = new AbortController();
   try {
     let mode = state.assistant.mode;
     const request = () => fetch(
@@ -2039,6 +2097,7 @@ async function sendAssistant(message) {
       {
         method: "POST",
         headers: { "content-type": "application/json", accept: "application/json" },
+        signal: state.assistant.controller.signal,
         body: JSON.stringify(
           mode === "agent"
             ? {
@@ -2077,9 +2136,15 @@ async function sendAssistant(message) {
       : "Local summary mode.");
   } catch (error) {
     thinking?.remove();
-    appendAssistant("error", `Assistant unavailable: ${error?.message ?? error}`);
-    assistantStatus("The assistant did not answer. Try again or use the open run details.");
+    if (error?.name === "AbortError") {
+      appendAssistant("assistant", "Stopped waiting. The local agent may still finish in the background.");
+      assistantStatus("Stopped waiting; the local process may still be running.");
+    } else {
+      appendAssistant("error", `Assistant unavailable: ${error?.message ?? error}`);
+      assistantStatus("The assistant did not answer. Try again or use the open run details.");
+    }
   } finally {
+    state.assistant.controller = null;
     setAssistantBusy(false);
     input?.focus();
     document.getElementById("assistant-log")?.scrollTo({
@@ -2100,6 +2165,9 @@ async function boot() {
   document.getElementById("assistant-button").addEventListener("click", openAssistant);
   document.getElementById("close-assistant").addEventListener("click", closeAssistant);
   document.getElementById("assistant-new").addEventListener("click", newAssistantChat);
+  document.getElementById("assistant-stop").addEventListener("click", () => {
+    state.assistant.controller?.abort();
+  });
   const assistantInput = document.getElementById("assistant-input");
   assistantInput.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
@@ -2157,6 +2225,7 @@ async function boot() {
     if (initial.metric) state.compareMetric = initial.metric;
     state.compareTable = initial.ctable;
     state.ready = true;
+    restoreAssistantHistory();
     renderShell();
     await renderPanel();
     updateUrl();
