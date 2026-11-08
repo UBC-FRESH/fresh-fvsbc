@@ -70,6 +70,18 @@ In the browser, **Enter sends** and **Shift+Enter inserts a newline**. The compo
 message, labels the active model, shows tool use as read-only chips, and keeps the local summary
 reader as a fallback when the agent is disabled or OpenCode is unavailable.
 
+Shareable analysis state
+------------------------
+
+The cockpit keeps the useful view in the URL:
+
+- ``workspace``, ``run``, ``panel``, and ``year`` for the open view;
+- ``table``, ``q``, and ``offset`` for a filtered table page;
+- ``a``, ``b``, ``metric``, and ``ctable`` for the two-run comparison.
+
+Those values are restored on reload, so a reviewer can send a link to the exact table filter or
+comparison instead of describing where to click.
+
 What it reads
 -------------
 
