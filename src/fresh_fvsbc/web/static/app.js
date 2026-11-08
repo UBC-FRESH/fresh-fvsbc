@@ -1036,26 +1036,122 @@ async function renderKeywords(body) {
   body.append(el("pre", {}, text));
 }
 
+function copyValue(text, button) {
+  const original = button.textContent;
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(String(text)).then(() => {
+      button.textContent = "Copied";
+      window.setTimeout(() => { button.textContent = original; }, 1400);
+    }).catch(() => {
+      button.textContent = "Copy failed";
+    });
+  } else {
+    button.textContent = "Copy unavailable";
+  }
+}
+
+function hashRow(label, value) {
+  const text = String(value ?? "—");
+  const button = el("button", { type: "button", className: "ghost hash-copy" }, "Copy");
+  button.addEventListener("click", () => copyValue(text, button));
+  return el("div", { className: "hash-row" },
+    el("span", { className: "hash-label" }, label),
+    el("code", { title: text }, text),
+    button,
+  );
+}
+
 async function renderProvenance(body) {
   body.append(el("h2", {}, "Provenance"));
-  const payload = await api(`api/runs/${state.run.id}/provenance`);
-  const grid = el("div", { className: "grid" });
-  for (const [key, value] of Object.entries(payload)) {
-    grid.append(
-      el(
-        "div",
-        { className: "card" },
-        el("h3", {}, key),
-        el("pre", {}, value === null ? "not written by this run" : JSON.stringify(value, null, 2)),
+  let payload;
+  try {
+    payload = await api(`api/runs/${encodeURIComponent(state.run.id)}/provenance`);
+  } catch (error) {
+    body.append(el("p", { className: "no-oracle" }, String(error)));
+    return;
+  }
+  const record = payload.provenance ?? null;
+  if (!record) {
+    body.append(el("div", { className: "empty-state" },
+      el("strong", {}, "No provenance record"),
+      el("p", { className: "muted" }, "This run did not write provenance.json."),
+    ));
+    return;
+  }
+  const pins = [
+    ["Model version", record.fresh_fvsbc_version],
+    ["PyFVS commit", record.pyfvs_commit],
+    ["FVS source commit", record.fvs_source_commit],
+    ["Variant", record.variant],
+    ["Run date", record.run_datetime],
+    ["Random seed", record.random_seed],
+    ["Case id", record.case_id],
+  ].filter(([, value]) => value !== undefined && value !== null && value !== "");
+  body.append(
+    el("div", { className: "pin-grid" },
+      ...pins.map(([label, value]) =>
+        el("article", { className: "pin-card" },
+          el("span", { className: "muted" }, label),
+          el("strong", { title: String(value ?? "") }, fmt(value)),
+        ),
+      ),
+    ),
+  );
+
+  body.append(el("h3", {}, "Hashes"));
+  body.append(
+    el("div", { className: "hash-list" },
+      hashRow("Keyword set", record.keyword_set_hash),
+      hashRow("Tree list", record.treelist_hash),
+    ),
+  );
+
+  body.append(el("h3", {}, "Calibration"));
+  const calibrationId = record.calibration_id;
+  if (!calibrationId) {
+    body.append(el("p", { className: "muted" }, "No calibration bundle is recorded for this run."));
+  } else {
+    const bundle = state.calibrations.find((entry) => entry.bundle_id === calibrationId);
+    const signed = Boolean(bundle?.review?.signed_off);
+    body.append(
+      el("div", { className: "calibration-callout" },
+        el("div", { className: "calibration-callout-head" },
+          el("strong", {}, calibrationId),
+          badge(signed ? "signed" : "unsigned", signed ? "ok" : "warn"),
+        ),
+        el("p", { className: "muted" },
+          `Version ${record.calibration_version || "—"} · `,
+          bundle ? "bundle found in the configured roots" : "bundle is not in the configured roots",
+        ),
+        bundle?.claim ? el("p", { className: "claim" }, bundle.claim) : null,
+        bundle?.warnings?.length
+          ? el("div", { className: "notice" }, ...bundle.warnings.map((warning) => el("p", {}, warning)))
+          : null,
       ),
     );
   }
-  body.append(grid);
+
+  body.append(el("h3", {}, "Variants"));
+  const variants = Array.isArray(payload.variants)
+    ? payload.variants
+    : Object.keys(payload.variants || {});
   body.append(
-    el(
-      "p",
-      { className: "muted" },
+    el("div", { className: "badge-row" },
+      ...(variants.length
+        ? variants.map((variant) => badge(String(variant), "ok"))
+        : [el("span", { className: "muted" }, "No variant list recorded.")]),
+    ),
+  );
+
+  body.append(
+    el("p", { className: "muted" },
       "A result without these pins cannot be reproduced.",
+    ),
+  );
+  body.append(
+    el("details", { className: "raw-record" },
+      el("summary", {}, "Raw provenance JSON"),
+      el("pre", {}, JSON.stringify(payload, null, 2)),
     ),
   );
 }

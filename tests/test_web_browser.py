@@ -156,6 +156,13 @@ def test_the_cockpit_runs_stand_calibration_and_url_state(cockpit: str) -> None:
             expect(page.get_by_role("button", name="FVS_Summary_Metric · 2 ✓")).to_be_visible()
             expect(page.locator("#panel-body")).to_contain_text("Year")
 
+            page.get_by_role("tab", name="Evidence").click()
+            page.get_by_role("tab", name="Provenance").click()
+            expect(page.locator("#panel-body")).to_contain_text("Model version")
+            expect(page.locator("#panel-body")).to_contain_text("Keyword set")
+            expect(page.locator("#panel-body")).to_contain_text("unsigned")
+            expect(page.locator("#panel-body")).to_contain_text("Raw provenance JSON")
+
             page.get_by_role("tab", name="Calibration").click()
             expect(page.get_by_role("heading", name="Calibration", exact=True)).to_be_visible()
             expect(page.get_by_text("cwh-growth-4cm-pilot-2026-11-04").first).to_be_visible()
