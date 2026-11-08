@@ -206,6 +206,36 @@ def create_app(
                 return run
         raise HTTPException(status_code=404, detail=f"no run {run_id!r} under the configured roots")
 
+    def _metric_rows(run: runstore.Run) -> list[dict[str, Any]]:
+        """Return the metric summary rows, or an empty list when the table is absent.
+
+        ``summary.csv`` is FVS's native summary and uses the variant's internal units. The web
+        cockpit is metric, so its overview reads ``FVS_Summary_Metric`` instead and falls back to
+        the native file only with an explicit unit warning.
+        """
+        try:
+            return list(runstore.table(run, "FVS_Summary_Metric", limit=runstore.MAX_LIMIT)["rows"])
+        except runstore.RunError:
+            return []
+
+    def _latest_metric(run: runstore.Run) -> dict[str, Any] | None:
+        """Return the last metric-summary row for a complete run, when available."""
+        rows = _metric_rows(run)
+        if not rows:
+            return None
+        latest = max(rows, key=lambda row: float(row.get("Year") or 0))
+        return {
+            "year": latest.get("Year"),
+            "age": latest.get("Age"),
+            "tph": latest.get("Tph"),
+            "ba": latest.get("BA"),
+            "qmd": latest.get("QMD"),
+            "top_height": latest.get("TopHt"),
+            "merchantable_m3_ha": latest.get("MCuM"),
+            "total_m3_ha": latest.get("TCuM"),
+            "ccf": latest.get("CCF"),
+        }
+
     def _bundle_files() -> list[Path]:
         """Return candidate bundle files under the configured roots, sorted."""
         files: set[Path] = set()
@@ -378,12 +408,19 @@ def create_app(
             return context
         run = _find(run_id)
         rows: list[dict[str, Any]] = []
+        summary_source = "none"
         if run.state == "complete":
-            try:
-                rows = runstore.summary(run)
-            except runstore.RunError as error:
-                context["run"] = {"id": run.id, "state": run.state, "error": str(error)}
-                return context
+            metric_rows = _metric_rows(run)
+            if metric_rows:
+                rows = metric_rows
+                summary_source = "FVS_Summary_Metric (metric units)"
+            else:
+                try:
+                    rows = runstore.summary(run)
+                    summary_source = "summary.csv (FVS native units, not metric)"
+                except runstore.RunError as error:
+                    context["run"] = {"id": run.id, "state": run.state, "error": str(error)}
+                    return context
         try:
             provenance = runstore.provenance(run)
         except runstore.RunError:
@@ -395,6 +432,7 @@ def create_app(
         context["run"] = {
             "id": run.id,
             "state": run.state,
+            "summary_source": summary_source,
             "summary": compact_rows,
             "provenance": {
                 key: recorded.get(key)
@@ -560,9 +598,22 @@ def create_app(
                     "state": state,
                     "path": str(run.path),
                     "tables": len(runstore.tables(run)) if run.state == "complete" else 0,
+                    "latest": _latest_metric(run) if state == "complete" else None,
                 }
             )
         return records
+
+    @app.get("/api/runs/{run_id}/metric-summary")
+    def run_metric_summary(run_id: str) -> list[dict[str, Any]]:
+        """Return the metric summary table, which is what the overview renders."""
+        run = _find(run_id)
+        rows = _metric_rows(run)
+        if not rows:
+            raise HTTPException(
+                status_code=404,
+                detail=f"the run {run.id} wrote no FVS_Summary_Metric table",
+            )
+        return rows
 
     @app.get("/api/runs/{run_id}/summary")
     def run_summary(run_id: str) -> list[dict[str, Any]]:

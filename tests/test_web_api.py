@@ -647,3 +647,47 @@ def test_agent_chat_can_context_a_running_run(
     assert isinstance(context, dict)
     assert context["run"]["state"] == "running"
     assert context["run"]["summary"] == []
+
+
+def _add_metric_summary(directory: Path) -> None:
+    """Add the metric summary table the run list and overview read."""
+    connection = sqlite3.connect(directory / "FVSOut.db")
+    try:
+        connection.execute(
+            "create table FVS_Summary_Metric ("
+            "Year integer, Age integer, Tph real, BA real, QMD real, TopHt real, "
+            "CCF real, TCuM real, MCuM real)"
+        )
+        connection.executemany(
+            "insert into FVS_Summary_Metric values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+                (0, 0, 551.0, 30.0, 26.5, 31.0, 130.0, 306.0, 293.0),
+                (10, 10, 210.0, 18.0, 33.7, 33.0, 72.0, 207.0, 200.0),
+            ],
+        )
+        connection.commit()
+    finally:
+        connection.close()
+
+
+def test_the_run_list_carries_the_latest_metric_summary(tmp_path: Path) -> None:
+    """The overview cards get metric values, not the native summary columns."""
+    _make_run(tmp_path / "run-c")
+    _add_metric_summary(tmp_path / "run-c")
+    client = TestClient(webapp.create_app([tmp_path]))
+    listed = client.get("/api/runs").json()
+    assert listed[0]["latest"]["year"] == 10
+    assert listed[0]["latest"]["ba"] == 18.0
+    assert listed[0]["latest"]["tph"] == 210.0
+    assert listed[0]["latest"]["top_height"] == 33.0
+
+
+def test_the_metric_summary_endpoint_returns_the_metric_rows(tmp_path: Path) -> None:
+    """The summary panel reads FVS_Summary_Metric when it exists."""
+    _make_run(tmp_path / "run-c")
+    _add_metric_summary(tmp_path / "run-c")
+    client = TestClient(webapp.create_app([tmp_path]))
+    rows = client.get("/api/runs/run-c/metric-summary").json()
+    assert [row["Year"] for row in rows] == [0, 10]
+    assert rows[-1]["Tph"] == 210.0
+    assert client.get("/api/runs/run-a/metric-summary").status_code == 404

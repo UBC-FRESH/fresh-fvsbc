@@ -71,7 +71,7 @@ const fmt = (value) => {
   if (value === null || value === undefined) return "";
   if (typeof value === "number") {
     if (Number.isInteger(value)) return value.toLocaleString();
-    return value.toLocaleString(undefined, { maximumFractionDigits: 4 });
+    return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
   return String(value);
 };
@@ -312,21 +312,30 @@ async function renderRuns(body) {
   const grid = el("div", { className: "run-grid" });
   for (const run of state.runs) {
     const complete = run.state === "complete";
+    const latest = run.latest;
+    const metricLine = latest
+      ? `${fmt(latest.year)} yr · BA ${fmt(latest.ba)} m²/ha · TPH ${fmt(latest.tph)}`
+      : complete
+        ? "No metric summary table"
+        : "Waiting for summary";
     grid.append(
-      el("article", { className: "run-card" },
+      el("article", { className: "run-card", title: run.path },
         el("div", { className: "run-card-head" },
           el("strong", {}, run.id),
           badge(run.state, complete ? "ok" : ""),
         ),
-        el("p", { className: "muted", title: run.path }, run.path),
+        el("p", { className: "run-card-metric" }, metricLine),
         el("div", { className: "run-card-meta" },
           el("span", {}, `${run.tables} tables`),
           el("span", {}, complete ? "ready" : "in progress"),
         ),
         el("div", { className: "run-card-actions" },
-          el("button", { type: "button", disabled: !complete, onclick: () => { state.run = run; selectWorkspace("stand"); } }, "Open stand"),
-          el("button", { type: "button", disabled: !complete, onclick: () => { state.run = run; selectWorkspace("results"); } }, "Open results"),
-          el("button", { type: "button", onclick: () => { state.run = run; selectWorkspace("evidence"); } }, "Evidence"),
+          el("button", { className: "primary", type: "button", disabled: !complete,
+            onclick: () => { state.run = run; selectWorkspace("stand"); } }, "Open"),
+          el("button", { type: "button", disabled: !complete,
+            onclick: () => { state.run = run; selectWorkspace("results"); selectPanel("summary"); } }, "Summary"),
+          el("button", { type: "button", disabled: !complete,
+            onclick: () => { state.run = run; selectWorkspace("evidence"); } }, "Evidence"),
         ),
       ),
     );
@@ -336,10 +345,16 @@ async function renderRuns(body) {
 
 function runHeader() {
   const run = state.run;
+  const latest = run.latest;
   return el("div", { className: "run-header" },
     el("div", {},
       el("h2", {}, run.id),
-      el("p", { className: "muted" }, run.path),
+      el("p", { className: "muted", title: run.path },
+        latest
+          ? `${fmt(latest.year)} yr · BA ${fmt(latest.ba)} m²/ha · TPH ${fmt(latest.tph)} `
+            + `· top height ${fmt(latest.top_height)} m`
+          : `${run.tables} tables · ${run.state}`,
+      ),
     ),
     runActions(),
   );
@@ -679,19 +694,25 @@ async function renderTables(body) {
         "button",
         {
           className: table.name === state.table ? "active" : "",
+          title: `${table.rows} rows${table.oracle ? " · checked against a reference" : ""}`,
           onclick: () => {
             state.table = table.name;
             renderPanel();
           },
         },
-        table.name,
+        `${table.name} · ${fmt(table.rows)}`,
         table.oracle ? " ✓" : "",
       ),
     );
   }
   body.append(list);
 
-  if (!state.table && tables.length) state.table = tables[0].name;
+  if (!state.table || !tables.some((table) => table.name === state.table)) {
+    const preferred = ["FVS_Summary_Metric", "FVS_TreeList_Metric", "FVS_CutList_Metric"];
+    state.table = preferred.find((name) => tables.some((table) => table.name === name))
+      ?? tables[0]?.name
+      ?? null;
+  }
   if (!state.table) return;
 
   const payload = await api(
@@ -743,38 +764,88 @@ async function renderTables(body) {
   );
 }
 
+const SUMMARY_METRICS = {
+  Year: { label: "Year", unit: "" },
+  Age: { label: "Age", unit: "years" },
+  Tph: { label: "TPH", unit: "trees/ha" },
+  BA: { label: "BA", unit: "m²/ha" },
+  QMD: { label: "QMD", unit: "cm" },
+  TopHt: { label: "Top height", unit: "m" },
+  CCF: { label: "CCF", unit: "%" },
+  MCuM: { label: "Merch. volume", unit: "m³/ha" },
+  TCuM: { label: "Total volume", unit: "m³/ha" },
+};
+
+const NATIVE_SUMMARY = {
+  year: { label: "Year", unit: "" },
+  age: { label: "Age", unit: "years" },
+  tpa: { label: "TPA", unit: "trees/ac" },
+  baa: { label: "BA", unit: "ft²/ac" },
+  top_ht: { label: "Top height", unit: "ft" },
+  ccf: { label: "CCF", unit: "%" },
+  tcuft: { label: "Total volume", unit: "ft³/ac" },
+  mcuft: { label: "Merch. volume", unit: "ft³/ac" },
+};
+
+async function loadSummaryRows(runId) {
+  try {
+    return {
+      rows: await api(`api/runs/${encodeURIComponent(runId)}/metric-summary`),
+      metric: true,
+    };
+  } catch (error) {
+    return {
+      rows: await api(`api/runs/${encodeURIComponent(runId)}/summary`),
+      metric: false,
+    };
+  }
+}
+
 async function renderSummary(body) {
-  const rows = await api(`api/runs/${state.run.id}/summary`);
+  const { rows, metric } = await loadSummaryRows(state.run.id);
   body.append(el("h2", {}, "Summary"));
   if (!rows.length) {
     body.append(el("p", { className: "muted" }, "This run wrote no summary rows."));
     return;
   }
+  const schema = metric ? SUMMARY_METRICS : NATIVE_SUMMARY;
   const latest = rows[rows.length - 1];
-  const kpis = [
-    ["Year", latest.year],
-    ["BA (summary)", latest.baa],
-    ["TPH (summary)", latest.tpa],
-    ["Top height", latest.top_ht],
-    ["CCF", latest.ccf],
-  ].filter(([, value]) => value !== undefined && value !== null);
+  const kpiKeys = metric
+    ? ["Year", "BA", "Tph", "QMD", "TopHt"]
+    : ["year", "baa", "tpa", "top_ht"];
+  const kpis = kpiKeys
+    .filter((key) => schema[key] && latest[key] !== undefined && latest[key] !== null)
+    .map((key) => [schema[key], latest[key]]);
   if (kpis.length) {
     body.append(
       el("div", { className: "kpi-grid" },
-        ...kpis.map(([label, value]) =>
+        ...kpis.map(([definition, value]) =>
           el("article", { className: "kpi-card" },
-            el("span", { className: "kpi-label" }, label),
+            el("span", { className: "kpi-label" },
+              definition.label,
+              definition.unit ? el("em", {}, ` ${definition.unit}`) : null,
+            ),
             el("strong", {}, fmt(value)),
-            el("small", {}, `at year ${latest.year ?? "?"}`),
+            el("small", {}, `at year ${fmt(latest.Year ?? latest.year ?? "?")}`),
           ),
         ),
       ),
     );
   }
-  const columns = Object.keys(rows[0]);
-  const numeric = columns.filter((column) => isNumeric(rows, column));
+  body.append(
+    el("p", { className: "muted summary-source" },
+      metric
+        ? "Metric summary from FVS_Summary_Metric: BA m²/ha, TPH trees/ha, QMD cm, top height m, volume m³/ha."
+        : "No FVS_Summary_Metric table in this run. These are summary.csv values in FVS native units "
+          + "(ft²/ac, trees/ac, ft), not metric values.",
+    ),
+  );
+
+  const columns = Object.keys(schema).filter((key) => rows.some((row) => row[key] !== undefined));
+  const numeric = columns.filter((column) => isNumeric(rows, column) && schema[column]);
+  const preferred = metric ? "BA" : "baa";
   if (!state.summaryColumn || !numeric.includes(state.summaryColumn)) {
-    state.summaryColumn = numeric.includes("baa") ? "baa" : numeric[0];
+    state.summaryColumn = numeric.includes(preferred) ? preferred : numeric[0];
   }
 
   const select = el(
@@ -786,17 +857,36 @@ async function renderSummary(body) {
       },
     },
     ...numeric.map((column) =>
-      el("option", { value: column, selected: column === state.summaryColumn }, column),
+      el("option", { value: column, selected: column === state.summaryColumn },
+        schema[column].label,
+      ),
     ),
   );
   body.append(el("label", { className: "muted" }, "Series ", select));
 
   const x = rows.map((_, index) => index);
   const y = rows.map((row) => Number(row[state.summaryColumn] ?? 0));
-  body.append(chart(x, y, rows.map((row) => row.year ?? ""), state.summaryColumn));
+  const definition = schema[state.summaryColumn] ?? { label: state.summaryColumn, unit: "" };
+  body.append(
+    chart(
+      x,
+      y,
+      rows.map((row) => row.Year ?? row.year ?? ""),
+      definition.label,
+      definition.unit,
+    ),
+  );
 
   body.append(el("h3", {}, "Rows"));
-  const header = el("tr", {}, ...columns.map((column) => el("th", {}, column)));
+  const header = el(
+    "tr",
+    {},
+    ...columns.map((column) =>
+      el("th", {}, schema[column].label,
+        schema[column].unit ? el("span", { className: "column-unit" }, schema[column].unit) : null,
+      ),
+    ),
+  );
   const tableRows = rows.map((row) =>
     el("tr", {}, ...columns.map((column) => el("td", {}, fmt(row[column])))),
   );
@@ -809,10 +899,10 @@ async function renderSummary(body) {
   );
 }
 
-function chart(xs, ys, labels, name) {
+function chart(xs, ys, labels, name, unit = "") {
   const width = 720;
-  const height = 240;
-  const pad = { left: 56, right: 12, top: 12, bottom: 28 };
+  const height = 260;
+  const pad = { left: 64, right: 20, top: 20, bottom: 30 };
   const maxY = Math.max(...ys, 1);
   const minY = Math.min(...ys, 0);
   const spanY = maxY - minY || 1;
@@ -823,12 +913,39 @@ function chart(xs, ys, labels, name) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("class", "chart");
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `${name}${unit ? ` in ${unit}` : ""} over time`);
+
+  for (let tick = 0; tick <= 3; tick += 1) {
+    const value = minY + (spanY * tick) / 3;
+    const y = py(value);
+    const grid = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    grid.setAttribute("class", "chart-grid");
+    grid.setAttribute("x1", pad.left);
+    grid.setAttribute("y1", y);
+    grid.setAttribute("x2", width - pad.right);
+    grid.setAttribute("y2", y);
+    svg.append(grid);
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", pad.left - 8);
+    label.setAttribute("y", y + 4);
+    label.setAttribute("text-anchor", "end");
+    label.textContent = fmt(value);
+    svg.append(label);
+  }
 
   const path = ys.map((value, index) => `${index ? "L" : "M"}${px(index)},${py(value)}`).join(" ");
   const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
   line.setAttribute("class", "line");
   line.setAttribute("d", path);
   svg.append(line);
+
+  const last = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  last.setAttribute("class", "chart-point");
+  last.setAttribute("cx", px(ys.length - 1));
+  last.setAttribute("cy", py(ys[ys.length - 1]));
+  last.setAttribute("r", 3.5);
+  svg.append(last);
 
   const axis = document.createElementNS("http://www.w3.org/2000/svg", "line");
   axis.setAttribute("class", "axis");
@@ -847,11 +964,12 @@ function chart(xs, ys, labels, name) {
     svg.append(text);
   }
 
-  const top = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  top.setAttribute("x", 6);
-  top.setAttribute("y", pad.top + 10);
-  top.textContent = `${name} ${maxY.toFixed(1)}`;
-  svg.append(top);
+  const caption = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  caption.setAttribute("class", "chart-caption");
+  caption.setAttribute("x", pad.left);
+  caption.setAttribute("y", 14);
+  caption.textContent = `${name}${unit ? ` (${unit})` : ""} · latest ${fmt(ys[ys.length - 1])}`;
+  svg.append(caption);
 
   return svg;
 }
