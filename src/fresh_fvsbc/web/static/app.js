@@ -22,6 +22,7 @@ const state = {
   standYear: null,
   pollTimer: null,
   ready: false,
+  detailsTrigger: null,
 };
 
 const WORKSPACES = [
@@ -89,6 +90,23 @@ function workspace_panels(workspace = workspace_definition(state.workspace)) {
   return workspace.panels.filter((panel) => panels.has(panel));
 }
 
+function wireTabs(container) {
+  const tabs = [...container.querySelectorAll('[role="tab"]')];
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("keydown", (event) => {
+      let next = null;
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (index + 1) % tabs.length;
+      if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (index - 1 + tabs.length) % tabs.length;
+      if (event.key === "Home") next = 0;
+      if (event.key === "End") next = tabs.length - 1;
+      if (next === null) return;
+      event.preventDefault();
+      tabs[next].focus();
+      tabs[next].click();
+    });
+  });
+}
+
 /* ---------------------------------------------------------------- shell */
 
 function renderShell() {
@@ -121,11 +139,13 @@ function renderShell() {
           onclick: () => selectWorkspace(workspace.id),
           role: "tab",
           "aria-selected": String(workspace.id === state.workspace),
+          tabindex: workspace.id === state.workspace ? "0" : "-1",
         },
         workspace.title,
       ),
     ),
   );
+  wireTabs(workspaceNav);
 
   const panels = workspace_panels();
   if (!panels.includes(state.panel)) state.panel = panels[0] ?? null;
@@ -137,11 +157,15 @@ function renderShell() {
         {
           className: panel === state.panel ? "active" : "",
           onclick: () => selectPanel(panel),
+          role: "tab",
+          "aria-selected": String(panel === state.panel),
+          tabindex: panel === state.panel ? "0" : "-1",
         },
         panel[0].toUpperCase() + panel.slice(1),
       ),
     ),
   );
+  wireTabs(panelNav);
   panelNav.hidden = state.workspace === "runs" || state.workspace === "stand" || panels.length === 0;
 
   const badgeEl = document.getElementById("run-state");
@@ -1008,10 +1032,13 @@ async function openDetails() {
   const body = document.getElementById("details-body");
   const drawer = document.getElementById("details-drawer");
   const backdrop = document.getElementById("drawer-backdrop");
+  state.detailsTrigger = document.activeElement;
   body.replaceChildren(el("p", { className: "muted" }, "Loading provenance…"));
   drawer.hidden = false;
   backdrop.hidden = false;
+  document.getElementById("details-button").setAttribute("aria-expanded", "true");
   document.body.classList.add("drawer-open");
+  document.getElementById("close-details").focus();
   let payload;
   try {
     payload = await api(`api/runs/${encodeURIComponent(state.run.id)}/provenance`);
@@ -1057,7 +1084,9 @@ function closeDetails() {
   const backdrop = document.getElementById("drawer-backdrop");
   if (drawer) drawer.hidden = true;
   if (backdrop) backdrop.hidden = true;
+  document.getElementById("details-button").setAttribute("aria-expanded", "false");
   document.body.classList.remove("drawer-open");
+  state.detailsTrigger?.focus?.();
 }
 
 /* ---------------------------------------------------------------- boot */

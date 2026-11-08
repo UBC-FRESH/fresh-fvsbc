@@ -379,6 +379,7 @@ function createMap(canvas, tooltip, onSelect = null) {
 
   const resize = () => {
     size();
+    if (state.payload) fit();
     schedule();
   };
 
