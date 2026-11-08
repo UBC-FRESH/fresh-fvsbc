@@ -520,3 +520,38 @@ body.drawer-open { overflow: hidden; }
   .dialog-actions button { width: 100%; }
   .drawer { width: 100vw; }
 }
+
+/* ---------------------------------------------------------------- assistant */
+.assistant-drawer { width: min(420px, 100vw); }
+.assistant-log {
+  flex: 1;
+  overflow: auto;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.assistant-message {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 9px 11px;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.assistant-message.user { margin-left: 28px; background: var(--panel-2); }
+.assistant-message.assistant { margin-right: 18px; background: var(--bg); }
+.assistant-message .citations { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.assistant-message .citations button { font-size: 11px; padding: 2px 7px; }
+.assistant-quick { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 18px 8px; }
+.assistant-quick button { font-size: 11px; }
+.assistant-form {
+  display: flex;
+  gap: 7px;
+  padding: 10px 18px 18px;
+  border-top: 1px solid var(--line);
+  align-items: flex-end;
+}
+.assistant-form textarea { flex: 1; min-height: 42px; }
+.assistant-form button { min-height: 42px; }

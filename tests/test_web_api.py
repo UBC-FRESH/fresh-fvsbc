@@ -262,6 +262,39 @@ def test_starting_a_run_can_apply_a_calibration_bundle(
     )
 
 
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    [
+        ("Is the calibration bundle signed?", "no calibration"),
+        ("Show provenance.", "fresh_fvsbc_version"),
+        ("Why did TPH change?", "tph"),
+        ("What is the basal area?", "ba"),
+        ("Summarize this run.", "run-a"),
+    ],
+)
+def test_the_assistant_answers_from_the_open_run(
+    client: TestClient, message: str, expected: str
+) -> None:
+    """The assistant reads summary, provenance, and calibration without inventing facts."""
+    response = client.post("/api/assistant", json={"run": "run-a", "message": message})
+    assert response.status_code == 200
+    payload = response.json()
+    assert expected in payload["reply"].lower()
+    assert payload["citations"]
+
+
+def test_the_assistant_refuses_bad_input_and_has_a_no_run_answer(client: TestClient) -> None:
+    """Empty, overlong, and unknown-run requests are refused; no-run gets a safe prompt."""
+    no_run = client.post("/api/assistant", json={"message": "Summarize this run."})
+    assert no_run.status_code == 200
+    assert "open a run" in no_run.json()["reply"].lower()
+    assert client.post("/api/assistant", json={"message": "  "}).status_code == 422
+    assert client.post("/api/assistant", json={"message": "x" * 4001}).status_code == 422
+    assert (
+        client.post("/api/assistant", json={"run": "nope", "message": "summary"}).status_code == 404
+    )
+
+
 def test_a_non_loopback_bind_is_refused_without_the_flag(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
