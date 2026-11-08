@@ -1,0 +1,64 @@
+{
+  "packet_id": "d9-cwh-review-2026-11-08",
+  "supersedes": "d8-review-2026-11-04 for the CWH-4cm scope only",
+  "signed_off": false,
+  "reviewer": null,
+  "decision": "pending",
+  "tier": "A-pilot-external",
+  "bundle": {
+    "domain": "CWH",
+    "path": "notes/reference/calibration/d7-cwh-4cm-bundle.json",
+    "bundle_id": "cwh-growth-4cm-pilot-2026-11-04",
+    "version": "0.1.3",
+    "sha256": "sha256:4c3a068dd3c50445cfa43a541b4a7a3b1903d4f3b05f44ab731d84c6d90bfce5",
+    "bytes": 6451
+  },
+  "evidence": [
+    {
+      "role": "PSP BA/TPH holdouts and bundle summary",
+      "path": "notes/reference/calibration/d7-cwh-4cm-summary.csv",
+      "sha256": "sha256:4c18d3fc67d13c442eec0a86dfb4bbb8af1b73ad7365f46e2d6b94c893aad99c",
+      "bytes": 1759
+    },
+    {
+      "role": "PSP QMD, top height, and volume validation",
+      "path": "notes/reference/calibration/d9-cwh-4cm-validation-summary.csv",
+      "sha256": "sha256:cc2ebfaa2f69f032ba95f4bc8f2ded23980f5d19b9d36bdf9ed09c25de9d851d",
+      "bytes": 847
+    },
+    {
+      "role": "Merchantability-matched volume comparison",
+      "path": "notes/reference/calibration/d9-cwh-volume-matched-summary.csv",
+      "sha256": "sha256:618146dc6ff6bdeb1c602d12928644f56c89e120e521bd710676df75bad2d6e0",
+      "bytes": 359
+    },
+    {
+      "role": "Same-sample non-PSP default and candidate comparison",
+      "path": "notes/reference/calibration/d9-faib-nonpsp-domain-candidates.csv",
+      "sha256": "sha256:c48545ab64dce1c18c0b2a0e612c4c5e55e1f68a20699f86ff9ead6dfe7e5474",
+      "bytes": 790
+    },
+    {
+      "role": "Tiered domain decision surface",
+      "path": "notes/reference/calibration/d9-tiered-domain-status.csv",
+      "sha256": "sha256:bc25ee3dce8b67d227f45b053e0e3a579337780643cc77a7210b50750d59ca51",
+      "bytes": 3834
+    }
+  ],
+  "required_checks": [
+    "recompute the bundle and evidence checksums",
+    "confirm CWH-only, CAR/KAM/NEL, DBH >=4 cm, untreated domain",
+    "confirm the PSP table is the 4 cm five-per-BEC fixed-parameter evidence",
+    "confirm the non-PSP table is the same D9.55 sample and not the older 2 cm comparison",
+    "confirm external matched volume is stated as unresolved",
+    "confirm the unsigned status and claim boundary are stated",
+    "accept, narrow, or reject the pilot; do not sign without a named reviewer"
+  ],
+  "blocking_items": [
+    "external matched volume is -12.6%, outside the \u00b110% band",
+    "BAIMULT 7.0 and REGDMULT 2.0 are structural corrections selected after the 4 cm grid",
+    "temporal TPH margin is +12.1%, close to the \u00b115% band",
+    "no named reviewer signature"
+  ],
+  "claim_boundary": "This is a review packet for an unsigned CWH 4 cm pilot. It does not support a yield, AAC, legal, or whole-block claim, and it is not a certificate."
+}

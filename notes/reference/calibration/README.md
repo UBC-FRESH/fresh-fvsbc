@@ -73,6 +73,7 @@ outside the repository because they carry site identifiers.
 | `d9-faib-nonpsp-domain-baseline.md`, `d9-faib-nonpsp-domain-baseline.csv` | D9.55 independent non-PSP screen of the identity default across every calibration domain |
 | `d9-faib-nonpsp-domain-candidates.csv` | D9.55 fixed-bundle comparison on the same non-PSP sample |
 | `d9-tiered-domain-status.csv` | D9.55 tiered domain decision surface: pilot, default, needs-work, insufficient |
+| `d9-cwh-review-packet.md`, `d9-cwh-review-manifest.json` | D9.56 review packet for the CWH 4 cm pilot; unsigned, external volume blocking |
 | `nonpsp_domain_baseline.py` | D9.55 reproducible domain summariser and site bootstrap |
 | `d9-faib-dbh-standard.md` | D9.3–D9.5 DBH-limit audit, 4+ cm denominator, and CWH 4 cm refit |
 | `d9-cwh-4cm-refit.md`, `d7-cwh-4cm-bundle.json`, `d7-cwh-4cm-summary.csv` | D9.6 CWH 4 cm pilot with REGDMULT |
