@@ -118,6 +118,22 @@ def create_app(
         title="fresh-fvsbc",
         description="A reader over the artefacts an FVS-BC run leaves behind.",
     )
+
+    @app.middleware("http")
+    async def _no_store_shell(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        """Keep the shell and its assets out of browser and edge caches.
+
+        The demo is updated in place, and a stale ``app.js`` is indistinguishable from a broken
+        assistant. The shell is tiny, so revalidation costs less than a cache surprise.
+        """
+        response = await call_next(request)
+        path = request.scope.get("path", "")
+        if path in {"/", "/index.html"} or path.endswith((".html", ".js", ".css")):
+            response.headers["Cache-Control"] = "no-store, max-age=0"
+        return response
+
     if root_path:
         prefix = "/" + root_path.strip("/")
 
