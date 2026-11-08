@@ -64,8 +64,9 @@ import pandas as pd
 from fresh_fvsbc.bec import BecCode, BecCodeError
 from fresh_fvsbc.bundle import BundleError, CalibrationBundle
 from fresh_fvsbc.calibration import SPECIES_GROUPS
+from fresh_fvsbc.calibration_probe import insert_parameters
 from fresh_fvsbc.keywords import Keyword, KeywordSet
-from fresh_fvsbc.nemora import PlotFields, to_tree_list
+from fresh_fvsbc.nemora import PlotFields, PopulationError, to_tree_list
 from fresh_fvsbc.outputs import check_run, read_cases
 from fresh_fvsbc.provenance import Provenance, built_variants, from_cases, treelist_hash
 from fresh_fvsbc.treelist import BC_TREFMT, TreeListFields, write_tree_file
@@ -710,6 +711,41 @@ def run_case(
     )
 
 
+def _timeint_years(keywords: Sequence[Keyword]) -> float:
+    """Return the first positive TIMEINT value, or a stated ten-year default."""
+    for keyword in keywords:
+        if keyword.name != "TIMEINT":
+            continue
+        for value in reversed(keyword.parameters):
+            try:
+                number = float(value)
+            except (TypeError, ValueError):
+                continue
+            if number > 0:
+                return number
+    return 10.0
+
+
+def _apply_calibration(
+    records: Sequence[TreeListFields],
+    keywords: Sequence[Keyword],
+    calibration: CalibrationBundle,
+) -> tuple[Keyword, ...]:
+    """Render a bundle's parameters and matching ESTAB block before the projection."""
+    additions = list(calibration.render())
+    if calibration.ingrowth is not None:
+        code = _bec_of(keywords)
+        block = calibration.ingrowth_keyword(
+            bec=f"{code.zone}{code.subzone}",
+            years=_timeint_years(keywords),
+            ba=_ba(records),
+            qmd=_qmd(records),
+        )
+        if block is not None:
+            additions.append(block)
+    return insert_parameters(keywords, additions)
+
+
 def run_population(
     population: Sequence[Mapping[str, object]],
     *,
@@ -720,6 +756,9 @@ def run_population(
     variant: str = "bc",
     plot_fields: PlotFields | None = None,
     key_name: str = KEYWORD_FILE_NAME,
+    calibration: CalibrationBundle | None = None,
+    tsa: str | None = None,
+    min_dbh: float | None = None,
 ) -> RunResult:
     """Run one case built from a synthetic stem population.
 
@@ -745,6 +784,12 @@ def run_population(
         The plot-level fields, which belong to a run.
     key_name : str, optional
         The keyword file's name inside ``directory``.
+    calibration : CalibrationBundle, optional
+        A bundle to render and apply to this run, including its ingrowth block.
+    tsa : str, optional
+        The TSA name for a bundle domain that names one.
+    min_dbh : float, optional
+        Filter the population to trees at or above this DBH before the run.
 
     Returns
     -------
@@ -765,4 +810,20 @@ def run_population(
         If the run cannot be set up, driven, or read.
     """
     records = to_tree_list(population, species=species, tree_age=tree_age, plot_fields=plot_fields)
-    return run_case(records, keywords, directory=directory, variant=variant, key_name=key_name)
+    if min_dbh is not None:
+        if min_dbh < 0:
+            raise PopulationError("min_dbh must not be negative")
+        records = [record for record in records if float(record["diam"]) >= min_dbh]
+        if not records:
+            raise PopulationError("the population has no trees at or above min_dbh")
+    if calibration is not None:
+        keywords = _apply_calibration(records, keywords, calibration)
+    return run_case(
+        records,
+        keywords,
+        directory=directory,
+        variant=variant,
+        key_name=key_name,
+        calibration=calibration,
+        tsa=tsa,
+    )

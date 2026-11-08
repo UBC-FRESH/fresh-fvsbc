@@ -487,6 +487,16 @@ def create_app(
         for entry in payload.get("keywords", []):
             text = str(entry)
             command.extend(["--block" if "|" in text else "--keyword", text])
+        bundle_id = payload.get("bundle")
+        if bundle_id:
+            bundle_records = [record for record in _bundles() if record["bundle_id"] == bundle_id]
+            if not bundle_records:
+                raise HTTPException(status_code=400, detail=f"no calibration bundle {bundle_id!r}")
+            command.extend(["--calibration", bundle_records[0]["path"]])
+        if payload.get("tsa"):
+            command.extend(["--tsa", str(payload["tsa"])])
+        if payload.get("min_dbh") is not None:
+            command.extend(["--min-dbh", str(payload["min_dbh"])])
         directory.mkdir(parents=True)
         log = (directory / "service.log").open("w", encoding="utf-8")
         app.state.processes[identifier] = subprocess.Popen(

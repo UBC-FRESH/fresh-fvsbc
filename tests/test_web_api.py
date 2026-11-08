@@ -220,6 +220,48 @@ def test_starting_a_run_invokes_the_cli(tmp_path: Path, monkeypatch: pytest.Monk
     assert (tmp_path / "new-run").is_dir()
 
 
+def test_starting_a_run_can_apply_a_calibration_bundle(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A selected bundle is passed as a server-side path, never as an arbitrary client path."""
+    recorded: list[list[str]] = []
+
+    class _Stub:
+        def __init__(self, command: list[str], **_: object) -> None:
+            recorded.append(command)
+
+    bundle_dir = tmp_path / "bundles"
+    bundle_dir.mkdir()
+    source = (
+        Path(__file__).resolve().parents[1] / "notes/reference/calibration/d7-cwh-4cm-bundle.json"
+    )
+    (bundle_dir / "cwh.json").write_bytes(source.read_bytes())
+    monkeypatch.setattr(subprocess, "Popen", _Stub)
+    client = TestClient(webapp.create_app([tmp_path / "runs"], bundles=[bundle_dir]))
+    response = client.post(
+        "/api/runs",
+        json={
+            "population": "p.json",
+            "species": "FD",
+            "tree_age": 60,
+            "id": "with-bundle",
+            "bundle": "cwh-growth-4cm-pilot-2026-11-04",
+            "min_dbh": 4,
+        },
+    )
+    assert response.status_code == 202
+    assert "--calibration" in recorded[0]
+    assert "--min-dbh" in recorded[0]
+    assert recorded[0][recorded[0].index("--calibration") + 1].endswith("cwh.json")
+    assert (
+        client.post(
+            "/api/runs",
+            json={"population": "p.json", "species": "FD", "tree_age": 60, "bundle": "missing"},
+        ).status_code
+        == 400
+    )
+
+
 def test_a_non_loopback_bind_is_refused_without_the_flag(
     capsys: pytest.CaptureFixture[str],
 ) -> None:

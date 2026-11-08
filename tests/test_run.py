@@ -27,7 +27,7 @@ from fresh_fvsbc.keywords import (
     UnknownKeywordError,
     keyword_set_hash,
 )
-from fresh_fvsbc.nemora import MissingAssignmentError, to_tree_list
+from fresh_fvsbc.nemora import MissingAssignmentError, PopulationError, to_tree_list
 from fresh_fvsbc.outputs import MissingOutputError, RunFailedError, read_table
 from fresh_fvsbc.provenance import Provenance
 from fresh_fvsbc.treelist import BC_TREFMT, TreeListFields, write_tree_record
@@ -520,6 +520,8 @@ def test_run_population_adapts_the_population_before_running(
         directory: str | Path,
         variant: str = "bc",
         key_name: str = run.KEYWORD_FILE_NAME,
+        calibration: object = None,
+        tsa: str | None = None,
     ) -> run.RunResult:
         captured.append(records)
         return a_result(Path(directory))
@@ -528,6 +530,115 @@ def test_run_population_adapts_the_population_before_running(
     population = synthetic_population()
     run.run_population(population, species="FD", tree_age=60.0, directory=tmp_path / "run")
     assert list(captured[0]) == to_tree_list(population, species="FD", tree_age=60.0)
+
+
+def test_run_population_applies_a_bundle_and_minimum_dbh(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A bundle renders its keywords and the population is filtered before the run."""
+    captured: list[tuple[Sequence[TreeListFields], Sequence[Keyword]]] = []
+
+    def stub(
+        records: Sequence[TreeListFields],
+        keywords: Sequence[Keyword],
+        *,
+        directory: str | Path,
+        variant: str = "bc",
+        key_name: str = run.KEYWORD_FILE_NAME,
+        calibration: object = None,
+        tsa: str | None = None,
+    ) -> run.RunResult:
+        captured.append((records, keywords))
+        return a_result(Path(directory))
+
+    monkeypatch.setattr(run, "run_case", stub)
+    bundle = load_bundle(
+        Path(__file__).resolve().parents[1] / "notes/reference/calibration/d7-cwh-4cm-bundle.json"
+    )
+    keywords = (
+        Keyword("STDINFO", ("CAR", "CWHvm1/01")),
+        Keyword("TIMEINT", ("", "5")),
+        Keyword("PROCESS"),
+    )
+    population = synthetic_population()
+    run.run_population(
+        population,
+        species="FD",
+        tree_age=60.0,
+        keywords=keywords,
+        calibration=bundle,
+        min_dbh=10.0,
+        directory=tmp_path / "run",
+    )
+    records, applied = captured[0]
+    assert all(float(record["diam"]) >= 10.0 for record in records)
+    names = [keyword.name for keyword in applied]
+    assert "BAIMULT" in names
+    assert "REGDMULT" in names
+    assert "PROCESS" in names
+
+
+def test_run_population_refuses_a_bad_dbh_filter(tmp_path: Path) -> None:
+    """The DBH filter is validated before the run and cannot hide an empty population."""
+    population = synthetic_population()
+    with pytest.raises(PopulationError, match="negative"):
+        run.run_population(
+            population, species="FD", tree_age=60.0, min_dbh=-1, directory=tmp_path / "run"
+        )
+    with pytest.raises(PopulationError, match="no trees"):
+        run.run_population(
+            population, species="FD", tree_age=60.0, min_dbh=999, directory=tmp_path / "run"
+        )
+
+
+def test_run_population_applies_an_ingrowth_bundle(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An ingrowth bundle renders ESTAB from the BEC, BA, QMD, and TIMEINT."""
+    captured: list[Sequence[Keyword]] = []
+
+    def stub(
+        records: Sequence[TreeListFields],
+        keywords: Sequence[Keyword],
+        *,
+        directory: str | Path,
+        variant: str = "bc",
+        key_name: str = run.KEYWORD_FILE_NAME,
+        calibration: object = None,
+        tsa: str | None = None,
+    ) -> run.RunResult:
+        captured.append(keywords)
+        return a_result(Path(directory))
+
+    monkeypatch.setattr(run, "run_case", stub)
+    bundle = load_bundle(
+        Path(__file__).resolve().parents[1] / "notes/reference/calibration/d7-idfdk-bundle.json"
+    )
+    keywords = (
+        Keyword("STDINFO", ("CAR", "IDFdk3/01")),
+        Keyword("TIMEINT", ("", "5")),
+        Keyword("PROCESS"),
+    )
+    run.run_population(
+        synthetic_population(),
+        species="FD",
+        tree_age=60.0,
+        keywords=keywords,
+        calibration=bundle,
+        directory=tmp_path / "run",
+    )
+    assert any(keyword.name == "ESTAB" for keyword in captured[0])
+
+
+def test_timeint_years_has_a_stated_fallback() -> None:
+    """A bundle without TIMEINT uses ten years; invalid values are ignored."""
+    assert run._timeint_years((Keyword("PROCESS"),)) == 10.0
+    keywords = (
+        Keyword("TIMEINT", ("", "0")),
+        Keyword("TIMEINT", ("", "x")),
+        Keyword("TIMEINT", ("", "7")),
+    )
+    assert run._timeint_years(keywords) == 7.0
 
 
 def test_run_population_refuses_a_population_without_species(tmp_path: Path) -> None:

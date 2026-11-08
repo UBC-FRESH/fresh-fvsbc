@@ -28,7 +28,7 @@ from functools import partial
 from pathlib import Path
 
 from fresh_fvsbc.bec import BecCodeError
-from fresh_fvsbc.bundle import BundleError
+from fresh_fvsbc.bundle import BundleError, load_bundle
 from fresh_fvsbc.keywords import (
     KEYWORD_BLOCK_KEYWORDS,
     LINES_KEYWORDS,
@@ -174,6 +174,25 @@ def _parser() -> argparse.ArgumentParser:
         dest="key_name",
         metavar="NAME",
         help=f"the keyword file's name inside DIR (default: {KEYWORD_FILE_NAME})",
+    )
+    parser.add_argument(
+        "--calibration",
+        type=Path,
+        metavar="FILE",
+        help="calibration bundle to render and apply to this run",
+    )
+    parser.add_argument(
+        "--tsa",
+        default=None,
+        metavar="NAME",
+        help="TSA name for a bundle domain that names one",
+    )
+    parser.add_argument(
+        "--min-dbh",
+        type=float,
+        default=None,
+        metavar="CM",
+        help="filter the population to trees at or above this DBH",
     )
     return parser
 
@@ -383,6 +402,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         for warning in validate_keywords(keywords):
             print(f"fresh-fvsbc: warning: {warning}", file=sys.stderr)
         population = _read_population(args.population)
+        calibration = load_bundle(args.calibration) if args.calibration is not None else None
         result = run_population(
             population,
             directory=args.directory,
@@ -390,6 +410,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             tree_age=args.tree_age,
             keywords=keywords,
             key_name=args.key_name,
+            calibration=calibration,
+            tsa=args.tsa,
+            min_dbh=args.min_dbh,
         )
     except _INPUT_ERRORS as error:
         print(f"fresh-fvsbc: {error}", file=sys.stderr)
