@@ -273,6 +273,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-cwh-volume-matched-summary.csv` | The D9.33 matched volume metrics |
 | `d9-bcmort-crown.md` | The D9.34 crown-class screen |
 | `d9-bcmort-crown-summary.csv` | The D9.34 crown metrics |
+| `d9-bcmort-hd.md` | The D9.35 height/DBH screen |
+| `d9-bcmort-hd-summary.csv` | The D9.35 height/DBH metrics |
+| `bcmort_hd.py` | The D9.35 height/DBH prototype |
 | `bcmort_crown.py` | The D9.34 crown prototype |
 | `cwh_volume_matched.py` | The D9.33 audit code |
 | `bcmort_local_calibration.py` | The D9.32 prototype code |
