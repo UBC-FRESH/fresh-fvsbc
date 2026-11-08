@@ -303,6 +303,7 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-quesnel-closure-summary.csv` | The D9.57 Quesnel metrics |
 | `d9-mpb-panel.md` | The D9.58 high-PL MPB panel |
 | `d9-mpb-local-protocol.md` | The D9.59 local MPB calibration protocol |
+| `d9-mpb-bec-local.md` | The D9.60 BEC-stratified MPB calibration |
 | `bcmort_provincial_temporal.py` | The D9.45 temporal prototype |
 | `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
