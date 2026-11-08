@@ -213,6 +213,37 @@ def test_the_compare_workspace_shows_two_run_deltas(cockpit: str) -> None:
             browser.close()
 
 
+def test_direct_links_restore_table_and_compare_state(cockpit: str) -> None:
+    """A shared URL reopens the same filtered table and comparison."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}"
+                "&table=FVS_Summary_Metric&q=70",
+                wait_until="networkidle",
+            )
+            expect(page.locator("#table-filter")).to_have_value("70")
+            expect(page.locator("#panel-body")).to_contain_text("1 matching row")
+            assert "table=FVS_Summary_Metric" in page.evaluate("window.location.search")
+            assert "q=70" in page.evaluate("window.location.search")
+
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}-b&b={RUN_ID}&metric=Tph&ctable=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            expect(page.locator(".compare-pickers select").nth(0)).to_have_value(f"{RUN_ID}-b")
+            expect(page.locator(".compare-pickers select").nth(1)).to_have_value(RUN_ID)
+            expect(page.locator("select").filter(has_text="TPH").first).to_have_value("Tph")
+            assert "metric=Tph" in page.evaluate("window.location.search")
+            assert f"a={RUN_ID}-b" in page.evaluate("window.location.search")
+        finally:
+            browser.close()
+
+
 def test_the_mobile_shell_does_not_overflow(cockpit: str) -> None:
     """The runs and summary views fit a phone-width viewport."""
     expect = playwright_module.expect

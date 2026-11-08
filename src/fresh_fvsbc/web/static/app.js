@@ -779,6 +779,7 @@ async function renderTables(body) {
             state.table = table.name;
             state.tableQuery = "";
             state.tableOffset = 0;
+            updateUrl();
             renderPanel();
           },
         },
@@ -794,6 +795,7 @@ async function renderTables(body) {
     state.table = preferred.find((name) => tables.some((table) => table.name === name))
       ?? tables[0]?.name
       ?? null;
+    updateUrl();
   }
   if (!state.table) return;
 
@@ -817,6 +819,7 @@ async function renderTables(body) {
       event.preventDefault();
       state.tableQuery = filterInput.value.trim();
       state.tableOffset = 0;
+      updateUrl();
       renderPanel();
     },
   },
@@ -825,7 +828,12 @@ async function renderTables(body) {
     state.tableQuery
       ? el("button", {
           type: "button",
-          onclick: () => { state.tableQuery = ""; state.tableOffset = 0; renderPanel(); },
+          onclick: () => {
+            state.tableQuery = "";
+            state.tableOffset = 0;
+            updateUrl();
+            renderPanel();
+          },
         }, "Clear")
       : null,
     el("a", { className: "button-like", href: csvHref, download: `${state.run.id}-${state.table}.csv` },
@@ -900,6 +908,7 @@ async function renderTables(body) {
         disabled: payload.offset <= 0,
         onclick: () => {
           state.tableOffset = Math.max(0, payload.offset - payload.limit);
+          updateUrl();
           renderPanel();
         },
       }, "Previous"),
@@ -908,6 +917,7 @@ async function renderTables(body) {
         disabled: payload.offset + payload.rows.length >= payload.total,
         onclick: () => {
           state.tableOffset = payload.offset + payload.limit;
+          updateUrl();
           renderPanel();
         },
       }, "Next"),
@@ -1425,16 +1435,19 @@ async function renderCompare(body) {
       { className: "compare-pickers" },
       el("label", {}, "A ", picker(state.compareA, (event) => {
         state.compareA = event.target.value;
+        updateUrl();
         renderPanel();
       })),
       el("label", {}, "B ", picker(state.compareB, (event) => {
         state.compareB = event.target.value;
+        updateUrl();
         renderPanel();
       })),
       el("button", {
         type: "button",
         onclick: () => {
           [state.compareA, state.compareB] = [state.compareB, state.compareA];
+          updateUrl();
           renderPanel();
         },
       }, "Swap"),
@@ -1476,10 +1489,12 @@ async function renderCompare(body) {
       ));
       if (!state.compareMetric || !SUMMARY_METRICS[state.compareMetric]) {
         state.compareMetric = "BA";
+        updateUrl();
       }
       const metricSelect = el("select", {
         onchange: (event) => {
           state.compareMetric = event.target.value;
+          updateUrl();
           renderPanel();
         },
       }, ...metrics.map((key) =>
@@ -1537,6 +1552,7 @@ async function renderCompare(body) {
   if (!state.compareTable || !shared.includes(state.compareTable)) {
     state.compareTable = ["FVS_Summary_Metric", "FVS_TreeList_Metric", "FVS_CutList_Metric"]
       .find((name) => shared.includes(name)) ?? shared[0];
+    updateUrl();
   }
 
   body.append(el("h3", {}, "Row-level table diff"));
@@ -1544,6 +1560,7 @@ async function renderCompare(body) {
     el("select", {
       onchange: (event) => {
         state.compareTable = event.target.value;
+        updateUrl();
         renderPanel();
       },
     }, ...shared.map((name) =>
@@ -1618,6 +1635,13 @@ function readUrlState() {
     run: params.get("run"),
     panel: params.get("panel"),
     year: params.get("year"),
+    table: params.get("table"),
+    q: params.get("q"),
+    offset: params.get("offset"),
+    a: params.get("a"),
+    b: params.get("b"),
+    metric: params.get("metric"),
+    ctable: params.get("ctable"),
   };
 }
 
@@ -1629,6 +1653,17 @@ function updateUrl() {
   if (state.panel) params.set("panel", state.panel);
   if (state.workspace === "stand" && state.standYear !== null) {
     params.set("year", String(state.standYear));
+  }
+  if (state.workspace === "results" && state.panel === "tables" && state.table) {
+    params.set("table", state.table);
+    if (state.tableQuery) params.set("q", state.tableQuery);
+    if (state.tableOffset > 0) params.set("offset", String(state.tableOffset));
+  }
+  if (state.workspace === "results" && state.panel === "compare") {
+    if (state.compareA) params.set("a", state.compareA);
+    if (state.compareB) params.set("b", state.compareB);
+    if (state.compareMetric) params.set("metric", state.compareMetric);
+    if (state.compareTable) params.set("ctable", state.compareTable);
   }
   const query = params.toString();
   window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
@@ -2113,6 +2148,14 @@ async function boot() {
     if (!workspaces.some((workspace) => workspace.id === state.workspace)) state.workspace = "runs";
     state.panel = initial.panel || workspace_panels()[0] || null;
     if (!workspace_panels().includes(state.panel)) state.panel = workspace_panels()[0] || null;
+    state.table = initial.table;
+    state.tableQuery = initial.q || "";
+    const offset = Number(initial.offset);
+    state.tableOffset = Number.isInteger(offset) && offset > 0 ? offset : 0;
+    if (initial.a) state.compareA = initial.a;
+    if (initial.b) state.compareB = initial.b;
+    if (initial.metric) state.compareMetric = initial.metric;
+    state.compareTable = initial.ctable;
     state.ready = true;
     renderShell();
     await renderPanel();
