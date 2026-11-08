@@ -235,6 +235,8 @@ def test_the_spa_is_served_at_the_root(client: TestClient) -> None:
     assert response.status_code == 200
     assert "fresh-fvsbc" in response.text
     assert "app.js" in response.text
+    assert "workspace-nav" in response.text
+    assert "new-run-dialog" in response.text
 
 
 def test_the_cli_dispatches_web_before_the_run_parser(

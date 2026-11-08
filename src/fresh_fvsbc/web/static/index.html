@@ -13,22 +13,69 @@
         <span class="muted" id="oracle-badge"></span>
       </div>
       <div class="controls">
+        <button id="new-run-button" class="primary" type="button">New run</button>
         <label>Skin <select id="skin-select"></select></label>
         <label>Run <select id="run-select"></select></label>
         <span class="badge" id="run-state"></span>
       </div>
     </header>
 
+    <nav id="workspace-nav" class="workspace-nav" role="tablist" aria-label="Workspaces"></nav>
+
     <div class="shell">
-      <nav class="panels" id="panel-nav"></nav>
+      <nav class="panels" id="panel-nav" aria-label="Panels"></nav>
       <main id="panel-body" class="panel-body">
-        <p class="muted">Choose a run.</p>
+        <p class="muted">Choose a run, or start a new one.</p>
       </main>
     </div>
 
     <footer class="footer">
       <span class="muted" id="footer-note"></span>
     </footer>
+
+    <dialog id="new-run-dialog" class="dialog">
+      <form id="new-run-form" method="dialog" class="dialog-card">
+        <div class="dialog-head">
+          <div>
+            <h2>New FVS run</h2>
+            <p class="muted">The service writes the run under its configured runs root.</p>
+          </div>
+          <button id="close-new-run" class="ghost" type="button" aria-label="Close">×</button>
+        </div>
+
+        <div class="form-grid">
+          <label class="field field-wide">
+            <span>Population / tree list path</span>
+            <input id="new-population" type="text" required placeholder="/path/to/treelist.csv" />
+            <small>Server-side path to a tree list the CLI can read.</small>
+          </label>
+          <label class="field">
+            <span>Species</span>
+            <input id="new-species" type="text" required value="FD" />
+          </label>
+          <label class="field">
+            <span>Tree age</span>
+            <input id="new-tree-age" type="number" min="1" step="1" value="60" required />
+          </label>
+          <label class="field field-wide">
+            <span>Run id <em>optional</em></span>
+            <input id="new-run-id" type="text" placeholder="leave blank for a timestamp" />
+          </label>
+          <label class="field field-wide">
+            <span>Keyword lines <em>optional</em></span>
+            <textarea id="new-keywords" rows="5" placeholder="MANAGED=0,1&#10;DATABASE|DSNOut|FVSOut.db|Summary|END"></textarea>
+            <small>One keyword or block per line. A line containing <code>|</code> becomes a block.</small>
+          </label>
+        </div>
+
+        <p id="new-run-error" class="form-error" hidden></p>
+
+        <div class="dialog-actions">
+          <button id="cancel-new-run" class="ghost" type="button">Cancel</button>
+          <button class="primary" type="submit">Start run</button>
+        </div>
+      </form>
+    </dialog>
 
     <script type="importmap">
       {
