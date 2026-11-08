@@ -182,7 +182,7 @@ Endpoints
 ``GET /api/runs/{id}/tables``
     exposed tables written, with counts and the flag
 ``GET /api/runs/{id}/tables/{name}``
-    one table, paged, with its columns; ``q`` filters every column before paging
+    one table, paged, with its columns; ``q`` filters before paging and ``column`` restricts it
 ``GET /api/runs/{id}/tables/{name}/csv``
     the filtered table as a CSV attachment
 ``GET /api/runs/{id}/visuals?year=``

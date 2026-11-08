@@ -222,13 +222,15 @@ def test_direct_links_restore_table_and_compare_state(cockpit: str) -> None:
         try:
             page.goto(
                 f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}"
-                "&table=FVS_Summary_Metric&q=70",
+                "&table=FVS_Summary_Metric&q=10&column=Year",
                 wait_until="networkidle",
             )
-            expect(page.locator("#table-filter")).to_have_value("70")
+            expect(page.locator("#table-filter")).to_have_value("10")
+            expect(page.locator("#table-column")).to_have_value("Year")
             expect(page.locator("#panel-body")).to_contain_text("1 matching row")
             assert "table=FVS_Summary_Metric" in page.evaluate("window.location.search")
-            assert "q=70" in page.evaluate("window.location.search")
+            assert "q=10" in page.evaluate("window.location.search")
+            assert "column=Year" in page.evaluate("window.location.search")
 
             page.goto(
                 f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"

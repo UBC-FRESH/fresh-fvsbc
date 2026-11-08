@@ -311,15 +311,24 @@ def _table_frame(run: Run, name: str) -> pd.DataFrame:
     return read_table(run.database, name)
 
 
-def _filter_frame(frame: pd.DataFrame, query: str | None) -> pd.DataFrame:
-    """Return rows containing a literal, case-insensitive query."""
+def _filter_frame(
+    frame: pd.DataFrame, query: str | None, column: str | None = None
+) -> pd.DataFrame:
+    """Return rows containing a literal, case-insensitive query.
+
+    When ``column`` is given the match is restricted to that column; otherwise every column is
+    searched. The caller has already checked that the column exists.
+    """
     if query is None or not query.strip():
         return frame
     needle = query.strip()
-    mask = frame.apply(
-        lambda column: column.astype("string").str.contains(
-            needle, case=False, regex=False, na=False
+    if column:
+        mask = (
+            frame[column].astype("string").str.contains(needle, case=False, regex=False, na=False)
         )
+        return frame[mask]
+    mask = frame.apply(
+        lambda item: item.astype("string").str.contains(needle, case=False, regex=False, na=False)
     ).any(axis=1)
     return cast(pd.DataFrame, frame[mask])
 
@@ -331,6 +340,7 @@ def table(
     limit: int = DEFAULT_LIMIT,
     offset: int = 0,
     query: str | None = None,
+    column: str | None = None,
 ) -> dict[str, Any]:
     """Read one exposed table from a run's database, as a filtered page.
 
@@ -345,20 +355,25 @@ def table(
     offset : int, optional
         The first row of the page, clamped at zero.
     query : str or None, optional
-        A literal, case-insensitive filter applied across every column before paging.
+        A literal, case-insensitive filter applied before paging.
+    column : str or None, optional
+        Restrict the filter to this column; ``None`` searches every column.
 
     Returns
     -------
     dict
-        ``name``, ``columns``, ``rows``, ``total``, ``limit``, ``offset``, ``query`` and
-        ``oracle``.
+        ``name``, ``columns``, ``rows``, ``total``, ``limit``, ``offset``, ``query``, ``column``
+        and ``oracle``.
 
     Raises
     ------
     RunError
         If the run has no database, or the table is not in it.
     """
-    frame = _filter_frame(_table_frame(run, name), query)
+    raw = _table_frame(run, name)
+    if column and column not in [str(item) for item in raw.columns]:
+        raise RunError(f"the run {run.id} table {name!r} has no column {column!r}")
+    frame = _filter_frame(raw, query, column)
     page_limit = max(1, min(int(limit), MAX_LIMIT))
     page_offset = max(0, int(offset))
     return {
@@ -369,11 +384,12 @@ def table(
         "limit": page_limit,
         "offset": page_offset,
         "query": (query or "").strip(),
+        "column": (column or "").strip(),
         "oracle": name in REFERENCE_VERIFIED,
     }
 
 
-def table_csv(run: Run, name: str, *, query: str | None = None) -> str:
+def table_csv(run: Run, name: str, *, query: str | None = None, column: str | None = None) -> str:
     """Return one exposed table as CSV, with the same literal filter as :func:`table`.
 
     Parameters
@@ -384,6 +400,8 @@ def table_csv(run: Run, name: str, *, query: str | None = None) -> str:
         The exposed table.
     query : str or None, optional
         A literal, case-insensitive filter applied before export.
+    column : str or None, optional
+        Restrict the filter to this column; ``None`` searches every column.
 
     Returns
     -------
@@ -395,8 +413,10 @@ def table_csv(run: Run, name: str, *, query: str | None = None) -> str:
     RunError
         If the run has no database, or the table is not in it.
     """
-    frame = _filter_frame(_table_frame(run, name), query)
-    return frame.to_csv(index=False)
+    raw = _table_frame(run, name)
+    if column and column not in [str(item) for item in raw.columns]:
+        raise RunError(f"the run {run.id} table {name!r} has no column {column!r}")
+    return _filter_frame(raw, query, column).to_csv(index=False)
 
 
 def keywords(run: Run) -> str:
