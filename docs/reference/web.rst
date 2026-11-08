@@ -68,7 +68,8 @@ for opening a table filtered to a cited column/value, or for putting a follow-up
 input. The server checks a table citation against the open run before returning it.
 
 The browser keeps the current assistant conversation and OpenCode session in ``sessionStorage``
-for that tab; **New** clears both. **Stop waiting** aborts the browser request, but the local
+for that tab; **New** clears both. **Copy** and **Export** write a Markdown transcript with the
+run, context, mode, model, session, messages, citations, tool use, and follow-up chips. **Stop waiting** aborts the browser request, but the local
 OpenCode process may still finish in the background, and the panel says so rather than pretending
 the model was cancelled.
 

@@ -1953,6 +1953,72 @@ function restoreAssistantHistory() {
   assistantStatus("Conversation restored · Enter sends · Shift+Enter adds a newline.");
 }
 
+function assistantTranscript() {
+  if (!state.assistant.history.length) return "";
+  const run = state.run?.id ?? "no run";
+  const model = state.assistant.model || (state.assistant.mode === "agent" ? "agent" : "local summary");
+  const lines = [
+    "# fresh-fvsbc assistant transcript",
+    "",
+    `- Run: ${run}`,
+    `- Workspace: ${state.workspace || "—"} / ${state.panel || "—"}`,
+    `- Mode: ${state.assistant.mode}`,
+    `- Model: ${model}`,
+    `- Session: ${state.assistant.session || "—"}`,
+    `- Exported: ${new Date().toISOString()}`,
+    "",
+  ];
+  for (const message of state.assistant.history) {
+    lines.push(`## ${message.role === "user" ? "User" : message.role === "error" ? "Error" : "Assistant"}`, "");
+    lines.push(message.text || "", "");
+    for (const citation of message.citations || []) {
+      lines.push(`- Citation: ${citation.label || citation.target} (${citation.target})`);
+    }
+    for (const action of message.actions || []) {
+      lines.push(`- Tool: ${action.tool}${action.summary ? `: ${action.summary}` : ""}`);
+    }
+    for (const chip of message.chips || []) {
+      lines.push(`- Follow-up: ${chip.label} [${chip.action}: ${chip.target}]`);
+    }
+    if ((message.citations || []).length || (message.actions || []).length || (message.chips || []).length) {
+      lines.push("");
+    }
+  }
+  return lines.join("\n").trimEnd() + "\n";
+}
+
+async function copyAssistantTranscript() {
+  const text = assistantTranscript();
+  if (!text) {
+    assistantStatus("Nothing to copy yet.");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    assistantStatus("Transcript copied.");
+  } catch (_error) {
+    assistantStatus("Clipboard unavailable; use Export instead.");
+  }
+}
+
+function exportAssistantTranscript() {
+  const text = assistantTranscript();
+  if (!text) {
+    assistantStatus("Nothing to export yet.");
+    return;
+  }
+  const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+  const href = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = href;
+  link.download = `fresh-fvsbc-assistant-${state.run?.id || "transcript"}.md`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(href), 1000);
+  assistantStatus("Transcript downloaded.");
+}
+
 function assistantContext() {
   return {
     workspace: state.workspace,
@@ -2215,6 +2281,8 @@ async function boot() {
   document.getElementById("assistant-button").addEventListener("click", openAssistant);
   document.getElementById("close-assistant").addEventListener("click", closeAssistant);
   document.getElementById("assistant-new").addEventListener("click", newAssistantChat);
+  document.getElementById("assistant-copy").addEventListener("click", copyAssistantTranscript);
+  document.getElementById("assistant-export").addEventListener("click", exportAssistantTranscript);
   document.getElementById("assistant-stop").addEventListener("click", () => {
     state.assistant.controller?.abort();
   });
