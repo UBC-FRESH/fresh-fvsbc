@@ -239,8 +239,12 @@ def test_the_calibration_editor_previews_the_domain_and_cycles(cockpit: str) -> 
         page = browser.new_page(viewport={"width": 1440, "height": 1000})
         try:
             page.goto(f"{cockpit}/?workspace=calibration", wait_until="networkidle")
+            expect(page.locator("#calibration-filter")).to_be_visible()
+            page.locator("#calibration-filter").fill("cwh-growth-4cm")
+            page.get_by_role("button", name="Apply").click()
+            expect(page.locator("#panel-body")).to_contain_text("1 of")
             page.get_by_role("button", name="Details", exact=True).click()
-            page.get_by_role("button", name="Use in new run").click()
+            page.locator(".calibration-detail").get_by_role("button", name="Use in new run").click()
             expect(page.locator("#new-run-dialog")).to_be_visible()
             expect(page.locator("#new-bundle")).to_have_value("cwh-growth-4cm-pilot-2026-11-04")
             expect(page.locator("#new-bundle-preview")).to_contain_text("Domain")
