@@ -57,7 +57,15 @@ A site-index covariate was tested with the same TSA holdouts. It did not improve
 
 Site index is not the missing transfer covariate. It does not justify a hierarchical SI-only model.
 
-## 5. Limits
+## 5. Crown-class screen
+
+Crown class (D/C/I/S) was added to the base design; see `d9-bcmort-crown.md` and
+`d9-bcmort-crown-summary.csv`. It improves held-out AUC, log loss, and Brier in three of four TSA
+directions, but worsens MSdm1 Boundary -> Okanagan. A local target intercept reduces the crown
+model's log loss in three directions but still leaves the target mean biased. Crown class is a
+useful next covariate; it is not a calibration fix and is not integrated.
+
+## 6. Limits
 
 - Poisson hazard, not the final cloglog binomial; no exact interval censoring beyond exposure.
 - Tree-level `dead` is a binary outcome, not a known death time.
@@ -65,6 +73,6 @@ Site index is not the missing transfer covariate. It does not justify a hierarch
 - No climate, site index, crown ratio, or recent growth yet.
 - This is a model prototype, not an FVS core change or a bundle.
 
-## 6. Claim boundary
+## 7. Claim boundary
 
 This is a diagnostic prototype. It does not support a yield, AAC, legal, or whole-block claim.
