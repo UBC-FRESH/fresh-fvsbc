@@ -1983,6 +1983,16 @@ function applyAssistantAction(chip) {
     closeAssistant();
     return;
   }
+  if (chip.action === "open_table" && typeof chip.target === "string") {
+    state.table = chip.target;
+    state.tableQuery = String(chip.query || "");
+    state.tableColumn = String(chip.column || "");
+    state.tableOffset = 0;
+    selectWorkspace("results");
+    selectPanel("tables");
+    closeAssistant();
+    return;
+  }
   if (chip.action === "select_year" && Number.isInteger(Number(chip.target))) {
     state.standYear = Number(chip.target);
     selectWorkspace("stand");

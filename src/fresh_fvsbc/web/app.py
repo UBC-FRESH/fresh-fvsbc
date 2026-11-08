@@ -429,6 +429,21 @@ def create_app(
         compact_rows = rows if len(rows) <= 24 else [*rows[:2], *rows[-16:]]
         calibration_id = recorded.get("calibration_id", "")
         bundle = next((item for item in _bundles() if item["bundle_id"] == calibration_id), None)
+        tables: list[dict[str, Any]] = []
+        if run.state == "complete":
+            try:
+                records = runstore.tables(run)
+            except runstore.RunError:
+                records = []
+            key_tables = {"FVS_Summary_Metric", "FVS_TreeList_Metric", "FVS_CutList_Metric"}
+            tables = [
+                {
+                    "name": record["name"],
+                    "columns": record["columns"] if record["name"] in key_tables else [],
+                }
+                for record in records
+            ]
+        context["tables"] = tables
         context["run"] = {
             "id": run.id,
             "state": run.state,
@@ -505,11 +520,26 @@ def create_app(
         except AgentError as error:
             raise HTTPException(status_code=error.status_code, detail=str(error)) from error
         chips: list[dict[str, Any]] = []
+        run = _find(body.run) if body.run else None
+        table_map: dict[str, list[str]] = {}
+        if run is not None:
+            try:
+                table_map = {
+                    record["name"]: list(record["columns"]) for record in runstore.tables(run)
+                }
+            except runstore.RunError:
+                table_map = {}
         for chip in result.get("chips", []):
             if chip.get("action") == "open_run":
                 try:
                     _find(str(chip["target"]))
                 except HTTPException:
+                    continue
+            elif chip.get("action") == "open_table":
+                if run is None or chip.get("target") not in table_map:
+                    continue
+                column = chip.get("column", "")
+                if column and column not in table_map[str(chip["target"])]:
                     continue
             chips.append(chip)
         return {**result, "chips": chips}

@@ -221,6 +221,28 @@ def test_chip_validation_rejects_unsafe_or_malformed_actions() -> None:
     assert agent._chip({"label": "x", "action": "select_year", "target": True}) is None
     assert agent._chip({"label": "x", "action": "select_year", "target": "not-a-year"}) is None
     assert agent._chip({"label": "x", "action": "select_year", "target": 1001}) is None
+    assert agent._chip(
+        {
+            "label": "Row",
+            "action": "open_table",
+            "target": "FVS_Summary_Metric",
+            "column": "Year",
+            "query": "10",
+        }
+    ) == {
+        "label": "Row",
+        "action": "open_table",
+        "target": "FVS_Summary_Metric",
+        "column": "Year",
+        "query": "10",
+    }
+    assert agent._chip({"label": "x", "action": "open_table", "target": "", "query": "10"}) is None
+    assert (
+        agent._chip(
+            {"label": "x", "action": "open_table", "target": "T", "column": [], "query": "10"}
+        )
+        is None
+    )
 
 
 def test_split_actions_tolerates_malformed_json_before_a_valid_array() -> None:
