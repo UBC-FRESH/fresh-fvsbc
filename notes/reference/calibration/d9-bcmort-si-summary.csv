@@ -1,0 +1,5 @@
+bec,train_tsa,test_tsa,auc_no_si,auc_si,logloss_no_si,logloss_si,brier_no_si,brier_si
+MSdm1,Okanagan TSA,Boundary TSA,0.721,0.700,0.411,0.438,0.1295,0.1392
+MSdm1,Boundary TSA,Okanagan TSA,0.694,0.677,0.411,0.419,0.1256,0.1289
+SBSmw,Quesnel TSA,Prince George TSA,0.745,0.747,0.390,0.389,0.1216,0.1214
+SBSmw,Prince George TSA,Quesnel TSA,0.710,0.711,0.472,0.471,0.1405,0.1402

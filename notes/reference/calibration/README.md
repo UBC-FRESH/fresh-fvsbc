@@ -266,6 +266,7 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-bcmort-prototype.md` | The D9.30 tree-level survival prototype |
 | `bcmort_prototype.py` | The D9.30 prototype code |
 | `d9-bcmort-prototype-summary.csv` | The D9.30 TSA-transfer metrics |
+| `d9-bcmort-si-summary.csv` | The D9.30 site-index screen |
 | `fvs-mortality-lore.md` | D9.25 annotated FVS mortality/ingress literature review |
 | `fvs-mortality-code.md` | D9.25 FVS-BC mortality/ingress source map and pseudocode |
 | `fvs-mortality-ingress-upgrades.md` | D9.25 cross-model design and core-function upgrades |

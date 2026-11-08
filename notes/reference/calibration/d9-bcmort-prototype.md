@@ -44,7 +44,20 @@ Calibration is not solved:
 - Calibrate the intercept/site effects on the target TSA or use a hierarchical prior; a pooled fixed
   intercept is not enough.
 
-## 4. Limits
+## 4. Site-index screen
+
+A site-index covariate was tested with the same TSA holdouts. It did not improve transfer:
+
+| BEC | Train → test | Test AUC (no SI → SI) | Log loss (no SI → SI) | Brier (no SI → SI) |
+| --- | --- | ---: | ---: | ---: |
+| MSdm1 | Okanagan → Boundary | 0.721 → 0.700 | 0.411 → 0.438 | 0.1295 → 0.1392 |
+| MSdm1 | Boundary → Okanagan | 0.694 → 0.677 | 0.411 → 0.419 | 0.1256 → 0.1289 |
+| SBSmw | Quesnel → Prince George | 0.745 → 0.747 | 0.390 → 0.389 | 0.1216 → 0.1214 |
+| SBSmw | Prince George → Quesnel | 0.710 → 0.711 | 0.472 → 0.471 | 0.1405 → 0.1402 |
+
+Site index is not the missing transfer covariate. It does not justify a hierarchical SI-only model.
+
+## 5. Limits
 
 - Poisson hazard, not the final cloglog binomial; no exact interval censoring beyond exposure.
 - Tree-level `dead` is a binary outcome, not a known death time.
@@ -52,6 +65,6 @@ Calibration is not solved:
 - No climate, site index, crown ratio, or recent growth yet.
 - This is a model prototype, not an FVS core change or a bundle.
 
-## 5. Claim boundary
+## 6. Claim boundary
 
 This is a diagnostic prototype. It does not support a yield, AAC, legal, or whole-block claim.
