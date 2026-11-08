@@ -107,15 +107,20 @@
 
     <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
     <aside id="assistant-drawer" class="drawer assistant-drawer" role="dialog" aria-modal="true" aria-labelledby="assistant-title" hidden>
-      <div class="drawer-head">
+      <div class="drawer-head assistant-head">
         <div>
           <span class="eyebrow">Context-aware</span>
           <h2 id="assistant-title">FVS assistant</h2>
+          <span id="assistant-model" class="assistant-model">checking…</span>
         </div>
-        <button id="close-assistant" class="ghost" type="button" aria-label="Close assistant">×</button>
+        <div class="assistant-head-actions">
+          <a id="assistant-guide" class="ghost" href="api/agent/guide.md" target="_blank" rel="noreferrer">Guide</a>
+          <button id="assistant-new" class="ghost" type="button">New</button>
+          <button id="close-assistant" class="ghost" type="button" aria-label="Close assistant">×</button>
+        </div>
       </div>
       <div id="assistant-log" class="assistant-log" aria-live="polite">
-        <p class="muted">Ask about the open run's summary, calibration, or provenance.</p>
+        <p class="muted" id="assistant-hint">Ask about the open run's summary, calibration, provenance, or stand.</p>
       </div>
       <div class="assistant-quick" id="assistant-quick">
         <button type="button" data-prompt="Summarize this run.">Summary</button>
@@ -123,10 +128,11 @@
         <button type="button" data-prompt="Is the calibration bundle signed?">Calibration</button>
         <button type="button" data-prompt="Show provenance.">Provenance</button>
       </div>
-      <form id="assistant-form" class="assistant-form">
-        <textarea id="assistant-input" rows="2" placeholder="Ask about this run…" aria-label="Ask the FVS assistant"></textarea>
-        <button class="primary" type="submit">Send</button>
+      <form id="assistant-form" class="assistant-form" aria-busy="false">
+        <textarea id="assistant-input" rows="2" placeholder="Ask about this run…" aria-label="Ask the FVS assistant" spellcheck="false"></textarea>
+        <button id="assistant-send" class="primary" type="submit">Send</button>
       </form>
+      <p id="assistant-status" class="assistant-status" aria-live="polite">Enter sends · Shift+Enter adds a newline.</p>
     </aside>
     <aside id="details-drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="details-title" hidden>
       <div class="drawer-head">

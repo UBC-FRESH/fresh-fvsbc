@@ -23,6 +23,15 @@ const state = {
   pollTimer: null,
   ready: false,
   detailsTrigger: null,
+  assistantTrigger: null,
+  assistant: {
+    mode: "local",
+    model: null,
+    session: null,
+    busy: false,
+    enabled: false,
+    available: false,
+  },
 };
 
 const WORKSPACES = [
@@ -1164,37 +1173,210 @@ function closeDetails() {
 
 /* ---------------------------------------------------------------- assistant */
 
-function appendAssistant(role, text, citations = []) {
+const ASSISTANT_WORKSPACES = new Set(["runs", "stand", "results", "evidence", "calibration"]);
+const ASSISTANT_PANELS = new Set([
+  "summary", "tables", "trees", "compare", "visuals", "provenance", "keywords",
+]);
+
+function assistantEscape(value) {
+  const escapes = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+  return String(value ?? "").replace(/[&<>"']/g, (character) => escapes[character]);
+}
+
+function renderAssistantMarkdown(text) {
+  return String(text ?? "")
+    .split(/```/)
+    .map((segment, index) => {
+      if (index % 2 === 1) {
+        const body = segment.replace(/^[^\n]*\n/, "");
+        return `<pre><code>${assistantEscape(body.trim())}</code></pre>`;
+      }
+      return assistantEscape(segment)
+        .replace(/\`([^`\n]+)\`/g, "<code>$1</code>")
+        .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+          '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+        .replace(/\n/g, "<br>");
+    })
+    .join("");
+}
+
+function assistantStatus(text) {
+  const node = document.getElementById("assistant-status");
+  if (node) node.textContent = text;
+}
+
+function appendAssistant(role, text, options = {}) {
   const log = document.getElementById("assistant-log");
-  const message = el("div", { className: `assistant-message ${role}` }, text);
-  if (citations.length) {
-    message.append(
-      el("div", { className: "citations" },
-        ...citations.map((citation) =>
-          el("button", { type: "button", onclick: () => openCitation(citation) },
-            citation.label || citation.target,
-          ),
+  if (!log) return null;
+  document.getElementById("assistant-hint")?.remove();
+  const message = el("div", { className: `assistant-message ${role}` });
+  if (options.html) message.innerHTML = renderAssistantMarkdown(text);
+  else message.textContent = text;
+  if (options.actions?.length) {
+    const row = el("div", { className: "assistant-actions" });
+    for (const action of options.actions) {
+      const chip = el("span", { className: "assistant-action" },
+        `${action.tool}${action.summary ? `: ${action.summary}` : ""}`,
+      );
+      chip.title = chip.textContent;
+      row.append(chip);
+    }
+    message.append(row);
+  }
+  if (options.chips?.length) {
+    const row = el("div", { className: "assistant-actions" });
+    for (const chip of options.chips) {
+      const button = el("button", { type: "button", className: "assistant-chip" }, chip.label);
+      button.addEventListener("click", () => applyAssistantAction(chip));
+      row.append(button);
+    }
+    message.append(row);
+  }
+  if (options.citations?.length) {
+    const row = el("div", { className: "citations" });
+    for (const citation of options.citations) {
+      row.append(
+        el("button", { type: "button", onclick: () => openCitation(citation) },
+          citation.label || citation.target,
         ),
-      ),
-    );
+      );
+    }
+    message.append(row);
   }
   log.append(message);
   log.scrollTop = log.scrollHeight;
+  return message;
+}
+
+function assistantContext() {
+  return {
+    workspace: state.workspace,
+    panel: state.panel,
+    run_id: state.run?.id ?? null,
+    year: state.standYear,
+    table: state.table,
+    compare: state.workspace === "results" && state.panel === "compare"
+      ? { a: state.compareA, b: state.compareB, table: state.compareTable }
+      : null,
+    skin: state.skin?.id ?? null,
+  };
+}
+
+function openPanelWorkspace(panel) {
+  if (panel === "provenance" || panel === "keywords") return "evidence";
+  if (panel === "visuals") return "stand";
+  return "results";
+}
+
+function applyAssistantAction(chip) {
+  if (!chip || typeof chip !== "object") return;
+  if (chip.action === "open_workspace" && ASSISTANT_WORKSPACES.has(chip.target)) {
+    selectWorkspace(chip.target);
+    closeAssistant();
+    return;
+  }
+  if (chip.action === "open_panel" && ASSISTANT_PANELS.has(chip.target)) {
+    const workspace = openPanelWorkspace(chip.target);
+    selectWorkspace(workspace);
+    if (workspace !== "stand") selectPanel(chip.target);
+    closeAssistant();
+    return;
+  }
+  if (chip.action === "open_run" && typeof chip.target === "string") {
+    selectRun(chip.target);
+    selectWorkspace("stand");
+    closeAssistant();
+    return;
+  }
+  if (chip.action === "select_year" && Number.isInteger(Number(chip.target))) {
+    state.standYear = Number(chip.target);
+    selectWorkspace("stand");
+    closeAssistant();
+    return;
+  }
+  if (chip.action === "ask" && typeof chip.target === "string") {
+    const input = document.getElementById("assistant-input");
+    if (input) {
+      input.value = chip.target;
+      resizeAssistantInput();
+      input.focus();
+    }
+    return;
+  }
 }
 
 function openCitation(citation) {
-  closeAssistant();
-  if (citation.kind === "workspace" && citation.target === "calibration") {
-    selectWorkspace("calibration");
-  } else if (citation.kind === "workspace") {
+  if (!citation) return;
+  if (citation.kind === "workspace") {
     selectWorkspace(citation.target);
-  } else if (citation.target === "provenance" || citation.target === "keywords") {
+    closeAssistant();
+    return;
+  }
+  if (citation.target === "provenance" || citation.target === "keywords") {
     selectWorkspace("evidence");
     selectPanel(citation.target);
   } else if (citation.target === "summary" || citation.target === "tables" || citation.target === "trees") {
     selectWorkspace("results");
     selectPanel(citation.target);
   }
+  closeAssistant();
+}
+
+function resizeAssistantInput() {
+  const input = document.getElementById("assistant-input");
+  if (!input) return;
+  input.style.height = "auto";
+  input.style.height = `${Math.min(160, Math.max(42, input.scrollHeight))}px`;
+}
+
+function setAssistantBusy(busy) {
+  state.assistant.busy = busy;
+  const send = document.getElementById("assistant-send");
+  const form = document.getElementById("assistant-form");
+  if (send) send.disabled = busy;
+  if (form) form.setAttribute("aria-busy", String(busy));
+  document.querySelectorAll("#assistant-quick button").forEach((button) => {
+    button.disabled = busy;
+  });
+}
+
+function configureAssistant(info) {
+  state.assistant.enabled = Boolean(info?.enabled);
+  state.assistant.available = Boolean(info?.available);
+  state.assistant.model = info?.model ?? null;
+  state.assistant.mode = state.assistant.enabled && state.assistant.available ? "agent" : "local";
+  const model = document.getElementById("assistant-model");
+  const guide = document.getElementById("assistant-guide");
+  if (guide) guide.hidden = state.assistant.mode !== "agent";
+  if (state.assistant.mode === "agent") {
+    const short = String(info.model || "agent").split("/").pop();
+    if (model) model.textContent = `${short} · plan · read-only`;
+    assistantStatus("Enter sends · Shift+Enter adds a newline.");
+  } else if (info?.enabled && !info?.available) {
+    if (model) model.textContent = "local summary · opencode unavailable";
+    assistantStatus("opencode is not on the service PATH; using the local summary reader.");
+  } else {
+    if (model) model.textContent = "local summary reader";
+    assistantStatus("LLM agent off; using the local summary reader.");
+  }
+}
+
+function newAssistantChat() {
+  state.assistant.session = null;
+  const log = document.getElementById("assistant-log");
+  if (!log) return;
+  log.replaceChildren(
+    el("p", { className: "muted", id: "assistant-hint" },
+      state.assistant.mode === "agent"
+        ? "New conversation. Ask about the open run, a table, the stand, or the provenance."
+        : "New conversation. This mode answers from the open run's summary and provenance.",
+    ),
+  );
+  assistantStatus(state.assistant.mode === "agent"
+    ? "Enter sends · Shift+Enter adds a newline."
+    : "Local summary mode.");
+  document.getElementById("assistant-input")?.focus();
 }
 
 function openAssistant() {
@@ -1205,7 +1387,9 @@ function openAssistant() {
   document.getElementById("drawer-backdrop").hidden = false;
   document.getElementById("assistant-button").setAttribute("aria-expanded", "true");
   document.body.classList.add("drawer-open");
-  document.getElementById("assistant-input").focus();
+  const input = document.getElementById("assistant-input");
+  input?.focus();
+  resizeAssistantInput();
 }
 
 function closeAssistant() {
@@ -1220,21 +1404,70 @@ function closeAssistant() {
 
 async function sendAssistant(message) {
   const clean = String(message || "").trim();
-  if (!clean) return;
+  if (!clean || state.assistant.busy) return;
   appendAssistant("user", clean);
   const input = document.getElementById("assistant-input");
   input.value = "";
+  resizeAssistantInput();
+  const thinking = appendAssistant("assistant", "working…");
+  thinking?.classList.add("thinking");
+  setAssistantBusy(true);
+  assistantStatus(state.assistant.mode === "agent"
+    ? "The local OpenCode agent is reading the run…"
+    : "Reading the run summary…");
   try {
-    const response = await fetch("api/assistant", {
-      method: "POST",
-      headers: { "content-type": "application/json", accept: "application/json" },
-      body: JSON.stringify({ message: clean, run: state.run?.id ?? null }),
-    });
+    let mode = state.assistant.mode;
+    const request = () => fetch(
+      mode === "agent" ? "api/agent/chat" : "api/assistant",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify(
+          mode === "agent"
+            ? {
+                message: clean,
+                session: state.assistant.session,
+                context: assistantContext(),
+                run: state.run?.id ?? null,
+                year: state.standYear,
+              }
+            : { message: clean, run: state.run?.id ?? null },
+        ),
+      },
+    );
+    let response = await request();
+    if (mode === "agent" && [502, 503, 504].includes(response.status)) {
+      // The first turn can hit a cold reverse-proxy or agent timeout; one delayed retry recovers it.
+      await new Promise((resolve) => window.setTimeout(resolve, 2000));
+      response = await request();
+    }
+    if (mode === "agent" && response.status === 403) {
+      mode = state.assistant.mode = "local";
+      response = await request();
+    }
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.detail ?? response.statusText);
-    appendAssistant("assistant", payload.reply ?? "No answer.", payload.citations ?? []);
+    if (!response.ok) throw new Error(payload.detail ?? `assistant failed (${response.status})`);
+    state.assistant.session = payload.session || state.assistant.session;
+    thinking?.remove();
+    appendAssistant("assistant", payload.reply ?? "(no reply)", {
+      html: true,
+      actions: payload.actions ?? [],
+      chips: payload.chips ?? [],
+      citations: payload.citations ?? [],
+    });
+    assistantStatus(state.assistant.mode === "agent"
+      ? "Enter sends · Shift+Enter adds a newline."
+      : "Local summary mode.");
   } catch (error) {
-    appendAssistant("assistant", `I could not answer: ${error}`);
+    thinking?.remove();
+    appendAssistant("error", `Assistant unavailable: ${error?.message ?? error}`);
+    assistantStatus("The assistant did not answer. Try again or use the open run details.");
+  } finally {
+    setAssistantBusy(false);
+    input?.focus();
+    document.getElementById("assistant-log")?.scrollTo({
+      top: document.getElementById("assistant-log").scrollHeight,
+    });
   }
 }
 
@@ -1249,6 +1482,14 @@ async function boot() {
   document.getElementById("close-details").addEventListener("click", closeDetails);
   document.getElementById("assistant-button").addEventListener("click", openAssistant);
   document.getElementById("close-assistant").addEventListener("click", closeAssistant);
+  document.getElementById("assistant-new").addEventListener("click", newAssistantChat);
+  const assistantInput = document.getElementById("assistant-input");
+  assistantInput.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+    event.preventDefault();
+    sendAssistant(assistantInput.value);
+  });
+  assistantInput.addEventListener("input", resizeAssistantInput);
   document.getElementById("drawer-backdrop").addEventListener("click", () => {
     closeDetails();
     closeAssistant();
@@ -1267,16 +1508,18 @@ async function boot() {
     }
   });
   try {
-    const [skins, runs, oracle, calibrations] = await Promise.all([
+    const [skins, runs, oracle, calibrations, agentInfo] = await Promise.all([
       api("api/skins"),
       api("api/runs"),
       api("api/oracle"),
       api("api/calibrations").catch(() => []),
+      api("api/agent").catch(() => null),
     ]);
     state.skins = skins;
     state.runs = runs;
     state.oracle = oracle;
     state.calibrations = calibrations;
+    configureAssistant(agentInfo);
     state.skin = skins[0];
     const initial = readUrlState();
     const firstComplete = runs.find((run) => run.state === "complete") ?? runs[0] ?? null;

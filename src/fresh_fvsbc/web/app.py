@@ -25,11 +25,20 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
 from fresh_fvsbc.bundle import BundleError, CalibrationBundle, load_bundle
 from fresh_fvsbc.outputs import EXPOSED_TABLES, ORACLE_TABLES, STANDALONE_VERIFIED
 from fresh_fvsbc.web import runs as runstore
 from fresh_fvsbc.web import visuals as visualstore
+from fresh_fvsbc.web.agent import (
+    AGENT_GUIDE,
+    DEFAULT_AGENT_MODEL,
+    DEFAULT_AGENT_TIMEOUT,
+    AgentError,
+    agent_info,
+    run_agent,
+)
 from fresh_fvsbc.web.skins import load_skins
 
 __all__ = ["create_app", "main"]
@@ -42,6 +51,16 @@ POLL_SECONDS: float = 1.0
 
 #: How long a live event stream stays open before it closes and the browser reconnects, in seconds.
 STREAM_SECONDS: float = 600.0
+
+
+class AgentChatRequest(BaseModel):
+    """One assistant turn from the browser."""
+
+    message: str = Field(min_length=1, max_length=8000)
+    session: str | None = Field(default=None, max_length=200)
+    context: dict[str, Any] | None = None
+    run: str | None = Field(default=None, max_length=200)
+    year: int | None = Field(default=None, ge=0, le=1000)
 
 
 def fmt_like(value: object) -> str:
@@ -59,6 +78,10 @@ def create_app(
     allow_remote: bool = False,
     root_path: str = "",
     bundles: Sequence[Path] = (),
+    allow_agent: bool = False,
+    agent_model: str = DEFAULT_AGENT_MODEL,
+    agent_workspace: Path | None = None,
+    agent_timeout: float = DEFAULT_AGENT_TIMEOUT,
 ) -> FastAPI:
     """Build the application over a set of run roots.
 
@@ -76,6 +99,15 @@ def create_app(
         the decision is recorded where it is used. Behind the JupyterHub port proxy this is the
         normal case: the proxy authenticates the request, and the service has to listen off
         loopback for it.
+    allow_agent : bool, optional
+        Whether the assistant may run an OpenCode turn. It remains disabled by default because
+        the process can read the workspace and execute commands as the service user.
+    agent_model : str, optional
+        The provider/model handed to ``opencode run``.
+    agent_workspace : Path or None, optional
+        The directory the assistant may read. ``None`` uses the service's working directory.
+    agent_timeout : float, optional
+        Seconds one assistant turn may run.
 
     Returns
     -------
@@ -122,6 +154,14 @@ def create_app(
     app.state.roots = resolved
     app.state.bundle_roots = bundle_roots
     app.state.allow_remote = allow_remote
+    app.state.allow_agent = allow_agent
+    app.state.agent_model = agent_model
+    app.state.agent_workspace = (
+        Path(agent_workspace).expanduser().resolve()
+        if agent_workspace is not None
+        else Path.cwd().resolve()
+    )
+    app.state.agent_timeout = agent_timeout
     app.state.skins = {skin.id: skin for skin in skins}
     #: The child processes this service started, so a run that died is reported as failed rather
     #: than running forever. A restarted service loses this, and a dead run stays ``running``.
@@ -303,6 +343,122 @@ def create_app(
         if len(message) > 4000:
             raise HTTPException(status_code=422, detail="the message is too long")
         return _assistant_answer(message, str(payload.get("run", "") or "").strip() or None)
+
+    def _agent_context(
+        payload: dict[str, Any] | None,
+        run_id: str | None,
+        year: int | None,
+    ) -> dict[str, Any]:
+        """Merge browser context with server-read run facts.
+
+        The browser supplies what it is showing; the server supplies the run's own summary and
+        provenance so the assistant cannot be tricked into inventing a run's numbers by a page
+        that has gone stale.
+        """
+        context: dict[str, Any] = dict(payload or {})
+        if year is not None:
+            context["year"] = year
+        if not run_id:
+            return context
+        run = _find(run_id)
+        rows: list[dict[str, Any]] = []
+        if run.state == "complete":
+            try:
+                rows = runstore.summary(run)
+            except runstore.RunError as error:
+                context["run"] = {"id": run.id, "state": run.state, "error": str(error)}
+                return context
+        try:
+            provenance = runstore.provenance(run)
+        except runstore.RunError:
+            provenance = {}
+        recorded = provenance.get("provenance", {})
+        compact_rows = rows if len(rows) <= 24 else [*rows[:2], *rows[-16:]]
+        calibration_id = recorded.get("calibration_id", "")
+        bundle = next((item for item in _bundles() if item["bundle_id"] == calibration_id), None)
+        context["run"] = {
+            "id": run.id,
+            "state": run.state,
+            "summary": compact_rows,
+            "provenance": {
+                key: recorded.get(key)
+                for key in (
+                    "fresh_fvsbc_version",
+                    "pyfvs_commit",
+                    "fvs_source_commit",
+                    "variant",
+                    "calibration_id",
+                    "calibration_version",
+                    "bec",
+                    "qmd",
+                    "ba",
+                    "tsa",
+                )
+            },
+            "calibration": None
+            if bundle is None
+            else {
+                "bundle_id": bundle["bundle_id"],
+                "version": bundle["version"],
+                "claim": bundle["claim"],
+                "review": bundle["review"],
+                "warnings": bundle["warnings"],
+            },
+        }
+        return context
+
+    @app.get("/api/agent")
+    def agent_status() -> dict[str, Any]:
+        """Report whether the optional local agent is enabled and available."""
+        return agent_info(
+            enabled=bool(app.state.allow_agent),
+            model=str(app.state.agent_model),
+            workspace=Path(app.state.agent_workspace),
+            timeout=float(app.state.agent_timeout),
+        )
+
+    @app.get("/api/agent/guide.md")
+    def agent_guide() -> Response:
+        """Return the assistant instruction sheet as Markdown."""
+        return Response(content=AGENT_GUIDE, media_type="text/markdown; charset=utf-8")
+
+    @app.post("/api/agent/chat")
+    def agent_chat(body: AgentChatRequest) -> dict[str, Any]:
+        """Run one assistant turn through the local OpenCode CLI."""
+        if not app.state.allow_agent:
+            raise HTTPException(
+                status_code=403,
+                detail="the assistant is disabled; restart the service with --allow-agent",
+            )
+        session = (body.session or "").strip()
+        if session and not session.startswith("ses"):
+            raise HTTPException(
+                status_code=422,
+                detail="an assistant session must be an OpenCode session id starting with 'ses'",
+            )
+        context = _agent_context(body.context, body.run, body.year)
+        if len(json.dumps(context, ensure_ascii=False)) > 20_000:
+            raise HTTPException(status_code=413, detail="the assistant context is too large")
+        try:
+            result = run_agent(
+                body.message,
+                session=session or None,
+                context=context,
+                workspace=Path(app.state.agent_workspace),
+                model=str(app.state.agent_model),
+                timeout=float(app.state.agent_timeout),
+            )
+        except AgentError as error:
+            raise HTTPException(status_code=error.status_code, detail=str(error)) from error
+        chips: list[dict[str, Any]] = []
+        for chip in result.get("chips", []):
+            if chip.get("action") == "open_run":
+                try:
+                    _find(str(chip["target"]))
+                except HTTPException:
+                    continue
+            chips.append(chip)
+        return {**result, "chips": chips}
 
     @app.get("/api/calibrations")
     def calibrations() -> list[dict[str, Any]]:
@@ -738,6 +894,32 @@ def _parser() -> argparse.ArgumentParser:
         dest="allow_remote",
         help="permit a non-loopback bind; there is no authentication",
     )
+    parser.add_argument(
+        "--allow-agent",
+        action="store_true",
+        dest="allow_agent",
+        help="permit the optional OpenCode assistant; it can read the workspace and run commands",
+    )
+    parser.add_argument(
+        "--agent-model",
+        default=DEFAULT_AGENT_MODEL,
+        metavar="PROVIDER/MODEL",
+        help=f"the assistant model (default: {DEFAULT_AGENT_MODEL})",
+    )
+    parser.add_argument(
+        "--agent-workspace",
+        type=Path,
+        default=None,
+        metavar="DIR",
+        help="the directory the assistant may read (default: the service working directory)",
+    )
+    parser.add_argument(
+        "--agent-timeout",
+        type=float,
+        default=DEFAULT_AGENT_TIMEOUT,
+        metavar="SECONDS",
+        help=f"assistant turn timeout (default: {DEFAULT_AGENT_TIMEOUT:g})",
+    )
     return parser
 
 
@@ -796,6 +978,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         allow_remote=args.allow_remote,
         root_path=args.root_path,
         bundles=args.bundles,
+        allow_agent=args.allow_agent,
+        agent_model=args.agent_model,
+        agent_workspace=args.agent_workspace,
+        agent_timeout=args.agent_timeout,
     )
     uvicorn.run(application, host=args.host, port=args.port, log_level="info")
     return 0

@@ -519,6 +519,8 @@ body.drawer-open { overflow: hidden; }
   .dialog-actions { flex-direction: column-reverse; }
   .dialog-actions button { width: 100%; }
   .drawer { width: 100vw; }
+  .assistant-head { flex-wrap: wrap; }
+  .assistant-head-actions { width: 100%; justify-content: flex-start; }
 }
 
 /* ---------------------------------------------------------------- assistant */
@@ -575,3 +577,99 @@ body.drawer-open { overflow: hidden; }
   font-weight: 500;
 }
 .preview-warning { margin: 2px 0 0; color: var(--warn, #e0a44a); line-height: 1.4; }
+
+/* ------------------------------------------------------------ assistant panel */
+.assistant-head { align-items: flex-start; }
+.assistant-head-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.assistant-head-actions .ghost {
+  font-size: 12px;
+  line-height: 1.2;
+  padding: 5px 8px;
+}
+.assistant-head-actions a.ghost {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.assistant-head-actions a.ghost:hover { color: var(--accent); border-color: var(--accent); }
+.assistant-head-actions #close-assistant {
+  font-size: 20px;
+  padding: 1px 8px;
+}
+.assistant-model {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.01em;
+}
+.assistant-status {
+  min-height: 16px;
+  margin: 0;
+  padding: 0 18px 12px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.assistant-message.thinking { color: var(--muted); font-style: italic; }
+.assistant-message.error {
+  border-color: color-mix(in srgb, var(--danger, #d46a6a) 55%, var(--line));
+  color: var(--danger, #d46a6a);
+}
+.assistant-message pre {
+  max-height: 240px;
+  overflow: auto;
+  margin: 6px 0;
+  padding: 7px;
+  border-radius: 5px;
+  background: var(--panel-2);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.assistant-message code {
+  padding: 0 3px;
+  border-radius: 3px;
+  background: var(--panel-2);
+  font-size: 0.94em;
+}
+.assistant-message a { color: var(--accent); }
+.assistant-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 7px;
+}
+.assistant-action {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.assistant-chip {
+  padding: 2px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 10px;
+  cursor: pointer;
+}
+.assistant-chip:hover { border-color: var(--accent); color: var(--accent); }
+.assistant-form textarea {
+  max-height: 160px;
+  resize: none;
+  line-height: 1.45;
+}
+.assistant-form textarea:disabled { opacity: 0.7; }

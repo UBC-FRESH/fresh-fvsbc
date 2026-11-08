@@ -14,6 +14,7 @@ pytest.importorskip("fastapi", reason="the web extra is not installed")
 from fastapi.testclient import TestClient
 
 from fresh_fvsbc.web import app as webapp
+from fresh_fvsbc.web.agent import AgentError
 
 
 def _make_run(directory: Path, *, summary: bool = True) -> Path:
@@ -488,3 +489,156 @@ def test_the_shell_carries_the_visuals_import_map_and_the_vendored_runtime() -> 
     assert (vendor / "three.module.js").is_file()
     assert (vendor / "OrbitControls.js").is_file()
     assert (vendor / "LICENSE").is_file()
+
+
+def test_the_agent_endpoint_reports_disabled_by_default(client: TestClient) -> None:
+    """The LLM bridge is opt-in even when the browser surface is otherwise available."""
+    payload = client.get("/api/agent").json()
+    assert payload["enabled"] is False
+    assert payload["model"]
+    assert "workspace" in payload
+    assert "timeout" in payload
+
+
+def test_the_agent_guide_is_served_as_markdown(client: TestClient) -> None:
+    """The browser can show the same instruction sheet the agent receives."""
+    response = client.get("/api/agent/guide.md")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/markdown")
+    assert "FRESH_ACTIONS" in response.text
+    assert "read-only" in response.text
+
+
+def test_agent_chat_is_refused_when_disabled(client: TestClient) -> None:
+    """A page cannot start the local agent without the explicit service flag."""
+    response = client.post("/api/agent/chat", json={"message": "hello"})
+    assert response.status_code == 403
+
+
+def test_agent_chat_enriches_context_and_validates_chips(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The server injects run facts and drops a chip that names a missing run."""
+    _make_run(tmp_path / "run-a")
+    captured: dict[str, object] = {}
+
+    def fake_run(
+        message: str,
+        *,
+        session: str | None,
+        context: dict[str, object] | None,
+        workspace: Path,
+        model: str,
+        timeout: float,
+    ) -> dict[str, object]:
+        captured.update(
+            {
+                "message": message,
+                "session": session,
+                "context": context,
+                "workspace": workspace,
+                "model": model,
+                "timeout": timeout,
+            }
+        )
+        return {
+            "reply": "The summary is here.",
+            "session": "ses_new",
+            "actions": [{"tool": "read", "summary": "summary.csv"}],
+            "chips": [
+                {"label": "Summary", "action": "open_panel", "target": "summary"},
+                {"label": "Missing", "action": "open_run", "target": "nope"},
+            ],
+        }
+
+    monkeypatch.setattr(webapp, "run_agent", fake_run)
+    client = TestClient(
+        webapp.create_app(
+            [tmp_path],
+            allow_agent=True,
+            agent_model="provider/model",
+            agent_workspace=tmp_path,
+            agent_timeout=12.0,
+        )
+    )
+    response = client.post(
+        "/api/agent/chat",
+        json={
+            "message": "What is the latest TPH?",
+            "session": "ses_old",
+            "run": "run-a",
+            "year": 10,
+            "context": {"workspace": "stand", "panel": "visuals"},
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["reply"] == "The summary is here."
+    assert payload["session"] == "ses_new"
+    assert [chip["target"] for chip in payload["chips"]] == ["summary"]
+    context = captured["context"]
+    assert isinstance(context, dict)
+    assert context["workspace"] == "stand"
+    assert context["year"] == 10
+    assert context["run"]["id"] == "run-a"
+    assert context["run"]["state"] == "complete"
+    assert context["run"]["summary"][-1]["year"] == 10
+    assert captured["workspace"] == tmp_path
+    assert captured["model"] == "provider/model"
+    assert captured["timeout"] == 12.0
+
+
+def test_agent_chat_refuses_a_bad_session_and_missing_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Bad sessions and stale run ids are refused before a subprocess starts."""
+    _make_run(tmp_path / "run-a")
+    client = TestClient(webapp.create_app([tmp_path], allow_agent=True, agent_workspace=tmp_path))
+    assert (
+        client.post("/api/agent/chat", json={"message": "x", "session": "bad"}).status_code == 422
+    )
+    assert client.post("/api/agent/chat", json={"message": "x", "run": "nope"}).status_code == 404
+
+
+def test_agent_chat_translates_agent_errors(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A timeout or unavailable CLI has a useful HTTP status, not a generic 500."""
+
+    def fail(*args: object, **kwargs: object) -> dict[str, object]:
+        raise AgentError("the agent did not answer", status_code=504)
+
+    monkeypatch.setattr(webapp, "run_agent", fail)
+    client = TestClient(webapp.create_app([tmp_path], allow_agent=True, agent_workspace=tmp_path))
+    response = client.post("/api/agent/chat", json={"message": "hello"})
+    assert response.status_code == 504
+    assert "did not answer" in response.json()["detail"]
+
+
+def test_agent_chat_can_context_a_running_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A running run has no summary yet; the assistant still gets its state."""
+    _make_run(tmp_path / "run-b", summary=False)
+    captured: dict[str, object] = {}
+
+    def fake_run(
+        message: str,
+        *,
+        session: str | None,
+        context: dict[str, object] | None,
+        workspace: Path,
+        model: str,
+        timeout: float,
+    ) -> dict[str, object]:
+        captured["context"] = context
+        return {"reply": "Still running.", "session": "ses_new", "actions": [], "chips": []}
+
+    monkeypatch.setattr(webapp, "run_agent", fake_run)
+    client = TestClient(webapp.create_app([tmp_path], allow_agent=True, agent_workspace=tmp_path))
+    response = client.post("/api/agent/chat", json={"message": "status?", "run": "run-b"})
+    assert response.status_code == 200
+    context = captured["context"]
+    assert isinstance(context, dict)
+    assert context["run"]["state"] == "running"
+    assert context["run"]["summary"] == []

@@ -38,6 +38,38 @@ not expose the port directly.
 ``--root-path`` is what makes the prefix work. The service answers both at ``/api/runs`` and under the
 prefix, and the front end asks for relative URLs, so one build serves either way.
 
+The optional LLM assistant
+--------------------------
+
+The cockpit ships a local summary reader and an optional LLM agent. The reader answers from the
+open run's summary and provenance. The agent runs one turn through the installed ``opencode`` CLI,
+which owns its own model authentication; the service never reads or stores a provider key.
+
+The agent is off by default because it runs with the service user's permissions and can read the
+workspace. Enable it explicitly, and only behind an authenticating proxy:
+
+.. code-block:: bash
+
+   fresh-fvsbc web --runs runs/ --host 127.0.0.1 \
+     --allow-agent --agent-workspace /path/to/fresh-fvsbc \
+     --agent-model opencode-go/deepseek-v4.1-flash
+
+The agent runs in OpenCode's **plan** agent, not the build agent: it may read the workspace but the
+cockpit is a reader and the assistant must not edit a run, calibration bundle, or repository. The
+service also strips common provider and cloud secrets from the child environment. This is a
+risk-reduction measure, not a sandbox or an authentication boundary.
+
+``GET /api/agent`` reports whether the agent is enabled, whether ``opencode`` is on the path, the
+model, the workspace, and the timeout. ``GET /api/agent/guide.md`` returns the instruction sheet.
+``POST /api/agent/chat`` accepts ``message``, optional ``session``, compact UI ``context``, ``run``,
+and ``year``; the server injects the run's summary, provenance pins, and calibration review state.
+A validated reply may carry safe UI chips for opening a workspace, panel, run, or stand year, or
+for putting a follow-up prompt in the input.
+
+In the browser, **Enter sends** and **Shift+Enter inserts a newline**. The composer grows with the
+message, labels the active model, shows tool use as read-only chips, and keeps the local summary
+reader as a fallback when the agent is disabled or OpenCode is unavailable.
+
 What it reads
 -------------
 
