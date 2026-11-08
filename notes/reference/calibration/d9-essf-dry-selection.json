@@ -1,0 +1,90 @@
+{
+  "selected": "ba40-m05",
+  "training_candidates": {
+    "ba15-m10": {
+      "intervals": 46,
+      "sites": 28,
+      "ba_bias": -6.967173913043476,
+      "ba_pct": -17.939647017335663,
+      "tph_bias": -192.0424130434783,
+      "tph_pct": -8.851658654621984,
+      "ba_sites_pass": 9,
+      "tph_sites_pass": 11
+    },
+    "ba20-m05": {
+      "intervals": 46,
+      "sites": 28,
+      "ba_bias": -3.771521739130435,
+      "ba_pct": -9.711221445404115,
+      "tph_bias": 10.588021739130452,
+      "tph_pct": 0.48802528971181625,
+      "ba_sites_pass": 10,
+      "tph_sites_pass": 12
+    },
+    "ba20-m10": {
+      "intervals": 46,
+      "sites": 28,
+      "ba_bias": -6.532391304347824,
+      "ba_pct": -16.820133334079667,
+      "tph_bias": -195.0424130434783,
+      "tph_pct": -8.989935275619523,
+      "ba_sites_pass": 9,
+      "tph_sites_pass": 10
+    },
+    "ba30-m05": {
+      "intervals": 46,
+      "sites": 28,
+      "ba_bias": -2.6628260869565215,
+      "ba_pct": -6.856461553101331,
+      "tph_bias": 8.06628260869567,
+      "tph_pct": 0.37179276771388464,
+      "ba_sites_pass": 10,
+      "tph_sites_pass": 11
+    },
+    "ba30-m10": {
+      "intervals": 46,
+      "sites": 28,
+      "ba_bias": -5.749782608695653,
+      "ba_pct": -14.805008704218887,
+      "tph_bias": -200.28154347826086,
+      "tph_pct": -9.231418360115224,
+      "ba_sites_pass": 8,
+      "tph_sites_pass": 10
+    },
+    "ba40-m05": {
+      "intervals": 46,
+      "sites": 28,
+      "ba_bias": -1.4671739130434782,
+      "ba_pct": -3.77779892414735,
+      "tph_bias": 11.783673913043485,
+      "tph_pct": 0.5431355372108351,
+      "ba_sites_pass": 9,
+      "tph_sites_pass": 11
+    },
+    "baseline": {
+      "intervals": 46,
+      "sites": 28,
+      "ba_bias": -7.423695652173911,
+      "ba_pct": -19.115136384754454,
+      "tph_bias": -189.6511086956522,
+      "tph_pct": -8.741438159623947,
+      "ba_sites_pass": 8,
+      "tph_sites_pass": 11
+    }
+  },
+  "training_passing": [
+    "ba20-m05",
+    "ba30-m05",
+    "ba40-m05"
+  ],
+  "test": {
+    "intervals": 6,
+    "sites": 4,
+    "ba_bias": -4.184333333333333,
+    "ba_pct": -10.160012302412728,
+    "tph_bias": 291.8931666666667,
+    "tph_pct": 15.424168848667255,
+    "ba_sites_pass": 1,
+    "tph_sites_pass": 2
+  }
+}

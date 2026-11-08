@@ -1,0 +1,2 @@
+domain,intervals,sites,ba_bias,ba_pct,ba_pct_low,ba_pct_high,ba_mae,ba_within,ba_sites_pass,tph_bias,tph_pct,tph_pct_low,tph_pct_high,tph_mae,tph_within,tph_sites_pass,verdict
+ESSFdry,62,56,-4.186564516129033,-11.827709065159551,-14.654060516038504,-9.162650429928595,4.692467741935483,False,20/56,-287.051564516129,-11.368001408474484,-14.255314962958362,-8.37584506816478,324.0626612903225,True,36/56,fails
