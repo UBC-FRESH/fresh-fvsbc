@@ -19,7 +19,9 @@ const state = {
   compareB: null,
   compareTable: null,
   summaryColumn: null,
+  standYear: null,
   pollTimer: null,
+  ready: false,
 };
 
 const WORKSPACES = [
@@ -145,6 +147,8 @@ function renderShell() {
   const badgeEl = document.getElementById("run-state");
   badgeEl.className = "badge";
   badgeEl.textContent = state.run ? state.run.state : "";
+  const detailsButton = document.getElementById("details-button");
+  if (detailsButton) detailsButton.disabled = !state.run;
 
   const oracleEl = document.getElementById("oracle-badge");
   oracleEl.textContent = state.oracle
@@ -178,6 +182,7 @@ function selectRun(id) {
   }
   renderShell();
   renderPanel();
+  updateUrl();
 }
 
 function selectWorkspace(id) {
@@ -185,12 +190,14 @@ function selectWorkspace(id) {
   state.panel = workspace_panels()[0] ?? null;
   renderShell();
   renderPanel();
+  updateUrl();
 }
 
 function selectPanel(panel) {
   state.panel = panel;
   renderShell();
   renderPanel();
+  updateUrl();
 }
 
 /* ---------------------------------------------------------------- panels */
@@ -789,7 +796,13 @@ async function renderTrees(body) {
 async function renderVisuals(body) {
   // three.js is fetched only when this panel opens, and only when the 3D view is chosen.
   const module = await import("./visuals.js");
-  await module.mountVisuals(body, state.run.id);
+  await module.mountVisuals(body, state.run.id, {
+    year: state.standYear,
+    onYear: (year) => {
+      state.standYear = year;
+      updateUrl();
+    },
+  });
 }
 
 async function renderKeywords(body) {
@@ -963,6 +976,90 @@ async function renderCompare(body) {
   );
 }
 
+/* ---------------------------------------------------------------- URL state */
+
+function readUrlState() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    workspace: params.get("workspace"),
+    run: params.get("run"),
+    panel: params.get("panel"),
+    year: params.get("year"),
+  };
+}
+
+function updateUrl() {
+  if (!state.ready) return;
+  const params = new URLSearchParams();
+  if (state.workspace) params.set("workspace", state.workspace);
+  if (state.run) params.set("run", state.run.id);
+  if (state.panel) params.set("panel", state.panel);
+  if (state.workspace === "stand" && state.standYear !== null) {
+    params.set("year", String(state.standYear));
+  }
+  const query = params.toString();
+  window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+}
+
+/* ---------------------------------------------------------------- details drawer */
+
+async function openDetails() {
+  if (!state.run) return;
+  const body = document.getElementById("details-body");
+  const drawer = document.getElementById("details-drawer");
+  const backdrop = document.getElementById("drawer-backdrop");
+  body.replaceChildren(el("p", { className: "muted" }, "Loading provenance…"));
+  drawer.hidden = false;
+  backdrop.hidden = false;
+  document.body.classList.add("drawer-open");
+  let payload;
+  try {
+    payload = await api(`api/runs/${encodeURIComponent(state.run.id)}/provenance`);
+  } catch (error) {
+    body.replaceChildren(el("p", { className: "no-oracle" }, String(error)));
+    return;
+  }
+  const provenance = payload.provenance ?? {};
+  const bundle = state.calibrations.find(
+    (entry) => entry.bundle_id === provenance.calibration_id,
+  );
+  const facts = [
+    ["Run", state.run.id],
+    ["State", state.run.state],
+    ["Path", state.run.path],
+    ["Calibration", provenance.calibration_id || "none"],
+    ["Calibration version", provenance.calibration_version || "—"],
+    ["Bundle review", bundle ? (bundle.review?.signed_off ? "signed" : "unsigned") : "not listed"],
+    ["BEC", provenance.bec ?? "—"],
+    ["QMD", provenance.qmd ?? "—"],
+    ["BA", provenance.ba ?? "—"],
+    ["TSA", provenance.tsa ?? "—"],
+  ];
+  const grid = el("div", { className: "details-grid" },
+    ...facts.flatMap(([label, value]) => [
+      el("span", { className: "muted" }, label),
+      el("strong", {}, String(value)),
+    ]),
+  );
+  body.replaceChildren(
+    el("p", { className: "details-lead" }, bundle?.claim ?? "No calibration bundle is recorded for this run."),
+    grid,
+  );
+  if (bundle?.warnings?.length) {
+    body.append(el("div", { className: "notice" }, ...bundle.warnings.map((warning) => el("p", {}, warning))));
+  }
+  body.append(el("h3", {}, "Provenance record"));
+  body.append(el("pre", {}, JSON.stringify(payload, null, 2)));
+}
+
+function closeDetails() {
+  const drawer = document.getElementById("details-drawer");
+  const backdrop = document.getElementById("drawer-backdrop");
+  if (drawer) drawer.hidden = true;
+  if (backdrop) backdrop.hidden = true;
+  document.body.classList.remove("drawer-open");
+}
+
 /* ---------------------------------------------------------------- boot */
 
 async function boot() {
@@ -970,6 +1067,12 @@ async function boot() {
   document.getElementById("close-new-run").addEventListener("click", closeNewRun);
   document.getElementById("cancel-new-run").addEventListener("click", closeNewRun);
   document.getElementById("new-run-form").addEventListener("submit", submitNewRun);
+  document.getElementById("details-button").addEventListener("click", openDetails);
+  document.getElementById("close-details").addEventListener("click", closeDetails);
+  document.getElementById("drawer-backdrop").addEventListener("click", closeDetails);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeDetails();
+  });
   try {
     const [skins, runs, oracle, calibrations] = await Promise.all([
       api("api/skins"),
@@ -982,12 +1085,19 @@ async function boot() {
     state.oracle = oracle;
     state.calibrations = calibrations;
     state.skin = skins[0];
-    state.workspace = "runs";
-    state.panel = null;
+    const initial = readUrlState();
     const firstComplete = runs.find((run) => run.state === "complete") ?? runs[0] ?? null;
-    state.run = firstComplete;
+    state.run = runs.find((run) => run.id === initial.run) ?? firstComplete;
+    state.workspace = initial.workspace || "runs";
+    state.standYear = initial.year && Number.isFinite(Number(initial.year)) ? Number(initial.year) : null;
+    const workspaces = available_workspaces();
+    if (!workspaces.some((workspace) => workspace.id === state.workspace)) state.workspace = "runs";
+    state.panel = initial.panel || workspace_panels()[0] || null;
+    if (!workspace_panels().includes(state.panel)) state.panel = workspace_panels()[0] || null;
+    state.ready = true;
     renderShell();
     await renderPanel();
+    updateUrl();
     if (runs.some((run) => run.state === "running")) startPolling();
   } catch (error) {
     body_error(`Could not start: ${error}`);

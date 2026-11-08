@@ -670,7 +670,7 @@ function updateInspector(panel, tree) {
   );
 }
 
-export async function mountVisuals(body, runId) {
+export async function mountVisuals(body, runId, options = {}) {
   body.append(el("h2", {}, "Stand"));
   body.append(
     el(
@@ -682,13 +682,16 @@ export async function mountVisuals(body, runId) {
 
   let payload;
   try {
-    payload = await api(`api/runs/${encodeURIComponent(runId)}/visuals`);
+    const initialYear = Number(options.year);
+    const query = Number.isFinite(initialYear) ? `?year=${encodeURIComponent(initialYear)}` : "";
+    payload = await api(`api/runs/${encodeURIComponent(runId)}/visuals${query}`);
   } catch (error) {
     if (body.isConnected) body.append(el("p", { class: "no-oracle" }, String(error)));
     return;
   }
   if (!body.isConnected) return;
 
+  if (typeof options.onYear === "function") options.onYear(payload.year);
   if (!payload.available) {
     body.append(el("div", { class: "notice" }, payload.reason));
     body.append(
@@ -840,6 +843,7 @@ export async function mountVisuals(body, runId) {
         yearSelect.value = String(payload.year);
         selected = null;
         updateInspector(inspectorBody, null);
+        if (typeof options.onYear === "function") options.onYear(payload.year);
         update();
       }
     } catch (error) {
