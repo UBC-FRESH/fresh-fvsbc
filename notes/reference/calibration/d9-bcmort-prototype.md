@@ -65,7 +65,14 @@ directions, but worsens MSdm1 Boundary -> Okanagan. A local target intercept red
 model's log loss in three directions but still leaves the target mean biased. Crown class is a
 useful next covariate; it is not a calibration fix and is not integrated.
 
-## 6. Limits
+## 6. Height/DBH screen
+
+Height/DBH was added to the crown model; see `d9-bcmort-hd.md` and `d9-bcmort-hd-summary.csv`. It
+improves MSdm1 in both directions (AUC 0.750 -> 0.763 and 0.681 -> 0.684), but is flat on SBSmw.
+It is not a calibration fix; a local target intercept still leaves the target mean biased. Add it
+to the MSdm1 prototype, not as a universal term.
+
+## 7. Limits
 
 - Poisson hazard, not the final cloglog binomial; no exact interval censoring beyond exposure.
 - Tree-level `dead` is a binary outcome, not a known death time.
@@ -73,6 +80,6 @@ useful next covariate; it is not a calibration fix and is not integrated.
 - No climate, site index, crown ratio, or recent growth yet.
 - This is a model prototype, not an FVS core change or a bundle.
 
-## 7. Claim boundary
+## 8. Claim boundary
 
 This is a diagnostic prototype. It does not support a yield, AAC, legal, or whole-block claim.
