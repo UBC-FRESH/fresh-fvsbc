@@ -10,13 +10,22 @@ const state = {
   oracle: null,
   skin: null,
   run: null,
+  workspace: "runs",
   panel: null,
   table: null,
   compareA: null,
   compareB: null,
   compareTable: null,
   summaryColumn: null,
+  pollTimer: null,
 };
+
+const WORKSPACES = [
+  { id: "runs", title: "Runs", panels: [] },
+  { id: "stand", title: "Stand", panels: ["visuals"] },
+  { id: "results", title: "Results", panels: ["summary", "tables", "trees", "compare"] },
+  { id: "evidence", title: "Evidence", panels: ["provenance", "keywords"] },
+];
 
 const el = (tag, props = {}, ...children) => {
   const node = document.createElement(tag);
@@ -59,6 +68,22 @@ function badge(text, kind) {
   return el("span", { className: `badge ${kind ?? ""}`.trim() }, text);
 }
 
+function workspace_definition(id) {
+  return WORKSPACES.find((workspace) => workspace.id === id) ?? WORKSPACES[0];
+}
+
+function available_workspaces() {
+  const panels = new Set(state.skin?.panels ?? []);
+  return WORKSPACES.filter(
+    (workspace) => workspace.id === "runs" || workspace.panels.some((panel) => panels.has(panel)),
+  );
+}
+
+function workspace_panels(workspace = workspace_definition(state.workspace)) {
+  const panels = new Set(state.skin?.panels ?? []);
+  return workspace.panels.filter((panel) => panels.has(panel));
+}
+
 /* ---------------------------------------------------------------- shell */
 
 function renderShell() {
@@ -77,9 +102,31 @@ function renderShell() {
   runSelect.value = state.run?.id ?? "";
   runSelect.onchange = () => selectRun(runSelect.value);
 
-  const nav = document.getElementById("panel-nav");
-  nav.replaceChildren(
-    ...(state.skin?.panels ?? []).map((panel) =>
+  const workspaces = available_workspaces();
+  if (!workspaces.some((workspace) => workspace.id === state.workspace)) {
+    state.workspace = workspaces[0]?.id ?? "runs";
+  }
+  const workspaceNav = document.getElementById("workspace-nav");
+  workspaceNav.replaceChildren(
+    ...workspaces.map((workspace) =>
+      el(
+        "button",
+        {
+          className: workspace.id === state.workspace ? "active" : "",
+          onclick: () => selectWorkspace(workspace.id),
+          role: "tab",
+          "aria-selected": String(workspace.id === state.workspace),
+        },
+        workspace.title,
+      ),
+    ),
+  );
+
+  const panels = workspace_panels();
+  if (!panels.includes(state.panel)) state.panel = panels[0] ?? null;
+  const panelNav = document.getElementById("panel-nav");
+  panelNav.replaceChildren(
+    ...panels.map((panel) =>
       el(
         "button",
         {
@@ -90,14 +137,13 @@ function renderShell() {
       ),
     ),
   );
+  panelNav.hidden = state.workspace === "runs" || state.workspace === "stand" || panels.length === 0;
 
   const badgeEl = document.getElementById("run-state");
   badgeEl.className = "badge";
   badgeEl.textContent = state.run ? state.run.state : "";
 
   const oracleEl = document.getElementById("oracle-badge");
-  // The standalone comparison is the broader of the two and the one to lead with: it covers every
-  // table either build writes, not only the four the official dump carries.
   oracleEl.textContent = state.oracle
     ? `${state.oracle.standalone} of ${state.oracle.exposed} tables verified against a standalone FVSbc`
     : "";
@@ -110,7 +156,9 @@ function renderShell() {
 
 function selectSkin(id) {
   state.skin = state.skins.find((skin) => skin.id === id) ?? state.skins[0];
-  if (!state.skin.panels.includes(state.panel)) state.panel = state.skin.panels[0];
+  if (!state.skin.panels.includes(state.panel)) {
+    state.panel = workspace_panels()[0] ?? null;
+  }
   renderShell();
   renderPanel();
 }
@@ -119,6 +167,19 @@ function selectRun(id) {
   state.run = state.runs.find((run) => run.id === id) ?? null;
   state.table = null;
   state.summaryColumn = null;
+  if (state.run) {
+    const workspaces = available_workspaces();
+    if (state.workspace === "runs" && workspaces.some((workspace) => workspace.id === "stand")) {
+      state.workspace = "stand";
+    }
+  }
+  renderShell();
+  renderPanel();
+}
+
+function selectWorkspace(id) {
+  state.workspace = id;
+  state.panel = workspace_panels()[0] ?? null;
   renderShell();
   renderPanel();
 }
@@ -138,16 +199,31 @@ async function renderPanel() {
     body._dispose = null;
   }
   body.replaceChildren();
+
+  if (state.workspace === "runs") {
+    await renderRuns(body);
+    return;
+  }
   if (!state.run) {
-    body.append(el("p", { className: "muted" }, "Choose a run."));
+    body.append(el("p", { className: "muted" }, "Choose a run, or start a new one."));
     return;
   }
   if (state.run.state !== "complete") {
     body.append(
-      el("p", { className: "muted" }, `The run ${state.run.id} is still running.`),
+      el(
+        "div",
+        { className: "notice" },
+        `The run ${state.run.id} is still running. Results and the stand view become available when summary.csv is written.`,
+      ),
     );
+    body.append(runActions());
     return;
   }
+  if (state.workspace === "stand") {
+    await renderVisuals(body);
+    return;
+  }
+
   const renderers = {
     tables: renderTables,
     summary: renderSummary,
@@ -162,11 +238,158 @@ async function renderPanel() {
     body.append(el("p", { className: "muted" }, `No renderer for ${state.panel}.`));
     return;
   }
+  body.append(runHeader());
   try {
     await renderer(body);
   } catch (error) {
     body.append(el("p", { className: "no-oracle" }, String(error)));
   }
+}
+
+async function renderRuns(body) {
+  const heading = el("div", { className: "section-head" },
+    el("div", {},
+      el("h2", {}, "Runs"),
+      el("p", { className: "muted" }, "Open a run to inspect its stand, results, and evidence. Start a new one from a tree list."),
+    ),
+    el("button", { className: "primary", type: "button", onclick: openNewRun }, "New run"),
+  );
+  body.append(heading);
+  if (!state.runs.length) {
+    body.append(el("div", { className: "empty-state" },
+      el("strong", {}, "No runs yet"),
+      el("p", { className: "muted" }, "The service searches its runs root one level deep. Start a run with a population path."),
+    ));
+    return;
+  }
+  const grid = el("div", { className: "run-grid" });
+  for (const run of state.runs) {
+    const complete = run.state === "complete";
+    grid.append(
+      el("article", { className: "run-card" },
+        el("div", { className: "run-card-head" },
+          el("strong", {}, run.id),
+          badge(run.state, complete ? "ok" : ""),
+        ),
+        el("p", { className: "muted", title: run.path }, run.path),
+        el("div", { className: "run-card-meta" },
+          el("span", {}, `${run.tables} tables`),
+          el("span", {}, complete ? "ready" : "in progress"),
+        ),
+        el("div", { className: "run-card-actions" },
+          el("button", { type: "button", disabled: !complete, onclick: () => { state.run = run; selectWorkspace("stand"); } }, "Open stand"),
+          el("button", { type: "button", disabled: !complete, onclick: () => { state.run = run; selectWorkspace("results"); } }, "Open results"),
+          el("button", { type: "button", onclick: () => { state.run = run; selectWorkspace("evidence"); } }, "Evidence"),
+        ),
+      ),
+    );
+  }
+  body.append(grid);
+}
+
+function runHeader() {
+  const run = state.run;
+  return el("div", { className: "run-header" },
+    el("div", {},
+      el("h2", {}, run.id),
+      el("p", { className: "muted" }, run.path),
+    ),
+    runActions(),
+  );
+}
+
+function runActions() {
+  if (!state.run) return el("span");
+  return el("div", { className: "run-actions" },
+    el("button", { type: "button", onclick: () => selectWorkspace("stand") }, "Stand"),
+    el("button", { type: "button", onclick: () => selectWorkspace("results") }, "Results"),
+    el("button", { type: "button", onclick: () => selectWorkspace("evidence") }, "Evidence"),
+  );
+}
+
+async function refreshRuns() {
+  try {
+    state.runs = await api("api/runs");
+    if (state.run) {
+      state.run = state.runs.find((run) => run.id === state.run.id) ?? state.run;
+    }
+    renderShell();
+    if (state.workspace === "runs") await renderPanel();
+    if (state.runs.some((run) => run.state === "running")) startPolling();
+  } catch (error) {
+    body_error(error);
+  }
+}
+
+function startPolling() {
+  if (state.pollTimer) return;
+  state.pollTimer = window.setTimeout(async () => {
+    state.pollTimer = null;
+    await refreshRuns();
+    if (state.runs.some((run) => run.state === "running") && !state.pollTimer) startPolling();
+  }, 2500);
+}
+
+function openNewRun() {
+  const dialog = document.getElementById("new-run-dialog");
+  const error = document.getElementById("new-run-error");
+  if (error) error.hidden = true;
+  if (dialog?.showModal) dialog.showModal();
+  else dialog?.setAttribute("open", "");
+  document.getElementById("new-population")?.focus();
+}
+
+function closeNewRun() {
+  const dialog = document.getElementById("new-run-dialog");
+  if (dialog?.close) dialog.close();
+  else dialog?.removeAttribute("open");
+}
+
+async function submitNewRun(event) {
+  event.preventDefault();
+  const error = document.getElementById("new-run-error");
+  const population = document.getElementById("new-population").value.trim();
+  const species = document.getElementById("new-species").value.trim();
+  const treeAge = Number(document.getElementById("new-tree-age").value);
+  const id = document.getElementById("new-run-id").value.trim();
+  const keywords = document.getElementById("new-keywords").value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (!population || !species || !Number.isFinite(treeAge)) {
+    error.textContent = "Population, species, and tree age are required.";
+    error.hidden = false;
+    return;
+  }
+  const payload = { population, species, tree_age: treeAge, keywords };
+  if (id) payload.id = id;
+  try {
+    const response = await fetch("api/runs", {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.detail ?? response.statusText);
+    closeNewRun();
+    document.getElementById("new-run-form").reset();
+    state.runs = await api("api/runs");
+    const created = state.runs.find((run) => run.id === body.id);
+    state.run = created ?? null;
+    state.workspace = "runs";
+    renderShell();
+    await renderPanel();
+    startPolling();
+  } catch (errorValue) {
+    error.textContent = String(errorValue);
+    error.hidden = false;
+  }
+}
+
+function body_error(error) {
+  document.getElementById("panel-body")?.replaceChildren(
+    el("p", { className: "no-oracle" }, String(error)),
+  );
 }
 
 function oracleNotice(tables) {
@@ -270,6 +493,27 @@ async function renderSummary(body) {
   if (!rows.length) {
     body.append(el("p", { className: "muted" }, "This run wrote no summary rows."));
     return;
+  }
+  const latest = rows[rows.length - 1];
+  const kpis = [
+    ["Year", latest.year],
+    ["BA (summary)", latest.baa],
+    ["TPH (summary)", latest.tpa],
+    ["Top height", latest.top_ht],
+    ["CCF", latest.ccf],
+  ].filter(([, value]) => value !== undefined && value !== null);
+  if (kpis.length) {
+    body.append(
+      el("div", { className: "kpi-grid" },
+        ...kpis.map(([label, value]) =>
+          el("article", { className: "kpi-card" },
+            el("span", { className: "kpi-label" }, label),
+            el("strong", {}, fmt(value)),
+            el("small", {}, `at year ${latest.year ?? "?"}`),
+          ),
+        ),
+      ),
+    );
   }
   const columns = Object.keys(rows[0]);
   const numeric = columns.filter((column) => isNumeric(rows, column));
@@ -578,6 +822,10 @@ async function renderCompare(body) {
 /* ---------------------------------------------------------------- boot */
 
 async function boot() {
+  document.getElementById("new-run-button").addEventListener("click", openNewRun);
+  document.getElementById("close-new-run").addEventListener("click", closeNewRun);
+  document.getElementById("cancel-new-run").addEventListener("click", closeNewRun);
+  document.getElementById("new-run-form").addEventListener("submit", submitNewRun);
   try {
     const [skins, runs, oracle] = await Promise.all([
       api("api/skins"),
@@ -588,16 +836,15 @@ async function boot() {
     state.runs = runs;
     state.oracle = oracle;
     state.skin = skins[0];
-    state.panel = state.skin.panels[0];
+    state.workspace = "runs";
+    state.panel = null;
     const firstComplete = runs.find((run) => run.state === "complete") ?? runs[0] ?? null;
     state.run = firstComplete;
     renderShell();
     await renderPanel();
+    if (runs.some((run) => run.state === "running")) startPolling();
   } catch (error) {
-    document.getElementById("panel-body").replaceChildren(
-      el("p", { className: "no-oracle" }, `Could not start: ${error}`),
-    );
+    body_error(`Could not start: ${error}`);
   }
 }
-
 boot();
