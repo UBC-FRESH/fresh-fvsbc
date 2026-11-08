@@ -204,6 +204,7 @@ def test_intervals_separate_dead_from_missing(tmp_path: Path) -> None:
     statuses = survival["status"].value_counts().to_dict()
 
     assert statuses == {"live": 4, "dead": 1, "missing": 1}
+    assert {"TREE_NO", "prior_dbh", "prior_year", "growth"}.issubset(survival.columns)
     interval = dataset.intervals.set_index("interval_id")
     first = interval.loc["S1|1|2000|2010"]
     assert _number(first["dead_ba"]) > 0.0
