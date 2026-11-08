@@ -268,6 +268,8 @@ snapshot with the same row counts still needs a new manifest.
 | `bcingr_v2.py` | The D9.40 BCINGR prototype |
 | `d9-provincial-mortality.md` | The D9.41 all-PSP provincial mortality fit |
 | `d9-provincial-mortality-summary.csv` | The D9.41 held-out TSA metrics |
+| `d9-provincial-crown-si.md` | The D9.42 crown/SI provincial fit |
+| `d9-provincial-crown-si-summary.csv` | The D9.42 held-out TSA metrics |
 | `bcmort_provincial.py` | The D9.41 provincial prototype |
 | `d9-bcmort-prototype.md` | The D9.30 tree-level survival prototype |
 | `bcmort_prototype.py` | The D9.30 prototype code |
