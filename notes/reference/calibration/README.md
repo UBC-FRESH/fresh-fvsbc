@@ -263,6 +263,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-bcingr-prototype.md` | The D9.28 BCINGR hurdle prototype and TSA-transfer failure |
 | `bcingr_prototype.py` | The D9.28 prototype code |
 | `d9-bcingr-prototype-summary.csv` | The D9.28 train/test metrics |
+| `d9-bcingr-v2.md` | The D9.40 BCINGR v2 screen |
+| `d9-bcingr-v2-summary.csv` | The D9.40 BCINGR metrics |
+| `bcingr_v2.py` | The D9.40 BCINGR prototype |
 | `d9-bcmort-prototype.md` | The D9.30 tree-level survival prototype |
 | `bcmort_prototype.py` | The D9.30 prototype code |
 | `d9-bcmort-prototype-summary.csv` | The D9.30 TSA-transfer metrics |
