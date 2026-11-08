@@ -1,0 +1,5 @@
+bec,source_tsa,target_tsa,delta,event_rate,base_mean,local_mean,base_logloss,local_logloss,base_brier,local_brier
+MSdm1,Okanagan TSA,Boundary TSA,-0.5462,0.1548,0.2094,0.1322,0.4094,0.4006,0.1289,0.1247
+MSdm1,Boundary TSA,Okanagan TSA,-0.2417,0.1598,0.1789,0.1444,0.4108,0.4109,0.1254,0.1257
+SBSmw,Quesnel TSA,Prince George TSA,-0.0856,0.1645,0.1575,0.1467,0.3912,0.3934,0.1220,0.1227
+SBSmw,Prince George TSA,Quesnel TSA,0.0790,0.1859,0.1408,0.1508,0.4685,0.4667,0.1395,0.1392
