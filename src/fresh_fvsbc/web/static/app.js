@@ -304,7 +304,6 @@ async function renderRuns(body) {
       el("h2", {}, "Runs"),
       el("p", { className: "muted" }, "Open a run to inspect its stand, results, and evidence. Start a new one from a tree list."),
     ),
-    el("button", { className: "primary", type: "button", onclick: openNewRun }, "New run"),
   );
   body.append(heading);
   if (!state.runs.length) {
@@ -1559,6 +1558,55 @@ function updateUrl() {
   window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
 }
 
+/* ---------------------------------------------------------------- drawers */
+
+const DRAWER_BACKGROUND = [".topbar", "#workspace-nav", ".shell", ".footer"];
+
+function activeDrawer() {
+  for (const id of ["assistant-drawer", "details-drawer"]) {
+    const drawer = document.getElementById(id);
+    if (drawer && !drawer.hidden) return drawer;
+  }
+  return null;
+}
+
+function syncDrawerBackground() {
+  const open = Boolean(activeDrawer());
+  for (const selector of DRAWER_BACKGROUND) {
+    for (const element of document.querySelectorAll(selector)) {
+      element.inert = open;
+    }
+  }
+}
+
+function drawerFocusables(drawer) {
+  return [...drawer.querySelectorAll(
+    'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), '
+      + 'textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+  )].filter((element) => element.offsetParent !== null);
+}
+
+function trapDrawerTab(event) {
+  if (event.key !== "Tab") return;
+  const drawer = activeDrawer();
+  if (!drawer) return;
+  const focusable = drawerFocusables(drawer);
+  if (!focusable.length) {
+    event.preventDefault();
+    return;
+  }
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const active = document.activeElement;
+  if (event.shiftKey && (!drawer.contains(active) || active === first)) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (!drawer.contains(active) || active === last)) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
 /* ---------------------------------------------------------------- details drawer */
 
 async function openDetails() {
@@ -1573,6 +1621,7 @@ async function openDetails() {
   backdrop.hidden = false;
   document.getElementById("details-button").setAttribute("aria-expanded", "true");
   document.body.classList.add("drawer-open");
+  syncDrawerBackground();
   document.getElementById("close-details").focus();
   let payload;
   try {
@@ -1616,11 +1665,13 @@ async function openDetails() {
 
 function closeDetails() {
   const drawer = document.getElementById("details-drawer");
+  if (!drawer || drawer.hidden) return;
   const backdrop = document.getElementById("drawer-backdrop");
-  if (drawer) drawer.hidden = true;
+  drawer.hidden = true;
   if (backdrop) backdrop.hidden = true;
   document.getElementById("details-button").setAttribute("aria-expanded", "false");
   document.body.classList.remove("drawer-open");
+  syncDrawerBackground();
   state.detailsTrigger?.focus?.();
 }
 
@@ -1840,6 +1891,7 @@ function openAssistant() {
   document.getElementById("drawer-backdrop").hidden = false;
   document.getElementById("assistant-button").setAttribute("aria-expanded", "true");
   document.body.classList.add("drawer-open");
+  syncDrawerBackground();
   const input = document.getElementById("assistant-input");
   input?.focus();
   resizeAssistantInput();
@@ -1852,6 +1904,7 @@ function closeAssistant() {
   document.getElementById("drawer-backdrop").hidden = true;
   document.getElementById("assistant-button").setAttribute("aria-expanded", "false");
   document.body.classList.remove("drawer-open");
+  syncDrawerBackground();
   state.assistantTrigger?.focus?.();
 }
 
@@ -1954,6 +2007,7 @@ async function boot() {
   document.querySelectorAll("#assistant-quick button").forEach((button) => {
     button.addEventListener("click", () => sendAssistant(button.dataset.prompt));
   });
+  document.addEventListener("keydown", trapDrawerTab);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       closeDetails();
