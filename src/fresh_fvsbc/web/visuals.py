@@ -196,13 +196,15 @@ def _merge(tree_frame: pd.DataFrame, cut_frame: pd.DataFrame) -> list[dict[str, 
     order: list[str] = []
     for row in tree_frame.to_dict(orient="records"):
         record = _record(row, status="live")
-        key = record["tree_id"]
+        # TreeId is not unique in the FVS table; TreeIndex is the per-plot identity the writer
+        # uses. Keying on TreeId alone collapsed hundreds of trees into a few in a real run.
+        key = f"{record['plot']}:{record['tree_index']}"
         if key not in records:
             order.append(key)
         records[key] = record
     for row in cut_frame.to_dict(orient="records"):
         record = _record(row, status="cut")
-        key = record["tree_id"]
+        key = f"{record['plot']}:{record['tree_index']}"
         if key in records:
             records[key]["status"] = "cut"
             continue

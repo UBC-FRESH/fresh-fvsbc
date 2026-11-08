@@ -353,3 +353,17 @@ def test_the_endpoint_serves_the_payload(tmp_path: Path) -> None:
     assert later.json()["year"] == 10
     missing = client.get("/api/runs/nope/visuals")
     assert missing.status_code == 404
+
+
+def test_duplicate_tree_ids_are_kept_as_distinct_trees(tmp_path: Path) -> None:
+    """TreeIndex, not TreeId, is the per-plot identity in FVS output."""
+    rows = [
+        ("c1", "S1", 0, "1", 1, 1, "FD", "PSME", 10.0, 8.0, 100.0, 40.0, 2.0, 60.0),
+        ("c1", "S1", 0, "1", 2, 1, "FD", "PSME", 12.0, 9.0, 100.0, 40.0, 2.0, 60.0),
+        ("c1", "S1", 0, "1", 3, 1, "FD", "PSME", 14.0, 10.0, 100.0, 40.0, 2.0, 60.0),
+    ]
+    run = _run(tmp_path / "run", tree_rows=rows)
+    payload = visualstore.visuals(run)
+    assert payload["counts"] == {"trees": 3, "cut": 0, "plots": 1, "shown": 3, "total": 3}
+    assert [tree["tree_index"] for tree in payload["trees"]] == [1, 2, 3]
+    assert sum(tree["tph"] for tree in payload["trees"]) == 300.0
