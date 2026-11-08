@@ -378,6 +378,14 @@ def test_the_assistant_conversation_survives_reload(cockpit: str) -> None:
             input_box.fill("Persistence smoke")
             input_box.press("Enter")
             expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+            with page.expect_download() as download_info:
+                page.get_by_role("button", name="Export", exact=True).click()
+            transcript = download_info.value.path()
+            assert transcript is not None
+            text = transcript.read_text(encoding="utf-8")
+            assert "fresh-fvsbc assistant transcript" in text
+            assert f"Run: {RUN_ID}" in text
+            assert "Persistence smoke" in text
             page.reload(wait_until="networkidle")
             page.get_by_role("button", name="Ask the FVS assistant").click()
             expect(page.locator("#assistant-log")).to_contain_text("Persistence smoke")
