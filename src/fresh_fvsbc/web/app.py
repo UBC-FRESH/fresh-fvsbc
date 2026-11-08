@@ -25,6 +25,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+from fresh_fvsbc.bundle import BundleError, CalibrationBundle, load_bundle
 from fresh_fvsbc.outputs import EXPOSED_TABLES, ORACLE_TABLES, STANDALONE_VERIFIED
 from fresh_fvsbc.web import runs as runstore
 from fresh_fvsbc.web import visuals as visualstore
@@ -47,6 +48,7 @@ def create_app(
     *,
     allow_remote: bool = False,
     root_path: str = "",
+    bundles: Sequence[Path] = (),
 ) -> FastAPI:
     """Build the application over a set of run roots.
 
@@ -105,8 +107,10 @@ def create_app(
             return await call_next(request)
 
     resolved = tuple(Path(root).resolve() for root in roots)
+    bundle_roots = tuple(Path(root).resolve() for root in bundles)
     skins = load_skins()
     app.state.roots = resolved
+    app.state.bundle_roots = bundle_roots
     app.state.allow_remote = allow_remote
     app.state.skins = {skin.id: skin for skin in skins}
     #: The child processes this service started, so a run that died is reported as failed rather
@@ -135,6 +139,88 @@ def create_app(
             if run.id == run_id:
                 return run
         raise HTTPException(status_code=404, detail=f"no run {run_id!r} under the configured roots")
+
+    def _bundle_files() -> list[Path]:
+        """Return candidate bundle files under the configured roots, sorted."""
+        files: set[Path] = set()
+        for root in app.state.bundle_roots:
+            if root.is_file() and root.suffix == ".json":
+                files.add(root)
+            elif root.is_dir():
+                files.update(root.glob("*.json"))
+        return sorted(files)
+
+    def _bundle_record(bundle: CalibrationBundle, path: Path) -> dict[str, Any]:
+        """Serialize the parts of a bundle a reviewer needs to see."""
+        domain = bundle.domain
+        return {
+            "bundle_id": bundle.bundle_id,
+            "version": bundle.version,
+            "path": str(path),
+            "claim": bundle.claim,
+            "pins": dict(bundle.pins),
+            "domain": {
+                "regions": list(domain.regions),
+                "tsas": list(domain.tsas),
+                "becs": list(domain.becs),
+                "species_groups": list(domain.species_groups),
+                "management": list(domain.management),
+                "qmd_min": domain.qmd_min,
+                "ba_min": domain.ba_min,
+                "dbh_classes": [list(item) for item in domain.dbh_classes],
+            },
+            "parameters": [
+                {
+                    "keyword": parameter.keyword,
+                    "fields": list(parameter.fields),
+                    "units": parameter.units,
+                    "bounds": list(parameter.bounds) if parameter.bounds is not None else None,
+                }
+                for parameter in bundle.parameters
+            ],
+            "training": dict(bundle.training),
+            "review": dict(bundle.review),
+            "warnings": list(bundle.warnings),
+            "ingrowth": None
+            if bundle.ingrowth is None
+            else {
+                "model_id": bundle.ingrowth.model_id,
+                "version": bundle.ingrowth.version,
+                "method": bundle.ingrowth.method,
+                "rates": len(bundle.ingrowth.rates),
+                "scale": bundle.ingrowth.scale,
+            },
+        }
+
+    def _bundles() -> list[dict[str, Any]]:
+        """Load every valid bundle under the configured roots."""
+        records: list[dict[str, Any]] = []
+        for path in _bundle_files():
+            try:
+                bundle = load_bundle(path)
+            except (BundleError, OSError, ValueError):
+                continue
+            records.append(_bundle_record(bundle, path))
+        return records
+
+    @app.get("/api/calibrations")
+    def calibrations() -> list[dict[str, Any]]:
+        """List the valid calibration bundles visible to this service.
+
+        Returns
+        -------
+        list of dict
+            Bundle metadata, claim, domain, parameters, review state, and warnings.
+        """
+        return _bundles()
+
+    @app.get("/api/calibrations/{bundle_id}")
+    def calibration(bundle_id: str) -> dict[str, Any]:
+        """Return one calibration bundle by its stable identifier."""
+        for record in _bundles():
+            if record["bundle_id"] == bundle_id:
+                return record
+        raise HTTPException(status_code=404, detail=f"no calibration bundle {bundle_id!r}")
 
     @app.get("/api/skins")
     def list_skins() -> list[dict[str, Any]]:
@@ -503,6 +589,14 @@ def _parser() -> argparse.ArgumentParser:
         metavar="DIR",
         help="a directory holding run directories; repeatable",
     )
+    parser.add_argument(
+        "--bundles",
+        type=Path,
+        action="append",
+        default=[],
+        metavar="DIR",
+        help="a directory holding calibration bundle JSON files; repeatable",
+    )
     parser.add_argument("--host", default="127.0.0.1", metavar="ADDR", help="the bind address")
     parser.add_argument("--port", type=int, default=8765, metavar="PORT", help="the bind port")
     parser.add_argument(
@@ -571,6 +665,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
-    application = create_app(args.runs, allow_remote=args.allow_remote, root_path=args.root_path)
+    application = create_app(
+        args.runs,
+        allow_remote=args.allow_remote,
+        root_path=args.root_path,
+        bundles=args.bundles,
+    )
     uvicorn.run(application, host=args.host, port=args.port, log_level="info")
     return 0
