@@ -213,6 +213,24 @@ def test_the_compare_workspace_shows_two_run_deltas(cockpit: str) -> None:
             browser.close()
 
 
+def test_the_mobile_shell_does_not_overflow(cockpit: str) -> None:
+    """The runs and summary views fit a phone-width viewport."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 390, "height": 844})
+        try:
+            for path in (
+                f"/?workspace=runs&run={RUN_ID}",
+                f"/?workspace=results&panel=summary&run={RUN_ID}",
+            ):
+                page.goto(f"{cockpit}{path}", wait_until="networkidle")
+                assert page.evaluate("document.body.scrollWidth <= document.body.clientWidth")
+            expect(page.get_by_role("heading", name="Summary", exact=True)).to_be_visible()
+        finally:
+            browser.close()
+
+
 def test_the_calibration_editor_previews_the_domain_and_cycles(cockpit: str) -> None:
     """A bundle can be carried into the run editor, where its domain and warnings are visible."""
     expect = playwright_module.expect
@@ -279,10 +297,19 @@ def test_the_details_drawer_restores_focus_and_escape_closes(cockpit: str) -> No
             expect(drawer).to_be_visible()
             expect(trigger).to_have_attribute("aria-expanded", "true")
             assert page.evaluate("document.activeElement.id") == "close-details"
+            assert page.evaluate("document.querySelector('.shell').inert") is True
+            page.keyboard.press("Shift+Tab")
+            assert (
+                page.evaluate(
+                    "document.querySelector('#details-drawer').contains(document.activeElement)"
+                )
+                is True
+            )
             expect(page.get_by_text("Provenance record")).to_be_visible()
             page.keyboard.press("Escape")
             expect(drawer).to_be_hidden()
             assert page.evaluate("document.activeElement.id") == "details-button"
+            assert page.evaluate("document.querySelector('.shell').inert") is False
         finally:
             browser.close()
 
