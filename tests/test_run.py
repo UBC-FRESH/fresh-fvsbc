@@ -630,6 +630,143 @@ def test_run_population_applies_an_ingrowth_bundle(
     assert any(keyword.name == "ESTAB" for keyword in captured[0])
 
 
+def test_run_population_rewrites_cycle_controls_before_the_projection(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A cycle request replaces TIMEINT and NUMCYCLE, and keeps them before PROCESS."""
+    captured: list[Sequence[Keyword]] = []
+
+    def stub(
+        records: Sequence[TreeListFields],
+        keywords: Sequence[Keyword],
+        *,
+        directory: str | Path,
+        variant: str = "bc",
+        key_name: str = run.KEYWORD_FILE_NAME,
+        calibration: object = None,
+        tsa: str | None = None,
+    ) -> run.RunResult:
+        captured.append(keywords)
+        return a_result(Path(directory))
+
+    monkeypatch.setattr(run, "run_case", stub)
+    run.run_population(
+        synthetic_population(),
+        species="FD",
+        tree_age=60.0,
+        keywords=(
+            Keyword("STDINFO", ("CAR", "IDFdk3/01")),
+            Keyword("TIMEINT", ("", "5")),
+            Keyword("NUMCYCLE", ("1",)),
+            Keyword("PROCESS"),
+        ),
+        cycles=2,
+        cycle_years=5,
+        directory=tmp_path / "run",
+    )
+    names = [keyword.name for keyword in captured[0]]
+    assert names.index("TIMEINT") < names.index("NUMCYCLE") < names.index("PROCESS")
+    assert captured[0][names.index("TIMEINT")].parameters == ("", "5")
+    assert captured[0][names.index("NUMCYCLE")].parameters == ("2",)
+
+
+def test_run_population_adds_cycle_controls_when_the_set_has_none(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A set without TIMEINT or NUMCYCLE gets both before its projection."""
+    captured: list[Sequence[Keyword]] = []
+
+    def stub(
+        records: Sequence[TreeListFields],
+        keywords: Sequence[Keyword],
+        *,
+        directory: str | Path,
+        variant: str = "bc",
+        key_name: str = run.KEYWORD_FILE_NAME,
+        calibration: object = None,
+        tsa: str | None = None,
+    ) -> run.RunResult:
+        captured.append(keywords)
+        return a_result(Path(directory))
+
+    monkeypatch.setattr(run, "run_case", stub)
+    run.run_population(
+        synthetic_population(),
+        species="FD",
+        tree_age=60.0,
+        keywords=(Keyword("STDINFO", ("CAR", "IDFdk3/01")), Keyword("PROCESS")),
+        cycles=3,
+        cycle_years=4,
+        directory=tmp_path / "run",
+    )
+    names = [keyword.name for keyword in captured[0]]
+    assert names[:4] == ["STDINFO", "TIMEINT", "NUMCYCLE", "PROCESS"]
+    assert captured[0][2].parameters == ("3",)
+
+
+def test_run_population_refuses_bad_cycle_controls(tmp_path: Path) -> None:
+    """Cycle counts and intervals are validated before any projection starts."""
+    with pytest.raises(PopulationError, match="cycles"):
+        run.run_population(
+            synthetic_population(),
+            species="FD",
+            tree_age=60.0,
+            cycles=0,
+            directory=tmp_path / "run",
+        )
+    with pytest.raises(PopulationError, match="cycle_years"):
+        run.run_population(
+            synthetic_population(),
+            species="FD",
+            tree_age=60.0,
+            cycle_years=0,
+            directory=tmp_path / "run",
+        )
+
+
+def test_run_population_sends_one_ingrowth_event_per_cycle(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The bundle's ESTAB block carries the requested cycles, not a single pulse."""
+    captured: list[Sequence[Keyword]] = []
+
+    def stub(
+        records: Sequence[TreeListFields],
+        keywords: Sequence[Keyword],
+        *,
+        directory: str | Path,
+        variant: str = "bc",
+        key_name: str = run.KEYWORD_FILE_NAME,
+        calibration: object = None,
+        tsa: str | None = None,
+    ) -> run.RunResult:
+        captured.append(keywords)
+        return a_result(Path(directory))
+
+    monkeypatch.setattr(run, "run_case", stub)
+    bundle = load_bundle(
+        Path(__file__).resolve().parents[1] / "notes/reference/calibration/d7-idfdk-bundle.json"
+    )
+    run.run_population(
+        synthetic_population(),
+        species="FD",
+        tree_age=60.0,
+        keywords=(
+            Keyword("STDINFO", ("CAR", "IDFdk3/01")),
+            Keyword("TIMEINT", ("", "5")),
+            Keyword("NUMCYCLE", ("1",)),
+            Keyword("PROCESS"),
+        ),
+        calibration=bundle,
+        cycles=2,
+        cycle_years=5,
+        directory=tmp_path / "run",
+    )
+    estab = next(keyword for keyword in captured[0] if keyword.name == "ESTAB")
+    assert len(estab.nested or ()) >= 2
+    assert {keyword.parameters[0] for keyword in estab.nested or ()} == {"1", "2"}
+
+
 def test_timeint_years_has_a_stated_fallback() -> None:
     """A bundle without TIMEINT uses ten years; invalid values are ignored."""
     assert run._timeint_years((Keyword("PROCESS"),)) == 10.0

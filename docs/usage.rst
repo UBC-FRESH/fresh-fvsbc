@@ -58,6 +58,21 @@ before the first ``|`` and each ``|`` starts a line. This is how a caller asks f
 
    --block "DATABASE|DSNOut|FVSOut.db|Summary|ComputDB"
 
+A calibration bundle is passed as a file, never as parameters assembled by the caller:
+
+.. code-block:: bash
+
+   --calibration bundle.json --min-dbh 4 --tsa "Quesnel TSA"
+
+``--min-dbh`` filters the population before the run. The bundle records the same cutoff in its
+domain, and the run refuses a stand outside the species, BEC, region, management, or DBH range it
+names. A bundle remains a pilot until its review is signed.
+
+``--cycles`` and ``--cycle-years`` are the projection controls. When ``--cycles`` is greater than
+one, the command replaces the caller's ``TIMEINT`` and ``NUMCYCLE`` before the projection and
+emits the bundle's ingrowth block once per cycle. If ``--cycle-years`` is omitted, the first
+positive ``TIMEINT`` is used; with none, the interval is ten years.
+
 ``--keyword`` and ``--block`` keep their relative order, because a ``DATABASE`` block must precede the
 stand setup — see :doc:`reference/keywords`. A ``--block`` for a keyword that takes no lines is refused
 with exit ``2``.

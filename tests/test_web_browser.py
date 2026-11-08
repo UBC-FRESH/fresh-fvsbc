@@ -151,6 +151,32 @@ def test_the_cockpit_runs_stand_calibration_and_url_state(cockpit: str) -> None:
             browser.close()
 
 
+def test_the_calibration_editor_previews_the_domain_and_cycles(cockpit: str) -> None:
+    """A bundle can be carried into the run editor, where its domain and warnings are visible."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=calibration", wait_until="networkidle")
+            page.get_by_role("button", name="Details", exact=True).click()
+            page.get_by_role("button", name="Use in new run").click()
+            expect(page.locator("#new-run-dialog")).to_be_visible()
+            expect(page.locator("#new-bundle")).to_have_value("cwh-growth-4cm-pilot-2026-11-04")
+            expect(page.locator("#new-bundle-preview")).to_contain_text("Domain")
+            expect(page.locator("#new-bundle-preview")).to_contain_text("unsigned pilot")
+            page.locator("#new-min-dbh").fill("2")
+            expect(page.locator("#new-bundle-preview")).to_contain_text("below this bundle")
+            page.locator("#new-cycles").fill("2")
+            page.locator("#new-cycle-years").fill("5")
+            expect(page.locator("#new-cycles")).to_have_value("2")
+            expect(page.locator("#new-cycle-years")).to_have_value("5")
+            page.get_by_role("button", name="Cancel").click()
+            expect(page.locator("#new-run-dialog")).to_be_hidden()
+        finally:
+            browser.close()
+
+
 def test_the_details_drawer_restores_focus_and_escape_closes(cockpit: str) -> None:
     """The evidence drawer traps attention, reports its state, and returns focus."""
     expect = playwright_module.expect

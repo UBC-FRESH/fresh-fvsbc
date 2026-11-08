@@ -726,20 +726,54 @@ def _timeint_years(keywords: Sequence[Keyword]) -> float:
     return 10.0
 
 
+def _with_cycles(
+    keywords: Sequence[Keyword], *, cycles: int, cycle_years: float | None
+) -> tuple[Keyword, ...]:
+    """Return the keyword set with the requested cycle count and interval.
+
+    The caller owns the stand, but the cycle controls are also the controls the browser's
+    calibration editor exposes. Repeating ``TIMEINT`` would be ambiguous, so the values are
+    replaced in place and the two keywords are placed before the projection. No other keyword is
+    reordered.
+    """
+    if cycles < 1:
+        raise PopulationError("cycles must be at least one")
+    if cycle_years is not None and (not math.isfinite(cycle_years) or cycle_years <= 0):
+        raise PopulationError("cycle_years must be a positive finite number")
+    if cycles == 1 and cycle_years is None:
+        return tuple(keywords)
+    interval = cycle_years if cycle_years is not None else _timeint_years(keywords)
+    replacements = [Keyword("TIMEINT", ("", f"{interval:g}"))]
+    if cycles > 1:
+        replacements.append(Keyword("NUMCYCLE", (str(cycles),)))
+    kept = tuple(keyword for keyword in keywords if keyword.name not in {"TIMEINT", "NUMCYCLE"})
+    at = next(
+        (index for index, keyword in enumerate(kept) if keyword.name in {"PROCESS", "STOP"}),
+        len(kept),
+    )
+    return (*kept[:at], *replacements, *kept[at:])
+
+
 def _apply_calibration(
     records: Sequence[TreeListFields],
     keywords: Sequence[Keyword],
     calibration: CalibrationBundle,
+    *,
+    cycles: int = 1,
+    cycle_years: float | None = None,
 ) -> tuple[Keyword, ...]:
     """Render a bundle's parameters and matching ESTAB block before the projection."""
     additions = list(calibration.render())
     if calibration.ingrowth is not None:
         code = _bec_of(keywords)
+        interval = cycle_years if cycle_years is not None else _timeint_years(keywords)
         block = calibration.ingrowth_keyword(
             bec=f"{code.zone}{code.subzone}",
-            years=_timeint_years(keywords),
+            years=interval * cycles,
             ba=_ba(records),
             qmd=_qmd(records),
+            cycles=cycles,
+            cycle_years=interval,
         )
         if block is not None:
             additions.append(block)
@@ -759,6 +793,8 @@ def run_population(
     calibration: CalibrationBundle | None = None,
     tsa: str | None = None,
     min_dbh: float | None = None,
+    cycles: int = 1,
+    cycle_years: float | None = None,
 ) -> RunResult:
     """Run one case built from a synthetic stem population.
 
@@ -790,6 +826,13 @@ def run_population(
         The TSA name for a bundle domain that names one.
     min_dbh : float, optional
         Filter the population to trees at or above this DBH before the run.
+    cycles : int, optional
+        The number of projection cycles. More than one replaces the caller's
+        ``TIMEINT`` and ``NUMCYCLE`` with the interval below, so the bundle's
+        ingrowth block is emitted once per cycle.
+    cycle_years : float, optional
+        The length of each cycle, in years. When omitted, the first positive
+        ``TIMEINT`` in ``keywords`` is used, or ten years when there is none.
 
     Returns
     -------
@@ -816,8 +859,15 @@ def run_population(
         records = [record for record in records if float(record["diam"]) >= min_dbh]
         if not records:
             raise PopulationError("the population has no trees at or above min_dbh")
+    keywords = _with_cycles(keywords, cycles=cycles, cycle_years=cycle_years)
     if calibration is not None:
-        keywords = _apply_calibration(records, keywords, calibration)
+        keywords = _apply_calibration(
+            records,
+            keywords,
+            calibration,
+            cycles=cycles,
+            cycle_years=cycle_years,
+        )
     return run_case(
         records,
         keywords,

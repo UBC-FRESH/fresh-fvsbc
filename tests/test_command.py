@@ -336,6 +336,8 @@ def test_the_command_passes_the_callers_keywords_through(
         calibration: object = None,
         tsa: str | None = None,
         min_dbh: float | None = None,
+        cycles: int = 1,
+        cycle_years: float | None = None,
     ) -> run.RunResult:
         captured.append(keywords)
         raise run.RunError("stub")
@@ -357,6 +359,51 @@ def test_the_command_passes_the_callers_keywords_through(
         ]
     )
     assert list(captured[0]) == [Keyword("STDINFO", ("CAR", "IDFdk3/01")), Keyword("PROCESS")]
+
+
+def test_cycle_flags_reach_the_run(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The command exposes the same cycle controls as the browser's calibration editor."""
+    captured: dict[str, object] = {}
+
+    def stub(
+        population: Sequence[dict[str, object]],
+        *,
+        directory: str | Path,
+        species: str | None = None,
+        tree_age: float | None = None,
+        keywords: Sequence[Keyword] = (),
+        variant: str = "bc",
+        plot_fields: object = None,
+        key_name: str = KEYWORD_FILE_NAME,
+        calibration: object = None,
+        tsa: str | None = None,
+        min_dbh: float | None = None,
+        cycles: int = 1,
+        cycle_years: float | None = None,
+    ) -> run.RunResult:
+        captured["cycles"] = cycles
+        captured["cycle_years"] = cycle_years
+        raise run.RunError("stub")
+
+    monkeypatch.setattr(cli, "run_population", stub)
+    cli.main(
+        [
+            str(a_population_file(tmp_path / "population.json")),
+            "--directory",
+            str(tmp_path / "run"),
+            "--species",
+            "FD",
+            "--tree-age",
+            "60",
+            "--keyword",
+            "PROCESS",
+            "--cycles",
+            "2",
+            "--cycle-years",
+            "5",
+        ]
+    )
+    assert captured == {"cycles": 2, "cycle_years": 5.0}
 
 
 def test_a_block_argument_parses_its_lines() -> None:
@@ -414,6 +461,8 @@ def test_the_two_options_keep_their_relative_order(
         calibration: object = None,
         tsa: str | None = None,
         min_dbh: float | None = None,
+        cycles: int = 1,
+        cycle_years: float | None = None,
     ) -> run.RunResult:
         captured.append(keywords)
         raise run.RunError("stub")
