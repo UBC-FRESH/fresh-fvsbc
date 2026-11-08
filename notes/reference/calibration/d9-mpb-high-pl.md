@@ -40,8 +40,19 @@ The MPB extension now produces large PL mortality on the high-PL stands. The low
 control remains near zero. This is the first evidence that the linked extension can reach the
 observed post-2000 PL range.
 
-The MPB table in the current output ends in 2011 for these cases; the final-year fraction and
-outbreak timing still need to be reconciled with the interval end year.
+The MPB table ends after 10 outbreak years. The cause is `colmod.f`:
+
+```
+IF (NUMYRS .GT. 10) NUMYRS = 10
+```
+
+Raising the cap to 30 is not a valid fix: the cumulative dead column then double-counts the same
+dead trees (for `4025471`, final dead rose from 363 to 2,497 against an initial 718 live PL). The
+MPB rate-of-loss arrays and event bookkeeping are designed around a 10-year outbreak.
+
+The correct next step is to split longer PSP intervals into <=10-year cycles with an explicit
+outbreak restart, or to carry the surviving live PL forward and re-enter MPB. Do not raise the cap
+without fixing the cumulative dead accounting.
 
 ## 3. Interpretation
 
