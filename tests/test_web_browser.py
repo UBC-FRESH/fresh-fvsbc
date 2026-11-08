@@ -1,0 +1,196 @@
+"""A real-browser smoke test for the cockpit.
+
+The test is skipped unless Playwright and its Chromium build are installed. CI installs
+them in the dedicated browser job; the Python quality jobs stay browser-free.
+"""
+
+from __future__ import annotations
+
+import json
+import socket
+import sqlite3
+import threading
+import time
+import urllib.request
+from collections.abc import Iterator
+from pathlib import Path
+
+import pytest
+
+from fresh_fvsbc.web import app as webapp
+
+playwright_module = pytest.importorskip("playwright.sync_api")
+
+ROOT = Path(__file__).resolve().parents[1]
+RUN_ID = "smoke-run"
+BUNDLE = ROOT / "notes/reference/calibration/d7-cwh-4cm-bundle.json"
+
+
+def _make_run(root: Path) -> None:
+    """Write one complete run with a small, deterministic tree list."""
+    run = root / RUN_ID
+    run.mkdir(parents=True)
+    (run / "run.key").write_text("STDIDENT\nbrowser smoke\n", encoding="utf-8")
+    (run / "summary.csv").write_text(
+        "year,age,tpa,baa\n0,60,3,3.0\n10,70,2,2.4\n", encoding="utf-8"
+    )
+    (run / "provenance.json").write_text(
+        json.dumps(
+            {
+                "fresh_fvsbc_version": "0.21.4",
+                "pyfvs_commit": "e95172b",
+                "fvs_source_commit": "ef5fa847",
+                "variant": "bc",
+                "calibration_id": "cwh-growth-4cm-pilot-2026-11-04",
+                "calibration_version": "0.1.3",
+                "bec": "CWHvm1",
+                "qmd": 12.3,
+                "ba": 35.0,
+                "tsa": "Arrowsmith TSA",
+            }
+        ),
+        encoding="utf-8",
+    )
+    (run / "variants.json").write_text(json.dumps({"BC": "OK"}), encoding="utf-8")
+    connection = sqlite3.connect(run / "FVSOut.db")
+    try:
+        connection.execute("create table FVS_Cases (CaseID text, StandID text, Variant text)")
+        connection.execute(
+            "create table FVS_TreeList_Metric ("
+            "Year integer, PtIndex integer, TreeIndex integer, TreeId text, "
+            "SpeciesFVS text, SpeciesPLANTS text, DBH real, Ht real, TPH real, "
+            "PctCr real, CrWidth real, TreeAge real)"
+        )
+        rows = [
+            (0, 1, 1, "0:1", "FD", "FD", 12.0, 14.0, 300.0, 55.0, 3.2, 60.0),
+            (0, 1, 2, "0:2", "HW", "HW", 8.0, 10.0, 200.0, 48.0, 2.4, 55.0),
+            (0, 2, 1, "0:3", "FD", "FD", 20.0, 19.0, 150.0, 35.0, 4.1, 70.0),
+            (10, 1, 1, "10:1", "FD", "FD", 18.0, 18.0, 250.0, 50.0, 4.0, 70.0),
+            (10, 1, 2, "10:2", "HW", "HW", 13.0, 14.0, 180.0, 44.0, 3.1, 65.0),
+            (10, 2, 1, "10:3", "FD", "FD", 25.0, 22.0, 120.0, 30.0, 4.8, 80.0),
+        ]
+        connection.executemany(
+            "insert into FVS_TreeList_Metric values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows
+        )
+        connection.execute("insert into FVS_Cases values ('c1', 'S1', 'BC')")
+        connection.commit()
+    finally:
+        connection.close()
+
+
+@pytest.fixture(scope="module")
+def cockpit(tmp_path_factory: pytest.TempPathFactory) -> Iterator[str]:
+    """Serve one temporary run and the reviewed CWH bundle on a loopback port."""
+    uvicorn = pytest.importorskip("uvicorn")
+
+    root = tmp_path_factory.mktemp("browser-runs")
+    _make_run(root)
+    application = webapp.create_app([root], bundles=[BUNDLE])
+
+    probe = socket.socket()
+    probe.bind(("127.0.0.1", 0))
+    port = int(probe.getsockname()[1])
+    probe.close()
+    server = uvicorn.Server(
+        uvicorn.Config(application, host="127.0.0.1", port=port, log_level="warning")
+    )
+    thread = threading.Thread(target=server.run, daemon=True)
+    thread.start()
+    base = f"http://127.0.0.1:{port}"
+    for _ in range(100):
+        try:
+            with urllib.request.urlopen(f"{base}/api/runs", timeout=0.5):
+                break
+        except OSError:
+            time.sleep(0.05)
+    else:  # pragma: no cover - only on a broken local server
+        pytest.fail("the browser-smoke server did not start")
+    try:
+        yield base
+    finally:
+        server.should_exit = True
+        thread.join(timeout=5)
+
+
+def test_the_cockpit_runs_stand_calibration_and_url_state(cockpit: str) -> None:
+    """The cockpit opens runs, draws a stand, lists bundles, and restores URL state."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        errors: list[str] = []
+        page.on(
+            "console",
+            lambda message: errors.append(message.text) if message.type == "error" else None,
+        )
+        page.on("pageerror", lambda error: errors.append(str(error)))
+        try:
+            page.goto(f"{cockpit}/?workspace=runs&run={RUN_ID}", wait_until="networkidle")
+            expect(page.get_by_role("heading", name="Runs", exact=True)).to_be_visible()
+            expect(page.locator("article", has_text=RUN_ID)).to_be_visible()
+            page.get_by_role("button", name="Open stand").click()
+            expect(page.get_by_role("heading", name="Stand", exact=True)).to_be_visible()
+            expect(page.locator("canvas.stand-canvas")).to_be_visible()
+            expect(page.get_by_role("combobox", name="Stand year")).to_have_value("0")
+
+            page.get_by_role("tab", name="Calibration").click()
+            expect(page.get_by_role("heading", name="Calibration", exact=True)).to_be_visible()
+            expect(page.get_by_text("cwh-growth-4cm-pilot-2026-11-04").first).to_be_visible()
+            page.get_by_role("button", name="Details", exact=True).click()
+            expect(page.locator("#panel-body")).to_contain_text("not signed off")
+
+            page.goto(
+                f"{cockpit}/?workspace=stand&run={RUN_ID}&year=10",
+                wait_until="networkidle",
+            )
+            expect(page.get_by_role("heading", name="Stand", exact=True)).to_be_visible()
+            expect(page.get_by_role("combobox", name="Stand year")).to_have_value("10")
+            assert "year=10" in page.evaluate("window.location.search")
+            assert errors == []
+        finally:
+            browser.close()
+
+
+def test_the_details_drawer_restores_focus_and_escape_closes(cockpit: str) -> None:
+    """The evidence drawer traps attention, reports its state, and returns focus."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            trigger = page.locator("#details-button")
+            expect(trigger).to_be_enabled()
+            trigger.click()
+            drawer = page.locator("#details-drawer")
+            expect(drawer).to_be_visible()
+            expect(trigger).to_have_attribute("aria-expanded", "true")
+            assert page.evaluate("document.activeElement.id") == "close-details"
+            expect(page.get_by_text("Provenance record")).to_be_visible()
+            page.keyboard.press("Escape")
+            expect(drawer).to_be_hidden()
+            assert page.evaluate("document.activeElement.id") == "details-button"
+        finally:
+            browser.close()
+
+
+def test_the_assistant_reads_the_open_run_and_cites_its_source(cockpit: str) -> None:
+    """The assistant answers from the run and opens the cited panel."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            expect(page.locator("#assistant-drawer")).to_be_visible()
+            page.locator("#assistant-quick button", has_text="Summary").click()
+            expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+            expect(page.locator("#assistant-log")).to_contain_text("Latest TPH")
+            page.locator("#assistant-log").get_by_role("button", name="Summary", exact=True).click()
+            expect(page.locator("#assistant-drawer")).to_be_hidden()
+            expect(page.locator("#panel-body")).to_contain_text("Summary")
+            assert "workspace=results" in page.evaluate("window.location.search")
+            assert "panel=summary" in page.evaluate("window.location.search")
+        finally:
+            browser.close()
