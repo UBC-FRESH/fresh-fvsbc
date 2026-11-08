@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <a class="skip-link" href="#panel-body">Skip to content</a>
+
     <header class="topbar">
       <div class="brand">
         <strong>fresh-fvsbc</strong>
@@ -14,7 +16,7 @@
       </div>
       <div class="controls">
         <button id="new-run-button" class="primary" type="button">New run</button>
-        <button id="details-button" class="ghost" type="button" disabled>Details</button>
+        <button id="details-button" class="ghost" type="button" aria-label="Open run evidence details" aria-expanded="false" disabled>Details</button>
         <label>Skin <select id="skin-select"></select></label>
         <label>Run <select id="run-select"></select></label>
         <span class="badge" id="run-state"></span>
@@ -24,8 +26,8 @@
     <nav id="workspace-nav" class="workspace-nav" role="tablist" aria-label="Workspaces"></nav>
 
     <div class="shell">
-      <nav class="panels" id="panel-nav" aria-label="Panels"></nav>
-      <main id="panel-body" class="panel-body">
+      <nav class="panels" id="panel-nav" role="tablist" aria-label="Panels"></nav>
+      <main id="panel-body" class="panel-body" role="tabpanel" tabindex="-1">
         <p class="muted">Choose a run, or start a new one.</p>
       </main>
     </div>

@@ -279,6 +279,8 @@ def test_the_spa_is_served_at_the_root(client: TestClient) -> None:
     assert "app.js" in response.text
     assert "workspace-nav" in response.text
     assert "new-run-dialog" in response.text
+    assert 'class="skip-link"' in response.text
+    assert 'role="tabpanel"' in response.text
 
 
 def test_the_cli_dispatches_web_before_the_run_parser(
