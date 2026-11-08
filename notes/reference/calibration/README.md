@@ -272,6 +272,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-provincial-crown-si-summary.csv` | The D9.42 held-out TSA metrics |
 | `d9-provincial-calibration.md` | The D9.43 Quesnel target calibration |
 | `d9-provincial-calibration-summary.csv` | The D9.43 calibration curve |
+| `d9-multi-tsa-calibration.md` | The D9.44 multi-TSA calibration backtest |
+| `d9-multi-tsa-calibration-summary.csv` | The D9.44 base/adaptive metrics |
+| `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
 | `bcmort_provincial.py` | The D9.41 provincial prototype |
 | `d9-bcmort-prototype.md` | The D9.30 tree-level survival prototype |
