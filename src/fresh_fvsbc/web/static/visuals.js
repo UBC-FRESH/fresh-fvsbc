@@ -616,13 +616,13 @@ function updateLegend(legend, payload) {
 }
 
 function updateStats(stats, payload) {
-  const summary = payload.summary || {};
+  // TPH is the tree-list expansion; sum it rather than reading summary.csv's native `tpa`.
+  const liveTph = payload.trees.reduce((total, tree) => total + (Number(tree.tph) || 0), 0);
   const bits = [
     `${fmt(payload.counts.trees)} live trees`,
     `${fmt(payload.counts.plots)} plot${payload.counts.plots === 1 ? "" : "s"}`,
     payload.counts.cut ? `${fmt(payload.counts.cut)} cut` : null,
-    summary.baa === undefined || summary.baa === null ? null : `baa ${fmt(summary.baa)}`,
-    summary.tpa === undefined || summary.tpa === null ? null : `tpa ${fmt(summary.tpa)}`,
+    liveTph > 0 ? `${fmt(liveTph)} TPH` : null,
   ].filter(Boolean);
   stats.textContent = bits.join(" · ");
 }

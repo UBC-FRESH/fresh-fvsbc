@@ -144,6 +144,7 @@ def test_the_cockpit_runs_stand_calibration_and_url_state(cockpit: str) -> None:
             expect(page.get_by_role("heading", name="Stand", exact=True)).to_be_visible()
             expect(page.locator("canvas.stand-canvas")).to_be_visible()
             expect(page.get_by_role("combobox", name="Stand year")).to_have_value("0")
+            expect(page.locator(".stand-stats")).to_contain_text("TPH")
 
             page.get_by_role("tab", name="Results").click()
             page.get_by_role("tab", name="Summary").click()
