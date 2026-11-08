@@ -156,6 +156,12 @@ def test_the_cockpit_runs_stand_calibration_and_url_state(cockpit: str) -> None:
             page.get_by_role("tab", name="Tables").click()
             expect(page.get_by_role("button", name="FVS_Summary_Metric · 2 ✓")).to_be_visible()
             expect(page.locator("#panel-body")).to_contain_text("Year")
+            page.locator("#table-filter").fill("70")
+            page.get_by_role("button", name="Apply").click()
+            expect(page.locator("#panel-body")).to_contain_text("1 matching row")
+            expect(page.locator("#panel-body")).to_contain_text("Rows 1")
+            expect(page.locator("#panel-body")).to_contain_text("of 1")
+            expect(page.get_by_role("link", name="Download CSV")).to_be_visible()
 
             page.get_by_role("tab", name="Evidence").click()
             page.get_by_role("tab", name="Provenance").click()

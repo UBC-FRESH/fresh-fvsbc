@@ -751,3 +751,41 @@ svg.chart .chart-caption { fill: var(--ink); font-weight: 600; }
 .raw-record { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; }
 .raw-record summary { cursor: pointer; color: var(--muted); font-size: 12px; }
 .raw-record pre { max-height: 44vh; margin-top: 8px; }
+
+/* ------------------------------------------------------------ table explorer */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 12px;
+}
+.table-toolbar input[type="search"] {
+  flex: 1 1 220px;
+  min-width: 160px;
+  padding: 7px 9px;
+}
+.table-toolbar .primary { min-height: 34px; }
+.button-like {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 12px;
+  background: var(--panel);
+}
+.button-like:hover { border-color: var(--accent); color: var(--accent); }
+.table-pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 10px;
+}
+.table-pager .muted { margin-right: auto; font-size: 11px; }
+.table-pager button { font-size: 12px; }

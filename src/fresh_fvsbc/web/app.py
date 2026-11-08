@@ -661,6 +661,7 @@ def create_app(
         name: str,
         limit: int = Query(runstore.DEFAULT_LIMIT, ge=1, le=runstore.MAX_LIMIT),
         offset: int = Query(0, ge=0),
+        q: str | None = Query(None, max_length=200),
     ) -> dict[str, Any]:
         """Return one table, as a page.
 
@@ -674,17 +675,38 @@ def create_app(
             The page size.
         offset : int, optional
             The first row of the page.
+        q : str, optional
+            A literal, case-insensitive filter applied across every column before paging.
 
         Returns
         -------
         dict
-            The columns, the page of rows, the total, and whether the table has an oracle.
+            The columns, the page of rows, the filtered total, the query, and the oracle flag.
         """
         run = _find(run_id)
         try:
-            return runstore.table(run, name, limit=limit, offset=offset)
+            return runstore.table(run, name, limit=limit, offset=offset, query=q)
         except runstore.RunError as error:
             raise HTTPException(status_code=404, detail=str(error)) from error
+
+    @app.get("/api/runs/{run_id}/tables/{name}/csv")
+    def run_table_csv(
+        run_id: str,
+        name: str,
+        q: str | None = Query(None, max_length=200),
+    ) -> Response:
+        """Return one exposed table as a CSV attachment, with the same literal filter."""
+        run = _find(run_id)
+        try:
+            text = runstore.table_csv(run, name, query=q)
+        except runstore.RunError as error:
+            raise HTTPException(status_code=404, detail=str(error)) from error
+        filename = f"{run.id}-{name}.csv"
+        return Response(
+            content=text,
+            media_type="text/csv; charset=utf-8",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
 
     @app.get("/api/runs/{run_id}/visuals")
     def run_visuals(run_id: str, year: int | None = Query(None)) -> dict[str, Any]:

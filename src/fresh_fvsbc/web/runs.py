@@ -18,7 +18,7 @@ import sqlite3
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import pandas as pd
 
@@ -39,6 +39,7 @@ __all__ = [
     "provenance",
     "summary",
     "table",
+    "table_csv",
     "tables",
 ]
 
@@ -296,8 +297,42 @@ def tables(run: Run) -> list[dict[str, Any]]:
     return records
 
 
-def table(run: Run, name: str, *, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[str, Any]:
-    """Read one exposed table from a run's database, as a page.
+def _table_frame(run: Run, name: str) -> pd.DataFrame:
+    """Read one exposed table and enforce the reader's table contract."""
+    _require_run(run)
+    if name not in EXPOSED_TABLES:
+        raise RunError(
+            f"{name!r} is not an exposed table; this reader exposes {len(EXPOSED_TABLES)}"
+        )
+    if not run.database.is_file():
+        raise RunError(f"the run {run.id} has no {DATABASE_NAME}")
+    if name not in _table_names(run.database):
+        raise RunError(f"the run {run.id} wrote no table {name!r}")
+    return read_table(run.database, name)
+
+
+def _filter_frame(frame: pd.DataFrame, query: str | None) -> pd.DataFrame:
+    """Return rows containing a literal, case-insensitive query."""
+    if query is None or not query.strip():
+        return frame
+    needle = query.strip()
+    mask = frame.apply(
+        lambda column: column.astype("string").str.contains(
+            needle, case=False, regex=False, na=False
+        )
+    ).any(axis=1)
+    return cast(pd.DataFrame, frame[mask])
+
+
+def table(
+    run: Run,
+    name: str,
+    *,
+    limit: int = DEFAULT_LIMIT,
+    offset: int = 0,
+    query: str | None = None,
+) -> dict[str, Any]:
+    """Read one exposed table from a run's database, as a filtered page.
 
     Parameters
     ----------
@@ -309,27 +344,21 @@ def table(run: Run, name: str, *, limit: int = DEFAULT_LIMIT, offset: int = 0) -
         The page size, clamped to ``MAX_LIMIT``.
     offset : int, optional
         The first row of the page, clamped at zero.
+    query : str or None, optional
+        A literal, case-insensitive filter applied across every column before paging.
 
     Returns
     -------
     dict
-        ``name``, ``columns``, ``rows``, ``total``, ``limit``, ``offset`` and ``oracle``.
+        ``name``, ``columns``, ``rows``, ``total``, ``limit``, ``offset``, ``query`` and
+        ``oracle``.
 
     Raises
     ------
     RunError
         If the run has no database, or the table is not in it.
     """
-    _require_run(run)
-    if name not in EXPOSED_TABLES:
-        raise RunError(
-            f"{name!r} is not an exposed table; this reader exposes {len(EXPOSED_TABLES)}"
-        )
-    if not run.database.is_file():
-        raise RunError(f"the run {run.id} has no {DATABASE_NAME}")
-    if name not in _table_names(run.database):
-        raise RunError(f"the run {run.id} wrote no table {name!r}")
-    frame = read_table(run.database, name)
+    frame = _filter_frame(_table_frame(run, name), query)
     page_limit = max(1, min(int(limit), MAX_LIMIT))
     page_offset = max(0, int(offset))
     return {
@@ -339,8 +368,35 @@ def table(run: Run, name: str, *, limit: int = DEFAULT_LIMIT, offset: int = 0) -
         "total": len(frame),
         "limit": page_limit,
         "offset": page_offset,
+        "query": (query or "").strip(),
         "oracle": name in REFERENCE_VERIFIED,
     }
+
+
+def table_csv(run: Run, name: str, *, query: str | None = None) -> str:
+    """Return one exposed table as CSV, with the same literal filter as :func:`table`.
+
+    Parameters
+    ----------
+    run : Run
+        The run to read.
+    name : str
+        The exposed table.
+    query : str or None, optional
+        A literal, case-insensitive filter applied before export.
+
+    Returns
+    -------
+    str
+        The CSV text, including its header.
+
+    Raises
+    ------
+    RunError
+        If the run has no database, or the table is not in it.
+    """
+    frame = _filter_frame(_table_frame(run, name), query)
+    return frame.to_csv(index=False)
 
 
 def keywords(run: Run) -> str:
