@@ -66,6 +66,11 @@ and ``year``; the server injects the run's summary, provenance pins, and calibra
 A validated reply may carry safe UI chips for opening a workspace, panel, run, or stand year, or
 for putting a follow-up prompt in the input.
 
+The browser keeps the current assistant conversation and OpenCode session in ``sessionStorage``
+for that tab; **New** clears both. **Stop waiting** aborts the browser request, but the local
+OpenCode process may still finish in the background, and the panel says so rather than pretending
+the model was cancelled.
+
 In the browser, **Enter sends** and **Shift+Enter inserts a newline**. The composer grows with the
 message, labels the active model, shows tool use as read-only chips, and keeps the local summary
 reader as a fallback when the agent is disabled or OpenCode is unavailable.

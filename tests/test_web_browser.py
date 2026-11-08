@@ -317,6 +317,27 @@ def test_the_assistant_sends_on_enter_and_adds_a_newline_on_shift_enter(cockpit:
             browser.close()
 
 
+def test_the_assistant_conversation_survives_reload(cockpit: str) -> None:
+    """The local fallback conversation and session survive a page reload."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            input_box = page.locator("#assistant-input")
+            input_box.fill("Persistence smoke")
+            input_box.press("Enter")
+            expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+            page.reload(wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            expect(page.locator("#assistant-log")).to_contain_text("Persistence smoke")
+            expect(page.locator("#assistant-status")).to_contain_text("restored")
+        finally:
+            browser.close()
+
+
 def test_the_details_drawer_restores_focus_and_escape_closes(cockpit: str) -> None:
     """The evidence drawer traps attention, reports its state, and returns focus."""
     expect = playwright_module.expect
