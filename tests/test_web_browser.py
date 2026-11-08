@@ -177,6 +177,31 @@ def test_the_calibration_editor_previews_the_domain_and_cycles(cockpit: str) -> 
             browser.close()
 
 
+def test_the_assistant_sends_on_enter_and_adds_a_newline_on_shift_enter(cockpit: str) -> None:
+    """The narrow composer follows the familiar chat contract."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            input_box = page.locator("#assistant-input")
+            expect(page.locator("#assistant-model")).to_contain_text("local summary")
+            input_box.fill("Line one")
+            input_box.press("Shift+Enter")
+            input_box.type("Line two")
+            expect(input_box).to_have_value("Line one\nLine two")
+            expect(page.locator("#assistant-log")).not_to_contain_text("Line one")
+            input_box.press("Enter")
+            expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+            expect(input_box).to_have_value("")
+            page.get_by_role("button", name="New", exact=True).click()
+            expect(page.locator("#assistant-hint")).to_be_visible()
+        finally:
+            browser.close()
+
+
 def test_the_details_drawer_restores_focus_and_escape_closes(cockpit: str) -> None:
     """The evidence drawer traps attention, reports its state, and returns focus."""
     expect = playwright_module.expect
