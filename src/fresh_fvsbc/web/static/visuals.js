@@ -122,7 +122,7 @@ function describe(tree) {
 
 /* ------------------------------------------------------------------ 2D map */
 
-function createMap(canvas, tooltip) {
+function createMap(canvas, tooltip, onSelect = null) {
   const context = canvas.getContext("2d");
   const state = {
     payload: null,
@@ -130,7 +130,9 @@ function createMap(canvas, tooltip) {
     ox: 0,
     oy: 0,
     dragging: null,
+    start: null,
     hover: null,
+    selected: null,
     hits: [],
     frame: 0,
     width: 0,
@@ -258,6 +260,14 @@ function createMap(canvas, tooltip) {
     state.hits = [];
     for (const tree of state.payload.cut_trees) drawTree(tree);
     for (const tree of state.payload.trees) drawTree(tree);
+    if (state.selected) {
+      const [x, y] = worldToScreen(state.selected.x, state.selected.y);
+      context.beginPath();
+      context.arc(x, y, treeRadius(state.selected.dbh_cm) + 5, 0, Math.PI * 2);
+      context.lineWidth = 2.2;
+      context.strokeStyle = COLORS.accent;
+      context.stroke();
+    }
     if (state.hover) {
       const [x, y] = worldToScreen(state.hover.tree.x, state.hover.tree.y);
       context.beginPath();
@@ -310,6 +320,9 @@ function createMap(canvas, tooltip) {
       state.ox += x - state.dragging.x;
       state.oy += y - state.dragging.y;
       state.dragging = { x, y };
+      if (state.start && Math.hypot(x - state.start.x, y - state.start.y) > 4) {
+        state.start.moved = true;
+      }
       hideTooltip();
       schedule();
       return;
@@ -329,16 +342,25 @@ function createMap(canvas, tooltip) {
   const onPointerDown = (event) => {
     if (event.button !== 0) return;
     const rect = canvas.getBoundingClientRect();
-    state.dragging = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    state.dragging = point;
+    state.start = { ...point, moved: false };
     canvas.setPointerCapture(event.pointerId);
     canvas.style.cursor = "grabbing";
     hideTooltip();
   };
 
   const onPointerUp = (event) => {
+    const wasClick = state.start && !state.start.moved;
     state.dragging = null;
+    state.start = null;
     if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     canvas.style.cursor = "grab";
+    if (wasClick && onSelect) {
+      const rect = canvas.getBoundingClientRect();
+      const hit = nearest(event.clientX - rect.left, event.clientY - rect.top);
+      if (hit) onSelect(hit.tree);
+    }
   };
 
   const onWheel = (event) => {
@@ -374,8 +396,13 @@ function createMap(canvas, tooltip) {
     setData(payload) {
       state.payload = payload;
       state.hover = null;
+      state.selected = null;
       hideTooltip();
       fit();
+    },
+    setSelected(tree) {
+      state.selected = tree;
+      schedule();
     },
     fit,
     resize,
@@ -614,6 +641,35 @@ function updateNote(note, payload) {
   note.textContent = parts.join(" ");
 }
 
+function updateInspector(panel, tree) {
+  if (!tree) {
+    panel.replaceChildren(
+      el("p", { class: "muted" }, "Click a tree in the 2D map to inspect it."),
+    );
+    return;
+  }
+  const rows = [
+    ["Species", tree.species_plants ? `${tree.species} (${tree.species_plants})` : tree.species],
+    ["Status", tree.status],
+    ["Plot", tree.plot],
+    ["Tree", tree.tree_id],
+    ["DBH", tree.dbh_cm === null ? "—" : `${fmt(tree.dbh_cm)} cm`],
+    ["Height", tree.height_m === null ? "—" : `${fmt(tree.height_m)} m`],
+    ["TPH", tree.tph === null ? "—" : fmt(tree.tph)],
+    ["Crown", tree.crown_ratio === null ? "—" : `${fmt(tree.crown_ratio)}%`],
+    ["Age", tree.tree_age === null ? "—" : fmt(tree.tree_age)],
+  ];
+  panel.replaceChildren(
+    el("p", { class: "inspector-kicker" }, "Selected tree"),
+    el("div", { class: "inspector-grid" },
+      ...rows.flatMap(([label, value]) => [
+        el("span", { class: "muted" }, label),
+        el("strong", {}, String(value)),
+      ]),
+    ),
+  );
+}
+
 export async function mountVisuals(body, runId) {
   body.append(el("h2", {}, "Stand"));
   body.append(
@@ -657,6 +713,20 @@ export async function mountVisuals(body, runId) {
       ),
     ),
   );
+  const speciesSelect = el(
+    "select",
+    { "aria-label": "Species filter" },
+    el("option", { value: "" }, "All species"),
+    ...payload.species.map((entry) => el("option", { value: entry.code }, entry.code)),
+  );
+  const statusSelect = el(
+    "select",
+    { "aria-label": "Status filter" },
+    el("option", { value: "all" }, "Live + cut"),
+    el("option", { value: "live" }, "Live only"),
+    el("option", { value: "cut" }, "Cut only"),
+  );
+  const playButton = el("button", { type: "button", class: "play-button" }, "▶ Play years");
   const view2d = el("button", { class: "active", type: "button" }, "2D map");
   const view3d = el("button", { type: "button" }, "3D stand");
   const fit = el("button", { type: "button" }, "Fit");
@@ -667,6 +737,16 @@ export async function mountVisuals(body, runId) {
   const canvas = el("canvas", { class: "stand-canvas" });
   const stage = el("div", { class: "stand-stage" }, canvas, tooltip);
   const sceneHost = el("div", { class: "stand-3d", hidden: "" });
+  const inspector = el("aside", { class: "stand-inspector", "aria-label": "Tree inspector" });
+  const inspectorBody = el("div");
+  inspector.append(
+    el("div", { class: "stand-inspector-head" },
+      el("h3", {}, "Inspector"),
+      el("span", { class: "muted", id: "inspector-hint" }, "click a tree"),
+    ),
+    inspectorBody,
+  );
+  updateInspector(inspectorBody, null);
   stage.append(sceneHost);
 
   body.append(
@@ -674,25 +754,139 @@ export async function mountVisuals(body, runId) {
       "div",
       { class: "stand-toolbar" },
       el("label", {}, "Year ", yearSelect),
+      el("label", {}, "Species ", speciesSelect),
+      el("label", {}, "Show ", statusSelect),
+      playButton,
       el("div", { class: "segmented" }, view2d, view3d),
       fit,
       stats,
     ),
   );
-  body.append(stage);
+  body.append(el("div", { class: "stand-layout" }, stage, inspector));
   body.append(legend);
   body.append(note);
 
-  const map = createMap(canvas, tooltip);
+  let selected = null;
+  const selectTree = (tree) => {
+    selected = tree;
+    map.setSelected(tree);
+    updateInspector(inspectorBody, tree);
+  };
+  const map = createMap(canvas, tooltip, selectTree);
   let scene = null;
   let view = "2d";
+  let playing = false;
+  let playTimer = null;
+  let loading = false;
+
+  const visiblePayload = () => {
+    const species = speciesSelect.value;
+    const status = statusSelect.value;
+    const keep = (tree) =>
+      (!species || tree.species === species) && (status === "all" || tree.status === status);
+    const trees = payload.trees.filter(keep);
+    const cutTrees = status === "live" ? [] : payload.cut_trees.filter(keep);
+    return {
+      ...payload,
+      trees,
+      cut_trees: cutTrees,
+      counts: {
+        ...payload.counts,
+        trees: trees.length,
+        cut: cutTrees.length,
+        shown: trees.length + cutTrees.length,
+      },
+    };
+  };
 
   const update = () => {
-    map.setData(payload);
-    if (scene) scene.setData(payload);
+    const visible = visiblePayload();
+    map.setData(visible);
+    if (scene) scene.setData(visible);
     updateLegend(legend, payload);
-    updateStats(stats, payload);
-    updateNote(note, payload);
+    updateStats(stats, visible);
+    updateNote(note, visible);
+    if (selected) {
+      const still = [...visible.trees, ...visible.cut_trees].find(
+        (tree) => tree.tree_id === selected.tree_id,
+      );
+      if (still) {
+        selected = still;
+        map.setSelected(still);
+      } else {
+        selected = null;
+        updateInspector(inspectorBody, null);
+      }
+    }
+  };
+
+  const stopPlay = () => {
+    playing = false;
+    playButton.textContent = "▶ Play years";
+    if (playTimer) window.clearTimeout(playTimer);
+    playTimer = null;
+  };
+
+  const loadYear = async (year) => {
+    if (loading) return;
+    loading = true;
+    try {
+      const next = await api(
+        `api/runs/${encodeURIComponent(runId)}/visuals?year=${encodeURIComponent(year)}`,
+      );
+      if (!body.isConnected) return;
+      if (next.available) {
+        payload = next;
+        yearSelect.value = String(payload.year);
+        selected = null;
+        updateInspector(inspectorBody, null);
+        update();
+      }
+    } catch (error) {
+      note.textContent = String(error);
+    } finally {
+      loading = false;
+    }
+  };
+
+  const stepPlay = async () => {
+    if (!playing) return;
+    const index = payload.years.indexOf(payload.year);
+    if (index < 0 || index >= payload.years.length - 1) {
+      stopPlay();
+      return;
+    }
+    await loadYear(payload.years[index + 1]);
+    if (!playing) return;
+    playTimer = window.setTimeout(stepPlay, 900);
+  };
+
+  playButton.onclick = () => {
+    if (playing) {
+      stopPlay();
+    } else {
+      playing = true;
+      playButton.textContent = "⏸ Pause";
+      if (payload.year === payload.years[payload.years.length - 1]) {
+        loadYear(payload.years[0]).then(() => {
+          if (playing) playTimer = window.setTimeout(stepPlay, 900);
+        });
+      } else {
+        playTimer = window.setTimeout(stepPlay, 900);
+      }
+    }
+  };
+  yearSelect.onchange = () => {
+    stopPlay();
+    loadYear(Number(yearSelect.value));
+  };
+  speciesSelect.onchange = update;
+  statusSelect.onchange = update;
+  view2d.onclick = () => showView("2d");
+  view3d.onclick = () => showView("3d");
+  fit.onclick = () => {
+    if (view === "2d") map.fit();
+    else if (scene) scene.fit();
   };
 
   const showView = async (next) => {
@@ -710,7 +904,7 @@ export async function mountVisuals(body, runId) {
           scene = null;
           return;
         }
-        scene.setData(payload);
+        scene.setData(visiblePayload());
         view3d.textContent = "3D stand";
       } catch (error) {
         view3d.textContent = "3D stand";
@@ -723,29 +917,8 @@ export async function mountVisuals(body, runId) {
     if (view === "3d" && scene) scene.fit();
   };
 
-  yearSelect.onchange = async () => {
-    const year = Number(yearSelect.value);
-    try {
-      const next = await api(
-        `api/runs/${encodeURIComponent(runId)}/visuals?year=${encodeURIComponent(year)}`,
-      );
-      if (!body.isConnected) return;
-      if (next.available) {
-        payload = next;
-        update();
-      }
-    } catch (error) {
-      note.textContent = String(error);
-    }
-  };
-  view2d.onclick = () => showView("2d");
-  view3d.onclick = () => showView("3d");
-  fit.onclick = () => {
-    if (view === "2d") map.fit();
-    else if (scene) scene.fit();
-  };
-
   body._dispose = () => {
+    stopPlay();
     map.destroy();
     if (scene) scene.destroy();
   };

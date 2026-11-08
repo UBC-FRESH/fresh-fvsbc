@@ -358,3 +358,49 @@ button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-
 .kpi-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
 .kpi-card strong { font-size: 22px; font-variant-numeric: tabular-nums; }
 .kpi-card small { color: var(--muted); font-size: 11px; }
+
+/* ---------------------------------------------------------------- stand workspace */
+.stand-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 12px;
+  align-items: stretch;
+}
+.stand-inspector {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  padding: 13px;
+  min-height: 240px;
+}
+.stand-inspector-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.stand-inspector-head h3 { margin: 0; font-size: 12px; }
+.stand-inspector-head .muted { font-size: 11px; }
+.inspector-kicker {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 650;
+}
+.inspector-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  font-size: 12px;
+}
+.inspector-grid span { color: var(--muted); }
+.inspector-grid strong { text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.play-button { min-width: 108px; }
+
+@media (max-width: 920px) {
+  .stand-layout { grid-template-columns: 1fr; }
+  .stand-inspector { min-height: 0; }
+  .form-grid { grid-template-columns: 1fr; }
+  .field-wide { grid-column: auto; }
+}
