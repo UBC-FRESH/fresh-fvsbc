@@ -299,6 +299,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-mpb-severity.md` | The D9.54 MPB severity and metric-unit result |
 | `d9-initmort.md` | The D9.55 INITMORT severity correction |
 | `d9-initmort-calibration.md` | The D9.56 INITMORT calibration failure |
+| `d9-quesnel-closure.md` | The D9.57 Quesnel background closure |
+| `d9-quesnel-closure-summary.csv` | The D9.57 Quesnel metrics |
 | `bcmort_provincial_temporal.py` | The D9.45 temporal prototype |
 | `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
