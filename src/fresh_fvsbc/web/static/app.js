@@ -19,6 +19,8 @@ const state = {
   compareB: null,
   compareTable: null,
   summaryColumn: null,
+  tableQuery: "",
+  tableOffset: 0,
   standYear: null,
   pollTimer: null,
   ready: false,
@@ -206,6 +208,8 @@ function selectSkin(id) {
 function selectRun(id) {
   state.run = state.runs.find((run) => run.id === id) ?? null;
   state.table = null;
+  state.tableQuery = "";
+  state.tableOffset = 0;
   state.summaryColumn = null;
   if (state.run) {
     const workspaces = available_workspaces();
@@ -697,6 +701,8 @@ async function renderTables(body) {
           title: `${table.rows} rows${table.oracle ? " · checked against a reference" : ""}`,
           onclick: () => {
             state.table = table.name;
+            state.tableQuery = "";
+            state.tableOffset = 0;
             renderPanel();
           },
         },
@@ -715,14 +721,49 @@ async function renderTables(body) {
   }
   if (!state.table) return;
 
-  const payload = await api(
-    `api/runs/${state.run.id}/tables/${encodeURIComponent(state.table)}?limit=200`,
+  const tablePath = `api/runs/${encodeURIComponent(state.run.id)}/tables/${encodeURIComponent(state.table)}`;
+  const params = new URLSearchParams({ limit: "200", offset: String(state.tableOffset) });
+  if (state.tableQuery) params.set("q", state.tableQuery);
+  const payload = await api(`${tablePath}?${params.toString()}`);
+  const csvParams = new URLSearchParams();
+  if (state.tableQuery) csvParams.set("q", state.tableQuery);
+  const csvHref = `${tablePath}/csv${csvParams.toString() ? `?${csvParams}` : ""}`;
+  const filterInput = el("input", {
+    id: "table-filter",
+    type: "search",
+    value: state.tableQuery,
+    placeholder: "Filter any column…",
+    "aria-label": "Filter table rows",
+  });
+  const filterForm = el("form", {
+    className: "table-toolbar",
+    onsubmit: (event) => {
+      event.preventDefault();
+      state.tableQuery = filterInput.value.trim();
+      state.tableOffset = 0;
+      renderPanel();
+    },
+  },
+    filterInput,
+    el("button", { className: "primary", type: "submit" }, "Apply"),
+    state.tableQuery
+      ? el("button", {
+          type: "button",
+          onclick: () => { state.tableQuery = ""; state.tableOffset = 0; renderPanel(); },
+        }, "Clear")
+      : null,
+    el("a", { className: "button-like", href: csvHref, download: `${state.run.id}-${state.table}.csv` },
+      "Download CSV",
+    ),
   );
+  body.append(filterForm);
   body.append(
     el(
       "h3",
       {},
-      `${payload.name} — ${fmt(payload.total)} rows, showing ${payload.rows.length}`,
+      `${payload.name} — ${fmt(payload.total)} ${state.tableQuery ? "matching " : ""}`
+        + `${payload.total === 1 ? "row" : "rows"}, showing ${payload.rows.length}`
+        + (state.tableQuery ? ` · filter “${state.tableQuery}”` : ""),
     ),
   );
   body.append(
@@ -734,6 +775,15 @@ async function renderTables(body) {
         : "No independent check: the reader proves the table exists and its columns match the schema.",
     ),
   );
+  if (!payload.rows.length) {
+    body.append(el("div", { className: "empty-state" },
+      el("strong", {}, state.tableQuery ? "No matching rows" : "No rows"),
+      el("p", { className: "muted" }, state.tableQuery
+        ? "Clear the filter or search for a different value."
+        : "This table exists but has no rows."),
+    ));
+    return;
+  }
 
   const header = el(
     "tr",
@@ -760,6 +810,31 @@ async function renderTables(body) {
       "div",
       { className: "scroll" },
       el("table", {}, el("thead", {}, header), el("tbody", {}, ...rows)),
+    ),
+  );
+  const firstRow = payload.offset + 1;
+  const lastRow = payload.offset + payload.rows.length;
+  body.append(
+    el("div", { className: "table-pager" },
+      el("span", { className: "muted" },
+        `Rows ${fmt(firstRow)}–${fmt(lastRow)} of ${fmt(payload.total)}`,
+      ),
+      el("button", {
+        type: "button",
+        disabled: payload.offset <= 0,
+        onclick: () => {
+          state.tableOffset = Math.max(0, payload.offset - payload.limit);
+          renderPanel();
+        },
+      }, "Previous"),
+      el("button", {
+        type: "button",
+        disabled: payload.offset + payload.rows.length >= payload.total,
+        onclick: () => {
+          state.tableOffset = payload.offset + payload.limit;
+          renderPanel();
+        },
+      }, "Next"),
     ),
   );
 }

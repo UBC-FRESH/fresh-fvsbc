@@ -691,3 +691,27 @@ def test_the_metric_summary_endpoint_returns_the_metric_rows(tmp_path: Path) -> 
     assert [row["Year"] for row in rows] == [0, 10]
     assert rows[-1]["Tph"] == 210.0
     assert client.get("/api/runs/run-a/metric-summary").status_code == 404
+
+
+def test_a_table_page_filters_before_paging(client: TestClient) -> None:
+    """The query is applied to the table, not only to the returned page."""
+    matching = client.get("/api/runs/run-a/tables/FVS_Cases?q=s1").json()
+    assert matching["total"] == 1
+    assert matching["query"] == "s1"
+    assert matching["rows"][0]["StandID"] == "S1"
+    missing = client.get("/api/runs/run-a/tables/FVS_Cases?q=nope").json()
+    assert missing["total"] == 0
+    assert missing["rows"] == []
+
+
+def test_a_table_can_be_downloaded_as_csv(client: TestClient) -> None:
+    """The CSV endpoint keeps the same filter and exposes every row, not one page."""
+    response = client.get("/api/runs/run-a/tables/FVS_Cases/csv?q=S1")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/csv")
+    assert "attachment" in response.headers["content-disposition"]
+    assert "StandID" in response.text
+    assert "S1" in response.text
+    empty = client.get("/api/runs/run-a/tables/FVS_Cases/csv?q=nope")
+    assert "StandID" in empty.text
+    assert "S1" not in empty.text
