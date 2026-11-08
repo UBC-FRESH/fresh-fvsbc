@@ -78,6 +78,9 @@ outside the repository because they carry site identifiers.
 | `select_probe_candidate.py` | D9.57 training-fold candidate selector for a pre-registered probe |
 | `d9-essf-dry-screen.md`, `d9-essf-dry-selection.json` | D9.57 ESSFdry negative direct-calibration result and frozen candidate |
 | `d9-essf-dry-probe-summary.csv`, `d9-essf-dry-external-summary.csv` | D9.57 PSP train/test and non-PSP external aggregates |
+| `d9-idf-dry-protocol.md`, `d9-idf-dry-candidates.json` | D9.58 pre-registered IDFdry direct-calibration protocol and candidate grid |
+| `d9-idf-dry-screen.md`, `d9-idf-dry-selection.json` | D9.58 IDFdry default-retained result and frozen selection |
+| `d9-idf-dry-probe-summary.csv` | D9.58 IDFdry PSP train/test aggregate |
 | `nonpsp_domain_baseline.py` | D9.55 reproducible domain summariser and site bootstrap |
 | `d9-faib-dbh-standard.md` | D9.3–D9.5 DBH-limit audit, 4+ cm denominator, and CWH 4 cm refit |
 | `d9-cwh-4cm-refit.md`, `d7-cwh-4cm-bundle.json`, `d7-cwh-4cm-summary.csv` | D9.6 CWH 4 cm pilot with REGDMULT |

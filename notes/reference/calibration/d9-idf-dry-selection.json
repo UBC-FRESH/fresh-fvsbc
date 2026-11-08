@@ -1,0 +1,104 @@
+{
+  "selected": "baseline",
+  "training_candidates": {
+    "ba125-m10": {
+      "intervals": 41,
+      "sites": 20,
+      "ba_bias": -0.1260975609756097,
+      "ba_pct": -0.3552849495247976,
+      "tph_bias": -100.03885365853661,
+      "tph_pct": -6.577535794237603,
+      "ba_sites_pass": 13,
+      "tph_sites_pass": 13
+    },
+    "ba150-m075": {
+      "intervals": 41,
+      "sites": 20,
+      "ba_bias": 1.5812195121951222,
+      "ba_pct": 4.455149570153316,
+      "tph_bias": -75.1120243902439,
+      "tph_pct": -4.9386014626959716,
+      "ba_sites_pass": 12,
+      "tph_sites_pass": 13
+    },
+    "ba150-m10": {
+      "intervals": 41,
+      "sites": 20,
+      "ba_bias": 0.3860975609756098,
+      "ba_pct": 1.0878454063786365,
+      "tph_bias": -118.91690243902441,
+      "tph_pct": -7.8187639474795025,
+      "ba_sites_pass": 12,
+      "tph_sites_pass": 13
+    },
+    "ba200-m075": {
+      "intervals": 41,
+      "sites": 20,
+      "ba_bias": 2.9470731707317075,
+      "ba_pct": 8.303497185895807,
+      "tph_bias": -101.25836585365856,
+      "tph_pct": -6.657718491475451,
+      "ba_sites_pass": 8,
+      "tph_sites_pass": 13
+    },
+    "ba200-m10": {
+      "intervals": 41,
+      "sites": 20,
+      "ba_bias": 1.508048780487805,
+      "ba_pct": 4.24898809073854,
+      "tph_bias": -152.9169024390244,
+      "tph_pct": -10.054257546470726,
+      "ba_sites_pass": 11,
+      "tph_sites_pass": 13
+    },
+    "ba300-m075": {
+      "intervals": 41,
+      "sites": 20,
+      "ba_bias": 5.678780487804878,
+      "ba_pct": 16.000192417380788,
+      "tph_bias": -145.67300000000003,
+      "tph_pct": -9.577972324877905,
+      "ba_sites_pass": 8,
+      "tph_sites_pass": 13
+    },
+    "ba300-m10": {
+      "intervals": 41,
+      "sites": 20,
+      "ba_bias": 3.508048780487805,
+      "ba_pct": 9.884068528075758,
+      "tph_bias": -211.03885365853657,
+      "tph_pct": -13.875764896826597,
+      "ba_sites_pass": 10,
+      "tph_sites_pass": 13
+    },
+    "baseline": {
+      "intervals": 41,
+      "sites": 20,
+      "ba_bias": -0.7114634146341464,
+      "ba_pct": -2.004576784843008,
+      "tph_bias": -79.8681219512195,
+      "tph_pct": -5.251313981923581,
+      "ba_sites_pass": 11,
+      "tph_sites_pass": 13
+    }
+  },
+  "training_passing": [
+    "ba125-m10",
+    "ba150-m075",
+    "ba150-m10",
+    "ba200-m075",
+    "ba200-m10",
+    "ba300-m10",
+    "baseline"
+  ],
+  "test": {
+    "intervals": 8,
+    "sites": 7,
+    "ba_bias": 1.7395,
+    "ba_pct": 7.4783431138625565,
+    "tph_bias": 139.194375,
+    "tph_pct": 14.326958891314124,
+    "ba_sites_pass": 5,
+    "tph_sites_pass": 4
+  }
+}
