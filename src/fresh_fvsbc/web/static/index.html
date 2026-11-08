@@ -62,6 +62,19 @@
             <input id="new-run-id" type="text" placeholder="leave blank for a timestamp" />
           </label>
           <label class="field field-wide">
+            <span>Calibration bundle <em>optional</em></span>
+            <select id="new-bundle"><option value="">No calibration</option></select>
+            <small id="new-bundle-note">A bundle renders its parameters and ingrowth block into the run.</small>
+          </label>
+          <label class="field">
+            <span>Minimum DBH <em>cm, optional</em></span>
+            <input id="new-min-dbh" type="number" min="0" step="0.1" placeholder="0" />
+          </label>
+          <label class="field">
+            <span>TSA <em>optional</em></span>
+            <input id="new-tsa" type="text" placeholder="Quesnel TSA" />
+          </label>
+          <label class="field field-wide">
             <span>Keyword lines <em>optional</em></span>
             <textarea id="new-keywords" rows="5" placeholder="MANAGED=0,1&#10;DATABASE|DSNOut|FVSOut.db|Summary|END"></textarea>
             <small>One keyword or block per line. A line containing <code>|</code> becomes a block.</small>

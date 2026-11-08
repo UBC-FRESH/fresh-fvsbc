@@ -333,6 +333,9 @@ def test_the_command_passes_the_callers_keywords_through(
         variant: str = "bc",
         plot_fields: object = None,
         key_name: str = KEYWORD_FILE_NAME,
+        calibration: object = None,
+        tsa: str | None = None,
+        min_dbh: float | None = None,
     ) -> run.RunResult:
         captured.append(keywords)
         raise run.RunError("stub")
@@ -408,6 +411,9 @@ def test_the_two_options_keep_their_relative_order(
         variant: str = "bc",
         plot_fields: object = None,
         key_name: str = KEYWORD_FILE_NAME,
+        calibration: object = None,
+        tsa: str | None = None,
+        min_dbh: float | None = None,
     ) -> run.RunResult:
         captured.append(keywords)
         raise run.RunError("stub")

@@ -337,10 +337,42 @@ function startPolling() {
   }, 2500);
 }
 
+function populateBundleSelect() {
+  const select = document.getElementById("new-bundle");
+  if (!select) return;
+  const current = select.value;
+  select.replaceChildren(
+    el("option", { value: "" }, "No calibration"),
+    ...state.calibrations.map((bundle) =>
+      el("option", { value: bundle.bundle_id },
+        `${bundle.bundle_id} ${bundle.review?.signed_off ? "· signed" : "· unsigned"}`,
+      ),
+    ),
+  );
+  if (state.calibrations.some((bundle) => bundle.bundle_id === current)) select.value = current;
+  updateBundleNote();
+}
+
+function updateBundleNote() {
+  const select = document.getElementById("new-bundle");
+  const note = document.getElementById("new-bundle-note");
+  if (!select || !note) return;
+  const bundle = state.calibrations.find((entry) => entry.bundle_id === select.value);
+  if (!bundle) {
+    note.textContent = "A bundle renders its parameters and ingrowth block into the run.";
+    return;
+  }
+  const warning = bundle.warnings?.length ? ` Warning: ${bundle.warnings[0]}` : "";
+  note.textContent = `${bundle.claim}${warning}`;
+}
+
 function openNewRun() {
   const dialog = document.getElementById("new-run-dialog");
   const error = document.getElementById("new-run-error");
   if (error) error.hidden = true;
+  populateBundleSelect();
+  const bundle = document.getElementById("new-bundle");
+  if (bundle) bundle.onchange = updateBundleNote;
   if (dialog?.showModal) dialog.showModal();
   else dialog?.setAttribute("open", "");
   document.getElementById("new-population")?.focus();
@@ -363,6 +395,9 @@ async function submitNewRun(event) {
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean);
+  const bundle = document.getElementById("new-bundle").value;
+  const minDbh = document.getElementById("new-min-dbh").value.trim();
+  const tsa = document.getElementById("new-tsa").value.trim();
   if (!population || !species || !Number.isFinite(treeAge)) {
     error.textContent = "Population, species, and tree age are required.";
     error.hidden = false;
@@ -370,6 +405,9 @@ async function submitNewRun(event) {
   }
   const payload = { population, species, tree_age: treeAge, keywords };
   if (id) payload.id = id;
+  if (bundle) payload.bundle = bundle;
+  if (minDbh) payload.min_dbh = Number(minDbh);
+  if (tsa) payload.tsa = tsa;
   try {
     const response = await fetch("api/runs", {
       method: "POST",
