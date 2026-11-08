@@ -16,6 +16,7 @@
       </div>
       <div class="controls">
         <button id="new-run-button" class="primary" type="button">New run</button>
+        <button id="assistant-button" class="ghost" type="button" aria-label="Ask the FVS assistant" aria-expanded="false">Ask</button>
         <button id="details-button" class="ghost" type="button" aria-label="Open run evidence details" aria-expanded="false" disabled>Details</button>
         <label>Skin <select id="skin-select"></select></label>
         <label>Run <select id="run-select"></select></label>
@@ -94,6 +95,28 @@
     </dialog>
 
     <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+    <aside id="assistant-drawer" class="drawer assistant-drawer" role="dialog" aria-modal="true" aria-labelledby="assistant-title" hidden>
+      <div class="drawer-head">
+        <div>
+          <span class="eyebrow">Context-aware</span>
+          <h2 id="assistant-title">FVS assistant</h2>
+        </div>
+        <button id="close-assistant" class="ghost" type="button" aria-label="Close assistant">×</button>
+      </div>
+      <div id="assistant-log" class="assistant-log" aria-live="polite">
+        <p class="muted">Ask about the open run's summary, calibration, or provenance.</p>
+      </div>
+      <div class="assistant-quick" id="assistant-quick">
+        <button type="button" data-prompt="Summarize this run.">Summary</button>
+        <button type="button" data-prompt="Why did TPH change?">TPH</button>
+        <button type="button" data-prompt="Is the calibration bundle signed?">Calibration</button>
+        <button type="button" data-prompt="Show provenance.">Provenance</button>
+      </div>
+      <form id="assistant-form" class="assistant-form">
+        <textarea id="assistant-input" rows="2" placeholder="Ask about this run…" aria-label="Ask the FVS assistant"></textarea>
+        <button class="primary" type="submit">Send</button>
+      </form>
+    </aside>
     <aside id="details-drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="details-title" hidden>
       <div class="drawer-head">
         <div>

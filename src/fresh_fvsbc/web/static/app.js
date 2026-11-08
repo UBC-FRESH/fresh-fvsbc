@@ -1032,6 +1032,7 @@ async function openDetails() {
   const body = document.getElementById("details-body");
   const drawer = document.getElementById("details-drawer");
   const backdrop = document.getElementById("drawer-backdrop");
+  closeAssistant();
   state.detailsTrigger = document.activeElement;
   body.replaceChildren(el("p", { className: "muted" }, "Loading provenance…"));
   drawer.hidden = false;
@@ -1089,6 +1090,82 @@ function closeDetails() {
   state.detailsTrigger?.focus?.();
 }
 
+/* ---------------------------------------------------------------- assistant */
+
+function appendAssistant(role, text, citations = []) {
+  const log = document.getElementById("assistant-log");
+  const message = el("div", { className: `assistant-message ${role}` }, text);
+  if (citations.length) {
+    message.append(
+      el("div", { className: "citations" },
+        ...citations.map((citation) =>
+          el("button", { type: "button", onclick: () => openCitation(citation) },
+            citation.label || citation.target,
+          ),
+        ),
+      ),
+    );
+  }
+  log.append(message);
+  log.scrollTop = log.scrollHeight;
+}
+
+function openCitation(citation) {
+  closeAssistant();
+  if (citation.kind === "workspace" && citation.target === "calibration") {
+    selectWorkspace("calibration");
+  } else if (citation.kind === "workspace") {
+    selectWorkspace(citation.target);
+  } else if (citation.target === "provenance" || citation.target === "keywords") {
+    selectWorkspace("evidence");
+    selectPanel(citation.target);
+  } else if (citation.target === "summary" || citation.target === "tables" || citation.target === "trees") {
+    selectWorkspace("results");
+    selectPanel(citation.target);
+  }
+}
+
+function openAssistant() {
+  closeDetails();
+  state.assistantTrigger = document.activeElement;
+  const drawer = document.getElementById("assistant-drawer");
+  drawer.hidden = false;
+  document.getElementById("drawer-backdrop").hidden = false;
+  document.getElementById("assistant-button").setAttribute("aria-expanded", "true");
+  document.body.classList.add("drawer-open");
+  document.getElementById("assistant-input").focus();
+}
+
+function closeAssistant() {
+  const drawer = document.getElementById("assistant-drawer");
+  if (!drawer || drawer.hidden) return;
+  drawer.hidden = true;
+  document.getElementById("drawer-backdrop").hidden = true;
+  document.getElementById("assistant-button").setAttribute("aria-expanded", "false");
+  document.body.classList.remove("drawer-open");
+  state.assistantTrigger?.focus?.();
+}
+
+async function sendAssistant(message) {
+  const clean = String(message || "").trim();
+  if (!clean) return;
+  appendAssistant("user", clean);
+  const input = document.getElementById("assistant-input");
+  input.value = "";
+  try {
+    const response = await fetch("api/assistant", {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({ message: clean, run: state.run?.id ?? null }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.detail ?? response.statusText);
+    appendAssistant("assistant", payload.reply ?? "No answer.", payload.citations ?? []);
+  } catch (error) {
+    appendAssistant("assistant", `I could not answer: ${error}`);
+  }
+}
+
 /* ---------------------------------------------------------------- boot */
 
 async function boot() {
@@ -1098,9 +1175,24 @@ async function boot() {
   document.getElementById("new-run-form").addEventListener("submit", submitNewRun);
   document.getElementById("details-button").addEventListener("click", openDetails);
   document.getElementById("close-details").addEventListener("click", closeDetails);
-  document.getElementById("drawer-backdrop").addEventListener("click", closeDetails);
+  document.getElementById("assistant-button").addEventListener("click", openAssistant);
+  document.getElementById("close-assistant").addEventListener("click", closeAssistant);
+  document.getElementById("drawer-backdrop").addEventListener("click", () => {
+    closeDetails();
+    closeAssistant();
+  });
+  document.getElementById("assistant-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    sendAssistant(document.getElementById("assistant-input").value);
+  });
+  document.querySelectorAll("#assistant-quick button").forEach((button) => {
+    button.addEventListener("click", () => sendAssistant(button.dataset.prompt));
+  });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeDetails();
+    if (event.key === "Escape") {
+      closeDetails();
+      closeAssistant();
+    }
   });
   try {
     const [skins, runs, oracle, calibrations] = await Promise.all([

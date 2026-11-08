@@ -43,6 +43,15 @@ POLL_SECONDS: float = 1.0
 STREAM_SECONDS: float = 600.0
 
 
+def fmt_like(value: object) -> str:
+    """Format a summary value without assuming whether it is a float or an integer."""
+    if value is None:
+        return "—"
+    if isinstance(value, float):
+        return f"{value:,.2f}"
+    return f"{value:,}" if isinstance(value, int) else str(value)
+
+
 def create_app(
     roots: Sequence[Path],
     *,
@@ -202,6 +211,97 @@ def create_app(
                 continue
             records.append(_bundle_record(bundle, path))
         return records
+
+    def _assistant_answer(message: str, run_id: str | None) -> dict[str, Any]:
+        """Answer from the open run's own summary and provenance, without inventing causes."""
+        text = message.lower()
+        citations: list[dict[str, str]] = []
+        suggestions = [
+            "Summarize this run.",
+            "Why did TPH change?",
+            "Is the calibration bundle signed?",
+            "Show provenance.",
+        ]
+        if not run_id:
+            return {
+                "reply": "Open a run first; I can read its summary, calibration, and provenance.",
+                "citations": [],
+                "suggestions": suggestions,
+            }
+        run = _find(run_id)
+        try:
+            rows = runstore.summary(run)
+            provenance = runstore.provenance(run)
+        except runstore.RunError as error:
+            raise HTTPException(status_code=400, detail=str(error)) from error
+        latest = rows[-1] if rows else {}
+        first = rows[0] if rows else {}
+        recorded = provenance.get("provenance", {})
+        calibration_id = recorded.get("calibration_id", "")
+        bundle = next((item for item in _bundles() if item["bundle_id"] == calibration_id), None)
+        if "signed" in text or "calibration" in text or "bundle" in text:
+            if not calibration_id:
+                reply = f"Run {run.id} records no calibration bundle."
+            else:
+                state_text = (
+                    "signed"
+                    if bundle and bundle.get("review", {}).get("signed_off")
+                    else "unsigned"
+                )
+                reply = (
+                    f"The run records calibration {calibration_id} "
+                    f"({recorded.get('calibration_version', 'unknown version')}); "
+                    f"the bundle is {state_text}."
+                )
+                if bundle and bundle.get("warnings"):
+                    reply += " Warnings: " + "; ".join(bundle["warnings"][:2])
+            citations.extend(
+                [
+                    {"label": "Calibration", "kind": "workspace", "target": "calibration"},
+                    {"label": "Provenance", "kind": "panel", "target": "provenance"},
+                ]
+            )
+        elif "provenance" in text or "version" in text or "pin" in text:
+            keys = ("fresh_fvsbc_version", "pyfvs_commit", "fvs_source_commit", "variant")
+            reply = (
+                "Provenance: " + ", ".join(f"{key}={recorded.get(key, '—')}" for key in keys) + "."
+            )
+            citations.append({"label": "Provenance", "kind": "panel", "target": "provenance"})
+        elif "tph" in text or "tree" in text or "density" in text:
+            reply = (
+                f"TPH in the summary goes from {fmt_like(first.get('tpa'))} at year "
+                f"{first.get('year', '?')} to {fmt_like(latest.get('tpa'))} at year "
+                f"{latest.get('year', '?')}. This view reads the summary; it cannot prove a cause. "
+                "The Details drawer shows the calibration and provenance."
+            )
+            citations.append({"label": "Summary", "kind": "panel", "target": "summary"})
+        elif "ba" in text or "basal" in text:
+            reply = (
+                f"BA in the summary goes from {fmt_like(first.get('baa'))} to "
+                f"{fmt_like(latest.get('baa'))} between years {first.get('year', '?')} and "
+                f"{latest.get('year', '?')}."
+            )
+            citations.append({"label": "Summary", "kind": "panel", "target": "summary"})
+        else:
+            reply = (
+                f"Run {run.id} is {run.state}; the summary has {len(rows)} rows, from "
+                f"year {first.get('year', '?')} to {latest.get('year', '?')}. "
+                f"Latest TPH (summary) is {fmt_like(latest.get('tpa'))} and latest BA is "
+                f"{fmt_like(latest.get('baa'))}."
+            )
+            citations.append({"label": "Summary", "kind": "panel", "target": "summary"})
+        return {"reply": reply, "citations": citations, "suggestions": suggestions}
+
+    @app.post("/api/assistant")
+    def assistant(body: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Answer a context-aware question from the open run's own artefacts."""
+        payload = body or {}
+        message = str(payload.get("message", "") or "").strip()
+        if not message:
+            raise HTTPException(status_code=422, detail="the message is empty")
+        if len(message) > 4000:
+            raise HTTPException(status_code=422, detail="the message is too long")
+        return _assistant_answer(message, str(payload.get("run", "") or "").strip() or None)
 
     @app.get("/api/calibrations")
     def calibrations() -> list[dict[str, Any]]:
