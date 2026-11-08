@@ -319,6 +319,48 @@ def test_the_assistant_sends_on_enter_and_adds_a_newline_on_shift_enter(cockpit:
             browser.close()
 
 
+def test_an_assistant_table_chip_opens_the_filtered_row(cockpit: str) -> None:
+    """A cited table/column/value becomes a filtered Tables view."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        page.route(
+            "**/api/assistant",
+            lambda route: route.fulfill(
+                status=200,
+                content_type="application/json",
+                body=json.dumps(
+                    {
+                        "reply": "The year-10 row is the one.",
+                        "citations": [],
+                        "suggestions": [],
+                        "chips": [
+                            {
+                                "label": "Year 10",
+                                "action": "open_table",
+                                "target": "FVS_Summary_Metric",
+                                "column": "Year",
+                                "query": "10",
+                            }
+                        ],
+                    }
+                ),
+            ),
+        )
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-input").fill("cite the year")
+            page.locator("#assistant-input").press("Enter")
+            page.get_by_role("button", name="Year 10", exact=True).click()
+            expect(page.locator("#table-filter")).to_have_value("10")
+            expect(page.locator("#table-column")).to_have_value("Year")
+            expect(page.locator("#panel-body")).to_contain_text("1 matching row")
+        finally:
+            browser.close()
+
+
 def test_the_assistant_conversation_survives_reload(cockpit: str) -> None:
     """The local fallback conversation and session survive a page reload."""
     expect = playwright_module.expect

@@ -80,8 +80,12 @@ Allowed actions:
 - `open_workspace` with target: runs, stand, results, evidence, calibration
 - `open_panel` with target: summary, tables, trees, compare, visuals, provenance, keywords
 - `open_run` with target: an existing run id
+- `open_table` with target: a table name, plus optional `column` and literal `query` fields
 - `select_year` with target: an integer year shown by the stand view
 - `ask` with target: a short follow-up prompt to put in the input
+
+Use `open_table` to cite a specific row or value: name the table, the column, and the exact value
+from the context. Do not cite a row you have not seen in the context or a file.
 
 Never use a chip to start a run, edit data, run a command, or change calibration. If no chip is
 needed, omit the marker.
@@ -156,6 +160,23 @@ def _chip(item: object) -> dict[str, Any] | None:
         if action == "ask" and len(target) > 500:
             return None
         return {"label": label, "action": action, "target": target[:500]}
+    if action == "open_table":
+        table = item.get("target")
+        column = item.get("column", "")
+        query = item.get("query", "")
+        if not isinstance(table, str) or not table.strip() or len(table) > 100:
+            return None
+        if not isinstance(column, str) or len(column) > 100:
+            return None
+        if not isinstance(query, str) or len(query) > 200:
+            return None
+        return {
+            "label": label,
+            "action": "open_table",
+            "target": table.strip(),
+            "column": column.strip(),
+            "query": query.strip(),
+        }
     if action == "select_year":
         if isinstance(target, bool):
             return None

@@ -728,3 +728,68 @@ def test_a_table_page_can_restrict_the_filter_to_one_column(client: TestClient) 
     assert missing.status_code == 404
     csv = client.get("/api/runs/run-a/tables/FVS_Cases/csv?q=S1&column=StandID")
     assert "S1" in csv.text
+
+
+def test_agent_table_chips_are_validated_against_the_open_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A row citation must name a real table and column in the open run."""
+    _make_run(tmp_path / "run-c")
+    _add_metric_summary(tmp_path / "run-c")
+
+    def fake_run(
+        message: str,
+        *,
+        session: str | None,
+        context: dict[str, object] | None,
+        workspace: Path,
+        model: str,
+        timeout: float,
+    ) -> dict[str, object]:
+        assert context is not None
+        tables = context["tables"]
+        assert isinstance(tables, list)
+        assert tables[0]["name"] == "FVS_Cases"
+        return {
+            "reply": "See the row.",
+            "session": "ses_new",
+            "actions": [],
+            "chips": [
+                {
+                    "label": "Year 10",
+                    "action": "open_table",
+                    "target": "FVS_Summary_Metric",
+                    "column": "Year",
+                    "query": "10",
+                },
+                {
+                    "label": "Bad table",
+                    "action": "open_table",
+                    "target": "Nope",
+                    "column": "Year",
+                    "query": "10",
+                },
+                {
+                    "label": "Bad column",
+                    "action": "open_table",
+                    "target": "FVS_Summary_Metric",
+                    "column": "Nope",
+                    "query": "10",
+                },
+            ],
+        }
+
+    monkeypatch.setattr(webapp, "run_agent", fake_run)
+    client = TestClient(webapp.create_app([tmp_path], allow_agent=True, agent_workspace=tmp_path))
+    response = client.post("/api/agent/chat", json={"message": "cite", "run": "run-c"})
+    assert response.status_code == 200
+    chips = response.json()["chips"]
+    assert chips == [
+        {
+            "label": "Year 10",
+            "action": "open_table",
+            "target": "FVS_Summary_Metric",
+            "column": "Year",
+            "query": "10",
+        }
+    ]

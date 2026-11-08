@@ -63,8 +63,9 @@ risk-reduction measure, not a sandbox or an authentication boundary.
 model, the workspace, and the timeout. ``GET /api/agent/guide.md`` returns the instruction sheet.
 ``POST /api/agent/chat`` accepts ``message``, optional ``session``, compact UI ``context``, ``run``,
 and ``year``; the server injects the run's summary, provenance pins, and calibration review state.
-A validated reply may carry safe UI chips for opening a workspace, panel, run, or stand year, or
-for putting a follow-up prompt in the input.
+A validated reply may carry safe UI chips for opening a workspace, panel, run, or stand year,
+for opening a table filtered to a cited column/value, or for putting a follow-up prompt in the
+input. The server checks a table citation against the open run before returning it.
 
 The browser keeps the current assistant conversation and OpenCode session in ``sessionStorage``
 for that tab; **New** clears both. **Stop waiting** aborts the browser request, but the local
