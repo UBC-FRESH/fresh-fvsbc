@@ -72,6 +72,18 @@ def _make_run(root: Path) -> None:
         connection.executemany(
             "insert into FVS_TreeList_Metric values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows
         )
+        connection.execute(
+            "create table FVS_Summary_Metric ("
+            "Year integer, Age integer, Tph real, BA real, QMD real, TopHt real, "
+            "CCF real, TCuM real, MCuM real)"
+        )
+        connection.executemany(
+            "insert into FVS_Summary_Metric values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+                (0, 60, 300.0, 3.0, 5.0, 7.0, 10.0, 20.0, 18.0),
+                (10, 70, 210.0, 18.0, 33.7, 33.0, 72.0, 207.0, 200.0),
+            ],
+        )
         connection.execute("insert into FVS_Cases values ('c1', 'S1', 'BC')")
         connection.commit()
     finally:
@@ -128,10 +140,21 @@ def test_the_cockpit_runs_stand_calibration_and_url_state(cockpit: str) -> None:
             page.goto(f"{cockpit}/?workspace=runs&run={RUN_ID}", wait_until="networkidle")
             expect(page.get_by_role("heading", name="Runs", exact=True)).to_be_visible()
             expect(page.locator("article", has_text=RUN_ID)).to_be_visible()
-            page.get_by_role("button", name="Open stand").click()
+            page.get_by_role("button", name="Open", exact=True).click()
             expect(page.get_by_role("heading", name="Stand", exact=True)).to_be_visible()
             expect(page.locator("canvas.stand-canvas")).to_be_visible()
             expect(page.get_by_role("combobox", name="Stand year")).to_have_value("0")
+
+            page.get_by_role("tab", name="Results").click()
+            page.get_by_role("tab", name="Summary").click()
+            expect(page.locator("#panel-body")).to_contain_text(
+                "Metric summary from FVS_Summary_Metric"
+            )
+            expect(page.locator("#panel-body")).to_contain_text("m²/ha")
+            expect(page.locator("#panel-body")).to_contain_text("210")
+            page.get_by_role("tab", name="Tables").click()
+            expect(page.get_by_role("button", name="FVS_Summary_Metric · 2 ✓")).to_be_visible()
+            expect(page.locator("#panel-body")).to_contain_text("Year")
 
             page.get_by_role("tab", name="Calibration").click()
             expect(page.get_by_role("heading", name="Calibration", exact=True)).to_be_visible()

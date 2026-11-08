@@ -673,3 +673,34 @@ body.drawer-open { overflow: hidden; }
   line-height: 1.45;
 }
 .assistant-form textarea:disabled { opacity: 0.7; }
+
+/* ------------------------------------------------------------ run overview */
+.run-card-metric {
+  color: var(--ink) !important;
+  font-size: 13px !important;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+  min-height: 2.9em;
+}
+.run-card:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+
+.kpi-label em {
+  font-style: normal;
+  opacity: 0.72;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.summary-source { font-size: 11px; line-height: 1.45; margin: 6px 0 12px; }
+
+svg.chart { height: 260px; }
+svg.chart .chart-grid { stroke: var(--line); stroke-dasharray: 2 4; opacity: 0.7; }
+svg.chart .chart-point { fill: var(--accent); }
+svg.chart .chart-caption { fill: var(--ink); font-weight: 600; }
+.column-unit {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}

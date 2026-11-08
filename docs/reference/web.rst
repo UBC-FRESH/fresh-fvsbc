@@ -82,10 +82,15 @@ File                What the surface uses it for
 ``run.tre``         the tree list as written
 ``FVSOut.db``        the output database: the primary surface
 ``run.sum``         the fixed-width summary, as FVS wrote it
-``summary.csv``     the parsed summary, for the trajectory chart
+``summary.csv``     the parsed FVS summary; the UI uses it only when no metric table exists
 ``provenance.json`` the PyFVS commit, the FVS source commit, the variant list
 ``variants.json``   the build's variant list
 =================== =========================================================
+
+The overview reads **``FVS_Summary_Metric``** rather than ``summary.csv``. The native summary uses
+FVS's internal units, so a card that labelled its ``tpa`` as metric TPH would be wrong. When the
+metric table is absent, the panel falls back to ``summary.csv`` and labels every value as native
+(ft²/ac, trees/ac, ft); it does not silently mix units.
 
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.
@@ -154,7 +159,9 @@ Endpoints
 ``GET /api/runs``
     run directories under the roots, with state
 ``GET /api/runs/{id}/summary``
-    ``summary.csv`` rows
+    ``summary.csv`` rows, in FVS native units
+``GET /api/runs/{id}/metric-summary``
+    ``FVS_Summary_Metric`` rows, the metric source the overview renders
 ``GET /api/runs/{id}/tables``
     exposed tables written, with counts and the flag
 ``GET /api/runs/{id}/tables/{name}``
