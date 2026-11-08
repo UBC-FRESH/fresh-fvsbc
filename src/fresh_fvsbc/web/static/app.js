@@ -889,6 +889,11 @@ async function renderTables(body) {
         : "No independent check: the reader proves the table exists and its columns match the schema.",
     ),
   );
+  if (payload.columns.length > 5) {
+    body.append(el("p", { className: "scroll-hint" },
+      "Scroll horizontally to see every column.",
+    ));
+  }
   if (!payload.rows.length) {
     body.append(el("div", { className: "empty-state" },
       el("strong", {}, state.tableQuery ? "No matching rows" : "No rows"),
@@ -1643,6 +1648,11 @@ async function renderCompare(body) {
     el("th", {}, key.join(" / ")),
     ...valueColumns.map((column) => el("th", { className: "num" }, column)),
   );
+  if (valueColumns.length > 4) {
+    body.append(el("p", { className: "scroll-hint" },
+      "Scroll horizontally to see every diff column.",
+    ));
+  }
   const rows = capped.map((entry) =>
     el("tr", {},
       el("td", {}, entry.key),

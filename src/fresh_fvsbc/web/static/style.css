@@ -820,3 +820,34 @@ svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
+
+/* ------------------------------------------------------------ mobile polish */
+.scroll-hint {
+  margin: 4px 0 6px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+@media (max-width: 760px) {
+  .calibration-toolbar input,
+  .calibration-toolbar select,
+  .table-toolbar input,
+  .table-toolbar select {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .calibration-toolbar button,
+  .calibration-toolbar .button-like,
+  .table-toolbar button,
+  .table-toolbar .button-like {
+    flex: 0 0 auto;
+  }
+  .table-pager {
+    flex-wrap: wrap;
+  }
+  .table-pager .muted {
+    flex: 1 1 100%;
+    margin-right: 0;
+  }
+}

@@ -256,10 +256,14 @@ def test_the_mobile_shell_does_not_overflow(cockpit: str) -> None:
             for path in (
                 f"/?workspace=runs&run={RUN_ID}",
                 f"/?workspace=results&panel=summary&run={RUN_ID}",
+                "/?workspace=calibration",
+                f"/?workspace=results&panel=tables&run={RUN_ID}",
+                f"/?workspace=results&panel=compare&run={RUN_ID}",
             ):
                 page.goto(f"{cockpit}{path}", wait_until="networkidle")
                 assert page.evaluate("document.body.scrollWidth <= document.body.clientWidth")
-            expect(page.get_by_role("heading", name="Summary", exact=True)).to_be_visible()
+            expect(page.get_by_role("heading", name="Compare two runs")).to_be_visible()
+            expect(page.locator(".scroll-hint").first).to_be_visible()
         finally:
             browser.close()
 
