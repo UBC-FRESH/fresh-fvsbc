@@ -350,6 +350,11 @@ def test_the_spa_is_served_at_the_root(client: TestClient) -> None:
     assert "new-run-dialog" in response.text
     assert 'class="skip-link"' in response.text
     assert 'role="tabpanel"' in response.text
+    assert "app.js?v=" in response.text
+    assert response.headers["cache-control"].startswith("no-store")
+    script = client.get("/app.js")
+    assert script.status_code == 200
+    assert script.headers["cache-control"].startswith("no-store")
 
 
 def test_the_cli_dispatches_web_before_the_run_parser(
