@@ -35,13 +35,21 @@ recruitment events are effectively predicted as present, and the residual RMSE i
 - The next model must include hierarchical TSA/site effects and an explicit zero process, and must be
   tested on a held-out TSA.
 
-## 4. Limits
+## 4. BCINGR v2 screen
+
+Year and prior stand rates were added to the hurdle. Training correlation improves slightly
+(0.353 -> 0.365), but the 100 Mile test correlation falls from 0.088 to 0.066 and RMSE rises from
+177.8 to 198.8. The model still predicts zero zeros while 6.4% of test intervals are zero. The
+failure is target-TSA/seed-year information, not a missing zero process. See `d9-bcingr-v2.md` and
+`d9-bcingr-v2-summary.csv`.
+
+## 5. Limits
 
 - The count model is a log-linear approximation, not a fitted NB/ZINB likelihood.
 - Parent BA is a crude seed-source proxy; it has no fecundity, dispersal, or seed-year term.
 - The 100 Mile test is one TSA; no independent site random effect is available for it.
 - Species composition is not modeled; the response is total new TPH.
 
-## 5. Claim boundary
+## 6. Claim boundary
 
 This is a prototype screen. It does not support a yield, AAC, legal, or whole-block claim.
