@@ -282,6 +282,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-tree-growth-summary.csv` | The D9.37 growth metrics |
 | `d9-bcmort-temporal.md` | The D9.38 temporal growth holdout |
 | `d9-bcmort-temporal-summary.csv` | The D9.38 temporal metrics |
+| `d9-bcmort-temporal-calibration.md` | The D9.39 temporal calibration curve |
+| `d9-bcmort-temporal-calibration-summary.csv` | The D9.39 temporal calibration metrics |
+| `bcmort_temporal_calibration.py` | The D9.39 temporal calibration prototype |
 | `bcmort_temporal.py` | The D9.38 temporal prototype |
 | `bcmort_tree_growth.py` | The D9.37 growth prototype |
 | `bcmort_growth.py` | The D9.36 growth prototype |

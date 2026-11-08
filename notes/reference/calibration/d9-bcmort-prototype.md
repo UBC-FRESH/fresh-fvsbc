@@ -97,7 +97,15 @@ post-2000 event rate is much higher than the model predicts (MSdm1 0.216 vs 0.16
 0.176), so temporal calibration is still required. See `d9-bcmort-temporal.md` and
 `d9-bcmort-temporal-summary.csv`.
 
-## 10. Limits
+## 10. Temporal calibration
+
+A post-2000 target intercept is not a fix. For MSdm1 every intercept makes log loss worse than the
+uncalibrated pre-2000 model; for SBSmw it improves log loss but even 20 sites leave the mean at 0.229
+vs 0.361 observed. A hierarchical random intercept shrinks toward the pre-2000 model, which is the
+wrong direction when the base underpredicts. See `d9-bcmort-temporal-calibration.md` and
+`d9-bcmort-temporal-calibration-summary.csv`.
+
+## 11. Limits
 
 - Poisson hazard, not the final cloglog binomial; no exact interval censoring beyond exposure.
 - Tree-level `dead` is a binary outcome, not a known death time.
@@ -105,6 +113,6 @@ post-2000 event rate is much higher than the model predicts (MSdm1 0.216 vs 0.16
 - No climate, site index, crown ratio, or recent growth yet.
 - This is a model prototype, not an FVS core change or a bundle.
 
-## 11. Claim boundary
+## 12. Claim boundary
 
 This is a diagnostic prototype. It does not support a yield, AAC, legal, or whole-block claim.
