@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import subprocess
 import sys
 import time
@@ -597,6 +598,21 @@ def create_app(
             command.extend(["--tsa", str(payload["tsa"])])
         if payload.get("min_dbh") is not None:
             command.extend(["--min-dbh", str(payload["min_dbh"])])
+        cycles = payload.get("cycles", 1)
+        if isinstance(cycles, bool) or not isinstance(cycles, int) or cycles < 1:
+            raise HTTPException(status_code=400, detail="cycles must be a positive integer")
+        cycle_years = payload.get("cycle_years")
+        if cycle_years is not None and (
+            isinstance(cycle_years, bool)
+            or not isinstance(cycle_years, (int, float))
+            or not math.isfinite(float(cycle_years))
+            or float(cycle_years) <= 0
+        ):
+            raise HTTPException(status_code=400, detail="cycle_years must be a positive number")
+        if cycles != 1:
+            command.extend(["--cycles", str(cycles)])
+        if cycle_years is not None:
+            command.extend(["--cycle-years", str(cycle_years)])
         directory.mkdir(parents=True)
         log = (directory / "service.log").open("w", encoding="utf-8")
         app.state.processes[identifier] = subprocess.Popen(

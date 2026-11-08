@@ -69,6 +69,7 @@
             <span>Calibration bundle <em>optional</em></span>
             <select id="new-bundle"><option value="">No calibration</option></select>
             <small id="new-bundle-note">A bundle renders its parameters and ingrowth block into the run.</small>
+            <div id="new-bundle-preview" class="bundle-preview" aria-live="polite"></div>
           </label>
           <label class="field">
             <span>Minimum DBH <em>cm, optional</em></span>
@@ -77,6 +78,16 @@
           <label class="field">
             <span>TSA <em>optional</em></span>
             <input id="new-tsa" type="text" placeholder="Quesnel TSA" />
+          </label>
+          <label class="field">
+            <span>Cycles</span>
+            <input id="new-cycles" type="number" min="1" step="1" value="1" />
+            <small>More than one rewrites TIMEINT and NUMCYCLE before the projection.</small>
+          </label>
+          <label class="field">
+            <span>Cycle length <em>years, optional</em></span>
+            <input id="new-cycle-years" type="number" min="0.1" step="0.1" placeholder="first TIMEINT or 10" />
+            <small>Used as the TIMEINT interval; a bundle's ingrowth block runs once per cycle.</small>
           </label>
           <label class="field field-wide">
             <span>Keyword lines <em>optional</em></span>

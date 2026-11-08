@@ -194,6 +194,21 @@ def _parser() -> argparse.ArgumentParser:
         metavar="CM",
         help="filter the population to trees at or above this DBH",
     )
+    parser.add_argument(
+        "--cycles",
+        type=int,
+        default=1,
+        metavar="N",
+        help="projection cycles; more than one rewrites TIMEINT and NUMCYCLE",
+    )
+    parser.add_argument(
+        "--cycle-years",
+        type=float,
+        default=None,
+        dest="cycle_years",
+        metavar="YEARS",
+        help="the interval per cycle; defaults to the first positive TIMEINT, or ten years",
+    )
     return parser
 
 
@@ -413,6 +428,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             calibration=calibration,
             tsa=args.tsa,
             min_dbh=args.min_dbh,
+            cycles=args.cycles,
+            cycle_years=args.cycle_years,
         )
     except _INPUT_ERRORS as error:
         print(f"fresh-fvsbc: {error}", file=sys.stderr)

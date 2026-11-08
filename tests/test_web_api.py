@@ -220,6 +220,41 @@ def test_starting_a_run_invokes_the_cli(tmp_path: Path, monkeypatch: pytest.Monk
     assert (tmp_path / "new-run").is_dir()
 
 
+def test_starting_a_run_passes_cycle_controls(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The browser's cycle fields reach the CLI as the flags that rewrite TIMEINT and NUMCYCLE."""
+    recorded: list[list[str]] = []
+
+    class _Stub:
+        def __init__(self, command: list[str], **_: object) -> None:
+            recorded.append(command)
+
+    monkeypatch.setattr(subprocess, "Popen", _Stub)
+    client = TestClient(webapp.create_app([tmp_path]))
+    response = client.post(
+        "/api/runs",
+        json={
+            "population": "p.json",
+            "species": "FD",
+            "tree_age": 60,
+            "id": "cycled",
+            "cycles": 2,
+            "cycle_years": 5,
+        },
+    )
+    assert response.status_code == 202
+    command = recorded[0]
+    assert command[command.index("--cycles") + 1] == "2"
+    assert command[command.index("--cycle-years") + 1] == "5"
+    for bad in ({"cycles": 0}, {"cycles": "2"}, {"cycle_years": 0}, {"cycle_years": "five"}):
+        refused = client.post(
+            "/api/runs",
+            json={"population": "p.json", "species": "FD", "tree_age": 60, **bad},
+        )
+        assert refused.status_code == 400
+
+
 def test_starting_a_run_can_apply_a_calibration_bundle(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

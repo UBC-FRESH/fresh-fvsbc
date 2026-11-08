@@ -384,26 +384,79 @@ function populateBundleSelect() {
   updateBundleNote();
 }
 
+function bundleDomainSummary(bundle) {
+  const domain = bundle.domain || {};
+  const parts = [];
+  if (domain.becs?.length) parts.push(`BEC ${domain.becs.join(", ")}`);
+  if (domain.tsas?.length) parts.push(`TSA ${domain.tsas.join(", ")}`);
+  if (domain.regions?.length) parts.push(`region ${domain.regions.join(", ")}`);
+  if (domain.species_groups?.length) parts.push(`species ${domain.species_groups.join(", ")}`);
+  if (domain.management?.length) parts.push(domain.management.join(" / "));
+  if (domain.dbh_classes?.length) {
+    parts.push(
+      `DBH ${domain.dbh_classes.map(([low, high]) => `${low}–${high} cm`).join(", ")}`,
+    );
+  }
+  if (domain.qmd_min) parts.push(`QMD ≥ ${domain.qmd_min} cm`);
+  if (domain.ba_min) parts.push(`BA ≥ ${domain.ba_min} m²/ha`);
+  return parts.length ? parts.join(" · ") : "unrestricted";
+}
+
 function updateBundleNote() {
   const select = document.getElementById("new-bundle");
   const note = document.getElementById("new-bundle-note");
-  if (!select || !note) return;
+  const preview = document.getElementById("new-bundle-preview");
+  if (!select || !note || !preview) return;
   const bundle = state.calibrations.find((entry) => entry.bundle_id === select.value);
+  preview.replaceChildren();
   if (!bundle) {
     note.textContent = "A bundle renders its parameters and ingrowth block into the run.";
     return;
   }
-  const warning = bundle.warnings?.length ? ` Warning: ${bundle.warnings[0]}` : "";
-  note.textContent = `${bundle.claim}${warning}`;
+  note.textContent = bundle.claim;
+  preview.append(
+    el("div", { className: "preview-row" },
+      el("strong", {}, "Domain"),
+      el("span", {}, bundleDomainSummary(bundle)),
+    ),
+    el("div", { className: "preview-row" },
+      el("strong", {}, "Review"),
+      el("span", {}, bundle.review?.signed_off ? "signed" : "unsigned pilot"),
+    ),
+    el("div", { className: "preview-row" },
+      el("strong", {}, "Parameters"),
+      el("span", {}, `${bundle.parameters?.length ?? 0} keywords · ${bundle.ingrowth ? `${bundle.ingrowth.rates} ingrowth rates` : "no ingrowth"}`),
+    ),
+  );
+  const lower = bundle.domain?.dbh_classes?.[0]?.[0];
+  const minDbh = Number(document.getElementById("new-min-dbh")?.value);
+  if (Number.isFinite(lower) && Number.isFinite(minDbh) && minDbh > 0 && minDbh < lower) {
+    preview.append(
+      el("p", { className: "preview-warning" },
+        `Minimum DBH ${minDbh} cm is below this bundle's ${lower} cm domain; the run may be refused.`,
+      ),
+    );
+  }
+  for (const warning of bundle.warnings || []) {
+    preview.append(el("p", { className: "preview-warning" }, warning));
+  }
 }
 
-function openNewRun() {
+function openNewRun(bundleId = null) {
   const dialog = document.getElementById("new-run-dialog");
   const error = document.getElementById("new-run-error");
   if (error) error.hidden = true;
   populateBundleSelect();
   const bundle = document.getElementById("new-bundle");
-  if (bundle) bundle.onchange = updateBundleNote;
+  if (bundle) {
+    bundle.onchange = updateBundleNote;
+    if (typeof bundleId === "string" && state.calibrations.some((entry) => entry.bundle_id === bundleId)) {
+      bundle.value = bundleId;
+    }
+  }
+  const minDbh = document.getElementById("new-min-dbh");
+  if (minDbh) minDbh.oninput = updateBundleNote;
+  updateBundleNote();
   if (dialog?.showModal) dialog.showModal();
   else dialog?.setAttribute("open", "");
   document.getElementById("new-population")?.focus();
@@ -429,8 +482,22 @@ async function submitNewRun(event) {
   const bundle = document.getElementById("new-bundle").value;
   const minDbh = document.getElementById("new-min-dbh").value.trim();
   const tsa = document.getElementById("new-tsa").value.trim();
+  const cyclesRaw = document.getElementById("new-cycles").value.trim();
+  const cycleYearsRaw = document.getElementById("new-cycle-years").value.trim();
+  const cycles = cyclesRaw ? Number(cyclesRaw) : 1;
+  const cycleYears = cycleYearsRaw ? Number(cycleYearsRaw) : null;
   if (!population || !species || !Number.isFinite(treeAge)) {
     error.textContent = "Population, species, and tree age are required.";
+    error.hidden = false;
+    return;
+  }
+  if (!Number.isInteger(cycles) || cycles < 1) {
+    error.textContent = "Cycles must be a whole number of at least one.";
+    error.hidden = false;
+    return;
+  }
+  if (cycleYears !== null && (!Number.isFinite(cycleYears) || cycleYears <= 0)) {
+    error.textContent = "Cycle length must be a positive number of years.";
     error.hidden = false;
     return;
   }
@@ -439,6 +506,8 @@ async function submitNewRun(event) {
   if (bundle) payload.bundle = bundle;
   if (minDbh) payload.min_dbh = Number(minDbh);
   if (tsa) payload.tsa = tsa;
+  if (cycles !== 1) payload.cycles = cycles;
+  if (cycleYears !== null) payload.cycle_years = cycleYears;
   try {
     const response = await fetch("api/runs", {
       method: "POST",
@@ -526,7 +595,10 @@ async function renderCalibration(body) {
         el("h2", {}, bundle.bundle_id),
         el("p", { className: "muted" }, `version ${bundle.version}`),
       ),
-      el("button", { type: "button", class: "ghost", onclick: () => { state.calibration = null; renderPanel(); } }, "Close"),
+      el("div", { className: "run-card-actions" },
+        el("button", { type: "button", class: "primary", onclick: () => openNewRun(bundle.bundle_id) }, "Use in new run"),
+        el("button", { type: "button", class: "ghost", onclick: () => { state.calibration = null; renderPanel(); } }, "Close"),
+      ),
     ),
     el("p", { className: "claim" }, bundle.claim),
   );
