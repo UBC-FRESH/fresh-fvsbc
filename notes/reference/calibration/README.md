@@ -281,6 +281,7 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-mpb-run.md` | The D9.47 BC MPB runtime test |
 | `d9-mpb-pl-test.md` | The D9.48 MPB PL sensitivity test |
 | `d9-mpb-high-pl.md` | The D9.49 high-PL MPB test |
+| `d9-mpb-5yr.md` | The D9.51 five-year high-PL MPB test |
 | `bcmort_provincial_temporal.py` | The D9.45 temporal prototype |
 | `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
