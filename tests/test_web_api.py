@@ -715,3 +715,16 @@ def test_a_table_can_be_downloaded_as_csv(client: TestClient) -> None:
     empty = client.get("/api/runs/run-a/tables/FVS_Cases/csv?q=nope")
     assert "StandID" in empty.text
     assert "S1" not in empty.text
+
+
+def test_a_table_page_can_restrict_the_filter_to_one_column(client: TestClient) -> None:
+    """A column-scoped filter does not match the same text in another column."""
+    scoped = client.get("/api/runs/run-a/tables/FVS_Cases?q=S1&column=StandID").json()
+    assert scoped["total"] == 1
+    assert scoped["column"] == "StandID"
+    wrong = client.get("/api/runs/run-a/tables/FVS_Cases?q=S1&column=CaseID").json()
+    assert wrong["total"] == 0
+    missing = client.get("/api/runs/run-a/tables/FVS_Cases?q=S1&column=Nope")
+    assert missing.status_code == 404
+    csv = client.get("/api/runs/run-a/tables/FVS_Cases/csv?q=S1&column=StandID")
+    assert "S1" in csv.text

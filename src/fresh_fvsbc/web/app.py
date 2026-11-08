@@ -662,6 +662,7 @@ def create_app(
         limit: int = Query(runstore.DEFAULT_LIMIT, ge=1, le=runstore.MAX_LIMIT),
         offset: int = Query(0, ge=0),
         q: str | None = Query(None, max_length=200),
+        column: str | None = Query(None, max_length=100),
     ) -> dict[str, Any]:
         """Return one table, as a page.
 
@@ -676,16 +677,19 @@ def create_app(
         offset : int, optional
             The first row of the page.
         q : str, optional
-            A literal, case-insensitive filter applied across every column before paging.
+            A literal, case-insensitive filter applied before paging.
+        column : str, optional
+            Restrict the filter to one column; omitted searches every column.
 
         Returns
         -------
         dict
-            The columns, the page of rows, the filtered total, the query, and the oracle flag.
+            The columns, the page of rows, the filtered total, the query, the column, and the
+            oracle flag.
         """
         run = _find(run_id)
         try:
-            return runstore.table(run, name, limit=limit, offset=offset, query=q)
+            return runstore.table(run, name, limit=limit, offset=offset, query=q, column=column)
         except runstore.RunError as error:
             raise HTTPException(status_code=404, detail=str(error)) from error
 
@@ -694,11 +698,12 @@ def create_app(
         run_id: str,
         name: str,
         q: str | None = Query(None, max_length=200),
+        column: str | None = Query(None, max_length=100),
     ) -> Response:
         """Return one exposed table as a CSV attachment, with the same literal filter."""
         run = _find(run_id)
         try:
-            text = runstore.table_csv(run, name, query=q)
+            text = runstore.table_csv(run, name, query=q, column=column)
         except runstore.RunError as error:
             raise HTTPException(status_code=404, detail=str(error)) from error
         filename = f"{run.id}-{name}.csv"

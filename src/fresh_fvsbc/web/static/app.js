@@ -23,6 +23,7 @@ const state = {
   compareMetric: "BA",
   summaryColumn: null,
   tableQuery: "",
+  tableColumn: "",
   tableOffset: 0,
   standYear: null,
   pollTimer: null,
@@ -214,6 +215,7 @@ function selectRun(id) {
   state.run = state.runs.find((run) => run.id === id) ?? null;
   state.table = null;
   state.tableQuery = "";
+  state.tableColumn = "";
   state.tableOffset = 0;
   state.summaryColumn = null;
   if (state.run) {
@@ -780,6 +782,7 @@ async function renderTables(body) {
           onclick: () => {
             state.table = table.name;
             state.tableQuery = "";
+            state.tableColumn = "";
             state.tableOffset = 0;
             updateUrl();
             renderPanel();
@@ -801,20 +804,43 @@ async function renderTables(body) {
   }
   if (!state.table) return;
 
+  const tableInfo = tables.find((table) => table.name === state.table);
+  const tableColumns = tableInfo?.columns ?? [];
+  if (state.tableColumn && !tableColumns.includes(state.tableColumn)) {
+    state.tableColumn = "";
+    updateUrl();
+  }
   const tablePath = `api/runs/${encodeURIComponent(state.run.id)}/tables/${encodeURIComponent(state.table)}`;
   const params = new URLSearchParams({ limit: "200", offset: String(state.tableOffset) });
   if (state.tableQuery) params.set("q", state.tableQuery);
+  if (state.tableColumn) params.set("column", state.tableColumn);
   const payload = await api(`${tablePath}?${params.toString()}`);
   const csvParams = new URLSearchParams();
   if (state.tableQuery) csvParams.set("q", state.tableQuery);
+  if (state.tableColumn) csvParams.set("column", state.tableColumn);
   const csvHref = `${tablePath}/csv${csvParams.toString() ? `?${csvParams}` : ""}`;
   const filterInput = el("input", {
     id: "table-filter",
     type: "search",
     value: state.tableQuery,
-    placeholder: "Filter any column…",
+    placeholder: state.tableColumn ? `Filter ${state.tableColumn}…` : "Filter any column…",
     "aria-label": "Filter table rows",
   });
+  const columnSelect = el("select", {
+    id: "table-column",
+    "aria-label": "Filter column",
+    onchange: (event) => {
+      state.tableColumn = event.target.value;
+      state.tableOffset = 0;
+      updateUrl();
+      renderPanel();
+    },
+  },
+    el("option", { value: "", selected: state.tableColumn === "" }, "Any column"),
+    ...tableColumns.map((column) =>
+      el("option", { value: column, selected: column === state.tableColumn }, column),
+    ),
+  );
   const filterForm = el("form", {
     className: "table-toolbar",
     onsubmit: (event) => {
@@ -825,6 +851,7 @@ async function renderTables(body) {
       renderPanel();
     },
   },
+    columnSelect,
     filterInput,
     el("button", { className: "primary", type: "submit" }, "Apply"),
     state.tableQuery
@@ -849,7 +876,8 @@ async function renderTables(body) {
       {},
       `${payload.name} — ${fmt(payload.total)} ${state.tableQuery ? "matching " : ""}`
         + `${payload.total === 1 ? "row" : "rows"}, showing ${payload.rows.length}`
-        + (state.tableQuery ? ` · filter “${state.tableQuery}”` : ""),
+        + (state.tableQuery ? ` · filter “${state.tableQuery}”` : "")
+        + (state.tableColumn ? ` · column ${state.tableColumn}` : ""),
     ),
   );
   body.append(
@@ -1639,6 +1667,7 @@ function readUrlState() {
     year: params.get("year"),
     table: params.get("table"),
     q: params.get("q"),
+    column: params.get("column"),
     offset: params.get("offset"),
     a: params.get("a"),
     b: params.get("b"),
@@ -1659,6 +1688,7 @@ function updateUrl() {
   if (state.workspace === "results" && state.panel === "tables" && state.table) {
     params.set("table", state.table);
     if (state.tableQuery) params.set("q", state.tableQuery);
+    if (state.tableColumn) params.set("column", state.tableColumn);
     if (state.tableOffset > 0) params.set("offset", String(state.tableOffset));
   }
   if (state.workspace === "results" && state.panel === "compare") {
@@ -2218,6 +2248,7 @@ async function boot() {
     if (!workspace_panels().includes(state.panel)) state.panel = workspace_panels()[0] || null;
     state.table = initial.table;
     state.tableQuery = initial.q || "";
+    state.tableColumn = initial.column || "";
     const offset = Number(initial.offset);
     state.tableOffset = Number.isInteger(offset) && offset > 0 ? offset : 0;
     if (initial.a) state.compareA = initial.a;
