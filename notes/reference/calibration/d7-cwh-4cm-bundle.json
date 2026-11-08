@@ -359,5 +359,5 @@
     "date": "2026-11-04",
     "signed_off": false
   },
-  "claim": "CWH 4 cm pilot: BAIMULT 7, MORTMULT 0.3, REGDMULT 2; BA/TPH/QMD/matched top height pass; PSP volume is -7.5% with MCuM, but external volume is -18.7% with MCuM and -0.1% with TCuM, so the volume column is unresolved. The bundle enforces DBH >=4 cm and remains an unsigned pilot, not a certificate."
+  "claim": "CWH 4 cm pilot: BAIMULT 7, MORTMULT 0.3, REGDMULT 2; BA/TPH/QMD/matched top height and PSP matched merchantability volume pass; external matched volume is -12.6% and remains unresolved. The bundle enforces DBH >=4 cm and remains an unsigned pilot, not a certificate."
 }
