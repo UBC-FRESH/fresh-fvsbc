@@ -72,7 +72,16 @@ improves MSdm1 in both directions (AUC 0.750 -> 0.763 and 0.681 -> 0.684), but i
 It is not a calibration fix; a local target intercept still leaves the target mean biased. Add it
 to the MSdm1 prototype, not as a universal term.
 
-## 7. Limits
+## 7. Growth history and calibration sample size
+
+Prior stand growth and mortality rates were tested on top of height/DBH. They improve two directions
+and worsen two, so they are not a universal term. A target-intercept curve shows that one target
+site is worse than no calibration; five or more help some directions, but SBSmw Quesnel -> Prince
+George remains worse than uncalibrated and the target mean stays biased. See
+`d9-bcmort-growth-calibration.md`, `d9-bcmort-growth-summary.csv`, and
+`d9-bcmort-calibration-curve-summary.csv`.
+
+## 8. Limits
 
 - Poisson hazard, not the final cloglog binomial; no exact interval censoring beyond exposure.
 - Tree-level `dead` is a binary outcome, not a known death time.
@@ -80,6 +89,6 @@ to the MSdm1 prototype, not as a universal term.
 - No climate, site index, crown ratio, or recent growth yet.
 - This is a model prototype, not an FVS core change or a bundle.
 
-## 8. Claim boundary
+## 9. Claim boundary
 
 This is a diagnostic prototype. It does not support a yield, AAC, legal, or whole-block claim.

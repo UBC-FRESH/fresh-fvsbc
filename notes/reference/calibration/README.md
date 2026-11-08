@@ -275,6 +275,11 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-bcmort-crown-summary.csv` | The D9.34 crown metrics |
 | `d9-bcmort-hd.md` | The D9.35 height/DBH screen |
 | `d9-bcmort-hd-summary.csv` | The D9.35 height/DBH metrics |
+| `d9-bcmort-growth-calibration.md` | The D9.36 growth and calibration curve |
+| `d9-bcmort-growth-summary.csv` | The D9.36 growth metrics |
+| `d9-bcmort-calibration-curve-summary.csv` | The D9.36 target calibration curve |
+| `bcmort_growth.py` | The D9.36 growth prototype |
+| `bcmort_calibration_curve.py` | The D9.36 calibration curve |
 | `bcmort_hd.py` | The D9.35 height/DBH prototype |
 | `bcmort_crown.py` | The D9.34 crown prototype |
 | `cwh_volume_matched.py` | The D9.33 audit code |
