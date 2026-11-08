@@ -16,7 +16,10 @@ import numpy as np
 import pandas as pd
 
 DATA = Path("/srv/shared-data/gep/ws4/.opencode/tmp/opencode/psp4-growth/tree_survival.csv")
-TARGETS = ("Okanagan TSA", "Boundary TSA", "Quesnel TSA", "Prince George TSA")
+INTERVALS = Path("/srv/shared-data/gep/ws4/.opencode/tmp/opencode/psp4-growth/intervals.csv")
+RAW = Path("/srv/shared-data/gep/ws4/tmp/inv01-data/psp/faib_tree_detail.csv")
+CROWN = {"D": 1.0, "C": 2.0, "I": 3.0, "S": 4.0}
+TARGETS = ("Okanagan TSA", "Quesnel TSA")
 GROUPS = ("FD", "PL", "SE", "HW", "OTHER")
 
 
@@ -29,6 +32,7 @@ def load() -> pd.DataFrame:
             "BEC",
             "TSA_DESC",
             "PLOT",
+            "TREE_NO",
             "group",
             "dbh",
             "ba0",
@@ -44,6 +48,24 @@ def load() -> pd.DataFrame:
     frame = frame[(frame["known"] == 1) & (frame["exposure"] > 0)].copy()
     frame["group"] = frame["group"].astype(str).str.upper()
     frame.loc[~frame["group"].isin(GROUPS[:-1]), "group"] = "OTHER"
+    parts = frame["interval_id"].str.split("|", expand=True)
+    frame["site"] = parts[0].astype(str)
+    intervals = pd.read_csv(INTERVALS, usecols=["interval_id", "visit0"])
+    frame = frame.merge(intervals, on="interval_id", how="left")
+    raw = pd.read_csv(
+        RAW,
+        usecols=["SITE_IDENTIFIER", "VISIT_NUMBER", "PLOT", "TREE_NO", "CR_CL", "SI_TREE"],
+    )
+    raw["site"] = raw["SITE_IDENTIFIER"].astype(str)
+    raw["visit0"] = raw["VISIT_NUMBER"].astype(int)
+    raw["TREE_NO"] = raw["TREE_NO"].astype(float)
+    raw["crown"] = raw["CR_CL"].astype(str).str.upper().map(CROWN)
+    raw["si"] = pd.to_numeric(raw["SI_TREE"], errors="coerce")
+    raw = raw.groupby(["site", "visit0", "PLOT", "TREE_NO"], as_index=False)[["crown", "si"]].mean()
+    frame = frame.merge(raw, on=["site", "visit0", "PLOT", "TREE_NO"], how="left")
+    for column in ("crown", "si"):
+        frame[column + "_missing"] = frame[column].isna().astype(float)
+        frame[column] = frame[column].fillna(frame[column].median())
     frame["qmd"] = 100.0 * np.sqrt(4.0 * frame["ba0"] / (np.pi * frame["tph0"]))
     frame["rel_dbh"] = frame["dbh"] / frame.groupby(["interval_id", "PLOT"])["dbh"].transform("max")
     frame["hd"] = frame["HEIGHT"] / (frame["dbh"] / 100.0)
@@ -67,6 +89,10 @@ def design(frame: pd.DataFrame, zones: list[str]) -> np.ndarray:
         frame["damage"].astype(float).to_numpy(),
         frame["hd_missing"].to_numpy(),
         frame["growth_missing"].to_numpy(),
+        frame["crown"].to_numpy(),
+        frame["crown_missing"].to_numpy(),
+        frame["si"].to_numpy(),
+        frame["si_missing"].to_numpy(),
     ]
     zone = frame["zone"].to_numpy()
     cols.extend([(zone == value).astype(float) for value in zones])
@@ -143,7 +169,7 @@ def main() -> None:
             f"obs={metric['event_rate']:.3f} ll={metric['log_loss']:.3f}"
         )
     pd.DataFrame(rows).to_csv(
-        "notes/reference/calibration/d9-provincial-mortality-summary.csv", index=False
+        "notes/reference/calibration/d9-provincial-crown-si-summary.csv", index=False
     )
 
 
