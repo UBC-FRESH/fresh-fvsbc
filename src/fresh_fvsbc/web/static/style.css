@@ -1288,3 +1288,10 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
   font-size: 10px;
   line-height: 1.5;
 }
+
+.collection-search {
+  flex: 1 1 100%;
+  min-width: 0;
+  padding: 5px 8px;
+  font-size: 11px;
+}

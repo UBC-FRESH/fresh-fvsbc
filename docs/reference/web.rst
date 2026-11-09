@@ -105,7 +105,8 @@ The cockpit keeps the useful view in the URL:
 
 Those values are restored on reload, so a reviewer can send a link to the exact table filter or
 comparison instead of describing where to click. Named comparisons are also kept in the browser's
-``localStorage`` for reuse; loading one replaces the current A/B/metric/table/diff-column state.
+``localStorage`` for reuse; loading one replaces the current A/B/metric/table/diff-column state. A
+search field filters the named comparison list without changing the underlying preset.
 
 **Export JSON** writes those named comparisons to a versioned file with ``version``,
 ``exported_at``, and ``comparisons``. **Import JSON** accepts that file or a bare comparison array,
@@ -174,8 +175,8 @@ downloads every saved table layout as versioned JSON, and **Import layouts** val
 layout file by table; the current table reloads immediately after import.
 
 A separate **Saved filters** disclosure stores the current literal query and column scope under a
-name, per table, in ``localStorage``. Loading one restores both and unhides its column if the saved
-layout had hidden it. Applying a filter also records it in a per-table **Recent** list (up to eight
+name, per table, in ``localStorage``; its search field filters the named list. Loading one restores
+both and unhides its column if the saved layout had hidden it. Applying a filter also records it in a per-table **Recent** list (up to eight
 distinct query/column pairs), which can be reapplied from the same panel. A recent entry can be
 pinned as a named filter or removed from history without changing the active filter. **Export filters**
 downloads named and recent history for every table as versioned JSON; **Import filters** validates
@@ -186,7 +187,8 @@ named and recent lists are browser-local.
 export option under a name. Loading one restores all of those together, reloads the table, and
 leaves the existing CSV and package links ready. **Export presets** downloads all presets as
 versioned JSON; **Import presets** validates and merges by table and preset name. **Duplicate** copies
-a preset under a unique “copy” name. Presets are per table and browser-local.
+a preset under a unique “copy” name. Presets are per table and browser-local. Its search field
+filters the preset list.
 
 The Tables workspace also has one **Analysis setup** bundle that combines every table's layout,
 named filters, recent filters, and export presets in a single versioned JSON file. Selecting an

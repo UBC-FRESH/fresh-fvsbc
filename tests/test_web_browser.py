@@ -1130,6 +1130,43 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             browser.close()
 
 
+def test_saved_comparisons_can_be_searched(cockpit: str) -> None:
+    """Searching a preset collection filters options and keeps one selected."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=BA&ctable=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#compare-save-name").fill("Alpha preset")
+            page.get_by_role("button", name="Save", exact=True).click()
+            page.locator("#compare-save-name").fill("Beta preset")
+            page.get_by_role("button", name="Save", exact=True).click()
+
+            search = page.locator("#compare-saved-search")
+            search.fill("bet")
+            saved = page.locator("#compare-saved")
+            expect(saved).to_contain_text("Beta preset")
+            expect(saved).not_to_contain_text("Alpha preset")
+            expect(page.locator("#compare-saved option:checked")).to_have_text("Beta preset")
+
+            search.fill("zzz")
+            expect(saved).to_contain_text("No matches")
+            expect(page.locator("#compare-saved-context")).to_contain_text(
+                "Choose a saved comparison"
+            )
+
+            search.fill("")
+            expect(saved).to_contain_text("Alpha preset")
+            expect(saved).to_contain_text("Beta preset")
+        finally:
+            browser.close()
+
+
 def test_saved_presets_can_be_duplicated(cockpit: str) -> None:
     """Compare and export presets can be copied under a unique name."""
     expect = playwright_module.expect
