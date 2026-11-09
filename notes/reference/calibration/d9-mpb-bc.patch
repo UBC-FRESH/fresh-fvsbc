@@ -1,0 +1,105 @@
+--- a/bin/FVSbc_sourceList.txt
++++ b/bin/FVSbc_sourceList.txt
+@@ -173,7 +173,54 @@
+ ../base/exdftm.f
+ ../base/execon.f
+ ../base/exfert.f
+-../base/exmpb.f
++../lpmpb/COLCOM.F77
++../lpmpb/MPBCOM.F77
++../lpmpb/MPBETA.F77
++../lpmpb/PT.F77
++../lpmpb/back.f
++../lpmpb/betin.f
++../lpmpb/coldbh.f
++../lpmpb/coldrv.f
++../lpmpb/colind.f
++../lpmpb/colmod.f
++../lpmpb/colmrt.f
++../lpmpb/emerg.f
++../lpmpb/forw.f
++../lpmpb/garbel.f
++../lpmpb/grclas.f
++../lpmpb/grpsum.f
++../lpmpb/mpbcup.f
++../lpmpb/mpbdam.f
++../lpmpb/mpbdrv.f
++../lpmpb/mpber.f
++../lpmpb/mpbgam.f
++../lpmpb/mpbgo.f
++../lpmpb/mpbhed.f
++../lpmpb/mpbin.f
++../lpmpb/mpbint.f
++../lpmpb/mpbmod.f
++../lpmpb/mpbout.f
++../lpmpb/mpbtab.f
++../lpmpb/mpgr.f
++../lpmpb/mpotpr.f
++../lpmpb/mprann.f
++../lpmpb/mpsdlp.f
++../lpmpb/percnt.f
++../lpmpb/pmslp.f
++../lpmpb/pqsml.f
++../lpmpb/ptary.f
++../lpmpb/ptbno.f
++../lpmpb/ptgrp.f
++../lpmpb/ptint.f
++../lpmpb/ptplt.f
++../lpmpb/ptsav.f
++../lpmpb/ptscl.f
++../lpmpb/ptsrg.f
++../lpmpb/ptssc.f
++../lpmpb/ptsym.f
++../lpmpb/surfce.f
++../lpmpb/surflp.f
++../lpmpb/tafit.f
+ ../base/exorganon.f
+ ../base/exppe.f
+ ../base/extree.f
+@@ -659,4 +706,6 @@
+ ../canada/newmist/misdam.f
+ ../canada/newmist/misin0.f
+ ../canada/newmist/misputz.f
+-../canada/newmist/mistoe.f
+\ No newline at end of file
++../canada/newmist/mistoe.f
++../lpmpb/mpblkdbc.f
++../wsbwe/txnote.f
+--- /dev/null
++++ b/lpmpb/mpblkdbc.f
+@@ -0,0 +1,35 @@
++      BLOCK DATA MPBLKD
++      IMPLICIT NONE
++C----------
++C LPMPB $Id$
++C----------
++C
++C     MOUNTAIN PINE BEETLE -- CANADA-BC VARIANT.
++C
++C     BC species list (MAXSP=15):
++C      1 PW, 2 LW, 3 FD, 4 BG, 5 HW, 6 CW, 7 PL,
++C      8 SE, 9 BL, 10 PY, 11 EP, 12 AT, 13 AC, 14 OC, 15 OH.
++C
++C     MPBSPM maps each BC species to the LPMPB surrogate group used by
++C     SURFCE: 1=WP, 2=WL, 3=DF/GF/WH/C, 7=LP, 10=PP.
++C
++COMMONS
++C
++      INCLUDE 'PRGPRM.F77'
++C
++      INCLUDE 'MPBCOM.F77'
++C
++COMMONS
++C
++      DATA JOMPB / 7 /
++C
++      DATA IPLTNO/1/,IMPROB/1/,NATR/2/,KEYMPB/2,3,6*0,1/,
++     >     INCRS/10/
++C
++      DATA IDXWP,IDXWL,IDXDF,IDXLP,IDXPP/1,2,3,7,10/
++C
++C     PW LW FD BG HW CW PL SE BL PY EP AT AC OC OH
++      DATA MPBSPM/
++     >     1, 2, 3, 3, 3, 3, 7, 1, 3,10, 3, 3, 3, 3, 3/
++C
++      END

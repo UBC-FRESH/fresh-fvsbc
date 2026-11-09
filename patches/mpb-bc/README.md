@@ -3,6 +3,10 @@
 This patch links the real LPMPB extension into the BC variant instead of
 `fvs/base/exmpb.f`.
 
+The banked CI form is `notes/reference/calibration/d9-mpb-bc.patch.gz`; it is
+applied by `.github/workflows/ci.yml` and `.github/workflows/wheels.yml`. The
+files here are the readable copy.
+
 ## Apply
 
 Use the pinned PyFVS source tree (`e95172b` in the project pins):
