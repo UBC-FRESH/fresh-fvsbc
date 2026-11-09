@@ -107,6 +107,50 @@ const fmt = (value) => {
 const isNumeric = (rows, column) =>
   rows.some((row) => typeof row[column] === "number");
 
+function createImportPreview(id, title, onConfirm, onCancel) {
+  let pending = null;
+  const summary = el("p", { className: "table-filters-status" });
+  const list = el("ul", { className: "table-setup-list" });
+  const node = el(
+    "div",
+    { id, className: "table-setup-preview", hidden: true },
+    el("strong", {}, title),
+    summary,
+    list,
+    el("div", { className: "table-filters-portability" },
+      el("button", {
+        id: `${id}-confirm`,
+        type: "button",
+        onclick: async () => {
+          if (pending) await onConfirm(pending);
+        },
+      }, "Import"),
+      el("button", {
+        id: `${id}-cancel`,
+        type: "button",
+        onclick: () => {
+          pending = null;
+          node.hidden = true;
+          if (onCancel) onCancel();
+        },
+      }, "Cancel"),
+    ),
+  );
+  return {
+    node,
+    show(data, summaryText, lines) {
+      pending = data;
+      summary.textContent = summaryText;
+      list.replaceChildren(...lines.map((line) => el("li", {}, line)));
+      node.hidden = false;
+    },
+    hide() {
+      pending = null;
+      node.hidden = true;
+    },
+  };
+}
+
 function attachSelectSearch(input, select) {
   if (!input || !select) return;
   const options = [...select.options].slice(1).map((option) => ({
@@ -949,7 +993,7 @@ function tableLayoutsExportText() {
   }, null, 2)}\n`;
 }
 
-function importTableLayouts(text) {
+function previewTableLayouts(text) {
   let parsed = null;
   try {
     parsed = JSON.parse(text);
@@ -979,11 +1023,22 @@ function importTableLayouts(text) {
   }
   const count = Object.keys(imported).length;
   if (!count) throw new Error("No table layouts found in that file.");
-  const merged = { ...readLayoutEnvelope().tables, ...imported };
-  if (!writeLayoutEnvelope(merged)) {
+  return {
+    count,
+    tables: imported,
+    merged: { ...readLayoutEnvelope().tables, ...imported },
+  };
+}
+
+function commitTableLayouts(preview) {
+  if (!writeLayoutEnvelope(preview.merged)) {
     throw new Error("Browser storage is unavailable; could not import layouts.");
   }
-  return { count, tables: merged };
+  return preview.count;
+}
+
+function importTableLayouts(text) {
+  return commitTableLayouts(previewTableLayouts(text));
 }
 
 const TABLE_FILTERS_KEY = "fresh-fvsbc.table-filters";
@@ -1207,7 +1262,7 @@ function tableFiltersExportText() {
   }, null, 2)}\n`;
 }
 
-function importTableFilters(text) {
+function previewTableFilters(text) {
   let parsed = null;
   try {
     parsed = JSON.parse(text);
@@ -1220,7 +1275,7 @@ function importTableFilters(text) {
   }
   const filterTables = { ...readFilterEnvelope().tables };
   const recentTables = { ...readRecentEnvelope().tables };
-  let tables = 0;
+  const details = [];
   let filters = 0;
   let recents = 0;
   for (const [table, value] of Object.entries(raw)) {
@@ -1248,16 +1303,39 @@ function importTableFilters(text) {
       ].slice(0, TABLE_RECENTS_LIMIT);
       recents += incomingRecents.length;
     }
-    tables += 1;
+    details.push({
+      name: table,
+      filters: incomingFilters.length,
+      recents: incomingRecents.length,
+    });
   }
-  if (!tables) throw new Error("No table filters found in that file.");
-  if (!writeFilterEnvelope(filterTables)) {
+  if (!details.length) throw new Error("No table filters found in that file.");
+  return {
+    tables: details.length,
+    filters,
+    recents,
+    details,
+    filterTables,
+    recentTables,
+  };
+}
+
+function commitTableFilters(preview) {
+  if (!writeFilterEnvelope(preview.filterTables)) {
     throw new Error("Browser storage is unavailable; could not import filters.");
   }
-  if (!writeRecentEnvelope(recentTables)) {
+  if (!writeRecentEnvelope(preview.recentTables)) {
     throw new Error("Browser storage is unavailable; could not import recent filters.");
   }
-  return { tables, filters, recents };
+  return {
+    tables: preview.tables,
+    filters: preview.filters,
+    recents: preview.recents,
+  };
+}
+
+function importTableFilters(text) {
+  return commitTableFilters(previewTableFilters(text));
 }
 
 function setTableLayoutStatus(text, kind = "") {
@@ -1348,7 +1426,7 @@ function tableExportPresetsExportText() {
   }, null, 2)}\n`;
 }
 
-function importTableExportPresets(text) {
+function previewTableExportPresets(text) {
   let parsed = null;
   try {
     parsed = JSON.parse(text);
@@ -1360,7 +1438,7 @@ function importTableExportPresets(text) {
     throw new Error("Expected a tables object in that preset file.");
   }
   const merged = { ...readExportPresetEnvelope().tables };
-  let tables = 0;
+  const details = [];
   let presets = 0;
   for (const [table, value] of Object.entries(raw)) {
     if (!table || table.length > 100) continue;
@@ -1373,14 +1451,22 @@ function importTableExportPresets(text) {
       ...incoming,
       ...existing.filter((preset) => !names.has(preset.name)),
     ].slice(0, 20);
-    tables += 1;
+    details.push({ name: table, presets: incoming.length });
     presets += incoming.length;
   }
-  if (!tables) throw new Error("No export presets found in that file.");
-  if (!writeExportPresetEnvelope(merged)) {
+  if (!details.length) throw new Error("No export presets found in that file.");
+  return { tables: details.length, presets, details, merged };
+}
+
+function commitTableExportPresets(preview) {
+  if (!writeExportPresetEnvelope(preview.merged)) {
     throw new Error("Browser storage is unavailable; could not import presets.");
   }
-  return { tables, presets };
+  return { tables: preview.tables, presets: preview.presets };
+}
+
+function importTableExportPresets(text) {
+  return commitTableExportPresets(previewTableExportPresets(text));
 }
 
 function writeTableExportPresets(table, presets) {
@@ -1952,6 +2038,25 @@ async function renderTables(body) {
   ) || Object.values(recentEnvelope.tables).some(
     (items) => Array.isArray(items) && items.length,
   );
+  const filterPreview = createImportPreview(
+    "table-filter-preview",
+    "Review filter import",
+    async (preview) => {
+      try {
+        const result = commitTableFilters(preview);
+        filterPreview.hide();
+        state.tableSavedFilter = "";
+        state.tableFiltersOpen = true;
+        await renderPanel();
+        setTableFilterStatus(
+          `Imported filters for ${result.tables} table${result.tables === 1 ? "" : "s"}.`,
+        );
+      } catch (error) {
+        setTableFilterStatus(error?.message ?? "That filter file could not be imported.", "error");
+      }
+    },
+    () => setTableFilterStatus("Filter import cancelled."),
+  );
   const filterFile = el("input", {
     id: "table-filter-import",
     type: "file",
@@ -1968,14 +2073,20 @@ async function renderTables(body) {
       return;
     }
     try {
-      const result = importTableFilters(await file.text());
-      state.tableSavedFilter = "";
-      state.tableFiltersOpen = true;
-      await renderPanel();
-      setTableFilterStatus(
-        `Imported filters for ${result.tables} table${result.tables === 1 ? "" : "s"}.`,
+      const preview = previewTableFilters(await file.text());
+      filterPreview.show(
+        preview,
+        `${preview.tables} table${preview.tables === 1 ? "" : "s"} · `
+          + `${preview.filters} filter${preview.filters === 1 ? "" : "s"} · `
+          + `${preview.recents} recent`,
+        preview.details.map((table) =>
+          `${table.name} — ${table.filters} filter${table.filters === 1 ? "" : "s"}, `
+            + `${table.recents} recent`,
+        ),
       );
+      setTableFilterStatus("Review the filter import, then import or cancel.");
     } catch (error) {
+      filterPreview.hide();
       setTableFilterStatus(error?.message ?? "That filter file could not be imported.", "error");
     } finally {
       event.target.value = "";
@@ -2205,6 +2316,7 @@ async function renderTables(body) {
           },
         }, "Save current"),
       ),
+      filterPreview.node,
       el("p", {
         id: "table-filter-status",
         className: `table-filters-status${filtersStorageOk ? "" : " error"}`,
@@ -2254,6 +2366,26 @@ async function renderTables(body) {
   const hasPortablePresets = Object.values(presetEnvelope.tables).some(
     (items) => Array.isArray(items) && items.length,
   );
+  const presetPreview = createImportPreview(
+    "table-export-preset-preview",
+    "Review preset import",
+    async (preview) => {
+      try {
+        const result = commitTableExportPresets(preview);
+        presetPreview.hide();
+        state.tableExportPreset = "";
+        state.tableExportPresetsOpen = true;
+        await renderPanel();
+        setExportPresetStatus(
+          `Imported ${result.presets} preset${result.presets === 1 ? "" : "s"} for `
+            + `${result.tables} table${result.tables === 1 ? "" : "s"}.`,
+        );
+      } catch (error) {
+        setExportPresetStatus(error?.message ?? "That preset file could not be imported.", "error");
+      }
+    },
+    () => setExportPresetStatus("Preset import cancelled."),
+  );
   const presetImportFile = el("input", {
     id: "table-export-preset-import",
     type: "file",
@@ -2270,15 +2402,18 @@ async function renderTables(body) {
       return;
     }
     try {
-      const result = importTableExportPresets(await file.text());
-      state.tableExportPreset = "";
-      state.tableExportPresetsOpen = true;
-      await renderPanel();
-      setExportPresetStatus(
-        `Imported ${result.presets} preset${result.presets === 1 ? "" : "s"} for `
-          + `${result.tables} table${result.tables === 1 ? "" : "s"}.`,
+      const preview = previewTableExportPresets(await file.text());
+      presetPreview.show(
+        preview,
+        `${preview.tables} table${preview.tables === 1 ? "" : "s"} · `
+          + `${preview.presets} preset${preview.presets === 1 ? "" : "s"}`,
+        preview.details.map((table) =>
+          `${table.name} — ${table.presets} preset${table.presets === 1 ? "" : "s"}`,
+        ),
       );
+      setExportPresetStatus("Review the preset import, then import or cancel.");
     } catch (error) {
+      presetPreview.hide();
       setExportPresetStatus(error?.message ?? "That preset file could not be imported.", "error");
     } finally {
       event.target.value = "";
@@ -2486,6 +2621,7 @@ async function renderTables(body) {
       }, storedPresets.ok
         ? "Presets store this filter, column order, hidden set, and visible-column export."
         : "Browser storage is unavailable; presets will not persist."),
+      presetPreview.node,
       el("p", {
         id: "table-export-preset-status",
         className: "table-filters-status",
@@ -2534,6 +2670,25 @@ async function renderTables(body) {
   });
   body.append(presetsDetails);
   const savedLayoutCount = Object.keys(readLayoutEnvelope().tables).length;
+  const layoutPreview = createImportPreview(
+    "table-layout-preview",
+    "Review layout import",
+    async (preview) => {
+      try {
+        const count = commitTableLayouts(preview);
+        layoutPreview.hide();
+        state.tableLayoutTable = null;
+        state.tableColumnsOpen = true;
+        state.tableLayoutWarning = false;
+        state.tableLayoutMessage = `Imported ${count} table layout`
+          + `${count === 1 ? "" : "s"}.`;
+        await renderPanel();
+      } catch (error) {
+        setTableLayoutStatus(error?.message ?? "That layout file could not be imported.", "error");
+      }
+    },
+    () => setTableLayoutStatus("Layout import cancelled."),
+  );
   const layoutFile = el("input", {
     id: "table-layout-import",
     type: "file",
@@ -2550,14 +2705,18 @@ async function renderTables(body) {
       return;
     }
     try {
-      const result = importTableLayouts(await file.text());
-      state.tableLayoutTable = null;
-      state.tableColumnsOpen = true;
-      state.tableLayoutWarning = false;
-      state.tableLayoutMessage = `Imported ${result.count} table layout`
-        + `${result.count === 1 ? "" : "s"}.`;
-      await renderPanel();
+      const preview = previewTableLayouts(await file.text());
+      layoutPreview.show(
+        preview,
+        `${preview.count} table layout${preview.count === 1 ? "" : "s"}`,
+        Object.entries(preview.tables).map(([table, layout]) => {
+          const hidden = layout.hidden.length ? `, ${layout.hidden.length} hidden` : "";
+          return `${table} — ${layout.order.length} columns${hidden}`;
+        }),
+      );
+      setTableLayoutStatus("Review the layout import, then import or cancel.");
     } catch (error) {
+      layoutPreview.hide();
       setTableLayoutStatus(error?.message ?? "That layout file could not be imported.", "error");
     } finally {
       event.target.value = "";
@@ -2723,6 +2882,7 @@ async function renderTables(body) {
         }, "Import layouts"),
         layoutFile,
       ),
+      layoutPreview.node,
       el("p", {
         id: "table-layout-status",
         className: "table-columns-status",

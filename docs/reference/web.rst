@@ -172,22 +172,22 @@ still contain the full table. Order and visibility are saved per table in ``loca
 restored on reload; **Show all columns** only unhides, while **Reset layout** clears both the saved
 order and the hidden set. An **Exports follow this layout** checkbox makes CSV and package exports
 use the visible columns in their current order; it is saved with the layout. **Export layouts**
-downloads every saved table layout as versioned JSON, and **Import layouts** validates and merges a
-layout file by table; the current table reloads immediately after import.
+downloads every saved table layout as versioned JSON, and **Import layouts** validates and previews
+a layout file before merging by table; the current table reloads after confirmation.
 
 A separate **Saved filters** disclosure stores the current literal query and column scope under a
 name, per table, in ``localStorage``; its search field filters the named list. Loading one restores
 both and unhides its column if the saved layout had hidden it. Applying a filter also records it in a per-table **Recent** list (up to eight
 distinct query/column pairs), which can be reapplied from the same panel. A recent entry can be
 pinned as a named filter or removed from history without changing the active filter. **Export filters**
-downloads named and recent history for every table as versioned JSON; **Import filters** validates
-and merges it by table, name, and query/column pair. Filters remain in the URL after loading; the
+downloads named and recent history for every table as versioned JSON; **Import filters** validates,
+previews, and then merges it by table, name, and query/column pair. Filters remain in the URL after loading; the
 named and recent lists are browser-local.
 
 **Export presets** bundle the current filter, column order, hidden columns, and visible-column
 export option under a name. Loading one restores all of those together, reloads the table, and
 leaves the existing CSV and package links ready. **Export presets** downloads all presets as
-versioned JSON; **Import presets** validates and merges by table and preset name. **Duplicate** copies
+versioned JSON; **Import presets** validates, previews, and merges by table and preset name. **Duplicate** copies
 a preset under a unique “copy” name. Presets are per table and browser-local. Its search field
 filters the preset list.
 

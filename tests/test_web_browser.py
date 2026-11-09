@@ -362,6 +362,9 @@ def test_table_layouts_can_be_exported_and_imported(cockpit: str, tmp_path: Path
             expect(page.locator("#table-export-visible")).not_to_be_checked()
 
             page.locator("#table-layout-import").set_input_files(str(exported))
+            expect(page.locator("#table-layout-preview")).to_be_visible()
+            expect(page.locator("#table-layout-preview")).to_contain_text("1 table layout")
+            page.locator("#table-layout-preview-confirm").click()
             expect(page.locator("#table-columns summary")).to_contain_text("8 of 9 shown")
             expect(page.locator("#table-export-visible")).to_be_checked()
             expect(page.locator("#table-layout-status")).to_contain_text("Imported 1 table layout")
@@ -543,6 +546,8 @@ def test_export_presets_can_be_exported_and_imported(cockpit: str, tmp_path: Pat
                 "Export presets · 0"
             )
             page.locator("#table-export-preset-import").set_input_files(str(exported))
+            expect(page.locator("#table-export-preset-preview")).to_be_visible()
+            page.locator("#table-export-preset-preview-confirm").click()
             expect(page.locator("#table-export-presets summary")).to_contain_text(
                 "Export presets · 1"
             )
@@ -701,6 +706,8 @@ def test_table_filters_can_be_exported_and_imported(cockpit: str, tmp_path: Path
             expect(page.locator("#table-filter-recent")).to_contain_text("No recent filters")
 
             page.locator("#table-filter-import").set_input_files(str(exported))
+            expect(page.locator("#table-filter-preview")).to_be_visible()
+            page.locator("#table-filter-preview-confirm").click()
             expect(page.locator("#table-filters summary")).to_contain_text("Saved filters · 1")
             expect(page.locator("#table-filter-recent")).to_contain_text("Tph = 210")
             expect(page.locator("#table-filter-status")).to_contain_text(
