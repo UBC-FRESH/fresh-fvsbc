@@ -4261,6 +4261,7 @@ function saveAssistantHistory() {
   try {
     window.sessionStorage.setItem("fresh-fvsbc.assistant", JSON.stringify({
       session: state.assistant.session,
+      savedChat: state.assistant.savedChat,
       history: state.assistant.history,
     }));
   } catch (_error) {
@@ -4388,6 +4389,33 @@ function updateAssistantSavedContext(chat) {
   node.textContent = parts.join(" · ");
 }
 
+function updateAssistantName(chats = readSavedChats()) {
+  const nameNode = document.getElementById("assistant-current-name");
+  const renameButton = document.getElementById("assistant-rename-open");
+  const form = document.getElementById("assistant-rename-form");
+  const chat = chats.find((entry) => entry.id === state.assistant.savedChat) ?? null;
+  if (nameNode) nameNode.textContent = chat ? chat.name : "Unsaved chat";
+  if (renameButton) renameButton.disabled = !chat;
+  if (!chat && form) form.hidden = true;
+}
+
+function openAssistantRename() {
+  const chat = readSavedChats().find((entry) => entry.id === state.assistant.savedChat);
+  if (!chat) {
+    assistantStatus("Save or load a saved chat before renaming.");
+    document.getElementById("assistant-saved").open = true;
+    return;
+  }
+  const form = document.getElementById("assistant-rename-form");
+  const input = document.getElementById("assistant-rename-input");
+  if (form) form.hidden = false;
+  if (input) {
+    input.value = chat.name;
+    input.focus();
+    input.select();
+  }
+}
+
 function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
   const select = document.getElementById("assistant-saved-select");
   if (!select) return;
@@ -4404,6 +4432,7 @@ function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
   select.value = selected;
   state.assistant.savedChat = selected;
   updateAssistantSavedContext(chats.find((chat) => chat.id === selected) ?? null);
+  updateAssistantName(chats);
   const load = document.getElementById("assistant-saved-load");
   const remove = document.getElementById("assistant-saved-delete");
   const rename = document.getElementById("assistant-rename");
@@ -4460,6 +4489,7 @@ function pinAssistantChat() {
   }
   if (input) input.value = "";
   refreshAssistantSaved(entry.id);
+  saveAssistantHistory();
   assistantSavedStatus(`Pinned “${entry.name}”.`);
 }
 
@@ -4471,37 +4501,52 @@ function savedChatsExportText() {
   }, null, 2)}\n`;
 }
 
-function renameAssistantChat() {
-  const select = document.getElementById("assistant-saved-select");
-  const id = select?.value || state.assistant.savedChat;
+function renameAssistantChat(name) {
   const chats = readSavedChats();
-  const chat = chats.find((entry) => entry.id === id);
-  if (!chat) {
-    assistantSavedStatus("Choose a saved chat to rename.", "error");
-    return;
+  const chat = chats.find((entry) => entry.id === state.assistant.savedChat);
+  if (!chat) return { error: "Choose a saved chat to rename." };
+  const clean = String(name || "").trim().slice(0, 80);
+  if (!clean) return { error: "Enter the new name first." };
+  if (clean === chat.name) return { error: "That is already the chat name." };
+  if (chats.some((entry) => entry.id !== chat.id && entry.name === clean)) {
+    return { error: "Another saved chat already uses that name." };
   }
-  const input = document.getElementById("assistant-pin-name");
-  const name = String(input?.value || "").trim().slice(0, 80);
-  if (!name) {
-    assistantSavedStatus("Enter the new name first.", "error");
-    return;
-  }
-  if (name === chat.name) {
-    assistantSavedStatus("That is already the chat name.", "error");
-    return;
-  }
-  if (chats.some((entry) => entry.id !== chat.id && entry.name === name)) {
-    assistantSavedStatus("Another saved chat already uses that name.", "error");
-    return;
-  }
-  const next = chats.map((entry) => (entry.id === chat.id ? { ...entry, name } : entry));
+  const next = chats.map((entry) => (entry.id === chat.id ? { ...entry, name: clean } : entry));
   if (!writeSavedChats(next)) {
-    assistantSavedStatus("Browser storage is unavailable; could not rename this chat.", "error");
+    return { error: "Browser storage is unavailable; could not rename this chat." };
+  }
+  refreshAssistantSaved(chat.id);
+  saveAssistantHistory();
+  return { name: clean };
+}
+
+function renameAssistantChatFromPanel() {
+  const input = document.getElementById("assistant-pin-name");
+  const result = renameAssistantChat(input?.value);
+  if (result.error) {
+    assistantSavedStatus(result.error, "error");
     return;
   }
   if (input) input.value = "";
-  refreshAssistantSaved(chat.id);
-  assistantSavedStatus(`Renamed to “${name}”.`);
+  assistantSavedStatus(`Renamed to “${result.name}”.`);
+}
+
+function submitAssistantRename(event) {
+  event.preventDefault();
+  const input = document.getElementById("assistant-rename-input");
+  const result = renameAssistantChat(input?.value);
+  if (result.error) {
+    assistantStatus(result.error);
+    return;
+  }
+  const form = document.getElementById("assistant-rename-form");
+  if (form) form.hidden = true;
+  assistantStatus(`Renamed chat to “${result.name}”.`);
+}
+
+function closeAssistantRename() {
+  const form = document.getElementById("assistant-rename-form");
+  if (form) form.hidden = true;
 }
 
 function exportSavedChats() {
@@ -4587,6 +4632,7 @@ function restoreAssistantHistory() {
   }
   if (!stored || !Array.isArray(stored.history) || !stored.history.length) return;
   state.assistant.session = typeof stored.session === "string" ? stored.session : null;
+  state.assistant.savedChat = typeof stored.savedChat === "string" ? stored.savedChat : "";
   state.assistant.history = stored.history.slice(-40);
   renderAssistantHistory();
   assistantStatus("Conversation restored · Enter sends · Shift+Enter adds a newline.");
@@ -4804,6 +4850,7 @@ function configureAssistant(info) {
 
 function newAssistantChat() {
   state.assistant.session = null;
+  state.assistant.savedChat = "";
   state.assistant.history = [];
   try {
     window.sessionStorage.removeItem("fresh-fvsbc.assistant");
@@ -4819,6 +4866,7 @@ function newAssistantChat() {
         : "New conversation. This mode answers from the open run's summary and provenance.",
     ),
   );
+  refreshAssistantSaved();
   assistantStatus(state.assistant.mode === "agent"
     ? "Enter sends · Shift+Enter adds a newline."
     : "Local summary mode.");
@@ -4955,7 +5003,16 @@ async function boot() {
   document.getElementById("assistant-pin").addEventListener("click", pinAssistantChat);
   document.getElementById("assistant-saved-load").addEventListener("click", loadAssistantChat);
   document.getElementById("assistant-saved-delete").addEventListener("click", deleteAssistantChat);
-  document.getElementById("assistant-rename").addEventListener("click", renameAssistantChat);
+  document.getElementById("assistant-rename").addEventListener("click", renameAssistantChatFromPanel);
+  document.getElementById("assistant-rename-open").addEventListener("click", openAssistantRename);
+  document.getElementById("assistant-rename-form").addEventListener("submit", submitAssistantRename);
+  document.getElementById("assistant-rename-cancel").addEventListener("click", closeAssistantRename);
+  document.getElementById("assistant-rename-input").addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeAssistantRename();
+    }
+  });
   document.getElementById("assistant-saved-export").addEventListener("click", exportSavedChats);
   const savedSelect = document.getElementById("assistant-saved-select");
   savedSelect.addEventListener("change", (event) => {

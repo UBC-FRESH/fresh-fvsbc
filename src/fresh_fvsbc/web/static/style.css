@@ -1241,3 +1241,30 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
+
+.assistant-name-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.assistant-current-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.assistant-name-bar button { font-size: 11px; padding: 3px 8px; }
+.assistant-rename-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.assistant-rename-form input { flex: 1 1 auto; min-width: 0; }
+.assistant-rename-form button { font-size: 11px; padding: 4px 8px; }

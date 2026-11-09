@@ -1500,6 +1500,7 @@ def test_an_assistant_chat_can_be_pinned_loaded_and_deleted(cockpit: str) -> Non
 
             page.get_by_role("button", name="New", exact=True).click()
             expect(page.locator("#assistant-log")).not_to_contain_text("Transcript smoke")
+            page.locator("#assistant-saved-select").select_option(label="Pinned smoke")
             page.get_by_role("button", name="Load", exact=True).click()
             expect(page.locator("#assistant-log")).to_contain_text("Transcript smoke")
             expect(page.locator("#assistant-saved-status")).to_contain_text("Loaded")
@@ -1531,6 +1532,43 @@ def test_an_assistant_chat_can_be_pinned_loaded_and_deleted(cockpit: str) -> Non
             browser.close()
 
 
+def test_a_saved_chat_can_be_renamed_from_the_header(cockpit: str) -> None:
+    """The drawer header renames the active saved chat and shows its name."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-input").fill("Header rename smoke")
+            page.locator("#assistant-input").press("Enter")
+            expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+            page.locator("#assistant-saved summary").click()
+            page.locator("#assistant-pin-name").fill("Header old")
+            page.get_by_role("button", name="Pin current").click()
+            expect(page.locator("#assistant-current-name")).to_have_text("Header old")
+
+            page.locator("#assistant-rename-open").click()
+            expect(page.locator("#assistant-rename-form")).to_be_visible()
+            expect(page.locator("#assistant-rename-input")).to_have_value("Header old")
+            page.locator("#assistant-rename-input").fill("Header new")
+            page.get_by_role("button", name="Save name").click()
+            expect(page.locator("#assistant-current-name")).to_have_text("Header new")
+            expect(page.locator("#assistant-saved-select")).to_contain_text("Header new")
+            expect(page.locator("#assistant-rename-form")).to_be_hidden()
+
+            page.reload(wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            expect(page.locator("#assistant-current-name")).to_have_text("Header new")
+            expect(page.locator("#assistant-rename-open")).to_be_enabled()
+            page.get_by_role("button", name="New", exact=True).click()
+            expect(page.locator("#assistant-current-name")).to_have_text("Unsaved chat")
+            expect(page.locator("#assistant-rename-open")).to_be_disabled()
+        finally:
+            browser.close()
+
+
 def test_a_saved_chat_can_be_renamed_and_exported(cockpit: str, tmp_path: Path) -> None:
     """Renaming keeps the transcript, and the JSON export carries it."""
     expect = playwright_module.expect
@@ -1552,7 +1590,7 @@ def test_a_saved_chat_can_be_renamed_and_exported(cockpit: str, tmp_path: Path) 
             )
 
             page.locator("#assistant-pin-name").fill("Renamed chat")
-            page.get_by_role("button", name="Rename", exact=True).click()
+            page.locator("#assistant-rename").click()
             expect(page.locator("#assistant-saved-status")).to_contain_text("Renamed to")
             saved = page.locator("#assistant-saved-select")
             expect(saved).to_contain_text("Renamed chat")
@@ -1574,7 +1612,7 @@ def test_a_saved_chat_can_be_renamed_and_exported(cockpit: str, tmp_path: Path) 
             page.locator("#assistant-pin-name").fill("Original chat")
             page.get_by_role("button", name="Pin current").click()
             page.locator("#assistant-pin-name").fill("Renamed chat")
-            page.get_by_role("button", name="Rename", exact=True).click()
+            page.locator("#assistant-rename").click()
             expect(page.locator("#assistant-saved-status")).to_contain_text("already uses")
 
             page.reload(wait_until="networkidle")
