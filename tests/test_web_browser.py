@@ -576,6 +576,54 @@ def test_the_table_key_column_stays_pinned_when_scrolling_sideways(cockpit: str)
             browser.close()
 
 
+def test_compare_key_columns_can_be_changed_and_shared(cockpit: str) -> None:
+    """Rows can be matched on a chosen subset of identity columns."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=BA&ctable=FVS_TreeList_Metric",
+                wait_until="networkidle",
+            )
+            keys = page.locator("#compare-keys")
+            expect(keys.locator("summary")).to_contain_text(
+                "Key columns · Year, PtIndex, TreeIndex"
+            )
+            keys.locator("summary").click()
+            page.locator("#compare-keys input[value='PtIndex']").uncheck()
+            expect(page.locator("#compare-keys summary")).to_contain_text(
+                "Key columns · Year, TreeIndex"
+            )
+            params = page.evaluate(
+                "Object.fromEntries(new URLSearchParams(window.location.search))"
+            )
+            assert params["ckey"] == "Year,TreeIndex"
+            expect(
+                page.locator("#panel-body .scroll")
+                .last.locator("th.num")
+                .filter(has_text=re.compile(r"^PtIndex$"))
+            ).to_have_count(1)
+
+            page.reload(wait_until="networkidle")
+            expect(page.locator("#compare-keys summary")).to_contain_text(
+                "Key columns · Year, TreeIndex"
+            )
+            page.locator("#compare-keys summary").click()
+            page.get_by_role("button", name="Use default keys").click()
+            expect(page.locator("#compare-keys summary")).to_contain_text(
+                "Key columns · Year, PtIndex, TreeIndex"
+            )
+            params = page.evaluate(
+                "Object.fromEntries(new URLSearchParams(window.location.search))"
+            )
+            assert "ckey" not in params
+        finally:
+            browser.close()
+
+
 def test_compare_diff_columns_can_be_filtered_and_shared(cockpit: str) -> None:
     """The row-level diff can use a subset of numeric columns and restore it from the URL."""
     expect = playwright_module.expect
@@ -688,7 +736,7 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             page.goto(
                 f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
                 f"&a={RUN_ID}&b={RUN_ID}-b&metric=Tph&ctable=FVS_Summary_Metric"
-                "&ccolumns=BA,CCF",
+                "&ccolumns=BA,CCF&ckey=Year",
                 wait_until="networkidle",
             )
             page.locator("#compare-save-name").fill("Export smoke")
@@ -704,6 +752,7 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             assert payload["comparisons"][0]["b"] == f"{RUN_ID}-b"
             assert payload["comparisons"][0]["metric"] == "Tph"
             assert payload["comparisons"][0]["ccolumns"] == ["BA", "CCF"]
+            assert payload["comparisons"][0]["ckey"] == ["Year"]
 
             imported = tmp_path / "imported.json"
             imported.write_text(
@@ -718,6 +767,7 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
                                 "metric": "BA",
                                 "ctable": "FVS_Summary_Metric",
                                 "ccolumns": ["Tph"],
+                                "ckey": ["Year"],
                             }
                         ],
                     }
@@ -735,6 +785,7 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             )
             assert params["metric"] == "BA"
             assert params["ccolumns"] == "Tph"
+            assert params["ckey"] == "Year"
 
             malformed = tmp_path / "malformed.json"
             malformed.write_text("{}", encoding="utf-8")
