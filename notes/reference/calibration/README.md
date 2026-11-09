@@ -342,6 +342,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-prince-george-candidate.md` | The D9.88 Prince George candidate |
 | `prince-george-candidate/metrics.csv` | The frozen Prince George aggregate metrics |
 | `prince-george-candidate/model-card.json` | Frozen Prince George coefficients and pins |
+| `d9-cranbrook-candidate.md` | The D9.89 Cranbrook candidate |
+| `cranbrook-candidate/metrics.csv` | The frozen Cranbrook aggregate metrics |
+| `cranbrook-candidate/model-card.json` | Frozen Cranbrook coefficients and pins |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |
