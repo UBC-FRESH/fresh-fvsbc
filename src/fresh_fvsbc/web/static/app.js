@@ -996,6 +996,70 @@ function setTableFilterStatus(text, kind = "") {
   node.className = `table-filters-status ${kind}`.trim();
 }
 
+const TABLE_RECENTS_KEY = "fresh-fvsbc.table-filter-recents";
+const TABLE_RECENTS_LIMIT = 8;
+
+function readTableRecents(table) {
+  let raw = null;
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TABLE_RECENTS_KEY) || "null");
+    raw = stored?.tables?.[table] ?? null;
+  } catch (_error) {
+    return { recents: [], ok: false };
+  }
+  if (!Array.isArray(raw)) return { recents: [], ok: true };
+  const recents = [];
+  for (const candidate of raw) {
+    if (!candidate || typeof candidate !== "object") continue;
+    const query = typeof candidate.query === "string" ? candidate.query.slice(0, 200) : "";
+    const column = typeof candidate.column === "string" ? candidate.column.slice(0, 100) : "";
+    if (!query && !column) continue;
+    if (recents.some((entry) => entry.query === query && entry.column === column)) continue;
+    recents.push({
+      query,
+      column,
+      used_at: typeof candidate.used_at === "string" ? candidate.used_at : "",
+    });
+    if (recents.length === TABLE_RECENTS_LIMIT) break;
+  }
+  return { recents, ok: true };
+}
+
+function writeTableRecents(table, recents) {
+  try {
+    let stored = null;
+    try {
+      stored = JSON.parse(window.localStorage.getItem(TABLE_RECENTS_KEY) || "null");
+    } catch (_error) {
+      stored = null;
+    }
+    const tables = stored?.tables && typeof stored.tables === "object" ? stored.tables : {};
+    tables[table] = recents.slice(0, TABLE_RECENTS_LIMIT);
+    window.localStorage.setItem(TABLE_RECENTS_KEY, JSON.stringify({ version: 1, tables }));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function recordTableRecent(table, query, column) {
+  const q = String(query || "").trim();
+  const c = String(column || "").trim();
+  if (!q && !c) return false;
+  const { recents } = readTableRecents(table);
+  const next = [
+    { query: q, column: c, used_at: new Date().toISOString() },
+    ...recents.filter((entry) => entry.query !== q || entry.column !== c),
+  ].slice(0, TABLE_RECENTS_LIMIT);
+  return writeTableRecents(table, next);
+}
+
+function recentFilterLabel(entry) {
+  if (entry.query && entry.column) return `${entry.column} = ${entry.query}`;
+  if (entry.query) return `Search: ${entry.query}`;
+  return `Column: ${entry.column}`;
+}
+
 function setTableLayoutStatus(text, kind = "") {
   const node = document.getElementById("table-layout-status");
   if (!node) return;
@@ -1160,6 +1224,7 @@ async function renderTables(body) {
       state.tableQuery = filterInput.value.trim();
       state.tableSavedFilter = "";
       state.tableOffset = 0;
+      recordTableRecent(state.table, state.tableQuery, state.tableColumn);
       updateUrl();
       renderPanel();
     },
@@ -1232,20 +1297,61 @@ async function renderTables(body) {
     placeholder: "Name this filter…",
     "aria-label": "Saved filter name",
   });
+  const storedRecents = readTableRecents(state.table);
+  const recents = storedRecents.recents;
+  const filtersStorageOk = storedFilters.ok && storedRecents.ok;
+  const recentSelect = el("select", {
+    id: "table-filter-recent",
+    "aria-label": "Recent table filters",
+    onchange: (event) => {
+      document.getElementById("table-filter-recent-load").disabled = !event.target.value;
+    },
+  },
+    el("option", { value: "" },
+      recents.length ? "Choose a recent filter…" : "No recent filters",
+    ),
+    ...recents.map((entry, index) => {
+      const option = el("option", { value: String(index) }, recentFilterLabel(entry));
+      if (entry.used_at) option.title = new Date(entry.used_at).toLocaleString();
+      return option;
+    }),
+  );
+  const applyFilterValues = (query, column) => {
+    state.tableQuery = query;
+    state.tableColumn = payload.columns.includes(column) ? column : "";
+    if (state.tableColumn && state.tableHidden.includes(state.tableColumn)) {
+      state.tableHidden = state.tableHidden.filter((name) => name !== state.tableColumn);
+      persistTableLayout();
+    }
+    state.tableOffset = 0;
+  };
+  const loadRecentFilter = async () => {
+    if (!recentSelect.value) {
+      setTableFilterStatus("Choose a recent filter first.", "error");
+      return;
+    }
+    const entry = recents[Number(recentSelect.value)];
+    if (!entry) {
+      setTableFilterStatus("Choose a recent filter first.", "error");
+      return;
+    }
+    applyFilterValues(entry.query, entry.column);
+    state.tableSavedFilter = "";
+    recordTableRecent(state.table, entry.query, entry.column);
+    state.tableFiltersOpen = true;
+    updateUrl();
+    await renderPanel();
+    setTableFilterStatus(`Loaded recent ${recentFilterLabel(entry)}.`);
+  };
   const loadSavedFilter = async () => {
     const filter = savedFilters.find((entry) => entry.id === filterSelect.value);
     if (!filter) {
       setTableFilterStatus("Choose a saved filter first.", "error");
       return;
     }
-    state.tableQuery = filter.query;
-    state.tableColumn = payload.columns.includes(filter.column) ? filter.column : "";
-    if (state.tableColumn && state.tableHidden.includes(state.tableColumn)) {
-      state.tableHidden = state.tableHidden.filter((column) => column !== state.tableColumn);
-      persistTableLayout();
-    }
+    applyFilterValues(filter.query, filter.column);
+    recordTableRecent(state.table, filter.query, filter.column);
     state.tableSavedFilter = filter.id;
-    state.tableOffset = 0;
     state.tableFiltersOpen = true;
     updateUrl();
     await renderPanel();
@@ -1290,6 +1396,16 @@ async function renderTables(body) {
           disabled: !state.tableSavedFilter,
           onclick: deleteSavedFilter,
         }, "Delete"),
+      ),
+      el("div", { className: "table-filters-row" },
+        el("span", { className: "table-filters-label" }, "Recent"),
+        recentSelect,
+        el("button", {
+          id: "table-filter-recent-load",
+          type: "button",
+          disabled: true,
+          onclick: loadRecentFilter,
+        }, "Load recent"),
       ),
       el("div", { className: "table-filters-row" },
         filterName,
@@ -1342,10 +1458,10 @@ async function renderTables(body) {
       ),
       el("p", {
         id: "table-filter-status",
-        className: `table-filters-status${storedFilters.ok ? "" : " error"}`,
+        className: `table-filters-status${filtersStorageOk ? "" : " error"}`,
         "aria-live": "polite",
-      }, storedFilters.ok
-        ? "Saved filters stay in this browser."
+      }, filtersStorageOk
+        ? "Saved filters and recent history stay in this browser."
         : "Browser storage is unavailable; saved filters will not persist."),
     ),
   );

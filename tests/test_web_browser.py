@@ -426,6 +426,50 @@ def test_table_exports_can_follow_the_visible_layout(cockpit: str, tmp_path: Pat
             browser.close()
 
 
+def test_recent_table_filters_are_recorded_and_reloaded(cockpit: str) -> None:
+    """Applying filters records a per-table recent history that can be reapplied."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-column").select_option("Year")
+            page.locator("#table-filter").fill("10")
+            page.get_by_role("button", name="Apply").click()
+            expect(page.locator("#table-filter")).to_have_value("10")
+
+            page.locator("#table-column").select_option("Tph")
+            page.locator("#table-filter").fill("210")
+            page.get_by_role("button", name="Apply").click()
+            expect(page.locator("#table-column")).to_have_value("Tph")
+
+            page.locator("#table-filters summary").click()
+            recent = page.locator("#table-filter-recent")
+            expect(recent).to_contain_text("Tph = 210")
+            expect(recent).to_contain_text("Year = 10")
+            recent.select_option(label="Year = 10")
+            page.get_by_role("button", name="Load recent").click()
+            expect(page.locator("#table-filter")).to_have_value("10")
+            expect(page.locator("#table-column")).to_have_value("Year")
+            expect(page.locator("#table-filter-status")).to_contain_text("Loaded recent")
+            params = page.evaluate(
+                "Object.fromEntries(new URLSearchParams(window.location.search))"
+            )
+            assert params["q"] == "10"
+            assert params["column"] == "Year"
+
+            page.reload(wait_until="networkidle")
+            page.locator("#table-filters summary").click()
+            expect(page.locator("#table-filter-recent")).to_contain_text("Year = 10")
+            expect(page.locator("#table-filter-recent")).to_contain_text("Tph = 210")
+        finally:
+            browser.close()
+
+
 def test_table_filters_can_be_saved_loaded_and_deleted(cockpit: str) -> None:
     """A named filter restores its query, column, and a hidden filter column."""
     expect = playwright_module.expect
