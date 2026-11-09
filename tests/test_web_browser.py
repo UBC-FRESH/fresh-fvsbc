@@ -428,6 +428,60 @@ def test_the_table_key_column_stays_pinned_when_scrolling_sideways(cockpit: str)
             browser.close()
 
 
+def test_compare_diff_columns_can_be_filtered_and_shared(cockpit: str) -> None:
+    """The row-level diff can use a subset of numeric columns and restore it from the URL."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=BA&ctable=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            columns = page.locator("#compare-columns")
+            expect(columns.locator("summary")).to_contain_text("8 of 8 selected")
+            columns.locator("summary").click()
+            tph = columns.locator('input[value="Tph"]')
+            expect(tph).to_be_checked()
+            tph.uncheck()
+            expect(columns.locator("summary")).to_contain_text("7 of 8 selected")
+            expect(
+                page.locator("#panel-body .scroll")
+                .last.locator("th.num")
+                .filter(has_text=re.compile(r"^Tph$"))
+            ).to_have_count(0)
+            params = page.evaluate(
+                "Object.fromEntries(new URLSearchParams(window.location.search))"
+            )
+            assert "Tph" not in params["ccolumns"].split(",")
+            assert "BA" in params["ccolumns"].split(",")
+
+            page.reload(wait_until="networkidle")
+            expect(page.locator("#compare-columns summary")).to_contain_text("7 of 8 selected")
+            page.locator("#compare-columns summary").click()
+            expect(page.locator("#compare-columns input[value='Tph']")).not_to_be_checked()
+            page.get_by_role("button", name="Show all diff columns").click()
+            expect(page.locator("#compare-columns summary")).to_contain_text("8 of 8 selected")
+            params = page.evaluate(
+                "Object.fromEntries(new URLSearchParams(window.location.search))"
+            )
+            assert "ccolumns" not in params
+
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=BA&ctable=FVS_Summary_Metric"
+                "&ccolumns=BA,CCF",
+                wait_until="networkidle",
+            )
+            expect(page.locator("#compare-columns summary")).to_contain_text("2 of 8 selected")
+            nums = page.locator("#panel-body .scroll").last.locator("th.num")
+            assert nums.all_inner_texts() == ["BA", "CCF"]
+        finally:
+            browser.close()
+
+
 def test_a_large_table_can_page_and_change_its_page_size(cockpit: str) -> None:
     """The table pager exposes page size, page number, and the filtered row range."""
     expect = playwright_module.expect
@@ -485,7 +539,8 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
         try:
             page.goto(
                 f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
-                f"&a={RUN_ID}&b={RUN_ID}-b&metric=Tph",
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=Tph&ctable=FVS_Summary_Metric"
+                "&ccolumns=BA,CCF",
                 wait_until="networkidle",
             )
             page.locator("#compare-save-name").fill("Export smoke")
@@ -500,6 +555,7 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             assert payload["comparisons"][0]["a"] == RUN_ID
             assert payload["comparisons"][0]["b"] == f"{RUN_ID}-b"
             assert payload["comparisons"][0]["metric"] == "Tph"
+            assert payload["comparisons"][0]["ccolumns"] == ["BA", "CCF"]
 
             imported = tmp_path / "imported.json"
             imported.write_text(
@@ -513,6 +569,7 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
                                 "b": RUN_ID,
                                 "metric": "BA",
                                 "ctable": "FVS_Summary_Metric",
+                                "ccolumns": ["Tph"],
                             }
                         ],
                     }
@@ -525,7 +582,11 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             page.get_by_role("button", name="Load").click()
             expect(page.locator(".compare-pickers select").nth(0)).to_have_value(f"{RUN_ID}-b")
             expect(page.locator(".compare-pickers select").nth(1)).to_have_value(RUN_ID)
-            assert "metric=BA" in page.evaluate("window.location.search")
+            params = page.evaluate(
+                "Object.fromEntries(new URLSearchParams(window.location.search))"
+            )
+            assert params["metric"] == "BA"
+            assert params["ccolumns"] == "Tph"
 
             malformed = tmp_path / "malformed.json"
             malformed.write_text("{}", encoding="utf-8")

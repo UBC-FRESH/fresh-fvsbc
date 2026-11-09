@@ -99,16 +99,21 @@ The cockpit keeps the useful view in the URL:
 
 - ``workspace``, ``run``, ``panel``, and ``year`` for the open view;
 - ``table``, ``q``, ``column``, ``limit``, and ``offset`` for a filtered table page;
-- ``a``, ``b``, ``metric``, and ``ctable`` for the two-run comparison.
+- ``a``, ``b``, ``metric``, ``ctable``, and ``ccolumns`` for the two-run comparison and its
+  selected diff columns.
 
 Those values are restored on reload, so a reviewer can send a link to the exact table filter or
 comparison instead of describing where to click. Named comparisons are also kept in the browser's
-``localStorage`` for reuse; loading one replaces the current A/B/metric/table state.
+``localStorage`` for reuse; loading one replaces the current A/B/metric/table/diff-column state.
 
 **Export JSON** writes those named comparisons to a versioned file with ``version``,
 ``exported_at``, and ``comparisons``. **Import JSON** accepts that file or a bare comparison array,
-validates every row, merges by name, and keeps at most 20 entries. The service never stores the
-file; the browser owns this state.
+validates every row, merges by name, and keeps at most 20 entries. Each comparison includes its
+``ccolumns`` diff selection. The service never stores the file; the browser owns this state.
+
+The row-level diff has its own **Diff columns** disclosure. Selecting a subset changes which deltas
+are shown and which rows rank highest; the summary metrics above it are unaffected. The selection
+is encoded in ``ccolumns`` and saved with named comparisons.
 
 What it reads
 -------------

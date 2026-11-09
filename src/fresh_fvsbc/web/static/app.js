@@ -21,6 +21,8 @@ const state = {
   compareB: null,
   compareTable: null,
   compareMetric: "BA",
+  compareColumns: [],
+  compareColumnsOpen: false,
   compareSaved: "",
   summaryColumn: null,
   tableQuery: "",
@@ -1864,8 +1866,14 @@ function normaliseComparison(item) {
   const b = typeof item.b === "string" ? item.b.trim().slice(0, 200) : "";
   const metric = typeof item.metric === "string" ? item.metric.trim().slice(0, 50) : "";
   const ctable = typeof item.ctable === "string" ? item.ctable.trim().slice(0, 100) : "";
+  const ccolumns = Array.isArray(item.ccolumns)
+    ? item.ccolumns
+      .filter((column) => typeof column === "string" && column.trim())
+      .map((column) => column.trim().slice(0, 100))
+      .slice(0, 100)
+    : [];
   if (!name || !a || !b || !metric) return null;
-  return { name, a, b, metric, ctable };
+  return { name, a, b, metric, ctable, ccolumns };
 }
 
 function readSavedComparisons() {
@@ -1906,6 +1914,7 @@ function saveCurrentComparison(name) {
     b: state.compareB,
     metric: state.compareMetric,
     ctable: state.compareTable ?? "",
+    ccolumns: [...state.compareColumns],
   });
   writeSavedComparisons(items);
   state.compareSaved = clean.slice(0, 80);
@@ -2068,6 +2077,7 @@ async function renderCompare(body) {
             state.compareB = item.b;
             state.compareMetric = item.metric;
             state.compareTable = item.ctable || null;
+            state.compareColumns = [...item.ccolumns];
             updateUrl();
             renderPanel();
           },
@@ -2245,9 +2255,76 @@ async function renderCompare(body) {
       : ["Year", "TreeId", "TreeIndex"];
   const keyColumns = keyCandidates.filter((column) => a.columns.includes(column));
   const key = keyColumns.length ? keyColumns : ["Year"];
-  const valueColumns = a.columns.filter(
+  const valueColumnsAll = a.columns.filter(
     (column) => !keyColumns.includes(column) && isNumeric(a.rows, column),
   );
+  const knownSelection = [...new Set(
+    state.compareColumns.filter((column) => valueColumnsAll.includes(column)),
+  )];
+  if (knownSelection.length !== state.compareColumns.length) {
+    state.compareColumns = knownSelection;
+    updateUrl();
+  }
+  const valueColumns = knownSelection.length ? knownSelection : valueColumnsAll;
+  if (valueColumnsAll.length > 1) {
+    const selected = new Set(valueColumns);
+    const columnsDetails = el(
+      "details",
+      {
+        id: "compare-columns",
+        className: "compare-columns",
+        open: state.compareColumnsOpen,
+      },
+      el("summary", {},
+        `Diff columns · ${valueColumns.length} of ${valueColumnsAll.length} selected`,
+      ),
+      el("div", { className: "compare-columns-body" },
+        el("div", { className: "compare-columns-grid" },
+          ...valueColumnsAll.map((column) =>
+            el("label", { className: "compare-column-toggle" },
+              el("input", {
+                type: "checkbox",
+                value: column,
+                checked: selected.has(column),
+                onchange: (event) => {
+                  if (!event.target.checked && selected.size <= 1) {
+                    event.target.checked = true;
+                    return;
+                  }
+                  if (event.target.checked) selected.add(column);
+                  else selected.delete(column);
+                  const chosen = valueColumnsAll.filter((name) => selected.has(name));
+                  state.compareColumns = chosen.length === valueColumnsAll.length ? [] : chosen;
+                  state.compareColumnsOpen = true;
+                  updateUrl();
+                  renderPanel();
+                },
+              }),
+              el("span", {}, column),
+            ),
+          ),
+        ),
+        el("div", { className: "compare-columns-actions" },
+          el("button", {
+            type: "button",
+            onclick: () => {
+              state.compareColumns = [];
+              state.compareColumnsOpen = true;
+              updateUrl();
+              renderPanel();
+            },
+          }, "Show all diff columns"),
+        ),
+        el("p", { className: "compare-columns-note" },
+          "Selection changes the row-level diff and its ranking; summary metrics above are unchanged.",
+        ),
+      ),
+    );
+    columnsDetails.addEventListener("toggle", () => {
+      state.compareColumnsOpen = columnsDetails.open;
+    });
+    body.append(columnsDetails);
+  }
   const indexB = new Map(b.rows.map((row) => [key.map((c) => row[c]).join("|"), row]));
   const diffs = [];
   for (const row of a.rows) {
@@ -2267,7 +2344,8 @@ async function renderCompare(body) {
   const capped = diffs.slice(0, 200);
   body.append(el("p", { className: "muted" },
     `${diffs.length} rows matched on ${key.join(", ") || "row order"}; `
-      + `showing the ${capped.length} with the largest absolute difference. B minus A.`,
+      + `showing the ${capped.length} with the largest absolute difference. B minus A. `
+      + `${valueColumns.length} of ${valueColumnsAll.length} diff columns.`,
   ));
   if (!capped.length) {
     body.append(el("p", { className: "muted" }, "No rows matched between the two runs."));
@@ -2313,6 +2391,7 @@ function readUrlState() {
     b: params.get("b"),
     metric: params.get("metric"),
     ctable: params.get("ctable"),
+    ccolumns: params.get("ccolumns"),
   };
 }
 
@@ -2337,6 +2416,7 @@ function updateUrl() {
     if (state.compareB) params.set("b", state.compareB);
     if (state.compareMetric) params.set("metric", state.compareMetric);
     if (state.compareTable) params.set("ctable", state.compareTable);
+    if (state.compareColumns.length) params.set("ccolumns", state.compareColumns.join(","));
   }
   const query = params.toString();
   window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
@@ -3329,6 +3409,9 @@ async function boot() {
     if (initial.b) state.compareB = initial.b;
     if (initial.metric) state.compareMetric = initial.metric;
     state.compareTable = initial.ctable;
+    state.compareColumns = initial.ccolumns
+      ? initial.ccolumns.split(",").filter(Boolean)
+      : [];
     state.ready = true;
     restoreAssistantHistory();
     renderShell();
