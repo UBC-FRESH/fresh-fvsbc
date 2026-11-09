@@ -333,6 +333,9 @@ snapshot with the same row counts still needs a new manifest.
 | `fit_candidate.py` | The target-excluded candidate template |
 | `okanagan-candidate/metrics.csv` | The frozen Okanagan aggregate metrics |
 | `okanagan-candidate/model-card.json` | Frozen Okanagan coefficients and pins |
+| `d9-north-island-candidate.md` | The D9.86 North Island candidate |
+| `north-island-candidate/metrics.csv` | The frozen North Island aggregate metrics |
+| `north-island-candidate/model-card.json` | Frozen North Island coefficients and pins |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |

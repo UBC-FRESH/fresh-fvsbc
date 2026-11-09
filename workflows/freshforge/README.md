@@ -59,3 +59,16 @@ freshforge run workflows/freshforge/okanagan_background.yaml --workdir . \
 
 It writes `okanagan-candidate/metrics.csv` and
 `okanagan-candidate/model-card.json`. No site-level rows are written.
+
+## `north_island_background.yaml`
+
+Third background candidate and the first coastal CWH test:
+
+```sh
+freshforge run workflows/freshforge/north_island_background.yaml --workdir . \
+  --evidence runtime/freshforge-north-island-evidence.json
+```
+
+It writes `north-island-candidate/metrics.csv` and
+`north-island-candidate/model-card.json`. PL is below the 500-tree support
+minimum and is omitted; the layer is coastal HW/FD/OTHER background only.
