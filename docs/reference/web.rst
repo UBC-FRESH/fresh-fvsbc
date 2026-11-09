@@ -177,6 +177,10 @@ downloads named and recent history for every table as versioned JSON; **Import f
 and merges it by table, name, and query/column pair. Filters remain in the URL after loading; the
 named and recent lists are browser-local.
 
+**Export presets** bundle the current filter, column order, hidden columns, and visible-column
+export option under a name. Loading one restores all of those together, reloads the table, and
+leaves the existing CSV and package links ready; presets are per table and browser-local.
+
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.
 

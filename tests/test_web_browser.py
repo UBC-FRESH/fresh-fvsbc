@@ -426,6 +426,66 @@ def test_table_exports_can_follow_the_visible_layout(cockpit: str, tmp_path: Pat
             browser.close()
 
 
+def test_export_presets_restore_filter_and_visible_layout(cockpit: str) -> None:
+    """An export preset reapplies the filter, column order, hidden set, and export option."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-column").select_option("Year")
+            page.locator("#table-filter").fill("10")
+            page.get_by_role("button", name="Apply").click()
+            page.locator("#table-columns summary").click()
+            page.get_by_role("button", name="Move Tph left").click()
+            page.locator("#table-columns input[value='Age']").uncheck()
+            page.locator("#table-export-visible").check()
+            page.locator("#table-export-presets summary").click()
+            page.locator("#table-export-preset-name").fill("Year view")
+            page.get_by_role("button", name="Save current").last.click()
+            expect(page.locator("#table-export-presets summary")).to_contain_text(
+                "Export presets · 1"
+            )
+
+            page.get_by_role("button", name="Reset layout").click()
+            page.locator("#table-column").select_option("")
+            page.get_by_role("button", name="Clear").click()
+            expect(page.locator("#table-columns summary")).to_contain_text("9 of 9 shown")
+
+            page.locator("#table-export-preset-select").select_option(label="Year view")
+            page.locator("#table-export-preset-load").click()
+            expect(page.locator("#table-filter")).to_have_value("10")
+            expect(page.locator("#table-column")).to_have_value("Year")
+            expect(page.locator("#table-columns summary")).to_contain_text("8 of 9 shown")
+            expect(page.locator("#table-export-visible")).to_be_checked()
+            names = page.locator("th .column-name")
+            expect(names.nth(0)).to_have_text("Year")
+            expect(names.nth(1)).to_have_text("Tph")
+            expect(names.nth(2)).to_have_text("BA")
+            href = page.get_by_role("link", name="CSV", exact=True).get_attribute("href") or ""
+            assert "q=10" in href
+            assert "column=Year" in href
+            assert "columns=" in href
+
+            page.reload(wait_until="networkidle")
+            page.locator("#table-export-presets summary").click()
+            expect(page.locator("#table-export-preset-select")).to_contain_text("Year view")
+            expect(page.locator("#table-export-presets summary")).to_contain_text(
+                "Export presets · 1"
+            )
+            page.locator("#table-export-preset-select").select_option(label="Year view")
+            page.locator("#table-export-preset-delete").click()
+            expect(page.locator("#table-export-presets summary")).to_contain_text(
+                "Export presets · 0"
+            )
+        finally:
+            browser.close()
+
+
 def test_table_filters_can_be_exported_and_imported(cockpit: str, tmp_path: Path) -> None:
     """A filter export carries named and recent history back into the browser."""
     expect = playwright_module.expect
