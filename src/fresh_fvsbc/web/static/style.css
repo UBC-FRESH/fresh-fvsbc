@@ -859,3 +859,22 @@ svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }
   font-size: 11px;
 }
 .table-pager input[type="number"] { width: 4.5rem; }
+
+.compare-saved {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 14px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.compare-saved-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.compare-saved-row select { min-width: 180px; flex: 1 1 180px; }
+.compare-saved-row input { min-width: 180px; flex: 1 1 180px; }
+.compare-saved-row button { font-size: 12px; }

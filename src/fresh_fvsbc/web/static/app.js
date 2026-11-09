@@ -21,6 +21,7 @@ const state = {
   compareB: null,
   compareTable: null,
   compareMetric: "BA",
+  compareSaved: "",
   summaryColumn: null,
   tableQuery: "",
   tableColumn: "",
@@ -1485,6 +1486,47 @@ function dualChart(years, seriesA, seriesB, name, unit) {
   return svg;
 }
 
+const COMPARE_STORAGE_KEY = "fresh-fvsbc.comparisons";
+
+function readSavedComparisons() {
+  let stored = null;
+  try {
+    stored = JSON.parse(window.localStorage.getItem(COMPARE_STORAGE_KEY) || "[]");
+  } catch (_error) {
+    stored = [];
+  }
+  if (!Array.isArray(stored)) return [];
+  return stored.filter((item) =>
+    item && typeof item.name === "string" && item.name.trim()
+      && typeof item.a === "string" && typeof item.b === "string"
+      && typeof item.metric === "string" && typeof item.ctable === "string",
+  ).slice(0, 20);
+}
+
+function writeSavedComparisons(items) {
+  try {
+    window.localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(items.slice(0, 20)));
+  } catch (_error) {
+    /* localStorage can be unavailable */
+  }
+}
+
+function saveCurrentComparison(name) {
+  const clean = String(name || "").trim();
+  if (!clean) return false;
+  const items = readSavedComparisons().filter((item) => item.name !== clean);
+  items.unshift({
+    name: clean.slice(0, 80),
+    a: state.compareA,
+    b: state.compareB,
+    metric: state.compareMetric,
+    ctable: state.compareTable,
+  });
+  writeSavedComparisons(items);
+  state.compareSaved = clean.slice(0, 80);
+  return true;
+}
+
 async function renderCompare(body) {
   body.append(el("h2", {}, "Compare two runs"));
   const complete = state.runs.filter((run) => run.state === "complete");
@@ -1530,6 +1572,65 @@ async function renderCompare(body) {
           renderPanel();
         },
       }, "Swap"),
+    ),
+  );
+
+  const saved = readSavedComparisons();
+  if (!state.compareSaved && saved.length) state.compareSaved = saved[0].name;
+  const savedSelect = el("select", {
+    id: "compare-saved",
+    "aria-label": "Saved comparisons",
+    onchange: (event) => { state.compareSaved = event.target.value; },
+  },
+    el("option", { value: "" }, saved.length ? "Choose a saved comparison" : "No saved comparisons"),
+    ...saved.map((item) =>
+      el("option", { value: item.name, selected: item.name === state.compareSaved }, item.name),
+    ),
+  );
+  const saveName = el("input", {
+    id: "compare-save-name",
+    type: "text",
+    placeholder: "Name this comparison…",
+    "aria-label": "Comparison name",
+  });
+  body.append(
+    el("div", { className: "compare-saved" },
+      el("div", { className: "compare-saved-row" },
+        savedSelect,
+        el("button", {
+          type: "button",
+          disabled: !saved.length,
+          onclick: () => {
+            const item = saved.find((entry) => entry.name === state.compareSaved);
+            if (!item) return;
+            state.compareA = item.a;
+            state.compareB = item.b;
+            state.compareMetric = item.metric;
+            state.compareTable = item.ctable;
+            updateUrl();
+            renderPanel();
+          },
+        }, "Load"),
+        el("button", {
+          type: "button",
+          disabled: !saved.length,
+          onclick: () => {
+            const items = readSavedComparisons().filter((item) => item.name !== state.compareSaved);
+            writeSavedComparisons(items);
+            state.compareSaved = items[0]?.name ?? "";
+            renderPanel();
+          },
+        }, "Delete"),
+      ),
+      el("div", { className: "compare-saved-row" },
+        saveName,
+        el("button", {
+          type: "button",
+          onclick: () => {
+            if (saveCurrentComparison(saveName.value)) renderPanel();
+          },
+        }, "Save"),
+      ),
     ),
   );
 

@@ -273,6 +273,31 @@ def test_a_large_table_can_page_and_change_its_page_size(cockpit: str) -> None:
             browser.close()
 
 
+def test_a_named_comparison_survives_reload(cockpit: str) -> None:
+    """A saved comparison reloads its A/B runs and metric from localStorage."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=Tph",
+                wait_until="networkidle",
+            )
+            page.locator("#compare-save-name").fill("smoke comparison")
+            page.get_by_role("button", name="Save", exact=True).click()
+            expect(page.locator("#compare-saved")).to_contain_text("smoke comparison")
+            page.reload(wait_until="networkidle")
+            expect(page.locator("#compare-saved")).to_contain_text("smoke comparison")
+            page.get_by_role("button", name="Load").click()
+            expect(page.locator(".compare-pickers select").nth(0)).to_have_value(RUN_ID)
+            expect(page.locator(".compare-pickers select").nth(1)).to_have_value(f"{RUN_ID}-b")
+            assert "metric=Tph" in page.evaluate("window.location.search")
+        finally:
+            browser.close()
+
+
 def test_the_mobile_shell_does_not_overflow(cockpit: str) -> None:
     """The runs and summary views fit a phone-width viewport."""
     expect = playwright_module.expect
