@@ -1576,6 +1576,18 @@ function dualChart(years, seriesA, seriesB, name, unit) {
 }
 
 const COMPARE_STORAGE_KEY = "fresh-fvsbc.comparisons";
+const COMPARE_EXPORT_VERSION = 1;
+
+function normaliseComparison(item) {
+  if (!item || typeof item !== "object") return null;
+  const name = typeof item.name === "string" ? item.name.trim().slice(0, 80) : "";
+  const a = typeof item.a === "string" ? item.a.trim().slice(0, 200) : "";
+  const b = typeof item.b === "string" ? item.b.trim().slice(0, 200) : "";
+  const metric = typeof item.metric === "string" ? item.metric.trim().slice(0, 50) : "";
+  const ctable = typeof item.ctable === "string" ? item.ctable.trim().slice(0, 100) : "";
+  if (!name || !a || !b || !metric) return null;
+  return { name, a, b, metric, ctable };
+}
 
 function readSavedComparisons() {
   let stored = null;
@@ -1585,11 +1597,16 @@ function readSavedComparisons() {
     stored = [];
   }
   if (!Array.isArray(stored)) return [];
-  return stored.filter((item) =>
-    item && typeof item.name === "string" && item.name.trim()
-      && typeof item.a === "string" && typeof item.b === "string"
-      && typeof item.metric === "string" && typeof item.ctable === "string",
-  ).slice(0, 20);
+  const seen = new Set();
+  const items = [];
+  for (const raw of stored) {
+    const item = normaliseComparison(raw);
+    if (!item || seen.has(item.name)) continue;
+    seen.add(item.name);
+    items.push(item);
+    if (items.length === 20) break;
+  }
+  return items;
 }
 
 function writeSavedComparisons(items) {
@@ -1609,11 +1626,48 @@ function saveCurrentComparison(name) {
     a: state.compareA,
     b: state.compareB,
     metric: state.compareMetric,
-    ctable: state.compareTable,
+    ctable: state.compareTable ?? "",
   });
   writeSavedComparisons(items);
   state.compareSaved = clean.slice(0, 80);
   return true;
+}
+
+function comparisonExportText() {
+  return `${JSON.stringify({
+    version: COMPARE_EXPORT_VERSION,
+    exported_at: new Date().toISOString(),
+    comparisons: readSavedComparisons(),
+  }, null, 2)}\n`;
+}
+
+function importComparisons(text) {
+  let parsed = null;
+  try {
+    parsed = JSON.parse(text);
+  } catch (_error) {
+    throw new Error("That file is not valid JSON.");
+  }
+  const raw = Array.isArray(parsed) ? parsed : parsed?.comparisons;
+  if (!Array.isArray(raw)) throw new Error("Expected a comparisons array.");
+  const imported = [];
+  const seen = new Set();
+  for (const candidate of raw) {
+    const item = normaliseComparison(candidate);
+    if (!item || seen.has(item.name)) continue;
+    seen.add(item.name);
+    imported.push(item);
+    if (imported.length === 20) break;
+  }
+  if (!imported.length) throw new Error("No valid comparisons found in that file.");
+  const names = new Set(imported.map((item) => item.name));
+  const merged = [
+    ...imported,
+    ...readSavedComparisons().filter((item) => !names.has(item.name)),
+  ].slice(0, 20);
+  writeSavedComparisons(merged);
+  state.compareSaved = imported[0].name;
+  return { imported: imported.length, total: merged.length };
 }
 
 async function renderCompare(body) {
@@ -1682,6 +1736,45 @@ async function renderCompare(body) {
     placeholder: "Name this comparison…",
     "aria-label": "Comparison name",
   });
+  const savedStatus = el("p", {
+    id: "compare-saved-status",
+    className: "compare-saved-status",
+    role: "status",
+    "aria-live": "polite",
+  }, "Saved in this browser. Export JSON to share; import merges by name.");
+  const setSavedStatus = (text, kind = "") => {
+    savedStatus.textContent = text;
+    savedStatus.className = `compare-saved-status ${kind}`.trim();
+  };
+  const importFile = el("input", {
+    id: "compare-import-file",
+    type: "file",
+    accept: ".json,application/json",
+    hidden: true,
+    "aria-label": "Import comparisons JSON",
+  });
+  importFile.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 200_000) {
+      setSavedStatus("That file is too large; choose a JSON export under 200 KB.", "error");
+      event.target.value = "";
+      return;
+    }
+    try {
+      const result = importComparisons(await file.text());
+      await renderPanel();
+      const fresh = document.getElementById("compare-saved-status");
+      if (fresh) {
+        fresh.textContent = `Imported ${result.imported} comparison`
+          + `${result.imported === 1 ? "" : "s"} (${result.total} saved).`;
+      }
+    } catch (error) {
+      setSavedStatus(error?.message ?? "That file could not be imported.", "error");
+    } finally {
+      event.target.value = "";
+    }
+  });
   body.append(
     el("div", { className: "compare-saved" },
       el("div", { className: "compare-saved-row" },
@@ -1695,7 +1788,7 @@ async function renderCompare(body) {
             state.compareA = item.a;
             state.compareB = item.b;
             state.compareMetric = item.metric;
-            state.compareTable = item.ctable;
+            state.compareTable = item.ctable || null;
             updateUrl();
             renderPanel();
           },
@@ -1710,6 +1803,27 @@ async function renderCompare(body) {
             renderPanel();
           },
         }, "Delete"),
+        el("button", {
+          type: "button",
+          disabled: !saved.length,
+          onclick: () => {
+            const url = URL.createObjectURL(
+              new Blob([comparisonExportText()], { type: "application/json" }),
+            );
+            const link = el("a", {
+              href: url,
+              download: "fresh-fvsbc-comparisons.json",
+            });
+            document.body.append(link);
+            link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+          },
+        }, "Export JSON"),
+        el("button", {
+          type: "button",
+          onclick: () => importFile.click(),
+        }, "Import JSON"),
       ),
       el("div", { className: "compare-saved-row" },
         saveName,
@@ -1720,6 +1834,8 @@ async function renderCompare(body) {
           },
         }, "Save"),
       ),
+      savedStatus,
+      importFile,
     ),
   );
 

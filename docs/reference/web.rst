@@ -96,6 +96,11 @@ Those values are restored on reload, so a reviewer can send a link to the exact 
 comparison instead of describing where to click. Named comparisons are also kept in the browser's
 ``localStorage`` for reuse; loading one replaces the current A/B/metric/table state.
 
+**Export JSON** writes those named comparisons to a versioned file with ``version``,
+``exported_at``, and ``comparisons``. **Import JSON** accepts that file or a bare comparison array,
+validates every row, merges by name, and keeps at most 20 entries. The service never stores the
+file; the browser owns this state.
+
 What it reads
 -------------
 
