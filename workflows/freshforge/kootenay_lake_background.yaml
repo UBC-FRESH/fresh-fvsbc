@@ -1,0 +1,28 @@
+workflow:
+  id: kootenay_lake_background_calibration
+  name: Kootenay Lake background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for Kootenay Lake and freeze
+    aggregate metrics and coefficients. The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_kootenay_lake
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - Kootenay Lake TSA
+        - --model-id
+        - kootenay-lake-background-v0
+        - --calibration
+        - none
+        - --min-target-trees
+        - "500"
+        - --metrics
+        - notes/reference/calibration/kootenay-lake-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/kootenay-lake-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/kootenay-lake-candidate/metrics.csv
+      model_card: notes/reference/calibration/kootenay-lake-candidate/model-card.json
