@@ -51,6 +51,81 @@ def _design(frame: pd.DataFrame, zones: list[str]) -> np.ndarray:
     return np.delete(bp.design(frame, zones), [6, 9], axis=1)
 
 
+def _delta(eta: np.ndarray, dead: np.ndarray, exposure: np.ndarray) -> float:
+    """Return the maximum-likelihood group intercept at fixed coefficients."""
+    offset = np.log(exposure) + eta
+    value = 0.0
+    for _ in range(60):
+        mu = np.exp(np.clip(value + offset, -20, 20))
+        weight = np.clip(mu, 1e-8, None)
+        z = value + offset + (dead - mu) / weight
+        value = float(np.sum(weight * (z - offset)) / np.sum(weight))
+    return value
+
+
+def _local_metrics(
+    frame: pd.DataFrame,
+    *,
+    calibration_sites: int,
+    bootstrap: int,
+    seed: int = 42,
+) -> dict[str, object]:
+    """Evaluate the 20-site conditional rule on held-out target sites.
+
+    Parameters
+    ----------
+    frame : pandas.DataFrame
+        One row per target tree, with ``site``, ``group``, ``eta``,
+        ``exposure``, and ``dead``.
+    calibration_sites : int
+        Number of sites used to estimate the group intercepts.
+    bootstrap : int
+        Number of site splits.
+    seed : int, optional
+        Random seed for the splits.
+
+    Returns
+    -------
+    dict
+        The mean held-out metrics and the split design.
+    """
+    sites = sorted(frame["site"].astype(str).unique())
+    if len(sites) <= calibration_sites:
+        return {"evaluated": False, "reason": "not enough target sites"}
+    rng = np.random.default_rng(seed)
+    rows: list[dict[str, float]] = []
+    for _ in range(bootstrap):
+        shuffled = list(rng.permutation(sites))
+        calibration = set(shuffled[:calibration_sites])
+        cal = frame[frame["site"].isin(calibration)]
+        hold = frame[~frame["site"].isin(calibration)]
+        if cal.empty or hold.empty:
+            continue
+        offsets: dict[str, float] = {}
+        for group, part in cal.groupby("group"):
+            if len(part) < 500:
+                continue
+            eta = part["eta"].to_numpy()
+            exposure = part["exposure"].to_numpy()
+            base = 1.0 - np.exp(-exposure * np.exp(np.clip(eta, -20, 20)))
+            if float(base.mean()) > float(part["dead"].mean()) + 0.03:
+                offsets[str(group)] = _delta(eta, part["dead"].to_numpy(), exposure)
+        delta = hold["group"].map(offsets).fillna(0.0).to_numpy()
+        pred = 1.0 - np.exp(
+            -hold["exposure"].to_numpy() * np.exp(np.clip(hold["eta"].to_numpy() + delta, -20, 20))
+        )
+        rows.append(bp.metrics(hold["dead"].to_numpy(), pred))
+    if not rows:
+        return {"evaluated": False, "reason": "no usable splits"}
+    return {
+        "evaluated": True,
+        "calibration_sites": calibration_sites,
+        "holdout_sites": len(sites) - calibration_sites,
+        "bootstrap": bootstrap,
+        "mean_metrics": pd.DataFrame(rows).mean(numeric_only=True).to_dict(),
+    }
+
+
 def main() -> None:
     """Fit the target-excluded model and write metrics and the model card."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -65,6 +140,13 @@ def main() -> None:
         default=0,
         help="Omit species groups with fewer target trees than this.",
     )
+    parser.add_argument(
+        "--evaluate-local",
+        action="store_true",
+        help="Evaluate the conditional 20-site rule on held-out target sites.",
+    )
+    parser.add_argument("--calibration-sites", type=int, default=20)
+    parser.add_argument("--bootstrap", type=int, default=40)
     args = parser.parse_args()
 
     frame = bp.load()
@@ -80,6 +162,7 @@ def main() -> None:
     omitted: list[dict[str, object]] = []
     all_y: list[np.ndarray] = []
     all_p: list[np.ndarray] = []
+    target_rows: list[pd.DataFrame] = []
     for group in bp.GROUPS:
         part = train[train["group"] == group]
         test = target[target["group"] == group]
@@ -96,11 +179,23 @@ def main() -> None:
         beta = bm._fit(x, part["dead"].to_numpy(), part["exposure"].to_numpy())
         xt = _design(test, zones)
         xt[:, 1:] = (xt[:, 1:] - mean) / scale
+        eta = xt @ beta
         pred = bm._predict(xt, test["exposure"].to_numpy(), beta)
         metric = bp.metrics(test["dead"].to_numpy(), pred)
         rows.append({"group": group, **metric})
         all_y.append(test["dead"].to_numpy())
         all_p.append(pred)
+        target_rows.append(
+            pd.DataFrame(
+                {
+                    "site": test["site"].to_numpy(),
+                    "group": group,
+                    "eta": eta,
+                    "exposure": test["exposure"].to_numpy(),
+                    "dead": test["dead"].to_numpy(),
+                }
+            )
+        )
         groups[group] = {
             "beta": [float(value) for value in beta],
             "mean": [float(value) for value in mean],
@@ -112,7 +207,7 @@ def main() -> None:
     args.metrics.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_csv(args.metrics, index=False)
 
-    calibration = (
+    calibration: dict[str, object] = (
         {
             "applied": False,
             "rule": (
@@ -128,6 +223,12 @@ def main() -> None:
             "evaluated": False,
         }
     )
+    if args.evaluate_local:
+        calibration["local_metrics"] = _local_metrics(
+            pd.concat(target_rows, ignore_index=True),
+            calibration_sites=args.calibration_sites,
+            bootstrap=args.bootstrap,
+        )
     card = {
         "model_id": args.model_id,
         "status": "frozen_candidate_layer",

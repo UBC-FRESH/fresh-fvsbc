@@ -1,0 +1,34 @@
+workflow:
+  id: kamloops_background_calibration
+  name: Kamloops background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for Kamloops, evaluate the
+    conditional 20-site rule, and freeze aggregate metrics and coefficients.
+    The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_kamloops
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - Kamloops TSA
+        - --model-id
+        - kamloops-background-v0
+        - --calibration
+        - conditional
+        - --evaluate-local
+        - --calibration-sites
+        - "20"
+        - --bootstrap
+        - "40"
+        - --min-target-trees
+        - "500"
+        - --metrics
+        - notes/reference/calibration/kamloops-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/kamloops-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/kamloops-candidate/metrics.csv
+      model_card: notes/reference/calibration/kamloops-candidate/model-card.json
