@@ -1060,6 +1060,162 @@ function recentFilterLabel(entry) {
   return `Column: ${entry.column}`;
 }
 
+function normaliseFilterEntries(raw) {
+  if (!Array.isArray(raw)) return [];
+  const filters = [];
+  const seen = new Set();
+  for (const candidate of raw) {
+    if (!candidate || typeof candidate !== "object") continue;
+    const name = typeof candidate.name === "string" ? candidate.name.trim().slice(0, 80) : "";
+    if (!name || seen.has(name)) continue;
+    seen.add(name);
+    filters.push({
+      id: typeof candidate.id === "string" && candidate.id
+        ? candidate.id.slice(0, 200)
+        : `filter-${filters.length}-${Date.now()}`,
+      name,
+      query: typeof candidate.query === "string" ? candidate.query.slice(0, 200) : "",
+      column: typeof candidate.column === "string" ? candidate.column.slice(0, 100) : "",
+      created_at: typeof candidate.created_at === "string" ? candidate.created_at : "",
+    });
+    if (filters.length === 20) break;
+  }
+  return filters;
+}
+
+function normaliseRecentEntries(raw) {
+  if (!Array.isArray(raw)) return [];
+  const recents = [];
+  for (const candidate of raw) {
+    if (!candidate || typeof candidate !== "object") continue;
+    const query = typeof candidate.query === "string" ? candidate.query.slice(0, 200) : "";
+    const column = typeof candidate.column === "string" ? candidate.column.slice(0, 100) : "";
+    if (!query && !column) continue;
+    if (recents.some((entry) => entry.query === query && entry.column === column)) continue;
+    recents.push({
+      query,
+      column,
+      used_at: typeof candidate.used_at === "string" ? candidate.used_at : "",
+    });
+    if (recents.length === TABLE_RECENTS_LIMIT) break;
+  }
+  return recents;
+}
+
+function readFilterEnvelope() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TABLE_FILTERS_KEY) || "null");
+    const tables = stored?.tables && typeof stored.tables === "object"
+      && !Array.isArray(stored.tables)
+      ? stored.tables
+      : {};
+    return { tables, ok: true };
+  } catch (_error) {
+    return { tables: {}, ok: false };
+  }
+}
+
+function writeFilterEnvelope(tables) {
+  try {
+    window.localStorage.setItem(TABLE_FILTERS_KEY, JSON.stringify({ version: 1, tables }));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function readRecentEnvelope() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TABLE_RECENTS_KEY) || "null");
+    const tables = stored?.tables && typeof stored.tables === "object"
+      && !Array.isArray(stored.tables)
+      ? stored.tables
+      : {};
+    return { tables, ok: true };
+  } catch (_error) {
+    return { tables: {}, ok: false };
+  }
+}
+
+function writeRecentEnvelope(tables) {
+  try {
+    window.localStorage.setItem(TABLE_RECENTS_KEY, JSON.stringify({ version: 1, tables }));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function tableFiltersExportText() {
+  const filterTables = readFilterEnvelope().tables;
+  const recentTables = readRecentEnvelope().tables;
+  const names = new Set([...Object.keys(filterTables), ...Object.keys(recentTables)]);
+  const tables = {};
+  for (const table of names) {
+    const filters = normaliseFilterEntries(filterTables[table]);
+    const recents = normaliseRecentEntries(recentTables[table]);
+    if (filters.length || recents.length) tables[table] = { filters, recents };
+  }
+  return `${JSON.stringify({
+    version: 1,
+    exported_at: new Date().toISOString(),
+    tables,
+  }, null, 2)}\n`;
+}
+
+function importTableFilters(text) {
+  let parsed = null;
+  try {
+    parsed = JSON.parse(text);
+  } catch (_error) {
+    throw new Error("That file is not valid JSON.");
+  }
+  const raw = parsed?.tables;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new Error("Expected a tables object in that filter file.");
+  }
+  const filterTables = { ...readFilterEnvelope().tables };
+  const recentTables = { ...readRecentEnvelope().tables };
+  let tables = 0;
+  let filters = 0;
+  let recents = 0;
+  for (const [table, value] of Object.entries(raw)) {
+    if (!table || table.length > 100) continue;
+    if (["__proto__", "constructor", "prototype"].includes(table)) continue;
+    if (!value || typeof value !== "object" || Array.isArray(value)) continue;
+    const incomingFilters = normaliseFilterEntries(value.filters);
+    const incomingRecents = normaliseRecentEntries(value.recents);
+    if (!incomingFilters.length && !incomingRecents.length) continue;
+    if (incomingFilters.length) {
+      const existing = normaliseFilterEntries(filterTables[table]);
+      const names = new Set(incomingFilters.map((entry) => entry.name));
+      filterTables[table] = [
+        ...incomingFilters,
+        ...existing.filter((entry) => !names.has(entry.name)),
+      ].slice(0, 20);
+      filters += incomingFilters.length;
+    }
+    if (incomingRecents.length) {
+      const existing = normaliseRecentEntries(recentTables[table]);
+      const keys = new Set(incomingRecents.map((entry) => `${entry.column}\u0000${entry.query}`));
+      recentTables[table] = [
+        ...incomingRecents,
+        ...existing.filter((entry) => !keys.has(`${entry.column}\u0000${entry.query}`)),
+      ].slice(0, TABLE_RECENTS_LIMIT);
+      recents += incomingRecents.length;
+    }
+    tables += 1;
+  }
+  if (!tables) throw new Error("No table filters found in that file.");
+  if (!writeFilterEnvelope(filterTables)) {
+    throw new Error("Browser storage is unavailable; could not import filters.");
+  }
+  if (!writeRecentEnvelope(recentTables)) {
+    throw new Error("Browser storage is unavailable; could not import recent filters.");
+  }
+  return { tables, filters, recents };
+}
+
 function setTableLayoutStatus(text, kind = "") {
   const node = document.getElementById("table-layout-status");
   if (!node) return;
@@ -1300,6 +1456,42 @@ async function renderTables(body) {
   const storedRecents = readTableRecents(state.table);
   const recents = storedRecents.recents;
   const filtersStorageOk = storedFilters.ok && storedRecents.ok;
+  const filterEnvelope = readFilterEnvelope();
+  const recentEnvelope = readRecentEnvelope();
+  const hasPortableHistory = Object.values(filterEnvelope.tables).some(
+    (items) => Array.isArray(items) && items.length,
+  ) || Object.values(recentEnvelope.tables).some(
+    (items) => Array.isArray(items) && items.length,
+  );
+  const filterFile = el("input", {
+    id: "table-filter-import",
+    type: "file",
+    accept: ".json,application/json",
+    hidden: true,
+    "aria-label": "Import table filters JSON",
+  });
+  filterFile.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 500_000) {
+      setTableFilterStatus("That file is too large; choose a filter export under 500 KB.", "error");
+      event.target.value = "";
+      return;
+    }
+    try {
+      const result = importTableFilters(await file.text());
+      state.tableSavedFilter = "";
+      state.tableFiltersOpen = true;
+      await renderPanel();
+      setTableFilterStatus(
+        `Imported filters for ${result.tables} table${result.tables === 1 ? "" : "s"}.`,
+      );
+    } catch (error) {
+      setTableFilterStatus(error?.message ?? "That filter file could not be imported.", "error");
+    } finally {
+      event.target.value = "";
+    }
+  });
   const recentSelect = el("select", {
     id: "table-filter-recent",
     "aria-label": "Recent table filters",
@@ -1463,6 +1655,33 @@ async function renderTables(body) {
       }, filtersStorageOk
         ? "Saved filters and recent history stay in this browser."
         : "Browser storage is unavailable; saved filters will not persist."),
+      el("div", { className: "table-filters-portability" },
+        el("button", {
+          type: "button",
+          disabled: !hasPortableHistory,
+          onclick: async () => {
+            const url = URL.createObjectURL(
+              new Blob([tableFiltersExportText()], { type: "application/json" }),
+            );
+            const link = el("a", {
+              href: url,
+              download: "fresh-fvsbc-table-filters.json",
+            });
+            document.body.append(link);
+            link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            state.tableFiltersOpen = true;
+            await renderPanel();
+            setTableFilterStatus("Exported saved and recent table filters.");
+          },
+        }, "Export filters"),
+        el("button", {
+          type: "button",
+          onclick: () => filterFile.click(),
+        }, "Import filters"),
+        filterFile,
+      ),
     ),
   );
   filtersDetails.addEventListener("toggle", () => {

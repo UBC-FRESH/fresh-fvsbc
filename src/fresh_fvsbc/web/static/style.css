@@ -1225,3 +1225,11 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+
+.table-filters-portability {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.table-filters-portability button { font-size: 11px; padding: 4px 8px; }
