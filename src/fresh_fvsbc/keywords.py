@@ -261,6 +261,28 @@ BLANK_SLOTS: tuple[int, ...] = tuple(
 #: real key file, which is what the run orchestration found the first time it wrote one.
 SPECIAL_KEYWORDS: frozenset[str] = frozenset({"STOP", "COMMENT"})
 
+#: The body options the LPMPB reader accepts inside an ``MPB`` block. They are
+#: not in FVS's main keyword table, so they are kept separate from ``KEYWORDS``
+#: and accepted only inside the block.
+MPB_KEYWORDS: frozenset[str] = frozenset(
+    {
+        "MPBSTART",
+        "MANSTART",
+        "BEETLES",
+        "INITMORT",
+        "CURRMORT",
+        "MAXYEARS",
+        "HABSUIT",
+        "STNDSIZE",
+        "PRBSCALE",
+        "ACTSURF",
+        "POPDYN",
+        "NOPOPDYN",
+        "MPBECHO",
+        "DEBUG",
+    }
+)
+
 #: The width of a parameter field. ``base/keyrdr.f`` reads ``KARD(I)=RECORD(J:J+9)`` with ``J``
 #: stepping by ten from eleven, so every parameter is a ten-column field of the keyword's own record
 #: and a longer one cannot be carried.
@@ -284,7 +306,9 @@ LINES_KEYWORDS: frozenset[str] = frozenset({"COMMENT", "COMPUTE", "DATABASE"})
 #: the units of its residual-density target. ``cuts.f`` reads ``PRMS(1..6)`` from the six post-year
 #: fields, which leaves ``QFATAR = INT(PRMS(7))`` for the supplemental record's value; the keyword
 #: guide says the same.
-SUPPLEMENTAL_KEYWORDS: frozenset[str] = frozenset({"THINQFA", "FUELMODL", "DEFULMOD"})
+SUPPLEMENTAL_KEYWORDS: frozenset[str] = frozenset(
+    {"THINQFA", "FUELMODL", "DEFULMOD", "INITMORT", "CURRMORT"}
+)
 
 NESTED_KEYWORDS: frozenset[str] = frozenset({"IF"})
 
@@ -474,6 +498,7 @@ BLOCK_BODIES: dict[str, frozenset[str]] = {
     "FMIN": FMIN_KEYWORDS,
     "MISTOE": MISTOE_KEYWORDS,
     "RDIN": RDIN_KEYWORDS,
+    "MPB": MPB_KEYWORDS,
 }
 
 #: The block keywords whose body holds **other keywords** and is closed by ``END``.
@@ -612,6 +637,9 @@ def _validate_supplemental(keyword: Keyword) -> None:
     if keyword.name in FMIN_KEYWORDS:
         # ``FUELMODL`` reads two more numbers and ``DEFULMOD`` seven fuel-model names, and FVS
         # parses both itself; only ``THINQFA``'s record has to be one of a fixed set of codes.
+        return
+    if keyword.name in {"INITMORT", "CURRMORT"}:
+        # MPB mortality records are three ten-column values, not a THINQFA unit code.
         return
     record = keyword.supplemental[0]
     if record not in THINQFA_UNITS:
