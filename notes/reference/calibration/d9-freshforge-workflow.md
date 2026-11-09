@@ -32,6 +32,11 @@ The checked run:
 - status: **success**
 - nodes: `fit_provincial` success, `calibrate_quesnel` success, `freeze_model` success
 - evidence: `runtime/freshforge-quesnel-evidence.json`
+- CLI run: `freshforge run ... --evidence runtime/freshforge-quesnel-cli-evidence.json --summary`
+  - status: success
+  - nodes: 3 success
+  - artifact count: 3
+  - diagnostics: 0
 
 ## 3. Provider
 
