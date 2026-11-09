@@ -117,8 +117,9 @@ are shown and which rows rank highest; the summary metrics above it are unaffect
 columns** disclosure chooses the identity columns used to match rows across runs; key columns are
 excluded from the deltas. The selections are encoded in ``ccolumns`` and ``ckey`` and saved with
 named comparisons. Selecting a named comparison shows its runs, metric, table, diff columns, and
-key columns; **Update** overwrites that preset with the current comparison settings, while
-**Rename** changes only its name and refuses duplicates.
+key columns; **Update** overwrites that preset with the current comparison settings, **Rename**
+changes only its name and refuses duplicates, and **Duplicate** copies every setting under a unique
+“copy” name.
 
 What it reads
 -------------
@@ -183,8 +184,8 @@ named and recent lists are browser-local.
 **Export presets** bundle the current filter, column order, hidden columns, and visible-column
 export option under a name. Loading one restores all of those together, reloads the table, and
 leaves the existing CSV and package links ready. **Export presets** downloads all presets as
-versioned JSON; **Import presets** validates and merges by table and preset name. Presets are per
-table and browser-local.
+versioned JSON; **Import presets** validates and merges by table and preset name. **Duplicate** copies
+a preset under a unique “copy” name. Presets are per table and browser-local.
 
 The Tables workspace also has one **Analysis setup** bundle that combines every table's layout,
 named filters, recent filters, and export presets in a single versioned JSON file. Importing it

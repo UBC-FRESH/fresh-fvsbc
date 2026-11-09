@@ -1116,6 +1116,45 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             browser.close()
 
 
+def test_saved_presets_can_be_duplicated(cockpit: str) -> None:
+    """Compare and export presets can be copied under a unique name."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=BA&ctable=FVS_Summary_Metric"
+                "&ccolumns=BA,CCF&ckey=Year",
+                wait_until="networkidle",
+            )
+            page.locator("#compare-save-name").fill("Base compare")
+            page.get_by_role("button", name="Save", exact=True).click()
+            page.get_by_role("button", name="Duplicate", exact=True).click()
+            expect(page.locator("#compare-saved-status")).to_contain_text("Duplicated as")
+            expect(page.locator("#compare-saved option:checked")).to_have_text("Base compare copy")
+            expect(page.locator("#compare-saved-context")).to_contain_text("keys Year")
+
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-export-presets summary").click()
+            page.locator("#table-export-preset-name").fill("Base export")
+            page.locator("#table-export-presets").get_by_role("button", name="Save current").click()
+            page.locator("#table-export-presets").get_by_role("button", name="Duplicate").click()
+            expect(page.locator("#table-export-presets summary")).to_contain_text(
+                "Export presets · 2"
+            )
+            expect(page.locator("#table-export-preset-select option:checked")).to_have_text(
+                "Base export copy"
+            )
+            expect(page.locator("#table-export-preset-status")).to_contain_text("Duplicated as")
+        finally:
+            browser.close()
+
+
 def test_saved_compare_preset_can_be_renamed(cockpit: str) -> None:
     """Renaming a saved comparison preserves its settings and selection."""
     expect = playwright_module.expect
