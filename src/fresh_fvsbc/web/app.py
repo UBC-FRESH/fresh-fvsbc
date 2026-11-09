@@ -13,11 +13,13 @@ request process, so a projection that crashes cannot take the surface down with 
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import math
 import subprocess
 import sys
 import time
+import zipfile
 from collections.abc import Awaitable, Callable, Iterator, Sequence
 from pathlib import Path
 from typing import Any
@@ -51,6 +53,28 @@ POLL_SECONDS: float = 1.0
 
 #: How long a live event stream stays open before it closes and the browser reconnects, in seconds.
 STREAM_SECONDS: float = 600.0
+
+#: Units for the common FVS metric columns. A column not listed is exported as ``null`` rather
+#: than guessed; FVS itself does not attach units to a table's columns.
+COLUMN_UNITS: dict[str, str] = {
+    "Year": "year",
+    "Age": "years",
+    "TreeAge": "years",
+    "Tph": "trees/ha",
+    "TPH": "trees/ha",
+    "BA": "m2/ha",
+    "QMD": "cm",
+    "DBH": "cm",
+    "Ht": "m",
+    "TopHt": "m",
+    "PctCr": "%",
+    "CrWidth": "m",
+    "CCF": "%",
+    "SDI": "index",
+    "TCuM": "m3/ha",
+    "MCuM": "m3/ha",
+    "PrdLen": "years",
+}
 
 
 class AgentChatRequest(BaseModel):
@@ -740,6 +764,57 @@ def create_app(
         return Response(
             content=text,
             media_type="text/csv; charset=utf-8",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+
+    @app.get("/api/runs/{run_id}/tables/{name}/export")
+    def run_table_export(
+        run_id: str,
+        name: str,
+        q: str | None = Query(None, max_length=200),
+        column: str | None = Query(None, max_length=100),
+    ) -> Response:
+        """Return a table, filtered CSV, and an auditable metadata sidecar as a ZIP."""
+        run = _find(run_id)
+        try:
+            page = runstore.table(run, name, limit=1, offset=0, query=q, column=column)
+            text = runstore.table_csv(run, name, query=q, column=column)
+        except runstore.RunError as error:
+            raise HTTPException(status_code=404, detail=str(error)) from error
+        try:
+            provenance = runstore.provenance(run).get("provenance")
+        except runstore.RunError:
+            provenance = None
+        metadata = {
+            "run": run.id,
+            "table": name,
+            "filter": {"query": q or "", "column": column or ""},
+            "rows": page["total"],
+            "columns": [{"name": item, "unit": COLUMN_UNITS.get(item)} for item in page["columns"]],
+            "oracle": page["oracle"],
+            "provenance": provenance,
+            "source": "FVSOut.db",
+        }
+        readme = (
+            "fresh-fvsbc table export\n"
+            f"run: {run.id}\n"
+            f"table: {name}\n"
+            f"filter: query={q or ''} column={column or ''}\n"
+            f"rows: {page['total']}\n"
+            f"oracle: {page['oracle']}\n\n"
+            "data.csv contains the filtered table. metadata.json carries the run, filter,\n"
+            "oracle flag, provenance pins, and the unit for each known column. A null unit\n"
+            "means this reader does not declare one; it is not a missing measurement.\n"
+        )
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr("data.csv", text)
+            archive.writestr("metadata.json", json.dumps(metadata, indent=2) + "\n")
+            archive.writestr("README.txt", readme)
+        filename = f"{run.id}-{name}.zip"
+        return Response(
+            content=buffer.getvalue(),
+            media_type="application/zip",
             headers={"Content-Disposition": f'attachment; filename="{filename}"'},
         )
 

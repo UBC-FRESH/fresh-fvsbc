@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import io
 import json
 import sqlite3
 import subprocess
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -793,3 +795,48 @@ def test_agent_table_chips_are_validated_against_the_open_run(
             "query": "10",
         }
     ]
+
+
+def test_a_table_export_contains_data_metadata_and_units(tmp_path: Path) -> None:
+    """The ZIP carries the filtered CSV, provenance, and declared column units."""
+    _make_run(tmp_path / "run-c")
+    _add_metric_summary(tmp_path / "run-c")
+    client = TestClient(webapp.create_app([tmp_path]))
+    response = client.get("/api/runs/run-c/tables/FVS_Summary_Metric/export?q=10&column=Year")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/zip"
+    with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+        assert set(archive.namelist()) == {"data.csv", "metadata.json", "README.txt"}
+        data = archive.read("data.csv").decode("utf-8")
+        metadata = json.loads(archive.read("metadata.json"))
+        readme = archive.read("README.txt").decode("utf-8")
+    assert "Year" in data
+    assert "10" in data
+    assert metadata["run"] == "run-c"
+    assert metadata["table"] == "FVS_Summary_Metric"
+    assert metadata["rows"] == 1
+    assert metadata["filter"] == {"query": "10", "column": "Year"}
+    assert metadata["oracle"] is True
+    units = {item["name"]: item["unit"] for item in metadata["columns"]}
+    assert units["Year"] == "year"
+    assert units["Tph"] == "trees/ha"
+    assert "null unit" in readme
+
+
+def test_main_starts_uvicorn_with_the_configured_bind(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The service entry point reaches uvicorn with the parsed host and port."""
+    import sys
+    import types
+
+    called: dict[str, object] = {}
+
+    def run(application: object, *, host: str, port: int, log_level: str) -> None:
+        called.update({"host": host, "port": port, "log_level": log_level})
+
+    fake = types.SimpleNamespace(run=run)
+    monkeypatch.setitem(sys.modules, "uvicorn", fake)
+    code = webapp.main(["--runs", str(tmp_path), "--host", "127.0.0.1", "--port", "8779"])
+    assert code == 0
+    assert called == {"host": "127.0.0.1", "port": 8779, "log_level": "info"}

@@ -819,6 +819,7 @@ async function renderTables(body) {
   if (state.tableQuery) csvParams.set("q", state.tableQuery);
   if (state.tableColumn) csvParams.set("column", state.tableColumn);
   const csvHref = `${tablePath}/csv${csvParams.toString() ? `?${csvParams}` : ""}`;
+  const packageHref = `${tablePath}/export${csvParams.toString() ? `?${csvParams}` : ""}`;
   const filterInput = el("input", {
     id: "table-filter",
     type: "search",
@@ -866,8 +867,14 @@ async function renderTables(body) {
         }, "Clear")
       : null,
     el("a", { className: "button-like", href: csvHref, download: `${state.run.id}-${state.table}.csv` },
-      "Download CSV",
+      "CSV",
     ),
+    el("a", {
+      className: "button-like",
+      href: packageHref,
+      download: `${state.run.id}-${state.table}.zip`,
+      title: "CSV plus metadata.json and README.txt",
+    }, "Package"),
   );
   body.append(filterForm);
   body.append(
