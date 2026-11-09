@@ -1,0 +1,26 @@
+workflow:
+  id: okanagan_background_calibration
+  name: Okanagan background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for Okanagan and freeze its
+    aggregate metrics and coefficients. The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_okanagan
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - Okanagan TSA
+        - --model-id
+        - okanagan-background-v0
+        - --calibration
+        - none
+        - --metrics
+        - notes/reference/calibration/okanagan-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/okanagan-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/okanagan-candidate/metrics.csv
+      model_card: notes/reference/calibration/okanagan-candidate/model-card.json

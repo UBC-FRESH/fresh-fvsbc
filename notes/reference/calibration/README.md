@@ -329,6 +329,10 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-freshforge-boundary.md` | The D9.83 checked small-tree boundary |
 | `freeze_boundary.py` | The boundary-card freeze script |
 | `d9-small-tree-panel-summary.csv` | The aggregate 16-case small-tree panel |
+| `d9-freshforge-okanagan.md` | The D9.84 Okanagan background workflow |
+| `fit_candidate.py` | The target-excluded candidate template |
+| `okanagan-candidate/metrics.csv` | The frozen Okanagan aggregate metrics |
+| `okanagan-candidate/model-card.json` | Frozen Okanagan coefficients and pins |
 | `bcmort_provincial_temporal.py` | The D9.45 temporal prototype |
 | `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
