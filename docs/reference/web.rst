@@ -304,6 +304,23 @@ first surprise a caller meets.
 A run whose child died is reported as ``failed``, and its traceback is at
 ``GET /api/runs/{id}/log``. A run the service did not start has no log and reports an empty body.
 
+Public demo smoke
+-----------------
+
+``scripts/public_smoke.py`` checks the public shell, ``app.js``, run list, and agent status. When the
+host is behind Cloudflare Access, configure an Access **service token** through the policy and export
+its two values:
+
+.. code-block:: bash
+
+   export CF_ACCESS_CLIENT_ID=...
+   export CF_ACCESS_CLIENT_SECRET=...
+   python scripts/public_smoke.py --url https://fresh-fvsbc.01101.dev
+
+The script sends the token headers but never prints or stores them. It exits ``0`` on a pass, ``1``
+when an endpoint fails or Access still redirects, and ``2`` for a partial token configuration. This
+gives automation a path that does not depend on a person approving a Duo prompt.
+
 Not verified
 ------------
 
