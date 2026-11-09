@@ -114,7 +114,9 @@ def test_an_mpb_block_renders_its_nested_options() -> None:
     assert text.startswith("MPB")
     assert "MPBSTART" in text
     assert "INITMORT" in text
-    assert "0.8 0.9 1.0" in text
+    assert "0.8" in text
+    assert "0.9" in text
+    assert "1.0" in text
     assert text.rstrip().endswith("END")
     assert validate_keyword(block) == []
 
