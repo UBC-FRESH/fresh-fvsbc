@@ -1,0 +1,157 @@
+{
+  "artifacts": {
+    "notes/reference/calibration/REVIEW-INSTRUCTIONS.md": {
+      "bytes": 4582,
+      "sha256": "sha256:c4f48d768e83064c0621cda2bbc4b1f3719d6d852bfe68465a00dab4f12af812"
+    },
+    "notes/reference/calibration/bcmort_provincial.py": {
+      "bytes": 6893,
+      "sha256": "sha256:f33c866d59157786571a41dfd584a68590dadbc00673ccb08ed156c1fd1e627a"
+    },
+    "notes/reference/calibration/bcmort_provincial_calibration.py": {
+      "bytes": 4308,
+      "sha256": "sha256:0ea2c6924428d63a4cddc1b42133d9f82da4ddbe0da91334c38d89b67b17e18b"
+    },
+    "notes/reference/calibration/d9-candidate-review-package.md": {
+      "bytes": 3397,
+      "sha256": "sha256:76a5b6da39428f9f04ecee365437617beb5e8f4b23d90aae981117871a7b61ad"
+    },
+    "notes/reference/calibration/d9-freshforge-boundary.md": {
+      "bytes": 1735,
+      "sha256": "sha256:d3d7e92ee73c354828073bd9efe0a7cde26ceaf707b9a16fe3802ce14bc175f6"
+    },
+    "notes/reference/calibration/d9-freshforge-mpb.md": {
+      "bytes": 2197,
+      "sha256": "sha256:e31d40296e1ebb3016a7435e0c80929e5936122e3dbb6ab06ed44e007e917104"
+    },
+    "notes/reference/calibration/d9-freshforge-okanagan.md": {
+      "bytes": 1762,
+      "sha256": "sha256:d7281704ba15f2e6bd502b6d3c4b87f1c92f2e1ae1727bc854fa523456a9aeb5"
+    },
+    "notes/reference/calibration/d9-freshforge-workflow.md": {
+      "bytes": 2389,
+      "sha256": "sha256:cb0a7a65e15662b787e0613d41263aed6fdc6c1b05300a8b05a6177abf0f0f7e"
+    },
+    "notes/reference/calibration/d9-okanagan-candidate-summary.csv": {
+      "bytes": 367,
+      "sha256": "sha256:dcae40fe2cae7ea7a1e0184ffb74b93dec2d784249e71970d74923ceed61136b"
+    },
+    "notes/reference/calibration/d9-okanagan-candidate.md": {
+      "bytes": 1741,
+      "sha256": "sha256:304a664ff93432e6a0ca394b296cfbd3ef3b8d43ed631276094bbc8867492ba9"
+    },
+    "notes/reference/calibration/d9-provincial-calibration-summary.csv": {
+      "bytes": 694,
+      "sha256": "sha256:55e183a377ecae1b1eb953af73deef56bde85a5907b283bfca8287837ef41ca7"
+    },
+    "notes/reference/calibration/d9-provincial-crown-si-summary.csv": {
+      "bytes": 1511,
+      "sha256": "sha256:6bcb5e939b021ea0fa7351039349b6e261f97ff5af368443fcc844db64b204cb"
+    },
+    "notes/reference/calibration/d9-quesnel-mpb-segment.md": {
+      "bytes": 2656,
+      "sha256": "sha256:6d7e97535ad0e639d2fac50b66071ee1ccd046239f8434c094eac126226432d9"
+    },
+    "notes/reference/calibration/d9-small-tree-panel-summary.csv": {
+      "bytes": 292,
+      "sha256": "sha256:5faa488e1f80368aa1b0912bf68ff2f42ab1ad43d46f014fa0cf2194183518b3"
+    },
+    "notes/reference/calibration/d9-small-tree-panel.md": {
+      "bytes": 1966,
+      "sha256": "sha256:2eb0404ce197ddadcabb298074e52ece1245eae1ebc78f6b0cf7ad95efb28ac0"
+    },
+    "notes/reference/calibration/fit_candidate.py": {
+      "bytes": 5628,
+      "sha256": "sha256:15ed4ffa4e03240e5834d8fdcda886155a728e452e95a9559efba09a69efc8ac"
+    },
+    "notes/reference/calibration/freeze_boundary.py": {
+      "bytes": 4416,
+      "sha256": "sha256:0cfa40a41fb3afd11a1d8a7c6c5431778a8f425499357f4c9a3854eb5db9c4c0"
+    },
+    "notes/reference/calibration/freeze_model.py": {
+      "bytes": 4654,
+      "sha256": "sha256:6a2fff4a7842f40da8f872824503a103b35a0c7426e7c5d98d0e631a790e1d43"
+    },
+    "notes/reference/calibration/mpb_segment.py": {
+      "bytes": 7773,
+      "sha256": "sha256:ed211b2ecdc91a6344c6387d7baa5e51fcac7f32e8f327767f2210df533c947c"
+    },
+    "notes/reference/calibration/okanagan-candidate/README.md": {
+      "bytes": 1022,
+      "sha256": "sha256:9893bfa98898ad64578bec95fe8e6b232f2781527933130683659041f2dfbba1"
+    },
+    "notes/reference/calibration/okanagan-candidate/metrics.csv": {
+      "bytes": 701,
+      "sha256": "sha256:ec0a00c8a90f9d33ced43325a428bdfec2c08be9aae95b0ac9677f4c6e2da0cc"
+    },
+    "notes/reference/calibration/okanagan-candidate/model-card.json": {
+      "bytes": 40064,
+      "sha256": "sha256:37776af42f0d17e66fc96142024ffd22777d1f01a1927392ee10c7aba38278f0"
+    },
+    "notes/reference/calibration/quesnel-candidate/JOINT-REPORT.md": {
+      "bytes": 2897,
+      "sha256": "sha256:faccde0faa3a47f9873ad8a1c11d91e592eac5ccae30c4a73fcfef4af2e20a75"
+    },
+    "notes/reference/calibration/quesnel-candidate/README.md": {
+      "bytes": 2194,
+      "sha256": "sha256:0b02e5d5a12a8fab0dd8ed462a2f00680df04692280903812849ff14a0ab9c0a"
+    },
+    "notes/reference/calibration/quesnel-candidate/metrics.csv": {
+      "bytes": 131,
+      "sha256": "sha256:a391515d0ff7694d758b99a1391307dcf3ac89e7b61096169966410723191750"
+    },
+    "notes/reference/calibration/quesnel-candidate/model-card.json": {
+      "bytes": 39452,
+      "sha256": "sha256:dfe6a1efd74e9be797a9dbe1399aad630652997321795cd2e56e22f349361ab3"
+    },
+    "notes/reference/calibration/quesnel-candidate/small-tree-boundary.json": {
+      "bytes": 1087,
+      "sha256": "sha256:473c92123821f717fc33ec86c77e80f837918d78dfc1019591b9bdd99e8d2bbc"
+    },
+    "notes/reports/d9-candidate-review-template.md": {
+      "bytes": 906,
+      "sha256": "sha256:1eab404fb143c8546edaeb4f3bf320c5a8fc7bd70e54bb7f9660aa36312f9ef3"
+    },
+    "workflows/freshforge/okanagan_background.yaml": {
+      "bytes": 933,
+      "sha256": "sha256:5e0796a2dd6cc86b2cc1e73821f1e367292090f5124c818edadfb9d07412fc70"
+    },
+    "workflows/freshforge/quesnel_background.yaml": {
+      "bytes": 1239,
+      "sha256": "sha256:91b0b06a20344257a87fe181397450dd2158de24151507092003f03ec03b836b"
+    },
+    "workflows/freshforge/quesnel_mpb_segment.yaml": {
+      "bytes": 995,
+      "sha256": "sha256:bfb790bd70febffc681deefe3658e7bac2ed12e49f5f56cbcca39a026d707f7f"
+    }
+  },
+  "claim": "Review package only. No bundle, certificate, yield, AAC, legal, or whole-block claim.",
+  "decision": "pending",
+  "instructions": "notes/reference/calibration/REVIEW-INSTRUCTIONS.md",
+  "package_id": "d9-candidate-review-v0",
+  "pins": {
+    "fvs_source_commit": "ef5fa847",
+    "pyfvs_commit": "e95172b",
+    "variant": "bc",
+    "wrapper_version": "0.21.4"
+  },
+  "scope": {
+    "excluded": [
+      "100 Mile (retracted)",
+      "IDFdk (no bundle)",
+      "ICHmw2 (unsigned)",
+      "CWH volume question",
+      "SBPSmk mature",
+      "new TSAs and global screens"
+    ],
+    "okanagan": [
+      "okanagan-background-v0"
+    ],
+    "quesnel": [
+      "quesnel-sbsmw-background-v0",
+      "quesnel large-tree MPB segment",
+      "quesnel small-tree PL boundary"
+    ]
+  },
+  "status": "published_for_review"
+}
