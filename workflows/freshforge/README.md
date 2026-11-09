@@ -72,3 +72,17 @@ freshforge run workflows/freshforge/north_island_background.yaml --workdir . \
 It writes `north-island-candidate/metrics.csv` and
 `north-island-candidate/model-card.json`. PL is below the 500-tree support
 minimum and is omitted; the layer is coastal HW/FD/OTHER background only.
+
+## `kamloops_background.yaml`
+
+Fourth background candidate and the second southern-interior test:
+
+```sh
+freshforge run workflows/freshforge/kamloops_background.yaml --workdir . \
+  --evidence runtime/freshforge-kamloops-evidence.json
+```
+
+It writes `kamloops-candidate/metrics.csv` and
+`kamloops-candidate/model-card.json`. The card records the 20-site conditional
+rule evaluation; the rule is not applied because it does not improve held-out
+log loss.
