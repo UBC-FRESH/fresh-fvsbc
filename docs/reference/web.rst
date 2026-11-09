@@ -116,7 +116,8 @@ The row-level diff has its own **Diff columns** disclosure. Selecting a subset c
 are shown and which rows rank highest; the summary metrics above it are unaffected. A **Key
 columns** disclosure chooses the identity columns used to match rows across runs; key columns are
 excluded from the deltas. The selections are encoded in ``ccolumns`` and ``ckey`` and saved with
-named comparisons.
+named comparisons. Selecting a named comparison shows its runs, metric, table, diff columns, and
+key columns; **Update** overwrites that preset with the current comparison settings.
 
 What it reads
 -------------

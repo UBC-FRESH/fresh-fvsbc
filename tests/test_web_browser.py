@@ -957,6 +957,42 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             browser.close()
 
 
+def test_saved_compare_preset_can_be_updated(cockpit: str) -> None:
+    """A saved comparison shows its key/diff settings and can overwrite them."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=BA&ctable=FVS_Summary_Metric"
+                "&ccolumns=BA,CCF&ckey=Year",
+                wait_until="networkidle",
+            )
+            page.locator("#compare-save-name").fill("Preset update")
+            page.get_by_role("button", name="Save", exact=True).click()
+            context = page.locator("#compare-saved-context")
+            expect(context).to_contain_text("2 diff columns: BA, CCF")
+            expect(context).to_contain_text("keys Year")
+
+            page.locator("#compare-columns summary").click()
+            page.locator("#compare-columns input[value='CCF']").uncheck()
+            page.get_by_role("button", name="Update", exact=True).click()
+            expect(context).to_contain_text("1 diff column: BA")
+
+            page.reload(wait_until="networkidle")
+            expect(page.locator("#compare-saved-context")).to_contain_text("1 diff column: BA")
+            page.get_by_role("button", name="Load", exact=True).click()
+            params = page.evaluate(
+                "Object.fromEntries(new URLSearchParams(window.location.search))"
+            )
+            assert params["ccolumns"] == "BA"
+            assert params["ckey"] == "Year"
+        finally:
+            browser.close()
+
+
 def test_the_mobile_shell_does_not_overflow(cockpit: str) -> None:
     """The runs and summary views fit a phone-width viewport."""
     expect = playwright_module.expect
