@@ -2001,6 +2001,8 @@ async function renderTables(body) {
       const disabled = !event.target.value;
       document.getElementById("table-filter-load").disabled = disabled;
       document.getElementById("table-filter-delete").disabled = disabled;
+      document.getElementById("table-filter-rename").disabled = disabled;
+      document.getElementById("table-filter-duplicate").disabled = disabled;
     },
   },
     el("option", { value: "" },
@@ -2168,6 +2170,64 @@ async function renderTables(body) {
     await renderPanel();
     setTableFilterStatus(`Deleted “${filter.name}”.`);
   };
+  const renameSavedFilter = async () => {
+    const filter = savedFilters.find((entry) => entry.id === state.tableSavedFilter);
+    if (!filter) {
+      setTableFilterStatus("Choose a saved filter to rename.", "error");
+      return;
+    }
+    const name = String(filterName.value || "").trim().slice(0, 80);
+    if (!name) {
+      setTableFilterStatus("Enter the new name first.", "error");
+      return;
+    }
+    if (name === filter.name) {
+      setTableFilterStatus("That is already the filter name.", "error");
+      return;
+    }
+    if (savedFilters.some((entry) => entry.id !== filter.id && entry.name === name)) {
+      setTableFilterStatus("Another saved filter already uses that name.", "error");
+      return;
+    }
+    const next = savedFilters.map((entry) =>
+      entry.id === filter.id ? { ...entry, name } : entry,
+    );
+    if (!writeTableFilters(state.table, next)) {
+      setTableFilterStatus("Browser storage is unavailable; could not rename this filter.", "error");
+      return;
+    }
+    state.tableSavedFilter = filter.id;
+    state.tableFiltersOpen = true;
+    filterName.value = "";
+    await renderPanel();
+    setTableFilterStatus(`Renamed to “${name}”.`);
+  };
+  const duplicateSavedFilter = async () => {
+    const filter = savedFilters.find((entry) => entry.id === state.tableSavedFilter);
+    if (!filter) {
+      setTableFilterStatus("Choose a saved filter to duplicate.", "error");
+      return;
+    }
+    const name = uniqueCopyName(filter.name, new Set(savedFilters.map((entry) => entry.name)));
+    const copy = {
+      ...filter,
+      id: window.crypto?.randomUUID?.()
+        ?? `filter-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name,
+      created_at: new Date().toISOString(),
+    };
+    if (!writeTableFilters(state.table, [copy, ...savedFilters])) {
+      setTableFilterStatus(
+        "Browser storage is unavailable; could not duplicate this filter.",
+        "error",
+      );
+      return;
+    }
+    state.tableSavedFilter = copy.id;
+    state.tableFiltersOpen = true;
+    await renderPanel();
+    setTableFilterStatus(`Duplicated as “${name}”.`);
+  };
   const saveNamedFilter = async (name, query, column) => {
     const clean = String(name || "").trim().slice(0, 80);
     if (!clean) {
@@ -2315,6 +2375,18 @@ async function renderTables(body) {
             }
           },
         }, "Save current"),
+        el("button", {
+          id: "table-filter-rename",
+          type: "button",
+          disabled: !state.tableSavedFilter,
+          onclick: renameSavedFilter,
+        }, "Rename"),
+        el("button", {
+          id: "table-filter-duplicate",
+          type: "button",
+          disabled: !state.tableSavedFilter,
+          onclick: duplicateSavedFilter,
+        }, "Duplicate"),
       ),
       filterPreview.node,
       el("p", {
