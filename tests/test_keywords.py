@@ -96,6 +96,29 @@ def test_the_blank_slots_are_the_six_that_are_blank() -> None:
     assert BLANK_SLOTS == (114, 118, 120, 148, 149, 150)
 
 
+def test_an_mpb_block_renders_its_nested_options() -> None:
+    """The MPB block is a keyword block, and INITMORT carries its supplemental record."""
+    block = Keyword(
+        "MPB",
+        nested=(
+            Keyword("MPBSTART", ("1",)),
+            Keyword(
+                "INITMORT",
+                ("0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7"),
+                supplemental=("0.8 0.9 1.0",),
+            ),
+            Keyword("MAXYEARS", ("10",)),
+        ),
+    )
+    text = render_keyword(block)
+    assert text.startswith("MPB")
+    assert "MPBSTART" in text
+    assert "INITMORT" in text
+    assert "0.8 0.9 1.0" in text
+    assert text.rstrip().endswith("END")
+    assert validate_keyword(block) == []
+
+
 def test_the_first_block_is_the_one_the_source_declares() -> None:
     """Slots 1 to 20, in order."""
     assert KEYWORD_TABLE[:20] == FIRST_BLOCK
