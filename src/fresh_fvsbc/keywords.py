@@ -876,6 +876,9 @@ def render_keyword(keyword: Keyword) -> str:
     if keyword.name in KEYWORD_BLOCK_KEYWORDS:
         return head + "".join(render_keyword(entry) for entry in keyword.nested) + "END\n"
     if keyword.supplemental:
+        if keyword.name in {"INITMORT", "CURRMORT"}:
+            fields = keyword.supplemental[0].split()
+            return head + "".join(f"{field:<{FIELD_WIDTH}}" for field in fields) + "\n"
         return head + "".join(f"{record}\n" for record in keyword.supplemental)
     return head
 

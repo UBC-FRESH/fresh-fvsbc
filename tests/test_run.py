@@ -205,6 +205,13 @@ def test_the_handoff_goes_before_the_first_projection_keyword() -> None:
     assert names == ["STDIDENT", "STDINFO", "NUMCYCLE", "TREEFMT", "TREEDATA", "PROCESS", "STOP"]
 
 
+def test_the_handoff_goes_before_an_mpb_block() -> None:
+    """MPB setup runs before the projection and needs the tree list already present."""
+    given = a_set("STDIDENT", "STDINFO", "MPB", "PROCESS")
+    names = [keyword.name for keyword in run.with_tree_handoff(given)]
+    assert names == ["STDIDENT", "STDINFO", "TREEFMT", "TREEDATA", "MPB", "PROCESS"]
+
+
 def test_the_handoff_goes_before_stop_when_there_is_no_process() -> None:
     """``STOP`` ends the run, so a handoff after it would never be read."""
     names = [keyword.name for keyword in run.with_tree_handoff(a_set("STDINFO", "STOP"))]

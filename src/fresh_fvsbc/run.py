@@ -211,9 +211,10 @@ def tree_file_name(key_path: str | Path) -> Path:
 def with_tree_handoff(keywords: Sequence[Keyword]) -> tuple[Keyword, ...]:
     """Return a keyword set with the tree handoff inserted, in the caller's order.
 
-    The handoff goes before the first ``PROCESS`` or ``STOP``, because FVS reads the trees when it
-    reaches ``TREEDATA`` and starts the projection at ``PROCESS``. A set that carries neither ends
-    with the handoff.
+    The handoff goes before the first ``PROCESS``, ``STOP``, or ``MPB``. FVS reads
+    the trees when it reaches ``TREEDATA``; MPB setup also runs before the
+    projection and expects the tree list already present. A set that carries
+    none ends with the handoff.
 
     Parameters
     ----------
@@ -239,7 +240,7 @@ def with_tree_handoff(keywords: Sequence[Keyword]) -> tuple[Keyword, ...]:
         )
     handoff = (Keyword(TREE_FORMAT_KEYWORD, TREEFMT_LINES), Keyword(TREE_DATA_KEYWORD))
     for index, keyword in enumerate(given):
-        if keyword.name in _PROJECTION_KEYWORDS:
+        if keyword.name in _PROJECTION_KEYWORDS or keyword.name == "MPB":
             return (*given[:index], *handoff, *given[index:])
     return (*given, *handoff)
 
