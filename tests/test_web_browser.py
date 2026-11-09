@@ -276,6 +276,55 @@ def test_the_table_shows_its_source_and_declared_units(cockpit: str) -> None:
             browser.close()
 
 
+def test_a_large_page_only_renders_a_virtual_window(cockpit: str) -> None:
+    """A 500-row page keeps the DOM small and still reveals the final row on scroll."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        rows = [{"TreeIndex": index, "DBH": index / 10} for index in range(500)]
+
+        def table_page(route: Any) -> None:  # noqa: ANN401
+            route.fulfill(
+                status=200,
+                content_type="application/json",
+                body=json.dumps(
+                    {
+                        "name": "FVS_TreeList_Metric",
+                        "columns": ["TreeIndex", "DBH"],
+                        "rows": rows,
+                        "total": len(rows),
+                        "offset": 0,
+                        "limit": 1000,
+                        "query": "",
+                        "column": "",
+                        "oracle": True,
+                        "source": "FVSOut.db",
+                        "units": {"DBH": "cm"},
+                    }
+                ),
+            )
+
+        page.route(
+            re.compile(r".*/api/runs/smoke-run/tables/FVS_TreeList_Metric\?.*"),
+            table_page,
+        )
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}"
+                "&table=FVS_TreeList_Metric&limit=1000",
+                wait_until="networkidle",
+            )
+            expect(page.locator("tr.data-row").first).to_be_visible()
+            assert 0 < page.locator("tr.data-row").count() < 500
+            page.locator(".table-scroll").evaluate(
+                "(node) => { node.scrollTop = node.scrollHeight; }"
+            )
+            expect(page.locator("tr.data-row").last).to_contain_text("499")
+        finally:
+            browser.close()
+
+
 def test_a_large_table_can_page_and_change_its_page_size(cockpit: str) -> None:
     """The table pager exposes page size, page number, and the filtered row range."""
     expect = playwright_module.expect

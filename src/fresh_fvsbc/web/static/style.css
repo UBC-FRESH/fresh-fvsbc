@@ -915,3 +915,11 @@ svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }
   letter-spacing: 0.01em;
   opacity: 0.85;
 }
+
+.virtual-spacer td {
+  height: inherit;
+  padding: 0;
+  border: 0;
+  font-size: 0;
+  line-height: 0;
+}

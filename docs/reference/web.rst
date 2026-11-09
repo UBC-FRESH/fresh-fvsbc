@@ -123,6 +123,10 @@ source. Units come from the reader's column table, not from FVS, which does not 
 output columns; a blank unit means the reader does not declare one, not that the column is
 dimensionless. The same declared units travel in the export's ``metadata.json`` sidecar.
 
+A page with more than 120 rows renders only the visible window plus a small overscan, with spacer
+rows preserving the full scroll height. Filtering and paging stay server-side, so virtualizing does
+not change which rows the reader returns or exports.
+
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.
 
