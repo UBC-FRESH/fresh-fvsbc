@@ -1220,6 +1220,36 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             browser.close()
 
 
+def test_saved_comparisons_can_be_sorted(cockpit: str) -> None:
+    """Sort controls order presets without losing the current selection."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=BA&ctable=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#compare-save-name").fill("Alpha preset")
+            page.get_by_role("button", name="Save", exact=True).click()
+            page.locator("#compare-save-name").fill("Beta preset")
+            page.get_by_role("button", name="Save", exact=True).click()
+
+            options = page.locator("#compare-saved option")
+            expect(options.nth(1)).to_have_text("Beta preset")
+            page.locator("#compare-saved-sort").select_option("name")
+            expect(options.nth(1)).to_have_text("Alpha preset")
+            expect(options.nth(2)).to_have_text("Beta preset")
+            expect(page.locator("#compare-saved option:checked")).to_have_text("Beta preset")
+            page.locator("#compare-saved-sort").select_option("name-desc")
+            expect(options.nth(1)).to_have_text("Beta preset")
+            expect(options.nth(2)).to_have_text("Alpha preset")
+        finally:
+            browser.close()
+
+
 def test_saved_comparisons_can_be_searched(cockpit: str) -> None:
     """Searching a preset collection filters options and keeps one selected."""
     expect = playwright_module.expect
