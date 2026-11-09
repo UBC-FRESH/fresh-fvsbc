@@ -187,6 +187,8 @@ Endpoints
     one table, paged, with its columns; ``q`` filters before paging and ``column`` restricts it
 ``GET /api/runs/{id}/tables/{name}/csv``
     the filtered table as a CSV attachment
+``GET /api/runs/{id}/tables/{name}/export``
+    a ZIP with the filtered ``data.csv``, ``metadata.json``, and a README
 ``GET /api/runs/{id}/visuals?year=``
     the schematic stand payload: layout, trees, cut trees, species and the year's summary row
 ``GET /api/runs/{id}/keywords``

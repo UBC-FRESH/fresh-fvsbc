@@ -7,6 +7,7 @@ them in the dedicated browser job; the Python quality jobs stay browser-free.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import socket
 import sqlite3
@@ -164,7 +165,10 @@ def test_the_cockpit_runs_stand_calibration_and_url_state(cockpit: str) -> None:
             expect(page.locator("#panel-body")).to_contain_text("1 matching row")
             expect(page.locator("#panel-body")).to_contain_text("Rows 1")
             expect(page.locator("#panel-body")).to_contain_text("of 1")
-            expect(page.get_by_role("link", name="Download CSV")).to_be_visible()
+            expect(page.get_by_role("link", name="CSV", exact=True)).to_be_visible()
+            expect(page.get_by_role("link", name="Package", exact=True)).to_have_attribute(
+                "href", re.compile(r"/export\?")
+            )
 
             page.get_by_role("tab", name="Evidence").click()
             page.get_by_role("tab", name="Provenance").click()
