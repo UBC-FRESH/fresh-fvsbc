@@ -34,8 +34,9 @@ Large-tree MPB, corrected one-cycle segment at 0.08× INITMORT:
 | `4031355` | 85.0% | 100% |
 | `4031394` | 91.2% | 100% |
 
-The remaining live PL is entirely 5–15 cm. Base FVS also leaves those small PL. This is a
-small-tree mortality gap, not MPB severity.
+The remaining live PL is entirely 5–15 cm. A 16-case high-PL panel confirms the pattern is general:
+the maximum surviving PL DBH is 16.66 cm, and only 0.04 PL/ac above 15 cm survives in one case. Base
+FVS also leaves those small PL. This is a structural small-tree mortality gap, not MPB severity.
 
 ## 4. Candidate composition
 
@@ -54,7 +55,15 @@ The PL/MPB layer is:
 - large-tree MPB;
 - small-tree residual reported separately.
 
-## 5. Decisions
+## 5. Small-tree boundary
+
+The small-tree residual is **not modeled** in this candidate. The 16-case panel shows it is a general
+structural gap: MPB removes the host-size classes and leaves 5–15 cm PL everywhere. That is a core
+small-tree mortality question, not an INITMORT or Quesnel tuning problem.
+
+The candidate reports the residual explicitly rather than hiding it in a multiplier.
+
+## 6. Decisions
 
 - Freeze `quesnel-sbsmw-background-v0` as a non-PL candidate layer.
 - Do not issue a bundle.
@@ -62,13 +71,13 @@ The PL/MPB layer is:
 - Do not add a global temporal or Quesnel multiplier.
 - Do not open new diagnostic seams until review feedback or the MPB wrapper integration.
 
-## 6. Open items
+## 7. Open items
 
 1. Wire the MPB build patch into the pinned wrapper.
 2. Decide whether the small-tree PL residual needs a model or is a documented limit.
 3. Finish SBSdw2 local severity.
 4. Build the same candidate template for other TSAs.
 
-## 7. Claim boundary
+## 8. Claim boundary
 
 This report does not support a yield, AAC, legal, or whole-block claim, and it is not a certificate.
