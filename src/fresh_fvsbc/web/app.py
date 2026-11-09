@@ -86,6 +86,21 @@ def _declared_units(columns: Sequence[str]) -> dict[str, str]:
     return {name: COLUMN_UNITS[name] for name in columns if name in COLUMN_UNITS}
 
 
+def _export_columns(available: Sequence[str], selected: str | None) -> list[str] | None:
+    """Validate and de-duplicate an ordered export column list."""
+    if not selected:
+        return None
+    requested: list[str] = []
+    for raw in selected.split(","):
+        name = raw.strip()
+        if not name or name in requested:
+            continue
+        if name not in available:
+            raise HTTPException(status_code=400, detail=f"the table has no column {name!r}")
+        requested.append(name)
+    return requested or None
+
+
 class AgentChatRequest(BaseModel):
     """One assistant turn from the browser."""
 
@@ -775,11 +790,14 @@ def create_app(
         name: str,
         q: str | None = Query(None, max_length=200),
         column: str | None = Query(None, max_length=100),
+        columns: str | None = Query(None, max_length=4000),
     ) -> Response:
         """Return one exposed table as a CSV attachment, with the same literal filter."""
         run = _find(run_id)
         try:
-            text = runstore.table_csv(run, name, query=q, column=column)
+            page = runstore.table(run, name, limit=1, offset=0, query=q, column=column)
+            chosen = _export_columns(page["columns"], columns)
+            text = runstore.table_csv(run, name, query=q, column=column, columns=chosen)
         except runstore.RunError as error:
             raise HTTPException(status_code=404, detail=str(error)) from error
         filename = f"{run.id}-{name}.csv"
@@ -795,37 +813,44 @@ def create_app(
         name: str,
         q: str | None = Query(None, max_length=200),
         column: str | None = Query(None, max_length=100),
+        columns: str | None = Query(None, max_length=4000),
     ) -> Response:
         """Return a table, filtered CSV, and an auditable metadata sidecar as a ZIP."""
         run = _find(run_id)
         try:
             page = runstore.table(run, name, limit=1, offset=0, query=q, column=column)
-            text = runstore.table_csv(run, name, query=q, column=column)
+            chosen = _export_columns(page["columns"], columns)
+            text = runstore.table_csv(run, name, query=q, column=column, columns=chosen)
         except runstore.RunError as error:
             raise HTTPException(status_code=404, detail=str(error)) from error
         try:
             provenance = runstore.provenance(run).get("provenance")
         except runstore.RunError:
             provenance = None
+        export_columns = chosen if chosen is not None else list(page["columns"])
         metadata = {
             "run": run.id,
             "table": name,
             "filter": {"query": q or "", "column": column or ""},
             "rows": page["total"],
-            "columns": [{"name": item, "unit": COLUMN_UNITS.get(item)} for item in page["columns"]],
+            "columns": [{"name": item, "unit": COLUMN_UNITS.get(item)} for item in export_columns],
             "oracle": page["oracle"],
             "provenance": provenance,
             "source": TABLE_SOURCE,
         }
+        column_line = (
+            f"columns: {', '.join(export_columns)}\n" if chosen is not None else "columns: all\n"
+        )
         readme = (
             "fresh-fvsbc table export\n"
             f"run: {run.id}\n"
             f"table: {name}\n"
             f"filter: query={q or ''} column={column or ''}\n"
             f"rows: {page['total']}\n"
+            f"{column_line}"
             f"oracle: {page['oracle']}\n\n"
             "data.csv contains the filtered table. metadata.json carries the run, filter,\n"
-            "oracle flag, provenance pins, and the unit for each known column. A null unit\n"
+            "oracle flag, provenance pins, and the unit for each included column. A null unit\n"
             "means this reader does not declare one; it is not a missing measurement.\n"
         )
         buffer = io.BytesIO()

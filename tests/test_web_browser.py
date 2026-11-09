@@ -330,6 +330,49 @@ def test_a_large_page_only_renders_a_virtual_window(cockpit: str) -> None:
             browser.close()
 
 
+def test_table_exports_can_follow_the_visible_layout(cockpit: str, tmp_path: Path) -> None:
+    """The layout option narrows and orders both CSV and package exports."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-columns summary").click()
+            page.locator("#table-export-visible").check()
+            page.locator("#table-columns input[value='Age']").uncheck()
+            csv_link = page.get_by_role("link", name="CSV", exact=True)
+            package_link = page.get_by_role("link", name="Package", exact=True)
+            assert "columns=" in (csv_link.get_attribute("href") or "")
+            assert "columns=" in (package_link.get_attribute("href") or "")
+
+            with page.expect_download() as download_info:
+                csv_link.click()
+            exported = tmp_path / "visible.csv"
+            download_info.value.save_as(exported)
+            header = exported.read_text(encoding="utf-8").splitlines()[0].split(",")
+            assert "Age" not in header
+            assert header[:2] == ["Year", "Tph"]
+
+            page.reload(wait_until="networkidle")
+            page.locator("#table-columns summary").click()
+            expect(page.locator("#table-export-visible")).to_be_checked()
+            expect(page.locator("#table-columns summary")).to_contain_text("8 of 9 shown")
+            assert "columns=" in (
+                page.get_by_role("link", name="CSV", exact=True).get_attribute("href") or ""
+            )
+
+            page.locator("#table-export-visible").uncheck()
+            assert "columns=" not in (
+                page.get_by_role("link", name="CSV", exact=True).get_attribute("href") or ""
+            )
+        finally:
+            browser.close()
+
+
 def test_table_filters_can_be_saved_loaded_and_deleted(cockpit: str) -> None:
     """A named filter restores its query, column, and a hidden filter column."""
     expect = playwright_module.expect
