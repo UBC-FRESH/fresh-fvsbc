@@ -129,6 +129,7 @@ jobs:
           gunzip -c notes/reference/calibration/w2-subzones.patch.gz > "$RUNNER_TEMP/w2-subzones.patch"
           gunzip -c notes/reference/calibration/w3-habtyp-boundary.patch.gz > "$RUNNER_TEMP/w3-habtyp-boundary.patch"
           gunzip -c notes/reference/calibration/w4-sbps-small-tree.patch.gz > "$RUNNER_TEMP/w4-sbps-small-tree.patch"
+          gunzip -c notes/reference/calibration/d9-mpb-bc.patch.gz > "$RUNNER_TEMP/d9-mpb-bc.patch"
           git -C "$RUNNER_TEMP/PyFVS" apply --check "$RUNNER_TEMP/pyfvs.patch"
           git -C "$RUNNER_TEMP/PyFVS" apply "$RUNNER_TEMP/pyfvs.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/fvsbc.patch"
@@ -149,6 +150,9 @@ jobs:
           # existing oracle because its branches are SBPS/SBS-only.
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/w4-sbps-small-tree.patch"
           git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/w4-sbps-small-tree.patch"
+          # D9.71 links the real LPMPB extension for the BC variant instead of the stub.
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply --check "$RUNNER_TEMP/d9-mpb-bc.patch"
+          git -C "$RUNNER_TEMP/PyFVS/fvs" apply "$RUNNER_TEMP/d9-mpb-bc.patch"
 
       - name: Build the BC variant
         working-directory: ${{ runner.temp }}/PyFVS
