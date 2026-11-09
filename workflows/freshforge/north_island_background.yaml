@@ -1,0 +1,29 @@
+workflow:
+  id: north_island_background_calibration
+  name: North Island background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for North Island and freeze
+    its aggregate metrics and coefficients. PL is below the target-support
+    minimum and is omitted. The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_north_island
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - North Island TSA
+        - --model-id
+        - north-island-background-v0
+        - --calibration
+        - none
+        - --min-target-trees
+        - "500"
+        - --metrics
+        - notes/reference/calibration/north-island-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/north-island-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/north-island-candidate/metrics.csv
+      model_card: notes/reference/calibration/north-island-candidate/model-card.json

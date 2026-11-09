@@ -59,6 +59,12 @@ def main() -> None:
     parser.add_argument("--metrics", type=Path, required=True)
     parser.add_argument("--model-card", type=Path, required=True)
     parser.add_argument("--calibration", choices=("none", "conditional"), default="none")
+    parser.add_argument(
+        "--min-target-trees",
+        type=int,
+        default=0,
+        help="Omit species groups with fewer target trees than this.",
+    )
     args = parser.parse_args()
 
     frame = bp.load()
@@ -71,12 +77,16 @@ def main() -> None:
     feature_names = list(FEATURES) + [f"zone_{zone}" for zone in zones]
     groups: dict[str, object] = {}
     rows: list[dict[str, object]] = []
+    omitted: list[dict[str, object]] = []
     all_y: list[np.ndarray] = []
     all_p: list[np.ndarray] = []
     for group in bp.GROUPS:
         part = train[train["group"] == group]
         test = target[target["group"] == group]
         if len(part) < 1000 or test.empty:
+            continue
+        if len(test) < args.min_target_trees:
+            omitted.append({"group": group, "n": len(test)})
             continue
         x = _design(part, zones)
         mean = x[:, 1:].mean(axis=0)
@@ -149,6 +159,12 @@ def main() -> None:
         ),
     }
     args.model_card.parent.mkdir(parents=True, exist_ok=True)
+    if omitted:
+        card["target_groups_below_minimum"] = omitted
+        card["limitations"].append(
+            "Groups below the target-support minimum are omitted: "
+            + ", ".join(f"{item['group']} ({item['n']})" for item in omitted)
+        )
     args.model_card.write_text(json.dumps(card, indent=2, sort_keys=True) + "\n")
     print(f"wrote {args.metrics} and {args.model_card}")
 
