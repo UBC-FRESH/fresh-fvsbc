@@ -1,0 +1,32 @@
+{
+  "boundary": {
+    "rule": "MPB handles the large-tree PL collapse. Do not tune INITMORT for small PL; report the sub-threshold residual as a separate mortality gap.",
+    "threshold_cm": 15.0
+  },
+  "boundary_id": "quesnel-pl-small-tree-v0",
+  "checks": {
+    "above_threshold_limit_tpa": 1.0,
+    "max_dbh_limit_cm": 20.0,
+    "passed": true
+  },
+  "claim": "Frozen diagnostic boundary for sub-threshold PL after MPB. Not a yield, AAC, legal, whole-block, or certificate claim.",
+  "evidence": {
+    "note": "notes/reference/calibration/d9-small-tree-panel.md",
+    "panel": "notes/reference/calibration/d9-small-tree-panel-summary.csv",
+    "panel_checksum": "sha256:5faa488e1f80368aa1b0912bf68ff2f42ab1ad43d46f014fa0cf2194183518b3"
+  },
+  "panel": {
+    "cases": 16,
+    "live_pl_above_15_tpa": 0.04,
+    "max_final_live_pl_tpa": 58.91,
+    "max_live_dbh_cm": 16.66,
+    "mean_final_live_pl_tpa": 12.1525
+  },
+  "pins": {
+    "fvs_source_commit": "ef5fa847",
+    "pyfvs_commit": "e95172b",
+    "variant": "bc",
+    "wrapper_version": "0.21.4"
+  },
+  "status": "frozen_boundary"
+}

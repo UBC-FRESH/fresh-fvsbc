@@ -326,6 +326,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-freshforge-workflow.md` | The D9.79 FreshForge calibration workflow |
 | `d9-freshforge-mpb.md` | The D9.82 FreshForge MPB segment workflow |
 | `mpb_segment.py` | The MPB segment workflow script |
+| `d9-freshforge-boundary.md` | The D9.83 checked small-tree boundary |
+| `freeze_boundary.py` | The boundary-card freeze script |
+| `d9-small-tree-panel-summary.csv` | The aggregate 16-case small-tree panel |
 | `bcmort_provincial_temporal.py` | The D9.45 temporal prototype |
 | `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
