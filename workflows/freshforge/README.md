@@ -174,3 +174,16 @@ freshforge run workflows/freshforge/kootenay_lake_background.yaml --workdir . \
 
 It writes `kootenay-lake-candidate/metrics.csv` and
 `kootenay-lake-candidate/model-card.json`. No local calibration is applied.
+
+## `boundary_background.yaml`
+
+Twelfth background candidate and the deferred Boundary hard case:
+
+```sh
+freshforge run workflows/freshforge/boundary_background.yaml --workdir . \
+  --evidence runtime/freshforge-boundary-evidence.json
+```
+
+It writes `boundary-candidate/metrics.csv` and
+`boundary-candidate/model-card.json`. The card records the symmetric 20-site
+local-rule evaluation; deployment offsets are not embedded.
