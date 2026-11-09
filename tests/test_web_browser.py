@@ -251,6 +251,31 @@ def test_direct_links_restore_table_and_compare_state(cockpit: str) -> None:
             browser.close()
 
 
+def test_the_table_shows_its_source_and_declared_units(cockpit: str) -> None:
+    """A table header carries the same units the package sidecar declares."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            expect(page.locator(".table-provenance")).to_contain_text("Source: FVSOut.db")
+            expect(page.locator(".table-provenance")).to_contain_text("declared units")
+            year_header = page.locator("th").filter(
+                has=page.locator(".column-name", has_text=re.compile(r"^Year$")),
+            )
+            expect(year_header.locator(".column-unit")).to_have_text("year")
+            tph_header = page.locator("th").filter(
+                has=page.locator(".column-name", has_text=re.compile(r"^Tph$")),
+            )
+            expect(tph_header.locator(".column-unit")).to_have_text("trees/ha")
+        finally:
+            browser.close()
+
+
 def test_a_large_table_can_page_and_change_its_page_size(cockpit: str) -> None:
     """The table pager exposes page size, page number, and the filtered row range."""
     expect = playwright_module.expect

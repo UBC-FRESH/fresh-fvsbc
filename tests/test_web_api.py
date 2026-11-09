@@ -131,6 +131,21 @@ def test_a_table_page_is_served(client: TestClient) -> None:
     assert page["oracle"] is False
 
 
+def test_a_table_page_carries_its_source_and_declared_units(tmp_path: Path) -> None:
+    """The UI receives the same units the export sidecar declares, and no guessed units."""
+    _make_run(tmp_path / "run-c")
+    _add_metric_summary(tmp_path / "run-c")
+    client = TestClient(webapp.create_app([tmp_path]))
+    page = client.get("/api/runs/run-c/tables/FVS_Summary_Metric").json()
+    assert page["source"] == "FVSOut.db"
+    assert page["units"]["Year"] == "year"
+    assert page["units"]["Tph"] == "trees/ha"
+    assert set(page["units"]) <= set(page["columns"])
+    listed = client.get("/api/runs/run-c/tables").json()
+    summary = next(table for table in listed if table["name"] == "FVS_Summary_Metric")
+    assert summary["units"]["Tph"] == "trees/ha"
+
+
 def test_an_unexposed_table_is_a_404(client: TestClient) -> None:
     """The service refuses a table the reader does not expose, and says which."""
     response = client.get("/api/runs/run-a/tables/FVS_Carbon_Metric")

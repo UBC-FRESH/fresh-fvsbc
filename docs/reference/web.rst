@@ -118,6 +118,11 @@ FVS's internal units, so a card that labelled its ``tpa`` as metric TPH would be
 metric table is absent, the panel falls back to ``summary.csv`` and labels every value as native
 (ft²/ac, trees/ac, ft); it does not silently mix units.
 
+Table headers show the units this reader declares, and the Tables panel names ``FVSOut.db`` as the
+source. Units come from the reader's column table, not from FVS, which does not attach units to
+output columns; a blank unit means the reader does not declare one, not that the column is
+dimensionless. The same declared units travel in the export's ``metadata.json`` sidecar.
+
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.
 
@@ -189,9 +194,10 @@ Endpoints
 ``GET /api/runs/{id}/metric-summary``
     ``FVS_Summary_Metric`` rows, the metric source the overview renders
 ``GET /api/runs/{id}/tables``
-    exposed tables written, with counts and the flag
+    exposed tables written, with counts, declared units, and the flag
 ``GET /api/runs/{id}/tables/{name}``
-    one table, paged, with its columns; ``q`` filters before paging and ``column`` restricts it
+    one table, paged, with its columns, source, and declared units; ``q`` filters before paging
+    and ``column`` restricts it
 ``GET /api/runs/{id}/tables/{name}/csv``
     the filtered table as a CSV attachment
 ``GET /api/runs/{id}/tables/{name}/export``

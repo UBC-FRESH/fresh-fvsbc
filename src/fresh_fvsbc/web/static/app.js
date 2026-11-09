@@ -916,12 +916,32 @@ async function renderTables(body) {
     return;
   }
 
+  const units = payload.units ?? {};
+  const declaredUnits = Object.keys(units).length;
+  body.append(
+    el("p", { className: "table-provenance" },
+      `Source: ${payload.source ?? "FVSOut.db"} · `,
+      declaredUnits
+        ? `${declaredUnits} of ${payload.columns.length} columns have declared units; blank means this reader does not declare one.`
+        : "This table has no declared units; blank does not mean dimensionless.",
+    ),
+  );
   const header = el(
     "tr",
     {},
-    ...payload.columns.map((column) =>
-      el("th", { className: isNumeric(payload.rows, column) ? "num" : "" }, column),
-    ),
+    ...payload.columns.map((column) => {
+      const unit = units[column];
+      const numeric = isNumeric(payload.rows, column);
+      return el(
+        "th",
+        {
+          className: numeric ? "num" : "",
+          title: unit ? `${column} — ${unit}` : `${column} — unit not declared`,
+        },
+        el("span", { className: "column-name" }, column),
+        unit ? el("span", { className: "column-unit" }, unit) : null,
+      );
+    }),
   );
   const rows = payload.rows.map((row) =>
     el(
