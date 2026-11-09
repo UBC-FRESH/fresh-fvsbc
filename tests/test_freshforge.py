@@ -110,4 +110,8 @@ def test_the_quesnel_workflow_validates_with_the_provider() -> None:
     assert [
         diagnostic for diagnostic in errors if diagnostic.code.startswith("node.provider")
     ] == []
-    assert [node.id for node in spec.nodes] == ["fit_provincial", "calibrate_quesnel"]
+    assert [node.id for node in spec.nodes] == [
+        "fit_provincial",
+        "calibrate_quesnel",
+        "freeze_model",
+    ]

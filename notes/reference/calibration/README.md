@@ -318,6 +318,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-small-tree-panel.md` | The D9.76 small-PL panel check |
 | `quesnel-candidate/README.md` | The frozen Quesnel non-PL candidate dossier |
 | `quesnel-candidate/metrics.csv` | The frozen Quesnel candidate metrics |
+| `quesnel-candidate/model-card.json` | Frozen coefficients, checksums, pins, calibration rule |
+| `freeze_model.py` | The model-card freeze script |
 | `quesnel-candidate/JOINT-REPORT.md` | The assembled Quesnel joint report |
 | `d9-okanagan-candidate.md` | The D9.78 Okanagan candidate layer |
 | `d9-okanagan-candidate-summary.csv` | The D9.78 Okanagan metrics |
