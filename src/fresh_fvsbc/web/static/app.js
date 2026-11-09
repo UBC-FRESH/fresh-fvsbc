@@ -943,26 +943,90 @@ async function renderTables(body) {
       );
     }),
   );
-  const rows = payload.rows.map((row) =>
-    el(
+  const numericColumns = new Set(
+    payload.columns.filter((column) => isNumeric(payload.rows, column)),
+  );
+  const rowAt = (index) => {
+    const row = payload.rows[index];
+    return el(
       "tr",
-      {},
+      {
+        className: "data-row",
+        "data-row-index": String(index),
+        "aria-rowindex": String(index + 2),
+      },
       ...payload.columns.map((column) =>
         el(
           "td",
-          { className: typeof row[column] === "number" ? "num" : "" },
+          { className: numericColumns.has(column) ? "num" : "" },
           fmt(row[column]),
         ),
       ),
-    ),
+    );
+  };
+  const rowCount = payload.rows.length;
+  const tbody = el("tbody");
+  const table = el(
+    "table",
+    { "aria-rowcount": String(rowCount + 1) },
+    el("thead", {}, header),
+    tbody,
   );
-  body.append(
-    el(
-      "div",
-      { className: "scroll" },
-      el("table", {}, el("thead", {}, header), el("tbody", {}, ...rows)),
-    ),
-  );
+  const scroll = el("div", { className: "scroll table-scroll" }, table);
+  body.append(scroll);
+
+  const VIRTUALIZE_AFTER = 120;
+  if (rowCount <= VIRTUALIZE_AFTER) {
+    tbody.append(...payload.rows.map((_, index) => rowAt(index)));
+  } else {
+    const headerHeight = header.getBoundingClientRect().height || 34;
+    const probe = rowAt(0);
+    tbody.append(probe);
+    const rowHeight = probe.getBoundingClientRect().height || 29;
+    probe.remove();
+    let paintedStart = -1;
+    let paintedEnd = -1;
+    let frame = 0;
+    const spacer = (height) => {
+      const cell = el("td", { colSpan: payload.columns.length });
+      cell.style.height = `${height}px`;
+      const row = el("tr", { className: "virtual-spacer", "aria-hidden": "true" }, cell);
+      row.style.height = `${height}px`;
+      return row;
+    };
+    const paint = () => {
+      const viewport = Math.max(rowHeight, scroll.clientHeight - headerHeight);
+      const overscan = 6;
+      const start = Math.max(
+        0,
+        Math.min(
+          rowCount,
+          Math.floor((scroll.scrollTop - headerHeight) / rowHeight) - overscan,
+        ),
+      );
+      const end = Math.min(
+        rowCount,
+        start + Math.ceil(viewport / rowHeight) + overscan * 2,
+      );
+      if (start === paintedStart && end === paintedEnd) return;
+      paintedStart = start;
+      paintedEnd = end;
+      const visible = [];
+      if (start > 0) visible.push(spacer(start * rowHeight));
+      for (let index = start; index < end; index += 1) visible.push(rowAt(index));
+      if (end < rowCount) visible.push(spacer((rowCount - end) * rowHeight));
+      tbody.replaceChildren(...visible);
+    };
+    const schedule = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        paint();
+      });
+    };
+    scroll.addEventListener("scroll", schedule, { passive: true });
+    window.requestAnimationFrame(paint);
+  }
   const firstRow = payload.offset + 1;
   const lastRow = payload.offset + payload.rows.length;
   const page = Math.floor(payload.offset / payload.limit) + 1;
