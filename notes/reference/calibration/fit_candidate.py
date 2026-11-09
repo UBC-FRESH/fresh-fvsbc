@@ -68,6 +68,7 @@ def _local_metrics(
     *,
     calibration_sites: int,
     bootstrap: int,
+    symmetric: bool = False,
     seed: int = 42,
 ) -> dict[str, object]:
     """Evaluate the 20-site conditional rule on held-out target sites.
@@ -81,6 +82,9 @@ def _local_metrics(
         Number of sites used to estimate the group intercepts.
     bootstrap : int
         Number of site splits.
+    symmetric : bool, optional
+        Apply an intercept when the group is over- or underpredicted by more
+        than three points. The default is overprediction only.
     seed : int, optional
         Random seed for the splits.
 
@@ -108,7 +112,9 @@ def _local_metrics(
             eta = part["eta"].to_numpy()
             exposure = part["exposure"].to_numpy()
             base = 1.0 - np.exp(-exposure * np.exp(np.clip(eta, -20, 20)))
-            if float(base.mean()) > float(part["dead"].mean()) + 0.03:
+            gap = float(base.mean()) - float(part["dead"].mean())
+            trigger = abs(gap) > 0.03 if symmetric else gap > 0.03
+            if trigger:
                 offsets[str(group)] = _delta(eta, part["dead"].to_numpy(), exposure)
         delta = hold["group"].map(offsets).fillna(0.0).to_numpy()
         pred = 1.0 - np.exp(
@@ -133,7 +139,11 @@ def main() -> None:
     parser.add_argument("--model-id", required=True)
     parser.add_argument("--metrics", type=Path, required=True)
     parser.add_argument("--model-card", type=Path, required=True)
-    parser.add_argument("--calibration", choices=("none", "conditional"), default="none")
+    parser.add_argument(
+        "--calibration",
+        choices=("none", "conditional", "symmetric"),
+        default="none",
+    )
     parser.add_argument(
         "--min-target-trees",
         type=int,
@@ -207,27 +217,42 @@ def main() -> None:
     args.metrics.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_csv(args.metrics, index=False)
 
-    calibration: dict[str, object] = (
-        {
+    if args.calibration == "conditional":
+        calibration: dict[str, object] = {
             "applied": False,
+            "mode": "conditional-one-sided",
             "rule": (
                 "Fit target-excluded species-group intercepts only when a group has at least 500 "
                 "target trees and overpredicts by more than 3 points."
             ),
-            "evaluated": args.calibration == "conditional",
+            "evaluated": True,
+            "recommended": False,
         }
-        if args.calibration == "conditional"
-        else {
+    elif args.calibration == "symmetric":
+        calibration = {
             "applied": False,
+            "mode": "conditional-symmetric",
+            "rule": (
+                "Fit target-excluded species-group intercepts when a group has at least 500 target "
+                "trees and is over- or underpredicted by more than 3 points."
+            ),
+            "evaluated": True,
+            "recommended": True,
+        }
+    else:
+        calibration = {
+            "applied": False,
+            "mode": "none",
             "rule": "No local calibration; the target-excluded layer is used directly.",
             "evaluated": False,
+            "recommended": False,
         }
-    )
     if args.evaluate_local:
         calibration["local_metrics"] = _local_metrics(
             pd.concat(target_rows, ignore_index=True),
             calibration_sites=args.calibration_sites,
             bootstrap=args.bootstrap,
+            symmetric=args.calibration == "symmetric",
         )
     card = {
         "model_id": args.model_id,

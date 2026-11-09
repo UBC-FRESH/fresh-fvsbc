@@ -1,0 +1,33 @@
+workflow:
+  id: boundary_background_calibration
+  name: Boundary background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for Boundary and evaluate the
+    symmetric 20-site local rule. The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_boundary
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - Boundary TSA
+        - --model-id
+        - boundary-background-v0
+        - --calibration
+        - symmetric
+        - --evaluate-local
+        - --calibration-sites
+        - "20"
+        - --bootstrap
+        - "40"
+        - --min-target-trees
+        - "500"
+        - --metrics
+        - notes/reference/calibration/boundary-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/boundary-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/boundary-candidate/metrics.csv
+      model_card: notes/reference/calibration/boundary-candidate/model-card.json
