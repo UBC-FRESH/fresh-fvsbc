@@ -826,11 +826,14 @@ async function renderTables(body) {
   if (state.tableColumn) csvParams.set("column", state.tableColumn);
   const csvHref = `${tablePath}/csv${csvParams.toString() ? `?${csvParams}` : ""}`;
   const packageHref = `${tablePath}/export${csvParams.toString() ? `?${csvParams}` : ""}`;
+  const selectedUnit = state.tableColumn ? payload.units?.[state.tableColumn] : undefined;
   const filterInput = el("input", {
     id: "table-filter",
     type: "search",
     value: state.tableQuery,
-    placeholder: state.tableColumn ? `Filter ${state.tableColumn}…` : "Filter any column…",
+    placeholder: state.tableColumn
+      ? `Filter ${state.tableColumn}${selectedUnit ? ` (${selectedUnit})` : ""}…`
+      : "Filter any column…",
     "aria-label": "Filter table rows",
   });
   const columnSelect = el("select", {
@@ -844,9 +847,18 @@ async function renderTables(body) {
     },
   },
     el("option", { value: "", selected: state.tableColumn === "" }, "Any column"),
-    ...tableColumns.map((column) =>
-      el("option", { value: column, selected: column === state.tableColumn }, column),
-    ),
+    ...tableColumns.map((column) => {
+      const unit = payload.units?.[column];
+      const option = el(
+        "option",
+        { value: column, selected: column === state.tableColumn },
+        unit ? `${column} · ${unit}` : column,
+      );
+      option.title = unit
+        ? `${column} (${unit})`
+        : `${column} — unit not declared`;
+      return option;
+    }),
   );
   const filterForm = el("form", {
     className: "table-toolbar",
@@ -890,7 +902,9 @@ async function renderTables(body) {
       `${payload.name} — ${fmt(payload.total)} ${state.tableQuery ? "matching " : ""}`
         + `${payload.total === 1 ? "row" : "rows"}, showing ${payload.rows.length}`
         + (state.tableQuery ? ` · filter “${state.tableQuery}”` : "")
-        + (state.tableColumn ? ` · column ${state.tableColumn}` : ""),
+        + (state.tableColumn
+          ? ` · column ${state.tableColumn}${selectedUnit ? ` (${selectedUnit})` : ""}`
+          : ""),
     ),
   );
   body.append(
