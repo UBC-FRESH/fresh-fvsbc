@@ -123,3 +123,16 @@ freshforge run workflows/freshforge/arrow_background.yaml --workdir . \
 It writes `arrow-candidate/metrics.csv` and
 `arrow-candidate/model-card.json`. No local calibration is applied; the
 candidate is weaker than the previous six.
+
+## `fraser_background.yaml`
+
+Eighth background candidate and the mainland coastal-transition test:
+
+```sh
+freshforge run workflows/freshforge/fraser_background.yaml --workdir . \
+  --evidence runtime/freshforge-fraser-evidence.json
+```
+
+It writes `fraser-candidate/metrics.csv` and
+`fraser-candidate/model-card.json`. The card records the conditional local-rule
+evaluation; deployment offsets are not embedded.

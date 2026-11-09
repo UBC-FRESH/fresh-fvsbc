@@ -1,0 +1,34 @@
+workflow:
+  id: fraser_background_calibration
+  name: Fraser background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for Fraser, evaluate the
+    conditional 20-site rule, and freeze aggregate base metrics and
+    coefficients. The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_fraser
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - Fraser TSA
+        - --model-id
+        - fraser-background-v0
+        - --calibration
+        - conditional
+        - --evaluate-local
+        - --calibration-sites
+        - "20"
+        - --bootstrap
+        - "40"
+        - --min-target-trees
+        - "500"
+        - --metrics
+        - notes/reference/calibration/fraser-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/fraser-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/fraser-candidate/metrics.csv
+      model_card: notes/reference/calibration/fraser-candidate/model-card.json
