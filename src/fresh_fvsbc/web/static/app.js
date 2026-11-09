@@ -106,6 +106,36 @@ const fmt = (value) => {
 const isNumeric = (rows, column) =>
   rows.some((row) => typeof row[column] === "number");
 
+function attachSelectSearch(input, select) {
+  if (!input || !select) return;
+  const options = [...select.options].slice(1).map((option) => ({
+    value: option.value,
+    text: option.textContent || option.value,
+    title: option.title,
+  }));
+  const placeholder = select.options[0]?.textContent || "Choose…";
+  input.addEventListener("input", () => {
+    const term = input.value.trim().toLowerCase();
+    const matches = term
+      ? options.filter((option) => option.text.toLowerCase().includes(term))
+      : options;
+    const previous = select.value;
+    select.replaceChildren(
+      el("option", { value: "" }, matches.length ? placeholder : "No matches"),
+      ...matches.map((option) => {
+        const node = el("option", { value: option.value }, option.text);
+        if (option.title) node.title = option.title;
+        return node;
+      }),
+    );
+    const kept = matches.some((option) => option.value === previous)
+      ? previous
+      : (matches[0]?.value ?? "");
+    select.value = kept;
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+}
+
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function uniqueCopyName(name, names) {
@@ -1896,6 +1926,14 @@ async function renderTables(body) {
       }, filter.name),
     ),
   );
+  const filterSearch = el("input", {
+    id: "table-filter-search",
+    type: "search",
+    className: "collection-search",
+    placeholder: "Search saved filters…",
+    "aria-label": "Search saved filters",
+  });
+  attachSelectSearch(filterSearch, filterSelect);
   const filterName = el("input", {
     id: "table-filter-name",
     type: "text",
@@ -2102,6 +2140,7 @@ async function renderTables(body) {
     },
     el("summary", {}, `Saved filters · ${savedFilters.length}`),
     el("div", { className: "table-filters-body" },
+      el("div", { className: "table-filters-row" }, filterSearch),
       el("div", { className: "table-filters-row" },
         filterSelect,
         el("button", {
@@ -2265,6 +2304,14 @@ async function renderTables(body) {
       }, preset.name),
     ),
   );
+  const presetSearch = el("input", {
+    id: "table-export-preset-search",
+    type: "search",
+    className: "collection-search",
+    placeholder: "Search export presets…",
+    "aria-label": "Search export presets",
+  });
+  attachSelectSearch(presetSearch, presetSelect);
   const presetName = el("input", {
     id: "table-export-preset-name",
     type: "text",
@@ -2361,6 +2408,7 @@ async function renderTables(body) {
     },
     el("summary", {}, `Export presets · ${exportPresets.length}`),
     el("div", { className: "table-filters-body" },
+      el("div", { className: "table-filters-row" }, presetSearch),
       el("div", { className: "table-filters-row" },
         presetSelect,
         el("button", {
@@ -3578,6 +3626,14 @@ async function renderCompare(body) {
       el("option", { value: item.name, selected: item.name === state.compareSaved }, item.name),
     ),
   );
+  const savedSearch = el("input", {
+    id: "compare-saved-search",
+    type: "search",
+    className: "collection-search",
+    placeholder: "Search saved comparisons…",
+    "aria-label": "Search saved comparisons",
+  });
+  attachSelectSearch(savedSearch, savedSelect);
   const saveName = el("input", {
     id: "compare-save-name",
     type: "text",
@@ -3625,6 +3681,7 @@ async function renderCompare(body) {
   });
   body.append(
     el("div", { className: "compare-saved" },
+      el("div", { className: "compare-saved-row" }, savedSearch),
       el("div", { className: "compare-saved-row" },
         savedSelect,
         el("button", {
