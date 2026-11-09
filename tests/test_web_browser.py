@@ -1583,6 +1583,40 @@ def test_an_assistant_chat_can_be_pinned_loaded_and_deleted(cockpit: str) -> Non
             browser.close()
 
 
+def test_a_saved_assistant_chat_can_be_duplicated(cockpit: str) -> None:
+    """Duplicating a chat clones its transcript under a unique copy name."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-input").fill("Duplicate chat smoke")
+            page.locator("#assistant-input").press("Enter")
+            expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+            page.locator("#assistant-saved summary").click()
+            page.locator("#assistant-pin-name").fill("Chat base")
+            page.get_by_role("button", name="Pin current").click()
+            page.locator("#assistant-duplicate").click()
+            expect(page.locator("#assistant-saved-status")).to_contain_text("Duplicated as")
+            expect(page.locator("#assistant-saved-select")).to_contain_text("Chat base copy")
+            expect(page.locator("#assistant-saved-select option:checked")).to_have_text(
+                "Chat base copy"
+            )
+            expect(page.locator("#assistant-current-name")).to_have_text("Chat base copy")
+            expect(page.locator("#assistant-saved-count")).to_have_text("(2)")
+
+            page.reload(wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            expect(page.locator("#assistant-current-name")).to_have_text("Chat base copy")
+            page.locator("#assistant-saved summary").click()
+            expect(page.locator("#assistant-saved-select")).to_contain_text("Chat base copy")
+            expect(page.locator("#assistant-saved-select")).to_contain_text("Chat base")
+        finally:
+            browser.close()
+
+
 def test_a_saved_chat_can_be_renamed_from_the_header(cockpit: str) -> None:
     """The drawer header renames the active saved chat and shows its name."""
     expect = playwright_module.expect

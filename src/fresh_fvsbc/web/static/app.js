@@ -4575,10 +4575,12 @@ function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
   const load = document.getElementById("assistant-saved-load");
   const remove = document.getElementById("assistant-saved-delete");
   const rename = document.getElementById("assistant-rename");
+  const duplicate = document.getElementById("assistant-duplicate");
   const exportButton = document.getElementById("assistant-saved-export");
   if (load) load.disabled = !selected;
   if (remove) remove.disabled = !selected;
   if (rename) rename.disabled = !selected;
+  if (duplicate) duplicate.disabled = !selected;
   if (exportButton) exportButton.disabled = !chats.length;
   const count = document.getElementById("assistant-saved-count");
   if (count) count.textContent = chats.length ? `(${chats.length})` : "";
@@ -4668,6 +4670,32 @@ function renameAssistantChatFromPanel() {
   }
   if (input) input.value = "";
   assistantSavedStatus(`Renamed to “${result.name}”.`);
+}
+
+function duplicateAssistantChat() {
+  const chats = readSavedChats();
+  const chat = chats.find((entry) => entry.id === state.assistant.savedChat);
+  if (!chat) {
+    assistantSavedStatus("Choose a saved chat to duplicate.", "error");
+    return;
+  }
+  const name = uniqueCopyName(chat.name, new Set(chats.map((entry) => entry.name)));
+  const copy = {
+    ...chat,
+    id: window.crypto?.randomUUID?.()
+      ?? `chat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name,
+    saved_at: new Date().toISOString(),
+    history: JSON.parse(JSON.stringify(chat.history)),
+  };
+  if (!writeSavedChats([copy, ...chats])) {
+    assistantSavedStatus("Browser storage is unavailable; could not duplicate this chat.", "error");
+    return;
+  }
+  state.assistant.savedChat = copy.id;
+  refreshAssistantSaved(copy.id);
+  saveAssistantHistory();
+  assistantSavedStatus(`Duplicated as “${name}”.`);
 }
 
 function submitAssistantRename(event) {
@@ -5143,6 +5171,7 @@ async function boot() {
   document.getElementById("assistant-saved-load").addEventListener("click", loadAssistantChat);
   document.getElementById("assistant-saved-delete").addEventListener("click", deleteAssistantChat);
   document.getElementById("assistant-rename").addEventListener("click", renameAssistantChatFromPanel);
+  document.getElementById("assistant-duplicate").addEventListener("click", duplicateAssistantChat);
   document.getElementById("assistant-rename-open").addEventListener("click", openAssistantRename);
   document.getElementById("assistant-rename-form").addEventListener("submit", submitAssistantRename);
   document.getElementById("assistant-rename-cancel").addEventListener("click", closeAssistantRename);
@@ -5160,6 +5189,7 @@ async function boot() {
     document.getElementById("assistant-saved-load").disabled = disabled;
     document.getElementById("assistant-saved-delete").disabled = disabled;
     document.getElementById("assistant-rename").disabled = disabled;
+    document.getElementById("assistant-duplicate").disabled = disabled;
     updateAssistantSavedContext(
       readSavedChats().find((chat) => chat.id === event.target.value) ?? null,
     );
