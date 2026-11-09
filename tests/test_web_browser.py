@@ -354,6 +354,9 @@ def test_table_columns_can_be_hidden_and_restored(cockpit: str) -> None:
             expect(page.locator('#table-column option[value="Age"]')).to_have_count(0)
             expect(columns.locator(".table-columns-note")).to_be_visible()
 
+            page.reload(wait_until="networkidle")
+            expect(page.locator("#table-columns summary")).to_contain_text("8 of 9 shown")
+            page.locator("#table-columns summary").click()
             age = page.locator("#table-columns input[value='Age']")
             expect(age).not_to_be_checked()
             age.check()
@@ -362,6 +365,24 @@ def test_table_columns_can_be_hidden_and_restored(cockpit: str) -> None:
                 page.locator("th .column-name").filter(has_text=re.compile(r"^Age$"))
             ).to_have_count(1)
             expect(page.locator('#table-column option[value="Age"]')).to_have_count(1)
+
+            page.get_by_role("button", name="Move Age right").click()
+            names = page.locator("th .column-name")
+            expect(names.nth(0)).to_have_text("Year")
+            expect(names.nth(1)).to_have_text("Tph")
+            expect(names.nth(2)).to_have_text("Age")
+            page.reload(wait_until="networkidle")
+            names = page.locator("th .column-name")
+            expect(names.nth(0)).to_have_text("Year")
+            expect(names.nth(1)).to_have_text("Tph")
+            expect(names.nth(2)).to_have_text("Age")
+            page.locator("#table-columns summary").click()
+            page.get_by_role("button", name="Reset layout").click()
+            expect(page.locator("#table-columns summary")).to_contain_text("9 of 9 shown")
+            names = page.locator("th .column-name")
+            expect(names.nth(0)).to_have_text("Year")
+            expect(names.nth(1)).to_have_text("Age")
+            expect(names.nth(2)).to_have_text("Tph")
 
             page.goto(
                 f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Cases",
