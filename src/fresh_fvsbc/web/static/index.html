@@ -122,6 +122,15 @@
           <button id="close-assistant" class="ghost" type="button" aria-label="Close assistant">×</button>
         </div>
       </div>
+      <div class="assistant-name-bar">
+        <span id="assistant-current-name" class="assistant-current-name">Unsaved chat</span>
+        <button id="assistant-rename-open" class="ghost" type="button" disabled>Rename</button>
+      </div>
+      <form id="assistant-rename-form" class="assistant-rename-form" hidden>
+        <input id="assistant-rename-input" type="text" maxlength="80" aria-label="Saved chat name">
+        <button class="primary" type="submit">Save name</button>
+        <button id="assistant-rename-cancel" class="ghost" type="button">Cancel</button>
+      </form>
       <details id="assistant-saved" class="assistant-saved">
         <summary>Saved chats <span id="assistant-saved-count" class="muted"></span></summary>
         <div class="assistant-saved-body">
