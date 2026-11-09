@@ -1567,7 +1567,10 @@ async function renderTables(body) {
     id: "table-filter-recent",
     "aria-label": "Recent table filters",
     onchange: (event) => {
-      document.getElementById("table-filter-recent-load").disabled = !event.target.value;
+      const disabled = !event.target.value;
+      document.getElementById("table-filter-recent-load").disabled = disabled;
+      document.getElementById("table-filter-recent-pin").disabled = disabled;
+      document.getElementById("table-filter-recent-remove").disabled = disabled;
     },
   },
     el("option", { value: "" },
@@ -1636,6 +1639,81 @@ async function renderTables(body) {
     await renderPanel();
     setTableFilterStatus(`Deleted “${filter.name}”.`);
   };
+  const saveNamedFilter = async (name, query, column) => {
+    const clean = String(name || "").trim().slice(0, 80);
+    if (!clean) {
+      setTableFilterStatus("Give the filter a name first.", "error");
+      return null;
+    }
+    const existing = savedFilters.find((filter) => filter.name === clean);
+    const entry = {
+      id: existing?.id ?? (
+        window.crypto?.randomUUID?.()
+        ?? `filter-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+      ),
+      name: clean,
+      query,
+      column,
+      created_at: new Date().toISOString(),
+    };
+    const next = [
+      entry,
+      ...savedFilters.filter((filter) => filter.id !== entry.id && filter.name !== clean),
+    ].slice(0, 20);
+    if (!writeTableFilters(state.table, next)) {
+      setTableFilterStatus(
+        "Browser storage is unavailable; could not save this filter.",
+        "error",
+      );
+      return null;
+    }
+    state.tableSavedFilter = entry.id;
+    state.tableFiltersOpen = true;
+    await renderPanel();
+    return entry;
+  };
+  const pinRecentFilter = async () => {
+    if (!recentSelect.value) {
+      setTableFilterStatus("Choose a recent filter first.", "error");
+      return;
+    }
+    const entry = recents[Number(recentSelect.value)];
+    if (!entry) {
+      setTableFilterStatus("Choose a recent filter first.", "error");
+      return;
+    }
+    const label = recentFilterLabel(entry);
+    const saved = await saveNamedFilter(
+      String(filterName.value || label).trim().slice(0, 80),
+      entry.query,
+      entry.column,
+    );
+    if (saved) {
+      filterName.value = "";
+      setTableFilterStatus(`Pinned recent ${label} as “${saved.name}”.`);
+    }
+  };
+  const removeRecentFilter = async () => {
+    if (!recentSelect.value) {
+      setTableFilterStatus("Choose a recent filter to remove.", "error");
+      return;
+    }
+    const entry = recents[Number(recentSelect.value)];
+    if (!entry) return;
+    const next = recents.filter(
+      (item) => item.query !== entry.query || item.column !== entry.column,
+    );
+    if (!writeTableRecents(state.table, next)) {
+      setTableFilterStatus(
+        "Browser storage is unavailable; could not remove this recent filter.",
+        "error",
+      );
+      return;
+    }
+    state.tableFiltersOpen = true;
+    await renderPanel();
+    setTableFilterStatus(`Removed recent ${recentFilterLabel(entry)}.`);
+  };
   const filtersDetails = el(
     "details",
     {
@@ -1669,6 +1747,18 @@ async function renderTables(body) {
           disabled: true,
           onclick: loadRecentFilter,
         }, "Load recent"),
+        el("button", {
+          id: "table-filter-recent-pin",
+          type: "button",
+          disabled: true,
+          onclick: pinRecentFilter,
+        }, "Pin recent"),
+        el("button", {
+          id: "table-filter-recent-remove",
+          type: "button",
+          disabled: true,
+          onclick: removeRecentFilter,
+        }, "Remove"),
       ),
       el("div", { className: "table-filters-row" },
         filterName,
@@ -1684,38 +1774,15 @@ async function renderTables(body) {
                 : column
                   ? `Column ${column}`
                   : "All rows";
-            const name = String(filterName.value || fallback).trim().slice(0, 80);
-            if (!name) {
-              setTableFilterStatus("Give the filter a name first.", "error");
-              return;
-            }
-            const existing = savedFilters.find((filter) => filter.name === name);
-            const entry = {
-              id: existing?.id ?? (
-                window.crypto?.randomUUID?.()
-                ?? `filter-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-              ),
-              name,
+            const saved = await saveNamedFilter(
+              String(filterName.value || fallback).trim().slice(0, 80),
               query,
               column,
-              created_at: new Date().toISOString(),
-            };
-            const next = [
-              entry,
-              ...savedFilters.filter((filter) => filter.id !== entry.id && filter.name !== name),
-            ].slice(0, 20);
-            if (!writeTableFilters(state.table, next)) {
-              setTableFilterStatus(
-                "Browser storage is unavailable; could not save this filter.",
-                "error",
-              );
-              return;
+            );
+            if (saved) {
+              filterName.value = "";
+              setTableFilterStatus(`Saved “${saved.name}”.`);
             }
-            state.tableSavedFilter = entry.id;
-            state.tableFiltersOpen = true;
-            filterName.value = "";
-            await renderPanel();
-            setTableFilterStatus(`Saved “${entry.name}”.`);
           },
         }, "Save current"),
       ),
