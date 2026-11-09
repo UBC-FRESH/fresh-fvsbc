@@ -640,6 +640,46 @@ def test_the_assistant_conversation_survives_reload(cockpit: str) -> None:
             browser.close()
 
 
+def test_an_assistant_chat_can_be_pinned_loaded_and_deleted(cockpit: str) -> None:
+    """A named transcript survives clearing, reload, load, and delete."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-input").fill("Transcript smoke")
+            page.locator("#assistant-input").press("Enter")
+            expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+
+            page.locator("#assistant-saved summary").click()
+            page.locator("#assistant-pin-name").fill("Pinned smoke")
+            page.get_by_role("button", name="Pin current").click()
+            expect(page.locator("#assistant-saved-status")).to_contain_text("Pinned")
+            expect(page.locator("#assistant-saved-select")).to_contain_text("Pinned smoke")
+
+            page.get_by_role("button", name="New", exact=True).click()
+            expect(page.locator("#assistant-log")).not_to_contain_text("Transcript smoke")
+            page.get_by_role("button", name="Load", exact=True).click()
+            expect(page.locator("#assistant-log")).to_contain_text("Transcript smoke")
+            expect(page.locator("#assistant-saved-status")).to_contain_text("Loaded")
+
+            page.reload(wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-saved summary").click()
+            saved = page.locator("#assistant-saved-select")
+            saved.select_option(label="Pinned smoke")
+            page.get_by_role("button", name="Load", exact=True).click()
+            expect(page.locator("#assistant-log")).to_contain_text("Transcript smoke")
+
+            page.get_by_role("button", name="Delete", exact=True).click()
+            expect(page.locator("#assistant-saved-status")).to_contain_text("Deleted")
+            expect(saved).not_to_contain_text("Pinned smoke")
+        finally:
+            browser.close()
+
+
 def test_the_details_drawer_restores_focus_and_escape_closes(cockpit: str) -> None:
     """The evidence drawer traps attention, reports its state, and returns focus."""
     expect = playwright_module.expect

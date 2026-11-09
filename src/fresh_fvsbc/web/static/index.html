@@ -122,6 +122,21 @@
           <button id="close-assistant" class="ghost" type="button" aria-label="Close assistant">×</button>
         </div>
       </div>
+      <details id="assistant-saved" class="assistant-saved">
+        <summary>Saved chats <span id="assistant-saved-count" class="muted"></span></summary>
+        <div class="assistant-saved-body">
+          <div class="assistant-saved-row">
+            <select id="assistant-saved-select" aria-label="Saved conversations"></select>
+            <button id="assistant-saved-load" class="ghost" type="button">Load</button>
+            <button id="assistant-saved-delete" class="ghost" type="button">Delete</button>
+          </div>
+          <div class="assistant-saved-row">
+            <input id="assistant-pin-name" type="text" maxlength="80" placeholder="Name this chat…" aria-label="Saved chat name">
+            <button id="assistant-pin" class="ghost" type="button">Pin current</button>
+          </div>
+          <p id="assistant-saved-status" class="assistant-saved-status" aria-live="polite">Saved chats stay in this browser.</p>
+        </div>
+      </details>
       <div id="assistant-log" class="assistant-log" aria-live="polite">
         <p class="muted" id="assistant-hint">Ask about the open run's summary, calibration, provenance, or stand.</p>
       </div>
