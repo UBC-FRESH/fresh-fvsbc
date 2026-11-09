@@ -1,0 +1,21 @@
+workflow:
+  id: quesnel_mpb_segment
+  name: Quesnel MPB segment diagnostic
+  description: >
+    Run one high-PL Quesnel interval through the linked BC MPB extension and
+    record the large-tree kill and small-tree residual. The interval key and
+    severity multiplier stay in an external case file, so the tracked workflow
+    carries no site-level key.
+
+nodes:
+  - id: run_segment
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/mpb_segment.py
+      args:
+        - --case
+        - runtime/mpb-case.json
+        - --output
+        - runtime/quesnel-mpb-segment.json
+    artifacts:
+      segment: runtime/quesnel-mpb-segment.json
