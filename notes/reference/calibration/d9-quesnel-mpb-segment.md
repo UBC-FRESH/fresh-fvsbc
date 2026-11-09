@@ -13,22 +13,29 @@ raising the cap double-counts dead trees. The test therefore uses two projection
 - 10-year MPB/INITMORT segment;
 - remaining 3–4-year background tail.
 
-## 2. Result: MPB segment at 2010/2011
+## 2. Correction: one cycle, not two
 
-Observed PL mortality is 100% at the end of these intervals.
+An earlier version of this note used two `TIMEINT` cycles. FVS parsed those records in the wrong
+order, so the first "10-year" MPB segment was actually 3 years. The corrected test uses one 13-year
+projection; the MPB model internally caps the outbreak at 10 years, and the remaining 3 years are
+background.
 
-| Case | Initial live PL/ac | 0.04× live | 0.06× live | 0.08× live | 0.08× dead fraction |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `4031355` | 165.12 | 41.68 | 33.56 | 28.91 | 82.5% |
-| `4031394` | 185.75 | 29.13 | 21.99 | 18.32 | 90.1% |
+Corrected 0.08× result at the 10-year MPB segment end:
 
-The 10-year MPB segment at 0.08× already removes 82–90% of the initial PL. The remaining 3–4-year
-background tail is not included in those numbers.
+| Case | Initial live PL/ac | Segment live PL/ac | Segment dead PL/ac | Dead fraction |
+| --- | ---: | ---: | ---: | ---: |
+| `4031355` | 165.12 | 24.78 | 140.34 | **85.0%** |
+| `4031394` | 185.75 | 16.40 | 169.36 | **91.2%** |
+
+Observed PL mortality is 100% at the end of the full interval. The 10-year MPB segment at 0.08×
+removes 85–91% of the initial PL; the remaining 3–4-year background tail is not included.
 
 ## 3. Interpretation
 
 - Segmenting long Quesnel intervals is the right workaround for the 10-year cap.
-- INITMORT severity at 0.06–0.08 reaches most of the observed PL collapse before the tail.
+- The one-cycle projection is the correct way to expose the 10-year MPB segment; the two-cycle
+  `TIMEINT` representation was parsed in the wrong order.
+- INITMORT severity at 0.08 reaches most of the observed PL collapse before the tail.
 - The remaining tail and final live PL need to be extracted before claiming a match.
 - This is a stronger result than the pooled Quesnel post-2000 model, where PL was 0.295 vs 0.588
   observed.
