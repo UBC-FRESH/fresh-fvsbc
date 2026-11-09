@@ -965,3 +965,31 @@ svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }
   line-height: 1.4;
 }
 .assistant-saved-status.error { color: var(--warn); }
+
+.sticky-key {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--bg);
+  box-shadow: 1px 0 0 var(--line);
+}
+th.sticky-key { z-index: 4; }
+tbody tr:hover td.sticky-key { background: var(--panel); }
+.sticky-value {
+  display: block;
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .sticky-key {
+    position: static;
+    box-shadow: none;
+  }
+  .sticky-value {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}

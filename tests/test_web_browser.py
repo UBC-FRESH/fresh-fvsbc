@@ -330,6 +330,35 @@ def test_a_large_page_only_renders_a_virtual_window(cockpit: str) -> None:
             browser.close()
 
 
+def test_the_table_key_column_stays_pinned_when_scrolling_sideways(cockpit: str) -> None:
+    """The first useful key column stays at the left while the rest scrolls."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1000, "height": 900})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_TreeList_Metric",
+                wait_until="networkidle",
+            )
+            sticky = page.locator("th.sticky-key")
+            expect(sticky).to_have_count(1)
+            expect(sticky).to_contain_text("Year")
+            assert sticky.evaluate("(node) => getComputedStyle(node).position") == "sticky"
+            scroll = page.locator(".table-scroll")
+            assert scroll.evaluate("(node) => node.scrollWidth > node.clientWidth")
+            before = sticky.bounding_box()
+            scroll.evaluate("(node) => { node.scrollLeft = 160; }")
+            page.wait_for_timeout(100)
+            after = sticky.bounding_box()
+            assert before is not None
+            assert after is not None
+            assert abs(before["x"] - after["x"]) < 1
+            expect(page.locator("td.sticky-key").first).to_be_visible()
+        finally:
+            browser.close()
+
+
 def test_a_large_table_can_page_and_change_its_page_size(cockpit: str) -> None:
     """The table pager exposes page size, page number, and the filtered row range."""
     expect = playwright_module.expect
