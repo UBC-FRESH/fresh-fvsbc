@@ -12,3 +12,4 @@ pandas-stubs>=2.0
 fastapi>=0.110
 httpx>=0.27
 uvicorn>=0.29
+freshforge==0.1.0a5

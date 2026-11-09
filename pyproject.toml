@@ -22,6 +22,11 @@ web = ["fastapi>=0.110", "uvicorn>=0.29"]
 # name — see `docs/installation.rst` and the `wheels` workflow. The pin matches the fork commit the
 # patch sets were made against, so a wheel and a patch set cannot drift apart silently.
 fvs = ["fresh-fvsbc-pyfvs==0.4.1", "six>=1.16"]
+# The optional FreshForge adapter is only needed when running the workflow specs.
+workflow = ["freshforge==0.1.0a5"]
+
+[project.entry-points."freshforge.providers"]
+fresh_fvsbc = "fresh_fvsbc.freshforge:provider"
 
 [project.urls]
 Repository = "https://github.com/UBC-FRESH/fresh-fvsbc"
@@ -69,6 +74,10 @@ ignore_missing_imports = true
 # untyped: it ships no stubs, so the override is the only option short of writing them here.
 [[tool.mypy.overrides]]
 module = ["pyfvs", "pyfvs.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["freshforge", "freshforge.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
