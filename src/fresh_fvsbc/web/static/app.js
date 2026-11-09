@@ -58,6 +58,7 @@ const state = {
     enabled: false,
     available: false,
     savedChat: "",
+    savedSearch: "",
   },
 };
 
@@ -4558,10 +4559,21 @@ function openAssistantRename() {
 function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
   const select = document.getElementById("assistant-saved-select");
   if (!select) return;
-  const chats = readSavedChats();
-  const selected = chats.some((chat) => chat.id === selectedId) ? selectedId : "";
+  const allChats = readSavedChats();
+  const selected = allChats.some((chat) => chat.id === selectedId) ? selectedId : "";
+  const term = state.assistant.savedSearch.trim().toLowerCase();
+  const activeChat = allChats.find((chat) => chat.id === selected) ?? null;
+  const matches = term
+    ? allChats.filter((chat) => chat.name.toLowerCase().includes(term))
+    : allChats;
+  const chats = activeChat && !matches.some((chat) => chat.id === activeChat.id)
+    ? [activeChat, ...matches]
+    : matches;
   select.replaceChildren(
-    el("option", { value: "" }, chats.length ? "Choose a saved chat…" : "No saved chats"),
+    el("option", { value: "" },
+      chats.length ? (term && !matches.length ? "No matches (active chat shown)" : "Choose a saved chat…")
+        : "No saved chats",
+    ),
     ...chats.map((chat) => {
       const option = el("option", { value: chat.id }, chat.name);
       if (chat.saved_at) option.title = new Date(chat.saved_at).toLocaleString();
@@ -4583,7 +4595,11 @@ function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
   if (duplicate) duplicate.disabled = !selected;
   if (exportButton) exportButton.disabled = !chats.length;
   const count = document.getElementById("assistant-saved-count");
-  if (count) count.textContent = chats.length ? `(${chats.length})` : "";
+  if (count) {
+    count.textContent = term && allChats.length
+      ? `(${chats.length} of ${allChats.length})`
+      : (allChats.length ? `(${allChats.length})` : "");
+  }
 }
 
 function pinAssistantChat() {
@@ -5018,6 +5034,9 @@ function configureAssistant(info) {
 function newAssistantChat() {
   state.assistant.session = null;
   state.assistant.savedChat = "";
+  state.assistant.savedSearch = "";
+  const search = document.getElementById("assistant-saved-search");
+  if (search) search.value = "";
   state.assistant.history = [];
   try {
     window.sessionStorage.removeItem("fresh-fvsbc.assistant");
@@ -5190,9 +5209,15 @@ async function boot() {
     document.getElementById("assistant-saved-delete").disabled = disabled;
     document.getElementById("assistant-rename").disabled = disabled;
     document.getElementById("assistant-duplicate").disabled = disabled;
+    const chats = readSavedChats();
     updateAssistantSavedContext(
-      readSavedChats().find((chat) => chat.id === event.target.value) ?? null,
+      chats.find((chat) => chat.id === event.target.value) ?? null,
     );
+    updateAssistantName(chats);
+  });
+  document.getElementById("assistant-saved-search").addEventListener("input", (event) => {
+    state.assistant.savedSearch = event.target.value;
+    refreshAssistantSaved();
   });
   const pinName = document.getElementById("assistant-pin-name");
   pinName.addEventListener("keydown", (event) => {

@@ -1583,6 +1583,46 @@ def test_an_assistant_chat_can_be_pinned_loaded_and_deleted(cockpit: str) -> Non
             browser.close()
 
 
+def test_saved_assistant_chats_can_be_searched(cockpit: str) -> None:
+    """Search filters saved chats while keeping the active chat visible."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-input").fill("Chat search smoke")
+            page.locator("#assistant-input").press("Enter")
+            expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+            page.locator("#assistant-saved summary").click()
+            for name in ("Alpha chat", "Beta chat", "Gamma chat"):
+                page.locator("#assistant-pin-name").fill(name)
+                page.get_by_role("button", name="Pin current").click()
+
+            search = page.locator("#assistant-saved-search")
+            search.fill("alp")
+            saved = page.locator("#assistant-saved-select")
+            expect(saved).to_contain_text("Gamma chat")
+            expect(saved).to_contain_text("Alpha chat")
+            expect(saved).not_to_contain_text("Beta chat")
+            expect(page.locator("#assistant-saved-count")).to_have_text("(2 of 3)")
+
+            search.fill("zzz")
+            expect(saved).to_contain_text("Gamma chat")
+            expect(saved).not_to_contain_text("Alpha chat")
+            expect(page.locator("#assistant-saved-count")).to_have_text("(1 of 3)")
+            expect(saved.locator("option").first).to_contain_text("No matches (active chat shown)")
+
+            search.fill("")
+            expect(saved).to_contain_text("Alpha chat")
+            expect(saved).to_contain_text("Beta chat")
+            expect(saved).to_contain_text("Gamma chat")
+            expect(page.locator("#assistant-saved-count")).to_have_text("(3)")
+        finally:
+            browser.close()
+
+
 def test_a_saved_assistant_chat_can_be_duplicated(cockpit: str) -> None:
     """Duplicating a chat clones its transcript under a unique copy name."""
     expect = playwright_module.expect
