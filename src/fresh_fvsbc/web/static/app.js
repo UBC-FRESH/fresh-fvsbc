@@ -31,6 +31,7 @@ const state = {
   tableOrder: [],
   tableLayoutTable: null,
   tableLayoutWarning: false,
+  tableLayoutMessage: "",
   tableExportVisible: false,
   tableColumnsOpen: false,
   tableFiltersOpen: false,
@@ -860,12 +861,83 @@ function clearTableLayout(table) {
 }
 
 function persistTableLayout() {
+  state.tableLayoutMessage = "";
   state.tableLayoutWarning = !writeTableLayout(
     state.table,
     state.tableOrder,
     state.tableHidden,
     state.tableExportVisible,
   );
+}
+
+function readLayoutEnvelope() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TABLE_LAYOUTS_KEY) || "null");
+    const tables = stored?.tables && typeof stored.tables === "object"
+      && !Array.isArray(stored.tables)
+      ? stored.tables
+      : {};
+    return { tables, ok: true };
+  } catch (_error) {
+    return { tables: {}, ok: false };
+  }
+}
+
+function writeLayoutEnvelope(tables) {
+  try {
+    window.localStorage.setItem(TABLE_LAYOUTS_KEY, JSON.stringify({
+      version: 1,
+      tables,
+    }));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function tableLayoutsExportText() {
+  return `${JSON.stringify({
+    version: 1,
+    exported_at: new Date().toISOString(),
+    tables: readLayoutEnvelope().tables,
+  }, null, 2)}\n`;
+}
+
+function importTableLayouts(text) {
+  let parsed = null;
+  try {
+    parsed = JSON.parse(text);
+  } catch (_error) {
+    throw new Error("That file is not valid JSON.");
+  }
+  const raw = parsed?.tables ?? parsed;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new Error("Expected a tables object in that layout file.");
+  }
+  const imported = {};
+  for (const [table, value] of Object.entries(raw)) {
+    if (!table || table.length > 100) continue;
+    if (["__proto__", "constructor", "prototype"].includes(table)) continue;
+    if (!value || typeof value !== "object" || Array.isArray(value)) continue;
+    if (!("order" in value) && !("hidden" in value) && !("exportVisible" in value)) continue;
+    const clean = (items) => Array.isArray(items)
+      ? [...new Set(items
+        .filter((item) => typeof item === "string" && item.trim())
+        .map((item) => item.trim().slice(0, 100)))].slice(0, 100)
+      : [];
+    imported[table] = {
+      order: clean(value.order),
+      hidden: clean(value.hidden),
+      exportVisible: value.exportVisible === true,
+    };
+  }
+  const count = Object.keys(imported).length;
+  if (!count) throw new Error("No table layouts found in that file.");
+  const merged = { ...readLayoutEnvelope().tables, ...imported };
+  if (!writeLayoutEnvelope(merged)) {
+    throw new Error("Browser storage is unavailable; could not import layouts.");
+  }
+  return { count, tables: merged };
 }
 
 const TABLE_FILTERS_KEY = "fresh-fvsbc.table-filters";
@@ -922,6 +994,13 @@ function setTableFilterStatus(text, kind = "") {
   node.className = `table-filters-status ${kind}`.trim();
 }
 
+function setTableLayoutStatus(text, kind = "") {
+  const node = document.getElementById("table-layout-status");
+  if (!node) return;
+  node.textContent = text;
+  node.className = `table-columns-status ${kind}`.trim();
+}
+
 function oracleNotice(tables) {
   const unverified = tables.filter((table) => !table.oracle).length;
   if (!unverified) return null;
@@ -962,6 +1041,7 @@ async function renderTables(body) {
             state.tableOrder = [];
             state.tableLayoutTable = null;
             state.tableLayoutWarning = false;
+            state.tableLayoutMessage = "";
             state.tableExportVisible = false;
             state.tableColumnsOpen = false;
             state.tableFiltersOpen = false;
@@ -987,6 +1067,7 @@ async function renderTables(body) {
     state.tableOrder = [];
     state.tableLayoutTable = null;
     state.tableLayoutWarning = false;
+    state.tableLayoutMessage = "";
     state.tableExportVisible = false;
     state.tableColumnsOpen = false;
     state.tableFiltersOpen = false;
@@ -1270,6 +1351,36 @@ async function renderTables(body) {
     state.tableFiltersOpen = filtersDetails.open;
   });
   body.append(filtersDetails);
+  const savedLayoutCount = Object.keys(readLayoutEnvelope().tables).length;
+  const layoutFile = el("input", {
+    id: "table-layout-import",
+    type: "file",
+    accept: ".json,application/json",
+    hidden: true,
+    "aria-label": "Import table layouts JSON",
+  });
+  layoutFile.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 500_000) {
+      setTableLayoutStatus("That file is too large; choose a layout export under 500 KB.", "error");
+      event.target.value = "";
+      return;
+    }
+    try {
+      const result = importTableLayouts(await file.text());
+      state.tableLayoutTable = null;
+      state.tableColumnsOpen = true;
+      state.tableLayoutWarning = false;
+      state.tableLayoutMessage = `Imported ${result.count} table layout`
+        + `${result.count === 1 ? "" : "s"}.`;
+      await renderPanel();
+    } catch (error) {
+      setTableLayoutStatus(error?.message ?? "That layout file could not be imported.", "error");
+    } finally {
+      event.target.value = "";
+    }
+  });
   const columnsDetails = el(
     "details",
     { id: "table-columns", className: "table-columns", open: state.tableColumnsOpen },
@@ -1390,12 +1501,51 @@ async function renderTables(body) {
             state.tableHidden = [];
             state.tableExportVisible = false;
             state.tableColumnsOpen = true;
+            state.tableLayoutMessage = "";
             state.tableLayoutTable = state.table;
             state.tableLayoutWarning = !clearTableLayout(state.table);
             renderPanel();
           },
         }, "Reset layout"),
       ),
+      el("div", { className: "table-columns-portability" },
+        el("button", {
+          type: "button",
+          disabled: savedLayoutCount === 0,
+          onclick: async () => {
+            const envelope = readLayoutEnvelope();
+            const count = Object.keys(envelope.tables).length;
+            if (!count) {
+              setTableLayoutStatus("No saved table layouts to export.", "error");
+              return;
+            }
+            const url = URL.createObjectURL(
+              new Blob([tableLayoutsExportText()], { type: "application/json" }),
+            );
+            const link = el("a", {
+              href: url,
+              download: "fresh-fvsbc-table-layouts.json",
+            });
+            document.body.append(link);
+            link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            state.tableLayoutMessage = `Exported ${count} table layout${count === 1 ? "" : "s"}.`;
+            state.tableColumnsOpen = true;
+            await renderPanel();
+          },
+        }, "Export layouts"),
+        el("button", {
+          type: "button",
+          onclick: () => layoutFile.click(),
+        }, "Import layouts"),
+        layoutFile,
+      ),
+      el("p", {
+        id: "table-layout-status",
+        className: "table-columns-status",
+        "aria-live": "polite",
+      }, state.tableLayoutMessage),
     ),
   );
   body.append(columnsDetails);
