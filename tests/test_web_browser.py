@@ -735,6 +735,10 @@ def test_an_assistant_chat_can_be_pinned_loaded_and_deleted(cockpit: str) -> Non
             page.get_by_role("button", name="Pin current").click()
             expect(page.locator("#assistant-saved-status")).to_contain_text("Pinned")
             expect(page.locator("#assistant-saved-select")).to_contain_text("Pinned smoke")
+            context_line = page.locator("#assistant-saved-context")
+            expect(context_line).to_contain_text(f"Run {RUN_ID}")
+            expect(context_line).to_contain_text("stand / visuals")
+            expect(context_line).to_contain_text("2 messages")
 
             page.get_by_role("button", name="New", exact=True).click()
             expect(page.locator("#assistant-log")).not_to_contain_text("Transcript smoke")
@@ -747,8 +751,20 @@ def test_an_assistant_chat_can_be_pinned_loaded_and_deleted(cockpit: str) -> Non
             page.locator("#assistant-saved summary").click()
             saved = page.locator("#assistant-saved-select")
             saved.select_option(label="Pinned smoke")
+            expect(page.locator("#assistant-saved-context")).to_contain_text(f"Run {RUN_ID}")
             page.get_by_role("button", name="Load", exact=True).click()
             expect(page.locator("#assistant-log")).to_contain_text("Transcript smoke")
+
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=summary&run={RUN_ID}-b",
+                wait_until="networkidle",
+            )
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-saved summary").click()
+            page.locator("#assistant-saved-select").select_option(label="Pinned smoke")
+            expect(page.locator("#assistant-saved-context")).to_contain_text(
+                f"current run {RUN_ID}-b"
+            )
 
             page.get_by_role("button", name="Delete", exact=True).click()
             expect(page.locator("#assistant-saved-status")).to_contain_text("Deleted")
@@ -794,6 +810,8 @@ def test_a_saved_chat_can_be_renamed_and_exported(cockpit: str, tmp_path: Path) 
             assert payload["chats"][0]["history"][0]["role"] == "user"
             assert "Rename export smoke" in payload["chats"][0]["history"][0]["text"]
             assert "session" in payload["chats"][0]
+            assert payload["chats"][0]["context"]["run"] == RUN_ID
+            assert payload["chats"][0]["context"]["workspace"] == "stand"
 
             page.locator("#assistant-pin-name").fill("Original chat")
             page.get_by_role("button", name="Pin current").click()

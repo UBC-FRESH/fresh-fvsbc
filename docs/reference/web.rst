@@ -83,7 +83,9 @@ drawer can load, rename, or delete a pinned chat; **New** clears the active conv
 pinned ones alone. At most ten are kept, they never reach the service, and **Load** restores the same
 session id so the next turn can continue it when the local agent still knows that session.
 **Export JSON** downloads every saved chat with ``version``, ``exported_at``, names, timestamps,
-sessions, and message metadata; rename refuses a name already used by another saved chat.
+sessions, saved run/view/model context, and message metadata; rename refuses a name already used by
+another saved chat. Selecting a saved chat shows that saved context and message count, and flags
+when the current run or workspace differs from the saved one.
 
 In the browser, **Enter sends** and **Shift+Enter inserts a newline**. The composer grows with the
 message, the header selector switches between the models the local CLI reports, and each reply

@@ -2354,6 +2354,20 @@ function normaliseAssistantMessage(message) {
   };
 }
 
+function normaliseSavedContext(context) {
+  if (!context || typeof context !== "object") return null;
+  const text = (value, length) =>
+    typeof value === "string" ? value.slice(0, length) : null;
+  const normalised = {
+    run: text(context.run, 200),
+    workspace: text(context.workspace, 50),
+    panel: text(context.panel, 50),
+    model: text(context.model, 200),
+    mode: text(context.mode, 20),
+  };
+  return Object.values(normalised).some(Boolean) ? normalised : null;
+}
+
 function readSavedChats() {
   let stored = null;
   try {
@@ -2376,6 +2390,7 @@ function readSavedChats() {
       name,
       saved_at: typeof candidate.saved_at === "string" ? candidate.saved_at : "",
       session: typeof candidate.session === "string" ? candidate.session : null,
+      context: normaliseSavedContext(candidate.context),
       history,
     });
     if (chats.length === SAVED_CHAT_LIMIT) break;
@@ -2402,6 +2417,41 @@ function assistantSavedStatus(text, kind = "") {
   node.className = `assistant-saved-status ${kind}`.trim();
 }
 
+function updateAssistantSavedContext(chat) {
+  const node = document.getElementById("assistant-saved-context");
+  if (!node) return;
+  if (!chat) {
+    node.textContent = "Choose a saved chat to see its run, view, and message count.";
+    return;
+  }
+  const context = chat.context ?? {};
+  const parts = [];
+  if (chat.saved_at) {
+    const saved = new Date(chat.saved_at);
+    if (!Number.isNaN(saved.getTime())) parts.push(`Saved ${saved.toLocaleString()}`);
+  }
+  if (context.run) parts.push(`Run ${context.run}`);
+  const savedView = context.workspace
+    ? `${context.workspace}${context.panel ? ` / ${context.panel}` : ""}`
+    : "";
+  if (savedView) parts.push(savedView);
+  parts.push(`${chat.history.length} message${chat.history.length === 1 ? "" : "s"}`);
+  if (context.model) {
+    parts.push(context.model.split("/").pop());
+  } else if (context.mode) {
+    parts.push(context.mode === "agent" ? "agent" : "local summary");
+  }
+  const currentView = state.workspace
+    ? `${state.workspace}${state.panel ? ` / ${state.panel}` : ""}`
+    : "";
+  if (context.run && state.run?.id && context.run !== state.run.id) {
+    parts.push(`current run ${state.run.id}`);
+  } else if (savedView && currentView && savedView !== currentView) {
+    parts.push(`current view ${currentView}`);
+  }
+  node.textContent = parts.join(" · ");
+}
+
 function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
   const select = document.getElementById("assistant-saved-select");
   if (!select) return;
@@ -2417,6 +2467,7 @@ function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
   );
   select.value = selected;
   state.assistant.savedChat = selected;
+  updateAssistantSavedContext(chats.find((chat) => chat.id === selected) ?? null);
   const load = document.getElementById("assistant-saved-load");
   const remove = document.getElementById("assistant-saved-delete");
   const rename = document.getElementById("assistant-rename");
@@ -2454,6 +2505,13 @@ function pinAssistantChat() {
     name,
     saved_at: new Date().toISOString(),
     session: state.assistant.session,
+    context: {
+      run: state.run?.id ?? null,
+      workspace: state.workspace ?? null,
+      panel: state.panel ?? null,
+      model: state.assistant.model ?? null,
+      mode: state.assistant.mode,
+    },
     history: JSON.parse(JSON.stringify(state.assistant.history)),
   };
   const next = [
@@ -2970,6 +3028,9 @@ async function boot() {
     document.getElementById("assistant-saved-load").disabled = disabled;
     document.getElementById("assistant-saved-delete").disabled = disabled;
     document.getElementById("assistant-rename").disabled = disabled;
+    updateAssistantSavedContext(
+      readSavedChats().find((chat) => chat.id === event.target.value) ?? null,
+    );
   });
   const pinName = document.getElementById("assistant-pin-name");
   pinName.addEventListener("keydown", (event) => {
