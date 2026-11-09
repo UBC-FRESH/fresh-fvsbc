@@ -110,3 +110,16 @@ freshforge run workflows/freshforge/cranbrook_background.yaml --workdir . \
 
 It writes `cranbrook-candidate/metrics.csv` and
 `cranbrook-candidate/model-card.json`. No local calibration is applied.
+
+## `arrow_background.yaml`
+
+Seventh background candidate and the first interior wet-belt test:
+
+```sh
+freshforge run workflows/freshforge/arrow_background.yaml --workdir . \
+  --evidence runtime/freshforge-arrow-evidence.json
+```
+
+It writes `arrow-candidate/metrics.csv` and
+`arrow-candidate/model-card.json`. No local calibration is applied; the
+candidate is weaker than the previous six.

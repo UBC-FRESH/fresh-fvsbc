@@ -1,0 +1,28 @@
+workflow:
+  id: arrow_background_calibration
+  name: Arrow background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for Arrow and freeze aggregate
+    metrics and coefficients. The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_arrow
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - Arrow TSA
+        - --model-id
+        - arrow-background-v0
+        - --calibration
+        - none
+        - --min-target-trees
+        - "500"
+        - --metrics
+        - notes/reference/calibration/arrow-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/arrow-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/arrow-candidate/metrics.csv
+      model_card: notes/reference/calibration/arrow-candidate/model-card.json
