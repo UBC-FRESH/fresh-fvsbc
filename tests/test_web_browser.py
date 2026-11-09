@@ -664,6 +664,46 @@ def test_recent_table_filters_can_be_pinned_and_removed(cockpit: str) -> None:
             browser.close()
 
 
+def test_named_table_filters_can_be_renamed_and_duplicated(cockpit: str) -> None:
+    """Saved filters can be renamed or copied without changing their query."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-column").select_option("Year")
+            page.locator("#table-filter").fill("10")
+            page.get_by_role("button", name="Apply").click()
+            page.locator("#table-filters summary").click()
+            page.locator("#table-filter-name").fill("Filter base")
+            page.get_by_role("button", name="Save current").first.click()
+            expect(page.locator("#table-filter-saved option:checked")).to_have_text("Filter base")
+
+            page.locator("#table-filter-name").fill("Filter renamed")
+            page.locator("#table-filter-rename").click()
+            expect(page.locator("#table-filter-status")).to_contain_text("Renamed to")
+            expect(page.locator("#table-filter-saved option:checked")).to_have_text(
+                "Filter renamed"
+            )
+            page.locator("#table-filter-duplicate").click()
+            expect(page.locator("#table-filter-status")).to_contain_text("Duplicated as")
+            expect(page.locator("#table-filter-saved option:checked")).to_have_text(
+                "Filter renamed copy"
+            )
+            expect(page.locator("#table-filters summary")).to_contain_text("Saved filters · 2")
+
+            page.reload(wait_until="networkidle")
+            page.locator("#table-filters summary").click()
+            expect(page.locator("#table-filter-saved")).to_contain_text("Filter renamed")
+            expect(page.locator("#table-filter-saved")).to_contain_text("Filter renamed copy")
+        finally:
+            browser.close()
+
+
 def test_table_filters_can_be_exported_and_imported(cockpit: str, tmp_path: Path) -> None:
     """A filter export carries named and recent history back into the browser."""
     expect = playwright_module.expect

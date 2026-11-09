@@ -176,8 +176,9 @@ downloads every saved table layout as versioned JSON, and **Import layouts** val
 a layout file before merging by table; the current table reloads after confirmation.
 
 A separate **Saved filters** disclosure stores the current literal query and column scope under a
-name, per table, in ``localStorage``; its search field filters the named list. Loading one restores
-both and unhides its column if the saved layout had hidden it. Applying a filter also records it in a per-table **Recent** list (up to eight
+name, per table, in ``localStorage``; its search field filters the named list. **Rename** changes
+only the name and **Duplicate** copies the query/column under a unique copy name. Loading one
+restores both and unhides its column if the saved layout had hidden it. Applying a filter also records it in a per-table **Recent** list (up to eight
 distinct query/column pairs), which can be reapplied from the same panel. A recent entry can be
 pinned as a named filter or removed from history without changing the active filter. **Export filters**
 downloads named and recent history for every table as versioned JSON; **Import filters** validates,
