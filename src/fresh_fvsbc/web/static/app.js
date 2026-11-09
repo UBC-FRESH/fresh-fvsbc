@@ -32,6 +32,8 @@ const state = {
   tableLayoutTable: null,
   tableLayoutWarning: false,
   tableColumnsOpen: false,
+  tableFiltersOpen: false,
+  tableSavedFilter: "",
   tableOffset: 0,
   tableLimit: 200,
   standYear: null,
@@ -860,6 +862,60 @@ function persistTableLayout() {
   );
 }
 
+const TABLE_FILTERS_KEY = "fresh-fvsbc.table-filters";
+
+function readTableFilters(table) {
+  let raw = null;
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TABLE_FILTERS_KEY) || "null");
+    raw = stored?.tables?.[table] ?? null;
+  } catch (_error) {
+    return { filters: [], ok: false };
+  }
+  if (!Array.isArray(raw)) return { filters: [], ok: true };
+  const filters = [];
+  const seen = new Set();
+  for (const candidate of raw) {
+    if (!candidate || typeof candidate !== "object") continue;
+    const name = typeof candidate.name === "string" ? candidate.name.trim().slice(0, 80) : "";
+    if (!name || seen.has(name)) continue;
+    seen.add(name);
+    filters.push({
+      id: typeof candidate.id === "string" ? candidate.id : `filter-${filters.length}`,
+      name,
+      query: typeof candidate.query === "string" ? candidate.query.slice(0, 200) : "",
+      column: typeof candidate.column === "string" ? candidate.column.slice(0, 100) : "",
+      created_at: typeof candidate.created_at === "string" ? candidate.created_at : "",
+    });
+    if (filters.length === 20) break;
+  }
+  return { filters, ok: true };
+}
+
+function writeTableFilters(table, filters) {
+  try {
+    let stored = null;
+    try {
+      stored = JSON.parse(window.localStorage.getItem(TABLE_FILTERS_KEY) || "null");
+    } catch (_error) {
+      stored = null;
+    }
+    const tables = stored?.tables && typeof stored.tables === "object" ? stored.tables : {};
+    tables[table] = filters.slice(0, 20);
+    window.localStorage.setItem(TABLE_FILTERS_KEY, JSON.stringify({ version: 1, tables }));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function setTableFilterStatus(text, kind = "") {
+  const node = document.getElementById("table-filter-status");
+  if (!node) return;
+  node.textContent = text;
+  node.className = `table-filters-status ${kind}`.trim();
+}
+
 function oracleNotice(tables) {
   const unverified = tables.filter((table) => !table.oracle).length;
   if (!unverified) return null;
@@ -901,6 +957,8 @@ async function renderTables(body) {
             state.tableLayoutTable = null;
             state.tableLayoutWarning = false;
             state.tableColumnsOpen = false;
+            state.tableFiltersOpen = false;
+            state.tableSavedFilter = "";
             state.tableOffset = 0;
             updateUrl();
             renderPanel();
@@ -923,6 +981,8 @@ async function renderTables(body) {
     state.tableLayoutTable = null;
     state.tableLayoutWarning = false;
     state.tableColumnsOpen = false;
+    state.tableFiltersOpen = false;
+    state.tableSavedFilter = "";
     updateUrl();
   }
   if (!state.table) return;
@@ -980,6 +1040,7 @@ async function renderTables(body) {
     "aria-label": "Filter column",
     onchange: (event) => {
       state.tableColumn = event.target.value;
+      state.tableSavedFilter = "";
       state.tableOffset = 0;
       updateUrl();
       renderPanel();
@@ -1004,6 +1065,7 @@ async function renderTables(body) {
     onsubmit: (event) => {
       event.preventDefault();
       state.tableQuery = filterInput.value.trim();
+      state.tableSavedFilter = "";
       state.tableOffset = 0;
       updateUrl();
       renderPanel();
@@ -1018,6 +1080,7 @@ async function renderTables(body) {
           className: "table-clear",
           onclick: () => {
             state.tableQuery = "";
+            state.tableSavedFilter = "";
             state.tableOffset = 0;
             updateUrl();
             renderPanel();
@@ -1040,6 +1103,159 @@ async function renderTables(body) {
     ),
   );
   body.append(filterForm);
+  const storedFilters = readTableFilters(state.table);
+  const savedFilters = storedFilters.filters;
+  if (!savedFilters.some((filter) => filter.id === state.tableSavedFilter)) {
+    state.tableSavedFilter = "";
+  }
+  const filterSelect = el("select", {
+    id: "table-filter-saved",
+    "aria-label": "Saved table filters",
+    onchange: (event) => {
+      state.tableSavedFilter = event.target.value;
+      const disabled = !event.target.value;
+      document.getElementById("table-filter-load").disabled = disabled;
+      document.getElementById("table-filter-delete").disabled = disabled;
+    },
+  },
+    el("option", { value: "" },
+      savedFilters.length ? "Choose a saved filter…" : "No saved filters",
+    ),
+    ...savedFilters.map((filter) =>
+      el("option", {
+        value: filter.id,
+        selected: filter.id === state.tableSavedFilter,
+      }, filter.name),
+    ),
+  );
+  const filterName = el("input", {
+    id: "table-filter-name",
+    type: "text",
+    maxlength: "80",
+    placeholder: "Name this filter…",
+    "aria-label": "Saved filter name",
+  });
+  const loadSavedFilter = async () => {
+    const filter = savedFilters.find((entry) => entry.id === filterSelect.value);
+    if (!filter) {
+      setTableFilterStatus("Choose a saved filter first.", "error");
+      return;
+    }
+    state.tableQuery = filter.query;
+    state.tableColumn = payload.columns.includes(filter.column) ? filter.column : "";
+    if (state.tableColumn && state.tableHidden.includes(state.tableColumn)) {
+      state.tableHidden = state.tableHidden.filter((column) => column !== state.tableColumn);
+      persistTableLayout();
+    }
+    state.tableSavedFilter = filter.id;
+    state.tableOffset = 0;
+    state.tableFiltersOpen = true;
+    updateUrl();
+    await renderPanel();
+    setTableFilterStatus(`Loaded “${filter.name}”.`);
+  };
+  const deleteSavedFilter = async () => {
+    const filter = savedFilters.find((entry) => entry.id === filterSelect.value);
+    if (!filter) {
+      setTableFilterStatus("Choose a saved filter to delete.", "error");
+      return;
+    }
+    const next = savedFilters.filter((entry) => entry.id !== filter.id);
+    if (!writeTableFilters(state.table, next)) {
+      setTableFilterStatus("Browser storage is unavailable; could not delete this filter.", "error");
+      return;
+    }
+    state.tableSavedFilter = next[0]?.id ?? "";
+    state.tableFiltersOpen = true;
+    await renderPanel();
+    setTableFilterStatus(`Deleted “${filter.name}”.`);
+  };
+  const filtersDetails = el(
+    "details",
+    {
+      id: "table-filters",
+      className: "table-filters",
+      open: state.tableFiltersOpen,
+    },
+    el("summary", {}, `Saved filters · ${savedFilters.length}`),
+    el("div", { className: "table-filters-body" },
+      el("div", { className: "table-filters-row" },
+        filterSelect,
+        el("button", {
+          id: "table-filter-load",
+          type: "button",
+          disabled: !state.tableSavedFilter,
+          onclick: loadSavedFilter,
+        }, "Load"),
+        el("button", {
+          id: "table-filter-delete",
+          type: "button",
+          disabled: !state.tableSavedFilter,
+          onclick: deleteSavedFilter,
+        }, "Delete"),
+      ),
+      el("div", { className: "table-filters-row" },
+        filterName,
+        el("button", {
+          type: "button",
+          onclick: async () => {
+            const query = state.tableQuery.trim();
+            const column = state.tableColumn;
+            const fallback = column && query
+              ? `${column} = “${query.slice(0, 40)}”`
+              : query
+                ? `Search “${query.slice(0, 40)}”`
+                : column
+                  ? `Column ${column}`
+                  : "All rows";
+            const name = String(filterName.value || fallback).trim().slice(0, 80);
+            if (!name) {
+              setTableFilterStatus("Give the filter a name first.", "error");
+              return;
+            }
+            const existing = savedFilters.find((filter) => filter.name === name);
+            const entry = {
+              id: existing?.id ?? (
+                window.crypto?.randomUUID?.()
+                ?? `filter-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+              ),
+              name,
+              query,
+              column,
+              created_at: new Date().toISOString(),
+            };
+            const next = [
+              entry,
+              ...savedFilters.filter((filter) => filter.id !== entry.id && filter.name !== name),
+            ].slice(0, 20);
+            if (!writeTableFilters(state.table, next)) {
+              setTableFilterStatus(
+                "Browser storage is unavailable; could not save this filter.",
+                "error",
+              );
+              return;
+            }
+            state.tableSavedFilter = entry.id;
+            state.tableFiltersOpen = true;
+            filterName.value = "";
+            await renderPanel();
+            setTableFilterStatus(`Saved “${entry.name}”.`);
+          },
+        }, "Save current"),
+      ),
+      el("p", {
+        id: "table-filter-status",
+        className: `table-filters-status${storedFilters.ok ? "" : " error"}`,
+        "aria-live": "polite",
+      }, storedFilters.ok
+        ? "Saved filters stay in this browser."
+        : "Browser storage is unavailable; saved filters will not persist."),
+    ),
+  );
+  filtersDetails.addEventListener("toggle", () => {
+    state.tableFiltersOpen = filtersDetails.open;
+  });
+  body.append(filtersDetails);
   const columnsDetails = el(
     "details",
     { id: "table-columns", className: "table-columns", open: state.tableColumnsOpen },

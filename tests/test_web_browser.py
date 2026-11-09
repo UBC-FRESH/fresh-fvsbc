@@ -330,6 +330,58 @@ def test_a_large_page_only_renders_a_virtual_window(cockpit: str) -> None:
             browser.close()
 
 
+def test_table_filters_can_be_saved_loaded_and_deleted(cockpit: str) -> None:
+    """A named filter restores its query, column, and a hidden filter column."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-column").select_option("Year")
+            page.locator("#table-filter").fill("10")
+            page.get_by_role("button", name="Apply").click()
+            expect(page.locator("#table-filter")).to_have_value("10")
+            expect(page.locator("#table-column")).to_have_value("Year")
+
+            page.locator("#table-filters summary").click()
+            page.locator("#table-filter-name").fill("Year ten")
+            page.get_by_role("button", name="Save current").click()
+            expect(page.locator("#table-filters summary")).to_contain_text("Saved filters · 1")
+            expect(page.locator("#table-filter-status")).to_contain_text("Saved")
+
+            page.locator("#table-columns summary").click()
+            page.locator("#table-columns input[value='Year']").uncheck()
+            expect(page.locator("#table-column")).to_have_value("")
+            page.locator("#table-filter-saved").select_option(label="Year ten")
+            page.get_by_role("button", name="Load", exact=True).click()
+            expect(page.locator("#table-column")).to_have_value("Year")
+            expect(page.locator("#table-filter")).to_have_value("10")
+            expect(page.locator("#table-columns input[value='Year']")).to_be_checked()
+
+            page.reload(wait_until="networkidle")
+            page.locator("#table-filters summary").click()
+            expect(page.locator("#table-filter-saved")).to_contain_text("Year ten")
+            page.locator("#table-filter-saved").select_option(label="Year ten")
+            page.get_by_role("button", name="Load", exact=True).click()
+            expect(page.locator("#table-filter")).to_have_value("10")
+            expect(page.locator("#table-column")).to_have_value("Year")
+            params = page.evaluate(
+                "Object.fromEntries(new URLSearchParams(window.location.search))"
+            )
+            assert params["q"] == "10"
+            assert params["column"] == "Year"
+
+            page.get_by_role("button", name="Delete", exact=True).click()
+            expect(page.locator("#table-filters summary")).to_contain_text("Saved filters · 0")
+            expect(page.locator("#table-filter-saved")).not_to_contain_text("Year ten")
+        finally:
+            browser.close()
+
+
 def test_table_columns_can_be_hidden_and_restored(cockpit: str) -> None:
     """Column visibility changes the table and filter without changing exports."""
     expect = playwright_module.expect
