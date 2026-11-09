@@ -139,6 +139,11 @@ A page with more than 120 rows renders only the visible window plus a small over
 rows preserving the full scroll height. Filtering and paging stay server-side, so virtualizing does
 not change which rows the reader returns or exports.
 
+On viewports wider than 900 pixels, a table with more than five columns pins its first useful key
+column while the rest scrolls sideways. A column of repeated UUID ``CaseID`` values is skipped so
+the pin lands on something readable such as ``StandID`` or ``Year``. Long pinned values ellipsize
+with the full value in a tooltip; narrower screens leave every column unpinned.
+
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.
 

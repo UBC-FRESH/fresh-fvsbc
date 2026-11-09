@@ -90,6 +90,24 @@ const fmt = (value) => {
 const isNumeric = (rows, column) =>
   rows.some((row) => typeof row[column] === "number");
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function stickyColumnFor(columns, rows) {
+  if (columns.length <= 5) return null;
+  for (const column of columns) {
+    const values = rows
+      .slice(0, 20)
+      .map((row) => row[column])
+      .filter((value) => value !== null && value !== undefined);
+    if (!values.length) continue;
+    if (values.every((value) => typeof value === "string" && UUID_PATTERN.test(value))) {
+      continue;
+    }
+    return column;
+  }
+  return columns[0] ?? null;
+}
+
 function badge(text, kind) {
   return el("span", { className: `badge ${kind ?? ""}`.trim() }, text);
 }
@@ -933,12 +951,14 @@ async function renderTables(body) {
 
   const units = payload.units ?? {};
   const declaredUnits = Object.keys(units).length;
+  const stickyColumn = stickyColumnFor(payload.columns, payload.rows);
   body.append(
     el("p", { className: "table-provenance" },
       `Source: ${payload.source ?? "FVSOut.db"} · `,
       declaredUnits
         ? `${declaredUnits} of ${payload.columns.length} columns have declared units; blank means this reader does not declare one.`
         : "This table has no declared units; blank does not mean dimensionless.",
+      stickyColumn ? ` ${stickyColumn} stays pinned on wide screens.` : "",
     ),
   );
   const header = el(
@@ -947,10 +967,11 @@ async function renderTables(body) {
     ...payload.columns.map((column) => {
       const unit = units[column];
       const numeric = isNumeric(payload.rows, column);
+      const sticky = column === stickyColumn;
       return el(
         "th",
         {
-          className: numeric ? "num" : "",
+          className: `${numeric ? "num " : ""}${sticky ? "sticky-key" : ""}`.trim(),
           title: unit ? `${column} — ${unit}` : `${column} — unit not declared`,
         },
         el("span", { className: "column-name" }, column),
@@ -966,13 +987,19 @@ async function renderTables(body) {
     const node = el(
       "tr",
       { className: "data-row" },
-      ...payload.columns.map((column) =>
-        el(
+      ...payload.columns.map((column) => {
+        const sticky = column === stickyColumn;
+        const value = fmt(row[column]);
+        const cell = el(
           "td",
-          { className: numericColumns.has(column) ? "num" : "" },
-          fmt(row[column]),
-        ),
-      ),
+          {
+            className: `${numericColumns.has(column) ? "num " : ""}${sticky ? "sticky-key" : ""}`.trim(),
+          },
+          sticky ? el("span", { className: "sticky-value" }, value) : value,
+        );
+        if (sticky) cell.title = String(row[column] ?? "");
+        return cell;
+      }),
     );
     node.dataset.rowIndex = String(index);
     node.setAttribute("aria-rowindex", String(index + 2));
