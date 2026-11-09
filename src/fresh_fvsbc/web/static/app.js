@@ -3453,7 +3453,7 @@ async function renderCompare(body) {
   const saveName = el("input", {
     id: "compare-save-name",
     type: "text",
-    placeholder: "Name this comparison…",
+    placeholder: "Name to save or rename…",
     "aria-label": "Comparison name",
   });
   const savedStatus = el("p", {
@@ -3578,6 +3578,39 @@ async function renderCompare(body) {
             if (saveCurrentComparison(saveName.value)) renderPanel();
           },
         }, "Save"),
+        el("button", {
+          type: "button",
+          disabled: !saved.length || !state.compareSaved,
+          onclick: async () => {
+            const item = saved.find((entry) => entry.name === state.compareSaved);
+            if (!item) {
+              setSavedStatus("Choose a saved comparison first.", "error");
+              return;
+            }
+            const name = String(saveName.value || "").trim().slice(0, 80);
+            if (!name) {
+              setSavedStatus("Enter the new name first.", "error");
+              return;
+            }
+            if (name === item.name) {
+              setSavedStatus("That is already the comparison name.", "error");
+              return;
+            }
+            if (saved.some((entry) => entry.name === name)) {
+              setSavedStatus("Another comparison already uses that name.", "error");
+              return;
+            }
+            const items = readSavedComparisons().map((entry) =>
+              entry.name === item.name ? { ...entry, name } : entry,
+            );
+            writeSavedComparisons(items);
+            state.compareSaved = name;
+            saveName.value = "";
+            await renderPanel();
+            const fresh = document.getElementById("compare-saved-status");
+            if (fresh) fresh.textContent = `Renamed to “${name}”.`;
+          },
+        }, "Rename"),
       ),
       savedStatus,
       importFile,

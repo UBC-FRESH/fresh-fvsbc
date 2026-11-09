@@ -117,7 +117,8 @@ are shown and which rows rank highest; the summary metrics above it are unaffect
 columns** disclosure chooses the identity columns used to match rows across runs; key columns are
 excluded from the deltas. The selections are encoded in ``ccolumns`` and ``ckey`` and saved with
 named comparisons. Selecting a named comparison shows its runs, metric, table, diff columns, and
-key columns; **Update** overwrites that preset with the current comparison settings.
+key columns; **Update** overwrites that preset with the current comparison settings, while
+**Rename** changes only its name and refuses duplicates.
 
 What it reads
 -------------

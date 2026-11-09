@@ -1116,6 +1116,41 @@ def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: 
             browser.close()
 
 
+def test_saved_compare_preset_can_be_renamed(cockpit: str) -> None:
+    """Renaming a saved comparison preserves its settings and selection."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=BA&ctable=FVS_Summary_Metric"
+                "&ccolumns=BA,CCF&ckey=Year",
+                wait_until="networkidle",
+            )
+            page.locator("#compare-save-name").fill("Original preset")
+            page.get_by_role("button", name="Save", exact=True).click()
+            page.locator("#compare-save-name").fill("Renamed preset")
+            page.get_by_role("button", name="Rename", exact=True).click()
+            expect(page.locator("#compare-saved-status")).to_contain_text("Renamed to")
+            saved = page.locator("#compare-saved")
+            expect(saved).to_contain_text("Renamed preset")
+            expect(saved).not_to_contain_text("Original preset")
+            expect(page.locator("#compare-saved option:checked")).to_have_text("Renamed preset")
+            expect(page.locator("#compare-saved-context")).to_contain_text(
+                "2 diff columns: BA, CCF"
+            )
+
+            page.reload(wait_until="networkidle")
+            expect(page.locator("#compare-saved")).to_contain_text("Renamed preset")
+            expect(page.locator("#compare-saved")).not_to_contain_text("Original preset")
+            page.get_by_role("button", name="Load", exact=True).click()
+            expect(page.locator("#compare-saved-context")).to_contain_text("keys Year")
+        finally:
+            browser.close()
+
+
 def test_saved_compare_preset_can_be_updated(cockpit: str) -> None:
     """A saved comparison shows its key/diff settings and can overwrite them."""
     expect = playwright_module.expect
