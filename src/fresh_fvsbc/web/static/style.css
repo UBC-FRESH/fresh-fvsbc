@@ -1156,3 +1156,38 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
   font-size: 10px;
   line-height: 1.4;
 }
+
+.table-filters {
+  margin: 8px 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.table-filters summary {
+  cursor: pointer;
+  padding: 7px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.table-filters summary:hover { color: var(--accent); }
+.table-filters-body {
+  display: grid;
+  gap: 6px;
+  padding: 0 10px 10px;
+}
+.table-filters-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.table-filters-row select { flex: 1 1 170px; min-width: 0; }
+.table-filters-row input { flex: 1 1 170px; min-width: 0; }
+.table-filters-row button { font-size: 11px; padding: 4px 8px; }
+.table-filters-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.table-filters-status.error { color: var(--warn); }
