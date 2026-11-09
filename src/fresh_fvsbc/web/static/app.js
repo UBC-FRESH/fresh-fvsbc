@@ -888,12 +888,13 @@ async function renderTables(body) {
       renderPanel();
     },
   },
-    columnSelect,
     filterInput,
+    columnSelect,
     el("button", { className: "primary", type: "submit" }, "Apply"),
     state.tableQuery
       ? el("button", {
           type: "button",
+          className: "table-clear",
           onclick: () => {
             state.tableQuery = "";
             state.tableOffset = 0;
@@ -902,15 +903,20 @@ async function renderTables(body) {
           },
         }, "Clear")
       : null,
-    el("a", { className: "button-like", href: csvHref, download: `${state.run.id}-${state.table}.csv` },
-      "CSV",
+    el("div", { className: "table-export-actions" },
+      el("a", {
+        className: "button-like",
+        href: csvHref,
+        download: `${state.run.id}-${state.table}.csv`,
+        title: "CSV data only; use Package for units and provenance.",
+      }, "CSV"),
+      el("a", {
+        className: "button-like",
+        href: packageHref,
+        download: `${state.run.id}-${state.table}.zip`,
+        title: "CSV plus metadata.json and README.txt",
+      }, "Package"),
     ),
-    el("a", {
-      className: "button-like",
-      href: packageHref,
-      download: `${state.run.id}-${state.table}.zip`,
-      title: "CSV plus metadata.json and README.txt",
-    }, "Package"),
   );
   body.append(filterForm);
   body.append(
@@ -1109,11 +1115,11 @@ async function renderTables(body) {
   );
   body.append(
     el("div", { className: "table-pager" },
-      el("span", { className: "muted" },
+      el("span", { className: "muted table-page-summary" },
         `Page ${fmt(page)} of ${fmt(pages)} · Rows ${fmt(firstRow)}–${fmt(lastRow)} of ${fmt(payload.total)}`,
       ),
-      el("label", { className: "muted" }, "Rows ", sizeSelect),
-      el("label", { className: "muted" }, "Go to ", pageInput),
+      el("label", { className: "muted table-pager-field" }, "Rows ", sizeSelect),
+      el("label", { className: "muted table-pager-field" }, "Go to ", pageInput),
       el("button", {
         type: "button",
         disabled: payload.offset <= 0,
