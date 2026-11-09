@@ -1,0 +1,29 @@
+workflow:
+  id: haida_gwaii_background_calibration
+  name: Haida Gwaii background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for Haida Gwaii and freeze
+    aggregate metrics and coefficients. PL is below the support minimum and is
+    omitted. The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_haida_gwaii
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - Haida Gwaii TSA
+        - --model-id
+        - haida-gwaii-background-v0
+        - --calibration
+        - none
+        - --min-target-trees
+        - "500"
+        - --metrics
+        - notes/reference/calibration/haida-gwaii-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/haida-gwaii-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/haida-gwaii-candidate/metrics.csv
+      model_card: notes/reference/calibration/haida-gwaii-candidate/model-card.json
