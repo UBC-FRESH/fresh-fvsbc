@@ -23,6 +23,7 @@ const state = {
   compareMetric: "BA",
   compareColumns: [],
   compareColumnsOpen: false,
+  compareSort: "recent",
   compareKeyColumns: [],
   compareKeysOpen: false,
   compareSaved: "",
@@ -40,6 +41,8 @@ const state = {
   tableSavedFilter: "",
   tableExportPresetsOpen: false,
   tableExportPreset: "",
+  tableFilterSort: "recent",
+  tablePresetSort: "recent",
   tableSetupOpen: false,
   tableOffset: 0,
   tableLimit: 200,
@@ -179,6 +182,16 @@ function attachSelectSearch(input, select) {
     select.value = kept;
     select.dispatchEvent(new Event("change", { bubbles: true }));
   });
+}
+
+function sortPresetCollection(items, mode) {
+  if (mode === "name") {
+    return [...items].sort((left, right) => left.name.localeCompare(right.name));
+  }
+  if (mode === "name-desc") {
+    return [...items].sort((left, right) => right.name.localeCompare(left.name));
+  }
+  return items;
 }
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -2017,7 +2030,7 @@ async function renderTables(body) {
   );
   body.append(filterForm);
   const storedFilters = readTableFilters(state.table);
-  const savedFilters = storedFilters.filters;
+  const savedFilters = sortPresetCollection(storedFilters.filters, state.tableFilterSort);
   if (!savedFilters.some((filter) => filter.id === state.tableSavedFilter)) {
     state.tableSavedFilter = "";
   }
@@ -2051,6 +2064,21 @@ async function renderTables(body) {
     "aria-label": "Search saved filters",
   });
   attachSelectSearch(filterSearch, filterSelect);
+  const filterSort = el("select", {
+    id: "table-filter-sort",
+    className: "collection-sort",
+    "aria-label": "Sort saved filters",
+    onchange: (event) => {
+      state.tableFilterSort = event.target.value;
+      renderPanel();
+    },
+  },
+    ...["recent", "name", "name-desc"].map((value) =>
+      el("option", { value, selected: state.tableFilterSort === value },
+        value === "recent" ? "Recent first" : value === "name" ? "Name A–Z" : "Name Z–A",
+      ),
+    ),
+  );
   const filterName = el("input", {
     id: "table-filter-name",
     type: "text",
@@ -2348,7 +2376,7 @@ async function renderTables(body) {
     },
     el("summary", {}, `Saved filters · ${savedFilters.length}`),
     el("div", { className: "table-filters-body" },
-      el("div", { className: "table-filters-row" }, filterSearch),
+      el("div", { className: "table-filters-row" }, filterSearch, filterSort),
       el("div", { className: "table-filters-row" },
         filterSelect,
         el("button", {
@@ -2469,7 +2497,7 @@ async function renderTables(body) {
   });
   body.append(filtersDetails);
   const storedPresets = readTableExportPresets(state.table);
-  const exportPresets = storedPresets.presets;
+  const exportPresets = sortPresetCollection(storedPresets.presets, state.tablePresetSort);
   if (!exportPresets.some((preset) => preset.id === state.tableExportPreset)) {
     state.tableExportPreset = "";
   }
@@ -2559,6 +2587,21 @@ async function renderTables(body) {
     "aria-label": "Search export presets",
   });
   attachSelectSearch(presetSearch, presetSelect);
+  const presetSort = el("select", {
+    id: "table-export-preset-sort",
+    className: "collection-sort",
+    "aria-label": "Sort export presets",
+    onchange: (event) => {
+      state.tablePresetSort = event.target.value;
+      renderPanel();
+    },
+  },
+    ...["recent", "name", "name-desc"].map((value) =>
+      el("option", { value, selected: state.tablePresetSort === value },
+        value === "recent" ? "Recent first" : value === "name" ? "Name A–Z" : "Name Z–A",
+      ),
+    ),
+  );
   const presetName = el("input", {
     id: "table-export-preset-name",
     type: "text",
@@ -2655,7 +2698,7 @@ async function renderTables(body) {
     },
     el("summary", {}, `Export presets · ${exportPresets.length}`),
     el("div", { className: "table-filters-body" },
-      el("div", { className: "table-filters-row" }, presetSearch),
+      el("div", { className: "table-filters-row" }, presetSearch, presetSort),
       el("div", { className: "table-filters-row" },
         presetSelect,
         el("button", {
@@ -3864,7 +3907,7 @@ async function renderCompare(body) {
     ),
   );
 
-  const saved = readSavedComparisons();
+  const saved = sortPresetCollection(readSavedComparisons(), state.compareSort);
   if (!state.compareSaved && saved.length) state.compareSaved = saved[0].name;
   const savedContext = el("p", {
     id: "compare-saved-context",
@@ -3906,6 +3949,21 @@ async function renderCompare(body) {
     "aria-label": "Search saved comparisons",
   });
   attachSelectSearch(savedSearch, savedSelect);
+  const savedSort = el("select", {
+    id: "compare-saved-sort",
+    className: "collection-sort",
+    "aria-label": "Sort saved comparisons",
+    onchange: (event) => {
+      state.compareSort = event.target.value;
+      renderPanel();
+    },
+  },
+    ...["recent", "name", "name-desc"].map((value) =>
+      el("option", { value, selected: state.compareSort === value },
+        value === "recent" ? "Recent first" : value === "name" ? "Name A–Z" : "Name Z–A",
+      ),
+    ),
+  );
   const saveName = el("input", {
     id: "compare-save-name",
     type: "text",
@@ -3953,7 +4011,7 @@ async function renderCompare(body) {
   });
   body.append(
     el("div", { className: "compare-saved" },
-      el("div", { className: "compare-saved-row" }, savedSearch),
+      el("div", { className: "compare-saved-row" }, savedSearch, savedSort),
       el("div", { className: "compare-saved-row" },
         savedSelect,
         el("button", {
