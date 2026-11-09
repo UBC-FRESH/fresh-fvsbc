@@ -2419,8 +2419,12 @@ function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
   state.assistant.savedChat = selected;
   const load = document.getElementById("assistant-saved-load");
   const remove = document.getElementById("assistant-saved-delete");
+  const rename = document.getElementById("assistant-rename");
+  const exportButton = document.getElementById("assistant-saved-export");
   if (load) load.disabled = !selected;
   if (remove) remove.disabled = !selected;
+  if (rename) rename.disabled = !selected;
+  if (exportButton) exportButton.disabled = !chats.length;
   const count = document.getElementById("assistant-saved-count");
   if (count) count.textContent = chats.length ? `(${chats.length})` : "";
 }
@@ -2463,6 +2467,68 @@ function pinAssistantChat() {
   if (input) input.value = "";
   refreshAssistantSaved(entry.id);
   assistantSavedStatus(`Pinned “${entry.name}”.`);
+}
+
+function savedChatsExportText() {
+  return `${JSON.stringify({
+    version: 1,
+    exported_at: new Date().toISOString(),
+    chats: readSavedChats(),
+  }, null, 2)}\n`;
+}
+
+function renameAssistantChat() {
+  const select = document.getElementById("assistant-saved-select");
+  const id = select?.value || state.assistant.savedChat;
+  const chats = readSavedChats();
+  const chat = chats.find((entry) => entry.id === id);
+  if (!chat) {
+    assistantSavedStatus("Choose a saved chat to rename.", "error");
+    return;
+  }
+  const input = document.getElementById("assistant-pin-name");
+  const name = String(input?.value || "").trim().slice(0, 80);
+  if (!name) {
+    assistantSavedStatus("Enter the new name first.", "error");
+    return;
+  }
+  if (name === chat.name) {
+    assistantSavedStatus("That is already the chat name.", "error");
+    return;
+  }
+  if (chats.some((entry) => entry.id !== chat.id && entry.name === name)) {
+    assistantSavedStatus("Another saved chat already uses that name.", "error");
+    return;
+  }
+  const next = chats.map((entry) => (entry.id === chat.id ? { ...entry, name } : entry));
+  if (!writeSavedChats(next)) {
+    assistantSavedStatus("Browser storage is unavailable; could not rename this chat.", "error");
+    return;
+  }
+  if (input) input.value = "";
+  refreshAssistantSaved(chat.id);
+  assistantSavedStatus(`Renamed to “${name}”.`);
+}
+
+function exportSavedChats() {
+  const chats = readSavedChats();
+  if (!chats.length) {
+    assistantSavedStatus("Pin a chat before exporting.", "error");
+    return;
+  }
+  const blob = new Blob([savedChatsExportText()], {
+    type: "application/json;charset=utf-8",
+  });
+  const href = URL.createObjectURL(blob);
+  const link = el("a", {
+    href,
+    download: "fresh-fvsbc-assistant-chats.json",
+  });
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(href), 1000);
+  assistantSavedStatus(`Exported ${chats.length} saved chat${chats.length === 1 ? "" : "s"}.`);
 }
 
 function renderAssistantHistory() {
@@ -2895,12 +2961,15 @@ async function boot() {
   document.getElementById("assistant-pin").addEventListener("click", pinAssistantChat);
   document.getElementById("assistant-saved-load").addEventListener("click", loadAssistantChat);
   document.getElementById("assistant-saved-delete").addEventListener("click", deleteAssistantChat);
+  document.getElementById("assistant-rename").addEventListener("click", renameAssistantChat);
+  document.getElementById("assistant-saved-export").addEventListener("click", exportSavedChats);
   const savedSelect = document.getElementById("assistant-saved-select");
   savedSelect.addEventListener("change", (event) => {
     state.assistant.savedChat = event.target.value;
     const disabled = !event.target.value;
     document.getElementById("assistant-saved-load").disabled = disabled;
     document.getElementById("assistant-saved-delete").disabled = disabled;
+    document.getElementById("assistant-rename").disabled = disabled;
   });
   const pinName = document.getElementById("assistant-pin-name");
   pinName.addEventListener("keydown", (event) => {
