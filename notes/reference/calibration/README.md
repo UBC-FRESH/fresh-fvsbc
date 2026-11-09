@@ -315,6 +315,7 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-quesnel-mpb-segment.md` | The D9.66 Quesnel MPB segment test |
 | `d9-quesnel-small-pl.md` | The D9.69 Quesnel small-PL residual |
 | `d9-quesnel-small-tree-base.md` | The D9.70 base-vs-MPB small-PL check |
+| `d9-small-tree-panel.md` | The D9.76 small-PL panel check |
 | `quesnel-candidate/README.md` | The frozen Quesnel non-PL candidate dossier |
 | `quesnel-candidate/metrics.csv` | The frozen Quesnel candidate metrics |
 | `quesnel-candidate/JOINT-REPORT.md` | The assembled Quesnel joint report |
