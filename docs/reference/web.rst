@@ -144,6 +144,10 @@ column while the rest scrolls sideways. A column of repeated UUID ``CaseID`` val
 the pin lands on something readable such as ``StandID`` or ``Year``. Long pinned values ellipsize
 with the full value in a tooltip; narrower screens leave every column unpinned.
 
+At phone widths the table toolbar becomes a compact grid: full-width search, column selector with
+Apply/Clear, then the CSV and package actions. The pager uses two columns for page size and jump
+controls, with full-width Previous/Next buttons below the row summary.
+
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.
 

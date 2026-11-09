@@ -490,6 +490,49 @@ def test_the_mobile_shell_does_not_overflow(cockpit: str) -> None:
             browser.close()
 
 
+def test_mobile_table_controls_form_a_compact_grid(cockpit: str) -> None:
+    """On a phone the filter, exports, and pager stack without losing controls."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 390, "height": 844})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}"
+                "&table=FVS_TreeList_Metric&limit=5",
+                wait_until="networkidle",
+            )
+            panel = page.locator("#panel-body").bounding_box()
+            filter_box = page.locator("#table-filter").bounding_box()
+            column_box = page.locator("#table-column").bounding_box()
+            export_box = page.locator(".table-export-actions").bounding_box()
+            assert panel is not None
+            assert filter_box is not None
+            assert column_box is not None
+            assert export_box is not None
+            assert (
+                page.locator(".table-toolbar").evaluate("(node) => getComputedStyle(node).display")
+                == "grid"
+            )
+            assert filter_box["width"] >= panel["width"] * 0.8
+            assert column_box["y"] >= filter_box["y"] + filter_box["height"]
+            assert export_box["y"] >= column_box["y"] + column_box["height"]
+            assert (
+                page.locator(".table-pager").evaluate("(node) => getComputedStyle(node).display")
+                == "grid"
+            )
+            expect(page.locator(".table-page-summary")).to_be_visible()
+            expect(page.locator(".table-pager select")).to_be_visible()
+            next_button = page.get_by_role("button", name="Next", exact=True)
+            expect(next_button).to_be_enabled()
+            next_box = next_button.bounding_box()
+            assert next_box is not None
+            assert next_box["height"] >= 36
+            assert page.evaluate("document.body.scrollWidth <= document.body.clientWidth")
+        finally:
+            browser.close()
+
+
 def test_the_calibration_editor_previews_the_domain_and_cycles(cockpit: str) -> None:
     """A bundle can be carried into the run editor, where its domain and warnings are visible."""
     expect = playwright_module.expect
