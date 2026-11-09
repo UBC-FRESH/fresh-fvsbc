@@ -19,3 +19,13 @@ nodes:
         - runtime/quesnel-mpb-segment.json
     artifacts:
       segment: runtime/quesnel-mpb-segment.json
+
+  - id: freeze_boundary
+    provider: fresh_fvsbc.freshforge.native_script
+    needs:
+      - run_segment
+    parameters:
+      script: notes/reference/calibration/freeze_boundary.py
+      args: []
+    artifacts:
+      boundary: notes/reference/calibration/quesnel-candidate/small-tree-boundary.json

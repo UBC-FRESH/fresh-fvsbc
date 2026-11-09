@@ -37,6 +37,11 @@ the final size distribution, and the skipped-tree count. It splits intervals
 longer than ten years into a ten-year MPB cycle plus a background tail, so the
 MPB ten-year cap is not exceeded.
 
+The second node, `freeze_boundary`, checks the aggregate 16-case panel and writes
+`quesnel-candidate/small-tree-boundary.json`. It fails if the panel no longer
+supports the boundary: more than 1 PL/ac above 15 cm, or a maximum live DBH above
+20 cm.
+
 The provider is `fresh_fvsbc.freshforge.native_script`. It runs the declared
 repository script with an explicit argument list, records stdout/stderr and the
 return code, and resolves declared artifacts against the work directory.

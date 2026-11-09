@@ -133,7 +133,7 @@ def test_the_mpb_segment_workflow_validates_with_the_provider() -> None:
     assert [
         diagnostic for diagnostic in errors if diagnostic.code.startswith("node.provider")
     ] == []
-    assert [node.id for node in spec.nodes] == ["run_segment"]
+    assert [node.id for node in spec.nodes] == ["run_segment", "freeze_boundary"]
     assert spec.nodes[0].parameters["args"] == [
         "--case",
         "runtime/mpb-case.json",
