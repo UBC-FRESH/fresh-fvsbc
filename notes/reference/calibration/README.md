@@ -339,6 +339,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-kamloops-candidate.md` | The D9.87 Kamloops candidate |
 | `kamloops-candidate/metrics.csv` | The frozen Kamloops aggregate metrics |
 | `kamloops-candidate/model-card.json` | Frozen Kamloops coefficients and pins |
+| `d9-prince-george-candidate.md` | The D9.88 Prince George candidate |
+| `prince-george-candidate/metrics.csv` | The frozen Prince George aggregate metrics |
+| `prince-george-candidate/model-card.json` | Frozen Prince George coefficients and pins |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |

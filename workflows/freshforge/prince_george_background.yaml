@@ -1,0 +1,28 @@
+workflow:
+  id: prince_george_background_calibration
+  name: Prince George background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for Prince George and freeze
+    aggregate metrics and coefficients. The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_prince_george
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - Prince George TSA
+        - --model-id
+        - prince-george-background-v0
+        - --calibration
+        - none
+        - --min-target-trees
+        - "500"
+        - --metrics
+        - notes/reference/calibration/prince-george-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/prince-george-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/prince-george-candidate/metrics.csv
+      model_card: notes/reference/calibration/prince-george-candidate/model-card.json
