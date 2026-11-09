@@ -2994,10 +2994,32 @@ async function renderCompare(body) {
 
   const saved = readSavedComparisons();
   if (!state.compareSaved && saved.length) state.compareSaved = saved[0].name;
+  const savedContext = el("p", {
+    id: "compare-saved-context",
+    className: "compare-saved-context",
+  });
+  const updateSavedContext = () => {
+    const item = saved.find((entry) => entry.name === state.compareSaved);
+    if (!item) {
+      savedContext.textContent = "Choose a saved comparison to inspect its runs, metric, table, diff columns, and keys.";
+      return;
+    }
+    const parts = [`${item.a} → ${item.b}`, `metric ${item.metric}`];
+    if (item.ctable) parts.push(item.ctable);
+    parts.push(item.ccolumns.length
+      ? `${item.ccolumns.length} diff column${item.ccolumns.length === 1 ? "" : "s"}: ${item.ccolumns.join(", ")}`
+      : "all diff columns");
+    parts.push(item.ckey.length ? `keys ${item.ckey.join(", ")}` : "default keys");
+    savedContext.textContent = parts.join(" · ");
+  };
+  updateSavedContext();
   const savedSelect = el("select", {
     id: "compare-saved",
     "aria-label": "Saved comparisons",
-    onchange: (event) => { state.compareSaved = event.target.value; },
+    onchange: (event) => {
+      state.compareSaved = event.target.value;
+      updateSavedContext();
+    },
   },
     el("option", { value: "" }, saved.length ? "Choose a saved comparison" : "No saved comparisons"),
     ...saved.map((item) =>
@@ -3071,6 +3093,28 @@ async function renderCompare(body) {
         }, "Load"),
         el("button", {
           type: "button",
+          disabled: !saved.length || !state.compareSaved,
+          onclick: async () => {
+            const items = readSavedComparisons();
+            const index = items.findIndex((item) => item.name === state.compareSaved);
+            if (index < 0) return;
+            items[index] = {
+              ...items[index],
+              a: state.compareA,
+              b: state.compareB,
+              metric: state.compareMetric,
+              ctable: state.compareTable ?? "",
+              ccolumns: [...state.compareColumns],
+              ckey: [...state.compareKeyColumns],
+            };
+            writeSavedComparisons(items);
+            await renderPanel();
+            const fresh = document.getElementById("compare-saved-status");
+            if (fresh) fresh.textContent = `Updated “${items[index].name}”.`;
+          },
+        }, "Update"),
+        el("button", {
+          type: "button",
           disabled: !saved.length,
           onclick: () => {
             const items = readSavedComparisons().filter((item) => item.name !== state.compareSaved);
@@ -3101,6 +3145,7 @@ async function renderCompare(body) {
           onclick: () => importFile.click(),
         }, "Import JSON"),
       ),
+      savedContext,
       el("div", { className: "compare-saved-row" },
         saveName,
         el("button", {
