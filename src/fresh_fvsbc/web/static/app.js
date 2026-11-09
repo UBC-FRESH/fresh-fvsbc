@@ -38,6 +38,8 @@ const state = {
   tableColumnsOpen: false,
   tableFiltersOpen: false,
   tableSavedFilter: "",
+  tableExportPresetsOpen: false,
+  tableExportPreset: "",
   tableOffset: 0,
   tableLimit: 200,
   standYear: null,
@@ -1223,6 +1225,71 @@ function setTableLayoutStatus(text, kind = "") {
   node.className = `table-columns-status ${kind}`.trim();
 }
 
+const TABLE_EXPORT_PRESETS_KEY = "fresh-fvsbc.table-export-presets";
+
+function readTableExportPresets(table) {
+  let raw = null;
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TABLE_EXPORT_PRESETS_KEY) || "null");
+    raw = stored?.tables?.[table] ?? null;
+  } catch (_error) {
+    return { presets: [], ok: false };
+  }
+  if (!Array.isArray(raw)) return { presets: [], ok: true };
+  const presets = [];
+  const seen = new Set();
+  for (const candidate of raw) {
+    if (!candidate || typeof candidate !== "object") continue;
+    const name = typeof candidate.name === "string" ? candidate.name.trim().slice(0, 80) : "";
+    if (!name || seen.has(name)) continue;
+    seen.add(name);
+    presets.push({
+      id: typeof candidate.id === "string" && candidate.id
+        ? candidate.id.slice(0, 200)
+        : `preset-${presets.length}`,
+      name,
+      query: typeof candidate.query === "string" ? candidate.query.slice(0, 200) : "",
+      column: typeof candidate.column === "string" ? candidate.column.slice(0, 100) : "",
+      order: Array.isArray(candidate.order)
+        ? candidate.order.filter((item) => typeof item === "string").slice(0, 100)
+        : [],
+      hidden: Array.isArray(candidate.hidden)
+        ? candidate.hidden.filter((item) => typeof item === "string").slice(0, 100)
+        : [],
+      created_at: typeof candidate.created_at === "string" ? candidate.created_at : "",
+    });
+    if (presets.length === 20) break;
+  }
+  return { presets, ok: true };
+}
+
+function writeTableExportPresets(table, presets) {
+  try {
+    let stored = null;
+    try {
+      stored = JSON.parse(window.localStorage.getItem(TABLE_EXPORT_PRESETS_KEY) || "null");
+    } catch (_error) {
+      stored = null;
+    }
+    const tables = stored?.tables && typeof stored.tables === "object" ? stored.tables : {};
+    tables[table] = presets.slice(0, 20);
+    window.localStorage.setItem(
+      TABLE_EXPORT_PRESETS_KEY,
+      JSON.stringify({ version: 1, tables }),
+    );
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function setExportPresetStatus(text, kind = "") {
+  const node = document.getElementById("table-export-preset-status");
+  if (!node) return;
+  node.textContent = text;
+  node.className = `table-filters-status ${kind}`.trim();
+}
+
 function oracleNotice(tables) {
   const unverified = tables.filter((table) => !table.oracle).length;
   if (!unverified) return null;
@@ -1268,6 +1335,8 @@ async function renderTables(body) {
             state.tableColumnsOpen = false;
             state.tableFiltersOpen = false;
             state.tableSavedFilter = "";
+            state.tableExportPresetsOpen = false;
+            state.tableExportPreset = "";
             state.tableOffset = 0;
             updateUrl();
             renderPanel();
@@ -1294,6 +1363,8 @@ async function renderTables(body) {
     state.tableColumnsOpen = false;
     state.tableFiltersOpen = false;
     state.tableSavedFilter = "";
+    state.tableExportPresetsOpen = false;
+    state.tableExportPreset = "";
     updateUrl();
   }
   if (!state.table) return;
@@ -1688,6 +1759,179 @@ async function renderTables(body) {
     state.tableFiltersOpen = filtersDetails.open;
   });
   body.append(filtersDetails);
+  const storedPresets = readTableExportPresets(state.table);
+  const exportPresets = storedPresets.presets;
+  if (!exportPresets.some((preset) => preset.id === state.tableExportPreset)) {
+    state.tableExportPreset = "";
+  }
+  const presetSelect = el("select", {
+    id: "table-export-preset-select",
+    "aria-label": "Export presets",
+    onchange: (event) => {
+      state.tableExportPreset = event.target.value;
+      const disabled = !event.target.value;
+      document.getElementById("table-export-preset-load").disabled = disabled;
+      document.getElementById("table-export-preset-delete").disabled = disabled;
+    },
+  },
+    el("option", { value: "" },
+      exportPresets.length ? "Choose an export preset…" : "No export presets",
+    ),
+    ...exportPresets.map((preset) =>
+      el("option", {
+        value: preset.id,
+        selected: preset.id === state.tableExportPreset,
+      }, preset.name),
+    ),
+  );
+  const presetName = el("input", {
+    id: "table-export-preset-name",
+    type: "text",
+    maxlength: "80",
+    placeholder: "Name this export preset…",
+    "aria-label": "Export preset name",
+  });
+  const loadExportPreset = async () => {
+    const preset = exportPresets.find((entry) => entry.id === presetSelect.value);
+    if (!preset) {
+      setExportPresetStatus("Choose an export preset first.", "error");
+      return;
+    }
+    const order = normaliseColumnOrder(preset.order, payload.columns);
+    const column = payload.columns.includes(preset.column) ? preset.column : "";
+    let hiddenColumns = preset.hidden.filter(
+      (name) => payload.columns.includes(name) && name !== column,
+    );
+    if (hiddenColumns.length >= order.length) hiddenColumns = [];
+    state.tableQuery = preset.query;
+    state.tableColumn = column;
+    state.tableOrder = order;
+    state.tableHidden = hiddenColumns;
+    state.tableExportVisible = true;
+    state.tableOffset = 0;
+    state.tableSavedFilter = "";
+    state.tableLayoutTable = state.table;
+    state.tableLayoutWarning = !writeTableLayout(
+      state.table,
+      order,
+      hiddenColumns,
+      true,
+    );
+    state.tableExportPreset = preset.id;
+    state.tableExportPresetsOpen = true;
+    updateUrl();
+    await renderPanel();
+    setExportPresetStatus(`Loaded “${preset.name}”.`);
+  };
+  const deleteExportPreset = async () => {
+    const preset = exportPresets.find((entry) => entry.id === presetSelect.value);
+    if (!preset) {
+      setExportPresetStatus("Choose an export preset to delete.", "error");
+      return;
+    }
+    const next = exportPresets.filter((entry) => entry.id !== preset.id);
+    if (!writeTableExportPresets(state.table, next)) {
+      setExportPresetStatus(
+        "Browser storage is unavailable; could not delete this preset.",
+        "error",
+      );
+      return;
+    }
+    state.tableExportPreset = next[0]?.id ?? "";
+    state.tableExportPresetsOpen = true;
+    await renderPanel();
+    setExportPresetStatus(`Deleted “${preset.name}”.`);
+  };
+  const presetsDetails = el(
+    "details",
+    {
+      id: "table-export-presets",
+      className: "table-filters table-export-presets",
+      open: state.tableExportPresetsOpen,
+    },
+    el("summary", {}, `Export presets · ${exportPresets.length}`),
+    el("div", { className: "table-filters-body" },
+      el("div", { className: "table-filters-row" },
+        presetSelect,
+        el("button", {
+          id: "table-export-preset-load",
+          type: "button",
+          disabled: !state.tableExportPreset,
+          onclick: loadExportPreset,
+        }, "Load"),
+        el("button", {
+          id: "table-export-preset-delete",
+          type: "button",
+          disabled: !state.tableExportPreset,
+          onclick: deleteExportPreset,
+        }, "Delete"),
+      ),
+      el("div", { className: "table-filters-row" },
+        presetName,
+        el("button", {
+          type: "button",
+          onclick: async () => {
+            const filterLabel = state.tableQuery
+              ? state.tableColumn
+                ? `${state.tableColumn} = ${state.tableQuery}`
+                : state.tableQuery
+              : "visible view";
+            const fallback = `Export ${filterLabel}`.slice(0, 80);
+            const name = String(presetName.value || fallback).trim().slice(0, 80);
+            if (!name) {
+              setExportPresetStatus("Give the export preset a name first.", "error");
+              return;
+            }
+            const existing = exportPresets.find((preset) => preset.name === name);
+            const entry = {
+              id: existing?.id ?? (
+                window.crypto?.randomUUID?.()
+                ?? `preset-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+              ),
+              name,
+              query: state.tableQuery,
+              column: state.tableColumn,
+              order: [...state.tableOrder],
+              hidden: [...state.tableHidden],
+              created_at: new Date().toISOString(),
+            };
+            const next = [
+              entry,
+              ...exportPresets.filter(
+                (preset) => preset.id !== entry.id && preset.name !== name,
+              ),
+            ].slice(0, 20);
+            if (!writeTableExportPresets(state.table, next)) {
+              setExportPresetStatus(
+                "Browser storage is unavailable; could not save this preset.",
+                "error",
+              );
+              return;
+            }
+            state.tableExportPreset = entry.id;
+            state.tableExportPresetsOpen = true;
+            presetName.value = "";
+            await renderPanel();
+            setExportPresetStatus(`Saved “${entry.name}”.`);
+          },
+        }, "Save current"),
+      ),
+      el("p", {
+        className: `table-filters-status${storedPresets.ok ? "" : " error"}`,
+      }, storedPresets.ok
+        ? "Presets store this filter, column order, hidden set, and visible-column export."
+        : "Browser storage is unavailable; presets will not persist."),
+      el("p", {
+        id: "table-export-preset-status",
+        className: "table-filters-status",
+        "aria-live": "polite",
+      }),
+    ),
+  );
+  presetsDetails.addEventListener("toggle", () => {
+    state.tableExportPresetsOpen = presetsDetails.open;
+  });
+  body.append(presetsDetails);
   const savedLayoutCount = Object.keys(readLayoutEnvelope().tables).length;
   const layoutFile = el("input", {
     id: "table-layout-import",
