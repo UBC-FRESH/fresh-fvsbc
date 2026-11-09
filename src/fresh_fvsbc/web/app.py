@@ -77,6 +77,14 @@ COLUMN_UNITS: dict[str, str] = {
     "PrdLen": "years",
 }
 
+#: The artefact every exposed table comes from.
+TABLE_SOURCE = "FVSOut.db"
+
+
+def _declared_units(columns: Sequence[str]) -> dict[str, str]:
+    """Return units for the columns this reader knows, omitting the rest rather than guessing."""
+    return {name: COLUMN_UNITS[name] for name in columns if name in COLUMN_UNITS}
+
 
 class AgentChatRequest(BaseModel):
     """One assistant turn from the browser."""
@@ -713,9 +721,10 @@ def create_app(
         """
         run = _find(run_id)
         try:
-            return runstore.tables(run)
+            records = runstore.tables(run)
         except runstore.RunError as error:
             raise HTTPException(status_code=404, detail=str(error)) from error
+        return [{**record, "units": _declared_units(record["columns"])} for record in records]
 
     @app.get("/api/runs/{run_id}/tables/{name}")
     def run_table(
@@ -746,14 +755,19 @@ def create_app(
         Returns
         -------
         dict
-            The columns, the page of rows, the filtered total, the query, the column, and the
-            oracle flag.
+            The columns, the page of rows, the filtered total, the query, the column, the
+            oracle flag, the source, and the declared units.
         """
         run = _find(run_id)
         try:
-            return runstore.table(run, name, limit=limit, offset=offset, query=q, column=column)
+            page = runstore.table(run, name, limit=limit, offset=offset, query=q, column=column)
         except runstore.RunError as error:
             raise HTTPException(status_code=404, detail=str(error)) from error
+        return {
+            **page,
+            "source": TABLE_SOURCE,
+            "units": _declared_units(page["columns"]),
+        }
 
     @app.get("/api/runs/{run_id}/tables/{name}/csv")
     def run_table_csv(
@@ -801,7 +815,7 @@ def create_app(
             "columns": [{"name": item, "unit": COLUMN_UNITS.get(item)} for item in page["columns"]],
             "oracle": page["oracle"],
             "provenance": provenance,
-            "source": "FVSOut.db",
+            "source": TABLE_SOURCE,
         }
         readme = (
             "fresh-fvsbc table export\n"

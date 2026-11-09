@@ -898,3 +898,20 @@ svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }
   font-size: 10px;
   opacity: 0.8;
 }
+
+.table-provenance {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.column-name { display: block; }
+.column-unit {
+  display: block;
+  margin-top: 1px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  opacity: 0.85;
+}
