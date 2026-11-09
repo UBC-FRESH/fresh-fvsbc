@@ -4740,6 +4740,7 @@ function assistantSavedStatus(text, kind = "") {
 function updateAssistantSavedContext(chat) {
   const node = document.getElementById("assistant-saved-context");
   if (!node) return;
+  node.title = "";
   if (!chat) {
     node.textContent = "Choose a saved chat to see its run, view, and message count.";
     return;
@@ -4757,9 +4758,13 @@ function updateAssistantSavedContext(chat) {
   if (savedView) parts.push(savedView);
   parts.push(`${chat.history.length} message${chat.history.length === 1 ? "" : "s"}`);
   if (context.model) {
-    parts.push(context.model.split("/").pop());
+    parts.push(`saved model ${context.model.split("/").pop()}`);
+    node.title = `Saved model: ${context.model}`;
+    if (state.assistant.model && state.assistant.model !== context.model) {
+      parts.push(`current model ${state.assistant.model.split("/").pop()}`);
+    }
   } else if (context.mode) {
-    parts.push(context.mode === "agent" ? "agent" : "local summary");
+    parts.push(context.mode === "agent" ? "saved via agent" : "local summary");
   }
   const currentView = state.workspace
     ? `${state.workspace}${state.panel ? ` / ${state.panel}` : ""}`
@@ -4819,7 +4824,10 @@ function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
     ),
     ...chats.map((chat) => {
       const option = el("option", { value: chat.id }, chat.name);
-      if (chat.saved_at) option.title = new Date(chat.saved_at).toLocaleString();
+      const title = [];
+      if (chat.saved_at) title.push(new Date(chat.saved_at).toLocaleString());
+      if (chat.context?.model) title.push(chat.context.model);
+      if (title.length) option.title = title.join(" · ");
       return option;
     }),
   );
@@ -5427,6 +5435,10 @@ async function boot() {
   });
   document.getElementById("assistant-model-select").addEventListener("change", (event) => {
     state.assistant.model = event.target.value;
+    const chats = readSavedChats();
+    updateAssistantSavedContext(
+      chats.find((chat) => chat.id === state.assistant.savedChat) ?? null,
+    );
     assistantStatus(`Model set to ${event.target.value.split("/").pop()}.`);
   });
   document.getElementById("assistant-pin").addEventListener("click", pinAssistantChat);

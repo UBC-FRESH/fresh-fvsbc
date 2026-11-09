@@ -1534,6 +1534,18 @@ def test_the_assistant_model_selector_sends_the_chosen_model(cockpit: str) -> No
             expect(page.locator("#assistant-log")).to_contain_text("model answer")
             expect(page.locator(".assistant-meta")).to_have_text("provider/other")
             assert captured["model"] == "provider/other"
+
+            page.locator("#assistant-saved summary").click()
+            page.locator("#assistant-pin-name").fill("Model chat")
+            page.get_by_role("button", name="Pin current").click()
+            context = page.locator("#assistant-saved-context")
+            expect(context).to_contain_text("saved model other")
+            assert context.get_attribute("title") == "Saved model: provider/other"
+            expect(page.locator("#assistant-saved-select option:checked")).to_have_attribute(
+                "title", re.compile(r"provider/other")
+            )
+            select.select_option("provider/model")
+            expect(context).to_contain_text("current model model")
         finally:
             browser.close()
 
