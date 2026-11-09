@@ -426,6 +426,62 @@ def test_table_exports_can_follow_the_visible_layout(cockpit: str, tmp_path: Pat
             browser.close()
 
 
+def test_table_filters_can_be_exported_and_imported(cockpit: str, tmp_path: Path) -> None:
+    """A filter export carries named and recent history back into the browser."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-column").select_option("Year")
+            page.locator("#table-filter").fill("10")
+            page.get_by_role("button", name="Apply").click()
+            page.locator("#table-filters summary").click()
+            page.locator("#table-filter-name").fill("Year ten")
+            page.get_by_role("button", name="Save current").click()
+            page.locator("#table-column").select_option("Tph")
+            page.locator("#table-filter").fill("210")
+            page.get_by_role("button", name="Apply").click()
+
+            with page.expect_download() as download_info:
+                page.get_by_role("button", name="Export filters").click()
+            exported = tmp_path / "filters.json"
+            download_info.value.save_as(exported)
+            payload = json.loads(exported.read_text(encoding="utf-8"))
+            table = payload["tables"]["FVS_Summary_Metric"]
+            assert table["filters"][0]["name"] == "Year ten"
+            assert any(
+                item["query"] == "210" and item["column"] == "Tph" for item in table["recents"]
+            )
+
+            page.evaluate(
+                "localStorage.removeItem('fresh-fvsbc.table-filters');"
+                "localStorage.removeItem('fresh-fvsbc.table-filter-recents');"
+            )
+            page.reload(wait_until="networkidle")
+            page.locator("#table-filters summary").click()
+            expect(page.locator("#table-filters summary")).to_contain_text("Saved filters · 0")
+            expect(page.locator("#table-filter-recent")).to_contain_text("No recent filters")
+
+            page.locator("#table-filter-import").set_input_files(str(exported))
+            expect(page.locator("#table-filters summary")).to_contain_text("Saved filters · 1")
+            expect(page.locator("#table-filter-recent")).to_contain_text("Tph = 210")
+            expect(page.locator("#table-filter-status")).to_contain_text(
+                "Imported filters for 1 table"
+            )
+
+            malformed = tmp_path / "malformed-filters.json"
+            malformed.write_text("{}", encoding="utf-8")
+            page.locator("#table-filter-import").set_input_files(str(malformed))
+            expect(page.locator("#table-filter-status")).to_contain_text("Expected a tables object")
+        finally:
+            browser.close()
+
+
 def test_recent_table_filters_are_recorded_and_reloaded(cockpit: str) -> None:
     """Applying filters records a per-table recent history that can be reapplied."""
     expect = playwright_module.expect
