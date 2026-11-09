@@ -310,6 +310,7 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-quesnel-temporal.md` | The D9.64 Quesnel temporal split |
 | `d9-quesnel-nonpl.md` | The D9.65 Quesnel non-PL candidate |
 | `d9-quesnel-nonpl-summary.csv` | The D9.65 candidate metrics |
+| `d9-quesnel-mpb-segment.md` | The D9.66 Quesnel MPB segment test |
 | `bcmort_provincial_temporal.py` | The D9.45 temporal prototype |
 | `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
