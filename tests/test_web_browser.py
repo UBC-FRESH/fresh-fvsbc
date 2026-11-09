@@ -486,6 +486,47 @@ def test_export_presets_restore_filter_and_visible_layout(cockpit: str) -> None:
             browser.close()
 
 
+def test_recent_table_filters_can_be_pinned_and_removed(cockpit: str) -> None:
+    """A recent filter can become a named filter or be dropped from history."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-column").select_option("Year")
+            page.locator("#table-filter").fill("10")
+            page.get_by_role("button", name="Apply").click()
+            page.locator("#table-column").select_option("Tph")
+            page.locator("#table-filter").fill("210")
+            page.get_by_role("button", name="Apply").click()
+
+            page.locator("#table-filters summary").click()
+            recent = page.locator("#table-filter-recent")
+            recent.select_option(label="Year = 10")
+            page.get_by_role("button", name="Pin recent").click()
+            expect(page.locator("#table-filters summary")).to_contain_text("Saved filters · 1")
+            expect(page.locator("#table-filter-status")).to_contain_text("Pinned recent")
+
+            page.locator("#table-filter-recent").select_option(label="Tph = 210")
+            page.get_by_role("button", name="Remove").click()
+            expect(page.locator("#table-filter-status")).to_contain_text("Removed recent")
+            expect(page.locator("#table-filter-recent")).not_to_contain_text("Tph = 210")
+            expect(page.locator("#table-filter-recent")).to_contain_text("Year = 10")
+
+            page.reload(wait_until="networkidle")
+            page.locator("#table-filters summary").click()
+            expect(page.locator("#table-filters summary")).to_contain_text("Saved filters · 1")
+            expect(page.locator("#table-filter-saved")).to_contain_text("Year = 10")
+            expect(page.locator("#table-filter-recent")).to_contain_text("Year = 10")
+            expect(page.locator("#table-filter-recent")).not_to_contain_text("Tph = 210")
+        finally:
+            browser.close()
+
+
 def test_table_filters_can_be_exported_and_imported(cockpit: str, tmp_path: Path) -> None:
     """A filter export carries named and recent history back into the browser."""
     expect = playwright_module.expect
