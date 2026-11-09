@@ -171,8 +171,9 @@ layout file by table; the current table reloads immediately after import.
 
 A separate **Saved filters** disclosure stores the current literal query and column scope under a
 name, per table, in ``localStorage``. Loading one restores both and unhides its column if the saved
-layout had hidden it. Filters remain in the URL after loading; the named list itself is
-browser-local and is not exported.
+layout had hidden it. Applying a filter also records it in a per-table **Recent** list (up to eight
+distinct query/column pairs), which can be reapplied from the same panel. Filters remain in the URL
+after loading; the named and recent lists are browser-local and are not exported.
 
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.

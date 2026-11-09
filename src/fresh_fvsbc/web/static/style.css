@@ -1217,3 +1217,11 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
   line-height: 1.4;
 }
 .table-columns-status.error { color: var(--warn); }
+
+.table-filters-label {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
