@@ -79,8 +79,8 @@ may still finish in the background, and the panel says so rather than pretending
 cancelled.
 
 **Saved chats** pins the current transcript and session under a name in ``localStorage``. The
-drawer can load, rename, or delete a pinned chat; **New** clears the active conversation but leaves
-pinned ones alone. The name bar under the drawer header shows the active saved chat and offers
+drawer can load, rename, duplicate, or delete a pinned chat; **New** clears the active conversation
+but leaves pinned ones alone. The name bar under the drawer header shows the active saved chat and offers
 **Rename** directly; it shows “Unsaved chat” after **New**. At most ten are kept, they never reach the service, and **Load** restores the same
 session id so the next turn can continue it when the local agent still knows that session.
 **Export JSON** downloads every saved chat with ``version``, ``exported_at``, names, timestamps,
