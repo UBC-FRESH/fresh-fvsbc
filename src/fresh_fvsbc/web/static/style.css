@@ -1114,3 +1114,45 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
   margin-top: 6px;
 }
 .table-columns-note.error { color: var(--warn); }
+
+.compare-columns {
+  margin: 8px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.compare-columns summary {
+  cursor: pointer;
+  padding: 7px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.compare-columns summary:hover { color: var(--accent); }
+.compare-columns-body { padding: 0 10px 10px; }
+.compare-columns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 3px 10px;
+  max-height: 180px;
+  overflow: auto;
+}
+.compare-column-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 11px;
+}
+.compare-column-toggle span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.compare-columns-actions { display: flex; margin-top: 6px; }
+.compare-columns-actions button { font-size: 11px; }
+.compare-columns-note {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
