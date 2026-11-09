@@ -1202,3 +1202,18 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
   line-height: 1.45;
 }
 .table-columns-export input { margin-top: 2px; }
+
+.table-columns-portability {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.table-columns-portability button { font-size: 11px; }
+.table-columns-status {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.table-columns-status.error { color: var(--warn); }

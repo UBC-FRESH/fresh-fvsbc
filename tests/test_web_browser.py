@@ -330,6 +330,59 @@ def test_a_large_page_only_renders_a_virtual_window(cockpit: str) -> None:
             browser.close()
 
 
+def test_table_layouts_can_be_exported_and_imported(cockpit: str, tmp_path: Path) -> None:
+    """A layout file restores order, hidden columns, and the export option."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-columns summary").click()
+            page.locator("#table-export-visible").check()
+            page.get_by_role("button", name="Move Age right").click()
+            page.locator("#table-columns input[value='Age']").uncheck()
+            expect(page.locator("#table-columns summary")).to_contain_text("8 of 9 shown")
+
+            with page.expect_download() as download_info:
+                page.get_by_role("button", name="Export layouts").click()
+            exported = tmp_path / "layouts.json"
+            download_info.value.save_as(exported)
+            payload = json.loads(exported.read_text(encoding="utf-8"))
+            layout = payload["tables"]["FVS_Summary_Metric"]
+            assert layout["hidden"] == ["Age"]
+            assert layout["exportVisible"] is True
+            assert layout["order"][:3] == ["Year", "Tph", "Age"]
+
+            page.get_by_role("button", name="Reset layout").click()
+            expect(page.locator("#table-columns summary")).to_contain_text("9 of 9 shown")
+            expect(page.locator("#table-export-visible")).not_to_be_checked()
+
+            page.locator("#table-layout-import").set_input_files(str(exported))
+            expect(page.locator("#table-columns summary")).to_contain_text("8 of 9 shown")
+            expect(page.locator("#table-export-visible")).to_be_checked()
+            expect(page.locator("#table-layout-status")).to_contain_text("Imported 1 table layout")
+            names = page.locator("th .column-name")
+            expect(names.nth(0)).to_have_text("Year")
+            expect(names.nth(1)).to_have_text("Tph")
+            expect(names.nth(2)).to_have_text("BA")
+
+            page.reload(wait_until="networkidle")
+            page.locator("#table-columns summary").click()
+            expect(page.locator("#table-columns summary")).to_contain_text("8 of 9 shown")
+            expect(page.locator("#table-export-visible")).to_be_checked()
+
+            malformed = tmp_path / "malformed-layouts.json"
+            malformed.write_text("{}", encoding="utf-8")
+            page.locator("#table-layout-import").set_input_files(str(malformed))
+            expect(page.locator("#table-layout-status")).to_contain_text("No table layouts found")
+        finally:
+            browser.close()
+
+
 def test_table_exports_can_follow_the_visible_layout(cockpit: str, tmp_path: Path) -> None:
     """The layout option narrows and orders both CSV and package exports."""
     expect = playwright_module.expect

@@ -162,7 +162,9 @@ columns also leave the filter menu, at least one column always remains, and CSV/
 still contain the full table. Order and visibility are saved per table in ``localStorage`` and
 restored on reload; **Show all columns** only unhides, while **Reset layout** clears both the saved
 order and the hidden set. An **Exports follow this layout** checkbox makes CSV and package exports
-use the visible columns in their current order; it is saved with the layout.
+use the visible columns in their current order; it is saved with the layout. **Export layouts**
+downloads every saved table layout as versioned JSON, and **Import layouts** validates and merges a
+layout file by table; the current table reloads immediately after import.
 
 A separate **Saved filters** disclosure stores the current literal query and column scope under a
 name, per table, in ``localStorage``. Loading one restores both and unhides its column if the saved
