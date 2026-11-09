@@ -108,6 +108,16 @@ const isNumeric = (rows, column) =>
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+function uniqueCopyName(name, names) {
+  const base = `${name} copy`.slice(0, 80);
+  if (!names.has(base)) return base;
+  for (let index = 2; index < 100; index += 1) {
+    const candidate = `${name} copy ${index}`.slice(0, 80);
+    if (!names.has(candidate)) return candidate;
+  }
+  return `${name} copy ${Date.now()}`.slice(0, 80);
+}
+
 function stickyColumnFor(columns, rows) {
   if (columns.length <= 5) return null;
   for (const column of columns) {
@@ -2160,6 +2170,7 @@ async function renderTables(body) {
       const disabled = !event.target.value;
       document.getElementById("table-export-preset-load").disabled = disabled;
       document.getElementById("table-export-preset-delete").disabled = disabled;
+      document.getElementById("table-export-preset-duplicate").disabled = disabled;
     },
   },
     el("option", { value: "" },
@@ -2230,6 +2241,35 @@ async function renderTables(body) {
     await renderPanel();
     setExportPresetStatus(`Deleted “${preset.name}”.`);
   };
+  const duplicateExportPreset = async () => {
+    const preset = exportPresets.find((entry) => entry.id === presetSelect.value);
+    if (!preset) {
+      setExportPresetStatus("Choose an export preset first.", "error");
+      return;
+    }
+    const name = uniqueCopyName(
+      preset.name,
+      new Set(exportPresets.map((entry) => entry.name)),
+    );
+    const copy = {
+      ...preset,
+      id: window.crypto?.randomUUID?.()
+        ?? `preset-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name,
+      created_at: new Date().toISOString(),
+    };
+    if (!writeTableExportPresets(state.table, [copy, ...exportPresets])) {
+      setExportPresetStatus(
+        "Browser storage is unavailable; could not duplicate this preset.",
+        "error",
+      );
+      return;
+    }
+    state.tableExportPreset = copy.id;
+    state.tableExportPresetsOpen = true;
+    await renderPanel();
+    setExportPresetStatus(`Duplicated as “${name}”.`);
+  };
   const presetsDetails = el(
     "details",
     {
@@ -2247,6 +2287,12 @@ async function renderTables(body) {
           disabled: !state.tableExportPreset,
           onclick: loadExportPreset,
         }, "Load"),
+        el("button", {
+          id: "table-export-preset-duplicate",
+          type: "button",
+          disabled: !state.tableExportPreset,
+          onclick: duplicateExportPreset,
+        }, "Duplicate"),
         el("button", {
           id: "table-export-preset-delete",
           type: "button",
@@ -3537,6 +3583,25 @@ async function renderCompare(body) {
             if (fresh) fresh.textContent = `Updated “${items[index].name}”.`;
           },
         }, "Update"),
+        el("button", {
+          type: "button",
+          disabled: !saved.length || !state.compareSaved,
+          onclick: async () => {
+            const item = saved.find((entry) => entry.name === state.compareSaved);
+            if (!item) {
+              setSavedStatus("Choose a saved comparison first.", "error");
+              return;
+            }
+            const items = readSavedComparisons();
+            const name = uniqueCopyName(item.name, new Set(items.map((entry) => entry.name)));
+            const copy = { ...item, name };
+            writeSavedComparisons([copy, ...items]);
+            state.compareSaved = name;
+            await renderPanel();
+            const fresh = document.getElementById("compare-saved-status");
+            if (fresh) fresh.textContent = `Duplicated as “${name}”.`;
+          },
+        }, "Duplicate"),
         el("button", {
           type: "button",
           disabled: !saved.length,
