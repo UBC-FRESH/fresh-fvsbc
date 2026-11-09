@@ -1,0 +1,67 @@
+--- a/fvs/bin/FVSbc_sourceList.txt
++++ b/fvs/bin/FVSbc_sourceList.txt
+@@ -173,7 +173,54 @@
+ ../base/exdftm.f
+ ../base/execon.f
+ ../base/exfert.f
+-../base/exmpb.f
++../lpmpb/COLCOM.F77
++../lpmpb/MPBCOM.F77
++../lpmpb/MPBETA.F77
++../lpmpb/PT.F77
++../lpmpb/back.f
++../lpmpb/betin.f
++../lpmpb/coldbh.f
++../lpmpb/coldrv.f
++../lpmpb/colind.f
++../lpmpb/colmod.f
++../lpmpb/colmrt.f
++../lpmpb/emerg.f
++../lpmpb/forw.f
++../lpmpb/garbel.f
++../lpmpb/grclas.f
++../lpmpb/grpsum.f
++../lpmpb/mpbcup.f
++../lpmpb/mpbdam.f
++../lpmpb/mpbdrv.f
++../lpmpb/mpber.f
++../lpmpb/mpbgam.f
++../lpmpb/mpbgo.f
++../lpmpb/mpbhed.f
++../lpmpb/mpbin.f
++../lpmpb/mpbint.f
++../lpmpb/mpbmod.f
++../lpmpb/mpbout.f
++../lpmpb/mpbtab.f
++../lpmpb/mpgr.f
++../lpmpb/mpotpr.f
++../lpmpb/mprann.f
++../lpmpb/mpsdlp.f
++../lpmpb/percnt.f
++../lpmpb/pmslp.f
++../lpmpb/pqsml.f
++../lpmpb/ptary.f
++../lpmpb/ptbno.f
++../lpmpb/ptgrp.f
++../lpmpb/ptint.f
++../lpmpb/ptplt.f
++../lpmpb/ptsav.f
++../lpmpb/ptscl.f
++../lpmpb/ptsrg.f
++../lpmpb/ptssc.f
++../lpmpb/ptsym.f
++../lpmpb/surfce.f
++../lpmpb/surflp.f
++../lpmpb/tafit.f
+ ../base/exorganon.f
+ ../base/exppe.f
+ ../base/extree.f
+@@ -659,4 +706,6 @@
+ ../canada/newmist/misdam.f
+ ../canada/newmist/misin0.f
+ ../canada/newmist/misputz.f
+-../canada/newmist/mistoe.f
+\ No newline at end of file
++../canada/newmist/mistoe.f
++../lpmpb/mpblkdbc.f
++../wsbwe/txnote.f
