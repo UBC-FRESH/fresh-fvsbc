@@ -1268,3 +1268,23 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
 }
 .assistant-rename-form input { flex: 1 1 auto; min-width: 0; }
 .assistant-rename-form button { font-size: 11px; padding: 4px 8px; }
+
+.table-setup-preview {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+.table-setup-preview strong { font-size: 12px; }
+.table-setup-list {
+  max-height: 160px;
+  margin: 0;
+  padding-left: 18px;
+  overflow: auto;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}

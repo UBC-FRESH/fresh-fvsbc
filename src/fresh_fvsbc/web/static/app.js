@@ -1425,7 +1425,7 @@ function analysisSetupExportText() {
   }, null, 2)}\n`;
 }
 
-function importAnalysisSetup(text) {
+function previewAnalysisSetup(text) {
   let parsed = null;
   try {
     parsed = JSON.parse(text);
@@ -1441,18 +1441,22 @@ function importAnalysisSetup(text) {
   const recentTables = { ...readRecentEnvelope().tables };
   const presetTables = { ...readExportPresetEnvelope().tables };
   const counts = { tables: 0, layouts: 0, filters: 0, recents: 0, presets: 0 };
+  const tables = [];
   for (const [table, value] of Object.entries(raw)) {
     if (!table || table.length > 100) continue;
     if (["__proto__", "constructor", "prototype"].includes(table)) continue;
     if (!value || typeof value !== "object" || Array.isArray(value)) continue;
-    let used = false;
     const layout = normaliseLayoutEntry(value.layout);
+    const incomingFilters = normaliseFilterEntries(value.filters);
+    const incomingRecents = normaliseRecentEntries(value.recents);
+    const incomingPresets = normaliseExportPresetEntries(value.export_presets);
+    if (!layout && !incomingFilters.length && !incomingRecents.length && !incomingPresets.length) {
+      continue;
+    }
     if (layout) {
       layoutTables[table] = layout;
       counts.layouts += 1;
-      used = true;
     }
-    const incomingFilters = normaliseFilterEntries(value.filters);
     if (incomingFilters.length) {
       const existing = normaliseFilterEntries(filterTables[table]);
       const names = new Set(incomingFilters.map((entry) => entry.name));
@@ -1461,9 +1465,7 @@ function importAnalysisSetup(text) {
         ...existing.filter((entry) => !names.has(entry.name)),
       ].slice(0, 20);
       counts.filters += incomingFilters.length;
-      used = true;
     }
-    const incomingRecents = normaliseRecentEntries(value.recents);
     if (incomingRecents.length) {
       const existing = normaliseRecentEntries(recentTables[table]);
       const keys = new Set(incomingRecents.map((entry) => `${entry.column}\u0000${entry.query}`));
@@ -1472,9 +1474,7 @@ function importAnalysisSetup(text) {
         ...existing.filter((entry) => !keys.has(`${entry.column}\u0000${entry.query}`)),
       ].slice(0, TABLE_RECENTS_LIMIT);
       counts.recents += incomingRecents.length;
-      used = true;
     }
-    const incomingPresets = normaliseExportPresetEntries(value.export_presets);
     if (incomingPresets.length) {
       const existing = normaliseExportPresetEntries(presetTables[table]);
       const names = new Set(incomingPresets.map((entry) => entry.name));
@@ -1483,18 +1483,39 @@ function importAnalysisSetup(text) {
         ...existing.filter((entry) => !names.has(entry.name)),
       ].slice(0, 20);
       counts.presets += incomingPresets.length;
-      used = true;
     }
-    if (used) counts.tables += 1;
+    counts.tables += 1;
+    tables.push({
+      name: table,
+      layout: Boolean(layout),
+      filters: incomingFilters.length,
+      recents: incomingRecents.length,
+      presets: incomingPresets.length,
+    });
   }
   if (!counts.tables) throw new Error("No table setup found in that file.");
-  if (!writeLayoutEnvelope(layoutTables)
-    || !writeFilterEnvelope(filterTables)
-    || !writeRecentEnvelope(recentTables)
-    || !writeExportPresetEnvelope(presetTables)) {
+  return {
+    counts,
+    tables,
+    layoutTables,
+    filterTables,
+    recentTables,
+    presetTables,
+  };
+}
+
+function commitAnalysisSetup(preview) {
+  if (!writeLayoutEnvelope(preview.layoutTables)
+    || !writeFilterEnvelope(preview.filterTables)
+    || !writeRecentEnvelope(preview.recentTables)
+    || !writeExportPresetEnvelope(preview.presetTables)) {
     throw new Error("Browser storage is unavailable; could not import the setup.");
   }
-  return counts;
+  return preview.counts;
+}
+
+function importAnalysisSetup(text) {
+  return commitAnalysisSetup(previewAnalysisSetup(text));
 }
 
 function setAnalysisSetupStatus(text, kind = "") {
@@ -1569,6 +1590,52 @@ async function renderTables(body) {
     );
   }
   body.append(list);
+  let pendingSetup = null;
+  const setupPreviewSummary = el("p", { className: "table-filters-status" });
+  const setupPreviewTables = el("ul", { className: "table-setup-list" });
+  const setupPreview = el(
+    "div",
+    { id: "table-setup-preview", className: "table-setup-preview", hidden: true },
+    el("strong", {}, "Review setup import"),
+    setupPreviewSummary,
+    setupPreviewTables,
+    el("div", { className: "table-filters-portability" },
+      el("button", {
+        id: "table-setup-confirm",
+        type: "button",
+        onclick: async () => {
+          if (!pendingSetup) return;
+          try {
+            const counts = commitAnalysisSetup(pendingSetup);
+            pendingSetup = null;
+            setupPreview.hidden = true;
+            state.tableLayoutTable = null;
+            state.tableSavedFilter = "";
+            state.tableExportPreset = "";
+            state.tableSetupOpen = true;
+            await renderPanel();
+            setAnalysisSetupStatus(
+              `Imported setup for ${counts.tables} table${counts.tables === 1 ? "" : "s"}.`,
+            );
+          } catch (error) {
+            setAnalysisSetupStatus(
+              error?.message ?? "That setup file could not be imported.",
+              "error",
+            );
+          }
+        },
+      }, "Import setup"),
+      el("button", {
+        id: "table-setup-cancel",
+        type: "button",
+        onclick: () => {
+          pendingSetup = null;
+          setupPreview.hidden = true;
+          setAnalysisSetupStatus("Import cancelled.");
+        },
+      }, "Cancel"),
+    ),
+  );
   const setupFile = el("input", {
     id: "table-setup-import",
     type: "file",
@@ -1580,21 +1647,35 @@ async function renderTables(body) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (file.size > 1_000_000) {
+      pendingSetup = null;
+      setupPreview.hidden = true;
       setAnalysisSetupStatus("That file is too large; choose a setup export under 1 MB.", "error");
       event.target.value = "";
       return;
     }
     try {
-      const result = importAnalysisSetup(await file.text());
-      state.tableLayoutTable = null;
-      state.tableSavedFilter = "";
-      state.tableExportPreset = "";
-      state.tableSetupOpen = true;
-      await renderPanel();
-      setAnalysisSetupStatus(
-        `Imported setup for ${result.tables} table${result.tables === 1 ? "" : "s"}.`,
-      );
+      const preview = previewAnalysisSetup(await file.text());
+      pendingSetup = preview;
+      setupPreviewSummary.textContent = [
+        `${preview.counts.tables} table${preview.counts.tables === 1 ? "" : "s"}`,
+        `${preview.counts.layouts} layout${preview.counts.layouts === 1 ? "" : "s"}`,
+        `${preview.counts.filters} filter${preview.counts.filters === 1 ? "" : "s"}`,
+        `${preview.counts.recents} recent`,
+        `${preview.counts.presets} preset${preview.counts.presets === 1 ? "" : "s"}`,
+      ].join(" · ");
+      setupPreviewTables.replaceChildren(...preview.tables.map((table) => {
+        const parts = [];
+        if (table.layout) parts.push("layout");
+        if (table.filters) parts.push(`${table.filters} filter${table.filters === 1 ? "" : "s"}`);
+        if (table.recents) parts.push(`${table.recents} recent`);
+        if (table.presets) parts.push(`${table.presets} preset${table.presets === 1 ? "" : "s"}`);
+        return el("li", {}, `${table.name} — ${parts.join(", ")}`);
+      }));
+      setupPreview.hidden = false;
+      setAnalysisSetupStatus("Review the import summary, then import or cancel.");
     } catch (error) {
+      pendingSetup = null;
+      setupPreview.hidden = true;
       setAnalysisSetupStatus(error?.message ?? "That setup file could not be imported.", "error");
     } finally {
       event.target.value = "";
@@ -1634,6 +1715,7 @@ async function renderTables(body) {
         }, "Import setup"),
         setupFile,
       ),
+      setupPreview,
       el("p", {
         id: "table-setup-status",
         className: "table-filters-status",

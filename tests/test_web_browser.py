@@ -469,6 +469,19 @@ def test_analysis_setup_bundle_round_trips(cockpit: str, tmp_path: Path) -> None
             page.reload(wait_until="networkidle")
             page.locator("#table-setup summary").click()
             page.locator("#table-setup-import").set_input_files(str(exported))
+            expect(page.locator("#table-setup-preview")).to_be_visible()
+            expect(page.locator("#table-setup-preview")).to_contain_text("1 table")
+            expect(page.locator("#table-setup-preview")).to_contain_text("1 layout")
+            expect(page.locator("#table-setup-preview")).to_contain_text("FVS_Summary_Metric")
+            expect(page.locator("#table-columns summary")).to_contain_text("9 of 9 shown")
+
+            page.get_by_role("button", name="Cancel", exact=True).click()
+            expect(page.locator("#table-setup-status")).to_contain_text("Import cancelled")
+            expect(page.locator("#table-setup-preview")).to_be_hidden()
+            expect(page.locator("#table-columns summary")).to_contain_text("9 of 9 shown")
+
+            page.locator("#table-setup-import").set_input_files(str(exported))
+            page.locator("#table-setup-confirm").click()
             expect(page.locator("#table-setup-status")).to_contain_text(
                 "Imported setup for 1 table"
             )
@@ -483,6 +496,7 @@ def test_analysis_setup_bundle_round_trips(cockpit: str, tmp_path: Path) -> None
             malformed.write_text("{}", encoding="utf-8")
             page.locator("#table-setup-import").set_input_files(str(malformed))
             expect(page.locator("#table-setup-status")).to_contain_text("Expected a tables object")
+            expect(page.locator("#table-setup-preview")).to_be_hidden()
         finally:
             browser.close()
 
