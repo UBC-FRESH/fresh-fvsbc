@@ -40,6 +40,7 @@ const state = {
   tableSavedFilter: "",
   tableExportPresetsOpen: false,
   tableExportPreset: "",
+  tableSetupOpen: false,
   tableOffset: 0,
   tableLimit: 200,
   standYear: null,
@@ -1361,6 +1362,138 @@ function writeTableExportPresets(table, presets) {
   }
 }
 
+function normaliseLayoutEntry(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  if (!("order" in value) && !("hidden" in value) && !("exportVisible" in value)) return null;
+  const clean = (items) => Array.isArray(items)
+    ? [...new Set(items
+      .filter((item) => typeof item === "string" && item.trim())
+      .map((item) => item.trim().slice(0, 100)))].slice(0, 100)
+    : [];
+  return {
+    order: clean(value.order),
+    hidden: clean(value.hidden),
+    exportVisible: value.exportVisible === true,
+  };
+}
+
+function hasAnalysisSetup() {
+  return Object.keys(readLayoutEnvelope().tables).length > 0
+    || Object.keys(readFilterEnvelope().tables).length > 0
+    || Object.keys(readRecentEnvelope().tables).length > 0
+    || Object.keys(readExportPresetEnvelope().tables).length > 0;
+}
+
+function analysisSetupExportText() {
+  const layouts = readLayoutEnvelope().tables;
+  const filters = readFilterEnvelope().tables;
+  const recents = readRecentEnvelope().tables;
+  const presets = readExportPresetEnvelope().tables;
+  const names = new Set([
+    ...Object.keys(layouts),
+    ...Object.keys(filters),
+    ...Object.keys(recents),
+    ...Object.keys(presets),
+  ]);
+  const tables = {};
+  for (const table of names) {
+    const entry = {};
+    const layout = normaliseLayoutEntry(layouts[table]);
+    if (layout) entry.layout = layout;
+    const tableFilters = normaliseFilterEntries(filters[table]);
+    if (tableFilters.length) entry.filters = tableFilters;
+    const tableRecents = normaliseRecentEntries(recents[table]);
+    if (tableRecents.length) entry.recents = tableRecents;
+    const tablePresets = normaliseExportPresetEntries(presets[table]);
+    if (tablePresets.length) entry.export_presets = tablePresets;
+    if (Object.keys(entry).length) tables[table] = entry;
+  }
+  return `${JSON.stringify({
+    version: 1,
+    exported_at: new Date().toISOString(),
+    tables,
+  }, null, 2)}\n`;
+}
+
+function importAnalysisSetup(text) {
+  let parsed = null;
+  try {
+    parsed = JSON.parse(text);
+  } catch (_error) {
+    throw new Error("That file is not valid JSON.");
+  }
+  const raw = parsed?.tables;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new Error("Expected a tables object in that setup file.");
+  }
+  const layoutTables = { ...readLayoutEnvelope().tables };
+  const filterTables = { ...readFilterEnvelope().tables };
+  const recentTables = { ...readRecentEnvelope().tables };
+  const presetTables = { ...readExportPresetEnvelope().tables };
+  const counts = { tables: 0, layouts: 0, filters: 0, recents: 0, presets: 0 };
+  for (const [table, value] of Object.entries(raw)) {
+    if (!table || table.length > 100) continue;
+    if (["__proto__", "constructor", "prototype"].includes(table)) continue;
+    if (!value || typeof value !== "object" || Array.isArray(value)) continue;
+    let used = false;
+    const layout = normaliseLayoutEntry(value.layout);
+    if (layout) {
+      layoutTables[table] = layout;
+      counts.layouts += 1;
+      used = true;
+    }
+    const incomingFilters = normaliseFilterEntries(value.filters);
+    if (incomingFilters.length) {
+      const existing = normaliseFilterEntries(filterTables[table]);
+      const names = new Set(incomingFilters.map((entry) => entry.name));
+      filterTables[table] = [
+        ...incomingFilters,
+        ...existing.filter((entry) => !names.has(entry.name)),
+      ].slice(0, 20);
+      counts.filters += incomingFilters.length;
+      used = true;
+    }
+    const incomingRecents = normaliseRecentEntries(value.recents);
+    if (incomingRecents.length) {
+      const existing = normaliseRecentEntries(recentTables[table]);
+      const keys = new Set(incomingRecents.map((entry) => `${entry.column}\u0000${entry.query}`));
+      recentTables[table] = [
+        ...incomingRecents,
+        ...existing.filter((entry) => !keys.has(`${entry.column}\u0000${entry.query}`)),
+      ].slice(0, TABLE_RECENTS_LIMIT);
+      counts.recents += incomingRecents.length;
+      used = true;
+    }
+    const incomingPresets = normaliseExportPresetEntries(value.export_presets);
+    if (incomingPresets.length) {
+      const existing = normaliseExportPresetEntries(presetTables[table]);
+      const names = new Set(incomingPresets.map((entry) => entry.name));
+      presetTables[table] = [
+        ...incomingPresets,
+        ...existing.filter((entry) => !names.has(entry.name)),
+      ].slice(0, 20);
+      counts.presets += incomingPresets.length;
+      used = true;
+    }
+    if (used) counts.tables += 1;
+  }
+  if (!counts.tables) throw new Error("No table setup found in that file.");
+  if (!writeLayoutEnvelope(layoutTables)
+    || !writeFilterEnvelope(filterTables)
+    || !writeRecentEnvelope(recentTables)
+    || !writeExportPresetEnvelope(presetTables)) {
+    throw new Error("Browser storage is unavailable; could not import the setup.");
+  }
+  return counts;
+}
+
+function setAnalysisSetupStatus(text, kind = "") {
+  const node = document.getElementById("table-setup-status");
+  if (!node) return;
+  node.textContent = text;
+  node.className = `table-filters-status ${kind}`.trim();
+}
+
 function setExportPresetStatus(text, kind = "") {
   const node = document.getElementById("table-export-preset-status");
   if (!node) return;
@@ -1426,6 +1559,82 @@ async function renderTables(body) {
     );
   }
   body.append(list);
+  const setupFile = el("input", {
+    id: "table-setup-import",
+    type: "file",
+    accept: ".json,application/json",
+    hidden: true,
+    "aria-label": "Import analysis setup JSON",
+  });
+  setupFile.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 1_000_000) {
+      setAnalysisSetupStatus("That file is too large; choose a setup export under 1 MB.", "error");
+      event.target.value = "";
+      return;
+    }
+    try {
+      const result = importAnalysisSetup(await file.text());
+      state.tableLayoutTable = null;
+      state.tableSavedFilter = "";
+      state.tableExportPreset = "";
+      state.tableSetupOpen = true;
+      await renderPanel();
+      setAnalysisSetupStatus(
+        `Imported setup for ${result.tables} table${result.tables === 1 ? "" : "s"}.`,
+      );
+    } catch (error) {
+      setAnalysisSetupStatus(error?.message ?? "That setup file could not be imported.", "error");
+    } finally {
+      event.target.value = "";
+    }
+  });
+  const setupDetails = el(
+    "details",
+    { id: "table-setup", className: "table-filters table-setup", open: state.tableSetupOpen },
+    el("summary", {}, "Analysis setup · export/import"),
+    el("div", { className: "table-filters-body" },
+      el("p", { className: "table-filters-status" },
+        "Bundle table layouts, saved/recent filters, and export presets."),
+      el("div", { className: "table-filters-portability" },
+        el("button", {
+          type: "button",
+          disabled: !hasAnalysisSetup(),
+          onclick: async () => {
+            const url = URL.createObjectURL(
+              new Blob([analysisSetupExportText()], { type: "application/json" }),
+            );
+            const link = el("a", {
+              href: url,
+              download: "fresh-fvsbc-analysis-setup.json",
+            });
+            document.body.append(link);
+            link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            state.tableSetupOpen = true;
+            await renderPanel();
+            setAnalysisSetupStatus("Exported the analysis setup.");
+          },
+        }, "Export setup"),
+        el("button", {
+          type: "button",
+          onclick: () => setupFile.click(),
+        }, "Import setup"),
+        setupFile,
+      ),
+      el("p", {
+        id: "table-setup-status",
+        className: "table-filters-status",
+        "aria-live": "polite",
+      }),
+    ),
+  );
+  setupDetails.addEventListener("toggle", () => {
+    state.tableSetupOpen = setupDetails.open;
+  });
+  body.append(setupDetails);
 
   if (!state.table || !tables.some((table) => table.name === state.table)) {
     const preferred = ["FVS_Summary_Metric", "FVS_TreeList_Metric", "FVS_CutList_Metric"];

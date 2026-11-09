@@ -185,6 +185,10 @@ leaves the existing CSV and package links ready. **Export presets** downloads al
 versioned JSON; **Import presets** validates and merges by table and preset name. Presets are per
 table and browser-local.
 
+The Tables workspace also has one **Analysis setup** bundle that combines every table's layout,
+named filters, recent filters, and export presets in a single versioned JSON file. Importing it
+merges each section into its existing store and reloads the current table.
+
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.
 

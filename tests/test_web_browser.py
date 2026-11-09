@@ -426,6 +426,67 @@ def test_table_exports_can_follow_the_visible_layout(cockpit: str, tmp_path: Pat
             browser.close()
 
 
+def test_analysis_setup_bundle_round_trips(cockpit: str, tmp_path: Path) -> None:
+    """A combined setup restores layout, filters, recents, and export presets."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-column").select_option("Year")
+            page.locator("#table-filter").fill("10")
+            page.get_by_role("button", name="Apply").click()
+            page.locator("#table-columns summary").click()
+            page.locator("#table-columns input[value='Age']").uncheck()
+            page.locator("#table-filters summary").click()
+            page.locator("#table-filter-name").fill("Year ten")
+            page.get_by_role("button", name="Save current").first.click()
+            page.locator("#table-export-presets summary").click()
+            page.locator("#table-export-preset-name").fill("Portable view")
+            page.get_by_role("button", name="Save current").last.click()
+
+            page.locator("#table-setup summary").click()
+            with page.expect_download() as download_info:
+                page.get_by_role("button", name="Export setup").click()
+            exported = tmp_path / "analysis-setup.json"
+            download_info.value.save_as(exported)
+            payload = json.loads(exported.read_text(encoding="utf-8"))
+            setup = payload["tables"]["FVS_Summary_Metric"]
+            assert "Age" in setup["layout"]["hidden"]
+            assert setup["filters"][0]["name"] == "Year ten"
+            assert setup["export_presets"][0]["name"] == "Portable view"
+            assert any(item["query"] == "10" for item in setup["recents"])
+
+            page.evaluate(
+                "for (const key of ['fresh-fvsbc.table-layouts',"
+                "'fresh-fvsbc.table-filters','fresh-fvsbc.table-filter-recents',"
+                "'fresh-fvsbc.table-export-presets']) localStorage.removeItem(key);"
+            )
+            page.reload(wait_until="networkidle")
+            page.locator("#table-setup summary").click()
+            page.locator("#table-setup-import").set_input_files(str(exported))
+            expect(page.locator("#table-setup-status")).to_contain_text(
+                "Imported setup for 1 table"
+            )
+            expect(page.locator("#table-columns summary")).to_contain_text("8 of 9 shown")
+            expect(page.locator("#table-filters summary")).to_contain_text("Saved filters · 1")
+            expect(page.locator("#table-export-presets summary")).to_contain_text(
+                "Export presets · 1"
+            )
+            expect(page.locator("#table-filter-recent")).to_contain_text("Year = 10")
+
+            malformed = tmp_path / "malformed-setup.json"
+            malformed.write_text("{}", encoding="utf-8")
+            page.locator("#table-setup-import").set_input_files(str(malformed))
+            expect(page.locator("#table-setup-status")).to_contain_text("Expected a tables object")
+        finally:
+            browser.close()
+
+
 def test_export_presets_can_be_exported_and_imported(cockpit: str, tmp_path: Path) -> None:
     """A preset file carries the filter and layout choices between browsers."""
     expect = playwright_module.expect
