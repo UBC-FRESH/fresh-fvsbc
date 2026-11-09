@@ -25,6 +25,8 @@ const state = {
   summaryColumn: null,
   tableQuery: "",
   tableColumn: "",
+  tableHidden: [],
+  tableColumnsOpen: false,
   tableOffset: 0,
   tableLimit: 200,
   standYear: null,
@@ -804,6 +806,8 @@ async function renderTables(body) {
             state.table = table.name;
             state.tableQuery = "";
             state.tableColumn = "";
+            state.tableHidden = [];
+            state.tableColumnsOpen = false;
             state.tableOffset = 0;
             updateUrl();
             renderPanel();
@@ -821,6 +825,8 @@ async function renderTables(body) {
     state.table = preferred.find((name) => tables.some((table) => table.name === name))
       ?? tables[0]?.name
       ?? null;
+    state.tableHidden = [];
+    state.tableColumnsOpen = false;
     updateUrl();
   }
   if (!state.table) return;
@@ -839,6 +845,18 @@ async function renderTables(body) {
   if (state.tableQuery) params.set("q", state.tableQuery);
   if (state.tableColumn) params.set("column", state.tableColumn);
   const payload = await api(`${tablePath}?${params.toString()}`);
+  const knownHidden = state.tableHidden.filter((column) => payload.columns.includes(column));
+  if (knownHidden.length !== state.tableHidden.length) state.tableHidden = knownHidden;
+  let hidden = new Set(knownHidden);
+  if (hidden.size >= payload.columns.length) {
+    hidden = new Set();
+    state.tableHidden = [];
+  }
+  const visibleColumns = payload.columns.filter((column) => !hidden.has(column));
+  if (state.tableColumn && !visibleColumns.includes(state.tableColumn)) {
+    state.tableColumn = "";
+    updateUrl();
+  }
   const csvParams = new URLSearchParams();
   if (state.tableQuery) csvParams.set("q", state.tableQuery);
   if (state.tableColumn) csvParams.set("column", state.tableColumn);
@@ -865,7 +883,7 @@ async function renderTables(body) {
     },
   },
     el("option", { value: "", selected: state.tableColumn === "" }, "Any column"),
-    ...tableColumns.map((column) => {
+    ...visibleColumns.map((column) => {
       const unit = payload.units?.[column];
       const option = el(
         "option",
@@ -919,6 +937,61 @@ async function renderTables(body) {
     ),
   );
   body.append(filterForm);
+  const columnsDetails = el(
+    "details",
+    { id: "table-columns", className: "table-columns", open: state.tableColumnsOpen },
+    el("summary", {},
+      `Columns · ${visibleColumns.length} of ${payload.columns.length} shown`,
+    ),
+    el("div", { className: "table-columns-body" },
+      el("div", { className: "table-columns-grid" },
+        ...payload.columns.map((column) => {
+          const unit = payload.units?.[column];
+          return el("label", { className: "table-column-toggle" },
+            el("input", {
+              type: "checkbox",
+              value: column,
+              checked: !hidden.has(column),
+              onchange: (event) => {
+                if (!event.target.checked && visibleColumns.length <= 1) {
+                  event.target.checked = true;
+                  return;
+                }
+                const next = new Set(state.tableHidden);
+                if (event.target.checked) next.delete(column);
+                else next.add(column);
+                state.tableHidden = [...next];
+                if (!event.target.checked && state.tableColumn === column) {
+                  state.tableColumn = "";
+                }
+                state.tableColumnsOpen = true;
+                updateUrl();
+                renderPanel();
+              },
+            }),
+            el("span", { className: "table-column-toggle-name" }, column),
+            unit ? el("small", {}, unit) : null,
+          );
+        }),
+      ),
+      el("p", { className: "table-columns-note" },
+        "Hidden columns stay in CSV and package exports.",
+      ),
+      el("button", {
+        type: "button",
+        onclick: () => {
+          state.tableHidden = [];
+          state.tableColumnsOpen = true;
+          updateUrl();
+          renderPanel();
+        },
+      }, "Show all columns"),
+    ),
+  );
+  columnsDetails.addEventListener("toggle", () => {
+    state.tableColumnsOpen = columnsDetails.open;
+  });
+  body.append(columnsDetails);
   body.append(
     el(
       "h3",
@@ -940,7 +1013,7 @@ async function renderTables(body) {
         : "No independent check: the reader proves the table exists and its columns match the schema.",
     ),
   );
-  if (payload.columns.length > 5) {
+  if (visibleColumns.length > 5) {
     body.append(el("p", { className: "scroll-hint" },
       "Scroll horizontally to see every column.",
     ));
@@ -957,7 +1030,7 @@ async function renderTables(body) {
 
   const units = payload.units ?? {};
   const declaredUnits = Object.keys(units).length;
-  const stickyColumn = stickyColumnFor(payload.columns, payload.rows);
+  const stickyColumn = stickyColumnFor(visibleColumns, payload.rows);
   body.append(
     el("p", { className: "table-provenance" },
       `Source: ${payload.source ?? "FVSOut.db"} · `,
@@ -970,7 +1043,7 @@ async function renderTables(body) {
   const header = el(
     "tr",
     {},
-    ...payload.columns.map((column) => {
+    ...visibleColumns.map((column) => {
       const unit = units[column];
       const numeric = isNumeric(payload.rows, column);
       const sticky = column === stickyColumn;
@@ -986,14 +1059,14 @@ async function renderTables(body) {
     }),
   );
   const numericColumns = new Set(
-    payload.columns.filter((column) => isNumeric(payload.rows, column)),
+    visibleColumns.filter((column) => isNumeric(payload.rows, column)),
   );
   const rowAt = (index) => {
     const row = payload.rows[index];
     const node = el(
       "tr",
       { className: "data-row" },
-      ...payload.columns.map((column) => {
+      ...visibleColumns.map((column) => {
         const sticky = column === stickyColumn;
         const value = fmt(row[column]);
         const cell = el(
@@ -1015,6 +1088,7 @@ async function renderTables(body) {
   const tbody = el("tbody");
   const table = el("table", {}, el("thead", {}, header), tbody);
   table.setAttribute("aria-rowcount", String(rowCount + 1));
+  table.setAttribute("aria-colcount", String(visibleColumns.length));
   const scroll = el("div", { className: "scroll table-scroll" }, table);
   body.append(scroll);
 
@@ -1031,7 +1105,7 @@ async function renderTables(body) {
     let paintedEnd = -1;
     let frame = 0;
     const spacer = (height) => {
-      const cell = el("td", { colSpan: payload.columns.length });
+      const cell = el("td", { colSpan: visibleColumns.length });
       cell.style.height = `${height}px`;
       const row = el("tr", { className: "virtual-spacer" }, cell);
       row.style.height = `${height}px`;

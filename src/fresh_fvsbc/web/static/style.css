@@ -1041,3 +1041,49 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
+
+.table-columns {
+  margin: 8px 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.table-columns summary {
+  cursor: pointer;
+  padding: 7px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.table-columns summary:hover { color: var(--accent); }
+.table-columns-body { padding: 0 10px 10px; }
+.table-columns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 3px 10px;
+  max-height: 180px;
+  overflow: auto;
+}
+.table-column-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 11px;
+}
+.table-column-toggle-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.table-column-toggle small {
+  color: var(--muted);
+  font-size: 9px;
+  white-space: nowrap;
+}
+.table-columns-note {
+  margin: 6px 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.table-columns-body button { font-size: 11px; }
