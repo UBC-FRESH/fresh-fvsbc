@@ -26,6 +26,9 @@ const state = {
   tableQuery: "",
   tableColumn: "",
   tableHidden: [],
+  tableOrder: [],
+  tableLayoutTable: null,
+  tableLayoutWarning: false,
   tableColumnsOpen: false,
   tableOffset: 0,
   tableLimit: 200,
@@ -770,6 +773,91 @@ async function loadCalibrations() {
   }
 }
 
+const TABLE_LAYOUTS_KEY = "fresh-fvsbc.table-layouts";
+
+function normaliseColumnOrder(order, columns) {
+  const known = new Set(columns);
+  const seen = new Set();
+  const result = [];
+  if (Array.isArray(order)) {
+    for (const column of order) {
+      if (!known.has(column) || seen.has(column)) continue;
+      seen.add(column);
+      result.push(column);
+    }
+  }
+  for (const column of columns) {
+    if (!seen.has(column)) result.push(column);
+  }
+  return result;
+}
+
+function readTableLayout(table, columns) {
+  let raw = null;
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TABLE_LAYOUTS_KEY) || "null");
+    raw = stored?.tables?.[table] ?? null;
+  } catch (_error) {
+    return { order: [...columns], hidden: [], ok: false };
+  }
+  if (!raw || typeof raw !== "object") {
+    return { order: [...columns], hidden: [], ok: true };
+  }
+  const order = normaliseColumnOrder(raw.order, columns);
+  const known = new Set(columns);
+  const hidden = Array.isArray(raw.hidden)
+    ? raw.hidden.filter((column) => known.has(column))
+    : [];
+  const unique = [...new Set(hidden)];
+  if (unique.length >= order.length && order.length) unique.shift();
+  return { order, hidden: unique, ok: true };
+}
+
+function writeTableLayout(table, order, hidden) {
+  try {
+    let stored = null;
+    try {
+      stored = JSON.parse(window.localStorage.getItem(TABLE_LAYOUTS_KEY) || "null");
+    } catch (_error) {
+      stored = null;
+    }
+    const tables = stored?.tables && typeof stored.tables === "object" ? stored.tables : {};
+    tables[table] = { order: [...order], hidden: [...hidden] };
+    window.localStorage.setItem(TABLE_LAYOUTS_KEY, JSON.stringify({ version: 1, tables }));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function clearTableLayout(table) {
+  try {
+    let stored = null;
+    try {
+      stored = JSON.parse(window.localStorage.getItem(TABLE_LAYOUTS_KEY) || "null");
+    } catch (_error) {
+      stored = null;
+    }
+    if (!stored?.tables || typeof stored.tables !== "object") return true;
+    delete stored.tables[table];
+    window.localStorage.setItem(TABLE_LAYOUTS_KEY, JSON.stringify({
+      version: 1,
+      tables: stored.tables,
+    }));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function persistTableLayout() {
+  state.tableLayoutWarning = !writeTableLayout(
+    state.table,
+    state.tableOrder,
+    state.tableHidden,
+  );
+}
+
 function oracleNotice(tables) {
   const unverified = tables.filter((table) => !table.oracle).length;
   if (!unverified) return null;
@@ -807,6 +895,9 @@ async function renderTables(body) {
             state.tableQuery = "";
             state.tableColumn = "";
             state.tableHidden = [];
+            state.tableOrder = [];
+            state.tableLayoutTable = null;
+            state.tableLayoutWarning = false;
             state.tableColumnsOpen = false;
             state.tableOffset = 0;
             updateUrl();
@@ -826,6 +917,9 @@ async function renderTables(body) {
       ?? tables[0]?.name
       ?? null;
     state.tableHidden = [];
+    state.tableOrder = [];
+    state.tableLayoutTable = null;
+    state.tableLayoutWarning = false;
     state.tableColumnsOpen = false;
     updateUrl();
   }
@@ -845,14 +939,21 @@ async function renderTables(body) {
   if (state.tableQuery) params.set("q", state.tableQuery);
   if (state.tableColumn) params.set("column", state.tableColumn);
   const payload = await api(`${tablePath}?${params.toString()}`);
-  const knownHidden = state.tableHidden.filter((column) => payload.columns.includes(column));
-  if (knownHidden.length !== state.tableHidden.length) state.tableHidden = knownHidden;
-  let hidden = new Set(knownHidden);
-  if (hidden.size >= payload.columns.length) {
+  if (state.tableLayoutTable !== state.table) {
+    const layout = readTableLayout(state.table, payload.columns);
+    state.tableOrder = layout.order;
+    state.tableHidden = layout.hidden;
+    state.tableLayoutWarning = !layout.ok;
+    state.tableLayoutTable = state.table;
+  }
+  state.tableOrder = normaliseColumnOrder(state.tableOrder, payload.columns);
+  state.tableHidden = state.tableHidden.filter((column) => payload.columns.includes(column));
+  let hidden = new Set(state.tableHidden);
+  if (hidden.size >= state.tableOrder.length) {
     hidden = new Set();
     state.tableHidden = [];
   }
-  const visibleColumns = payload.columns.filter((column) => !hidden.has(column));
+  const visibleColumns = state.tableOrder.filter((column) => !hidden.has(column));
   if (state.tableColumn && !visibleColumns.includes(state.tableColumn)) {
     state.tableColumn = "";
     updateUrl();
@@ -945,52 +1046,108 @@ async function renderTables(body) {
     ),
     el("div", { className: "table-columns-body" },
       el("div", { className: "table-columns-grid" },
-        ...payload.columns.map((column) => {
+        ...state.tableOrder.map((column, index) => {
           const unit = payload.units?.[column];
-          return el("label", { className: "table-column-toggle" },
-            el("input", {
-              type: "checkbox",
-              value: column,
-              checked: !hidden.has(column),
-              onchange: (event) => {
-                if (!event.target.checked && visibleColumns.length <= 1) {
-                  event.target.checked = true;
-                  return;
-                }
-                const next = new Set(state.tableHidden);
-                if (event.target.checked) next.delete(column);
-                else next.add(column);
-                state.tableHidden = [...next];
-                if (!event.target.checked && state.tableColumn === column) {
-                  state.tableColumn = "";
-                }
-                state.tableColumnsOpen = true;
-                updateUrl();
-                renderPanel();
-              },
-            }),
-            el("span", { className: "table-column-toggle-name" }, column),
-            unit ? el("small", {}, unit) : null,
+          return el("div", { className: "table-column-row" },
+            el("label", { className: "table-column-toggle" },
+              el("input", {
+                type: "checkbox",
+                value: column,
+                checked: !hidden.has(column),
+                onchange: (event) => {
+                  if (!event.target.checked && visibleColumns.length <= 1) {
+                    event.target.checked = true;
+                    return;
+                  }
+                  const next = new Set(state.tableHidden);
+                  if (event.target.checked) next.delete(column);
+                  else next.add(column);
+                  state.tableHidden = [...next];
+                  if (!event.target.checked && state.tableColumn === column) {
+                    state.tableColumn = "";
+                  }
+                  state.tableColumnsOpen = true;
+                  persistTableLayout();
+                  updateUrl();
+                  renderPanel();
+                },
+              }),
+              el("span", { className: "table-column-toggle-name" }, column),
+              unit ? el("small", {}, unit) : null,
+            ),
+            el("div", { className: "table-column-moves" },
+              (() => {
+                const button = el("button", {
+                  type: "button",
+                  disabled: index === 0,
+                  onclick: () => {
+                    const target = index - 1;
+                    if (target < 0) return;
+                    const order = [...state.tableOrder];
+                    [order[index], order[target]] = [order[target], order[index]];
+                    state.tableOrder = order;
+                    state.tableColumnsOpen = true;
+                    persistTableLayout();
+                    renderPanel();
+                  },
+                }, "←");
+                button.setAttribute("aria-label", `Move ${column} left`);
+                button.title = `Move ${column} left`;
+                return button;
+              })(),
+              (() => {
+                const button = el("button", {
+                  type: "button",
+                  disabled: index === state.tableOrder.length - 1,
+                  onclick: () => {
+                    const target = index + 1;
+                    if (target >= state.tableOrder.length) return;
+                    const order = [...state.tableOrder];
+                    [order[index], order[target]] = [order[target], order[index]];
+                    state.tableOrder = order;
+                    state.tableColumnsOpen = true;
+                    persistTableLayout();
+                    renderPanel();
+                  },
+                }, "→");
+                button.setAttribute("aria-label", `Move ${column} right`);
+                button.title = `Move ${column} right`;
+                return button;
+              })(),
+            ),
           );
         }),
       ),
-      el("p", { className: "table-columns-note" },
-        "Hidden columns stay in CSV and package exports.",
+      el("p", {
+        className: `table-columns-note${state.tableLayoutWarning ? " error" : ""}`,
+      }, state.tableLayoutWarning
+        ? "Browser storage is unavailable; this layout will not persist."
+        : "Layout changes are saved in this browser."),
+      el("div", { className: "table-columns-actions" },
+        el("button", {
+          type: "button",
+          onclick: () => {
+            state.tableHidden = [];
+            state.tableColumnsOpen = true;
+            persistTableLayout();
+            updateUrl();
+            renderPanel();
+          },
+        }, "Show all columns"),
+        el("button", {
+          type: "button",
+          onclick: () => {
+            state.tableOrder = [...payload.columns];
+            state.tableHidden = [];
+            state.tableColumnsOpen = true;
+            state.tableLayoutTable = state.table;
+            state.tableLayoutWarning = !clearTableLayout(state.table);
+            renderPanel();
+          },
+        }, "Reset layout"),
       ),
-      el("button", {
-        type: "button",
-        onclick: () => {
-          state.tableHidden = [];
-          state.tableColumnsOpen = true;
-          updateUrl();
-          renderPanel();
-        },
-      }, "Show all columns"),
     ),
   );
-  columnsDetails.addEventListener("toggle", () => {
-    state.tableColumnsOpen = columnsDetails.open;
-  });
   body.append(columnsDetails);
   body.append(
     el(
