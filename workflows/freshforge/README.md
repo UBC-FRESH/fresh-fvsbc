@@ -98,3 +98,15 @@ freshforge run workflows/freshforge/prince_george_background.yaml --workdir . \
 
 It writes `prince-george-candidate/metrics.csv` and
 `prince-george-candidate/model-card.json`. No local calibration is applied.
+
+## `cranbrook_background.yaml`
+
+Sixth background candidate and the first southeast Interior test:
+
+```sh
+freshforge run workflows/freshforge/cranbrook_background.yaml --workdir . \
+  --evidence runtime/freshforge-cranbrook-evidence.json
+```
+
+It writes `cranbrook-candidate/metrics.csv` and
+`cranbrook-candidate/model-card.json`. No local calibration is applied.
