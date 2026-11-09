@@ -162,3 +162,15 @@ freshforge run workflows/freshforge/haida_gwaii_background.yaml --workdir . \
 It writes `haida-gwaii-candidate/metrics.csv` and
 `haida-gwaii-candidate/model-card.json`. PL is below the support minimum and is
 omitted.
+
+## `kootenay_lake_background.yaml`
+
+Eleventh background candidate and the ICH wet-belt completion:
+
+```sh
+freshforge run workflows/freshforge/kootenay_lake_background.yaml --workdir . \
+  --evidence runtime/freshforge-kootenay-lake-evidence.json
+```
+
+It writes `kootenay-lake-candidate/metrics.csv` and
+`kootenay-lake-candidate/model-card.json`. No local calibration is applied.
