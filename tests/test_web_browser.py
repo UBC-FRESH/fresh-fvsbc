@@ -231,6 +231,9 @@ def test_direct_links_restore_table_and_compare_state(cockpit: str) -> None:
                 wait_until="networkidle",
             )
             expect(page.locator("#table-filter")).to_have_value("10")
+            expect(page.locator("#table-filter")).to_have_attribute(
+                "placeholder", "Filter Year (year)…"
+            )
             expect(page.locator("#table-column")).to_have_value("Year")
             expect(page.locator("#panel-body")).to_contain_text("1 matching row")
             assert "table=FVS_Summary_Metric" in page.evaluate("window.location.search")
@@ -272,6 +275,8 @@ def test_the_table_shows_its_source_and_declared_units(cockpit: str) -> None:
                 has=page.locator(".column-name", has_text=re.compile(r"^Tph$")),
             )
             expect(tph_header.locator(".column-unit")).to_have_text("trees/ha")
+            expect(page.locator('#table-column option[value="Year"]')).to_have_text("Year · year")
+            expect(page.locator('#table-column option[value="Tph"]')).to_have_text("Tph · trees/ha")
         finally:
             browser.close()
 

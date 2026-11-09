@@ -131,7 +131,9 @@ metric table is absent, the panel falls back to ``summary.csv`` and labels every
 Table headers show the units this reader declares, and the Tables panel names ``FVSOut.db`` as the
 source. Units come from the reader's column table, not from FVS, which does not attach units to
 output columns; a blank unit means the reader does not declare one, not that the column is
-dimensionless. The same declared units travel in the export's ``metadata.json`` sidecar.
+dimensionless. The same declared units travel in the export's ``metadata.json`` sidecar. The column
+filter repeats the declared unit in each option while keeping the URL value as the bare column
+name.
 
 A page with more than 120 rows renders only the visible window plus a small overscan, with spacer
 rows preserving the full scroll height. Filtering and paging stay server-side, so virtualizing does
