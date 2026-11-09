@@ -60,22 +60,28 @@ service also strips common provider and cloud secrets from the child environment
 risk-reduction measure, not a sandbox or an authentication boundary.
 
 ``GET /api/agent`` reports whether the agent is enabled, whether ``opencode`` is on the path, the
-model, the workspace, and the timeout. ``GET /api/agent/guide.md`` returns the instruction sheet.
-``POST /api/agent/chat`` accepts ``message``, optional ``session``, compact UI ``context``, ``run``,
-and ``year``; the server injects the run's summary, provenance pins, and calibration review state.
+default model, the models reported by ``opencode models``, the workspace, and the timeout.
+``GET /api/agent/guide.md`` returns the instruction sheet. ``POST /api/agent/chat`` accepts
+``message``, optional ``session``, optional ``model``, compact UI ``context``, ``run``, and
+``year``; the server injects the run's summary, provenance pins, and calibration review state. A
+non-default model must appear in the CLI's reported list, so the browser cannot invent a provider
+or model string.
 A validated reply may carry safe UI chips for opening a workspace, panel, run, or stand year,
 for opening a table filtered to a cited column/value, or for putting a follow-up prompt in the
 input. The server checks a table citation against the open run before returning it.
 
 The browser keeps the current assistant conversation and OpenCode session in ``sessionStorage``
 for that tab; **New** clears both. **Copy** and **Export** write a Markdown transcript with the
-run, context, mode, model, session, messages, citations, tool use, and follow-up chips. **Stop waiting** aborts the browser request, but the local
-OpenCode process may still finish in the background, and the panel says so rather than pretending
-the model was cancelled.
+run, context, mode, model, session, messages, citations, tool use, and follow-up chips. Each
+assistant reply also records the model that produced it, so a transcript remains accurate after
+the selector changes. **Stop waiting** aborts the browser request, but the local OpenCode process
+may still finish in the background, and the panel says so rather than pretending the model was
+cancelled.
 
 In the browser, **Enter sends** and **Shift+Enter inserts a newline**. The composer grows with the
-message, labels the active model, shows tool use as read-only chips, and keeps the local summary
-reader as a fallback when the agent is disabled or OpenCode is unavailable.
+message, the header selector switches between the models the local CLI reports, and each reply
+shows its model. Tool use appears as read-only chips, and the local summary reader remains the
+fallback when the agent is disabled or OpenCode is unavailable.
 
 Shareable analysis state
 ------------------------

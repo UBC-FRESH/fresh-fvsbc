@@ -39,6 +39,7 @@ from fresh_fvsbc.web.agent import (
     DEFAULT_AGENT_TIMEOUT,
     AgentError,
     agent_info,
+    agent_models,
     run_agent,
 )
 from fresh_fvsbc.web.skins import load_skins
@@ -82,6 +83,7 @@ class AgentChatRequest(BaseModel):
 
     message: str = Field(min_length=1, max_length=8000)
     session: str | None = Field(default=None, max_length=200)
+    model: str | None = Field(default=None, max_length=200)
     context: dict[str, Any] | None = None
     run: str | None = Field(default=None, max_length=200)
     year: int | None = Field(default=None, ge=0, le=1000)
@@ -529,6 +531,12 @@ def create_app(
                 status_code=422,
                 detail="an assistant session must be an OpenCode session id starting with 'ses'",
             )
+        default_model = str(app.state.agent_model)
+        selected_model = (body.model or default_model).strip()
+        if selected_model != default_model and selected_model not in agent_models():
+            raise HTTPException(
+                status_code=400, detail=f"unknown assistant model {selected_model!r}"
+            )
         context = _agent_context(body.context, body.run, body.year)
         if len(json.dumps(context, ensure_ascii=False)) > 20_000:
             raise HTTPException(status_code=413, detail="the assistant context is too large")
@@ -538,7 +546,7 @@ def create_app(
                 session=session or None,
                 context=context,
                 workspace=Path(app.state.agent_workspace),
-                model=str(app.state.agent_model),
+                model=selected_model,
                 timeout=float(app.state.agent_timeout),
             )
         except AgentError as error:

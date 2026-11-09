@@ -42,11 +42,13 @@ def _events(*, text: str = "OK", tool: str = "read", session: str = "ses_test") 
 def test_agent_info_reports_availability(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """The info payload distinguishes enabled from executable availability."""
     monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/opencode")
+    monkeypatch.setattr(agent, "agent_models", lambda: ("p/m", "p/n"))
     info = agent.agent_info(enabled=True, model="p/m", workspace=tmp_path, timeout=12.0)
     assert info == {
         "enabled": True,
         "available": True,
         "model": "p/m",
+        "models": ["p/m", "p/n"],
         "workspace": str(tmp_path),
         "timeout": 12.0,
     }
@@ -55,6 +57,34 @@ def test_agent_info_reports_availability(monkeypatch: pytest.MonkeyPatch, tmp_pa
         agent.agent_info(enabled=True, model="p/m", workspace=tmp_path, timeout=12.0)["available"]
         is False
     )
+
+
+def test_agent_models_parses_the_cli_list(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Only provider/model lines are exposed, and a failed CLI call is empty."""
+    agent.agent_models.cache_clear()
+    monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/opencode")
+    monkeypatch.setattr(
+        subprocess,
+        "run",
+        lambda command, **kwargs: subprocess.CompletedProcess(
+            command, 0, "provider/model\n\nnot a model\nprovider/other\n", ""
+        ),
+    )
+    try:
+        assert agent.agent_models() == ("provider/model", "provider/other")
+    finally:
+        agent.agent_models.cache_clear()
+
+    agent.agent_models.cache_clear()
+    monkeypatch.setattr(
+        subprocess,
+        "run",
+        lambda command, **kwargs: subprocess.CompletedProcess(command, 1, "", "failed"),
+    )
+    try:
+        assert agent.agent_models() == ()
+    finally:
+        agent.agent_models.cache_clear()
 
 
 @pytest.mark.parametrize(

@@ -2037,6 +2037,9 @@ function appendAssistant(role, text, options = {}) {
     }
     message.append(row);
   }
+  if (options.model) {
+    message.append(el("div", { className: "assistant-meta" }, options.model));
+  }
   if (options.citations?.length) {
     const row = el("div", { className: "citations" });
     for (const citation of options.citations) {
@@ -2057,6 +2060,7 @@ function appendAssistant(role, text, options = {}) {
       citations: options.citations ?? [],
       actions: options.actions ?? [],
       chips: options.chips ?? [],
+      model: options.model ?? null,
     });
     state.assistant.history = state.assistant.history.slice(-40);
     saveAssistantHistory();
@@ -2094,6 +2098,7 @@ function restoreAssistantHistory() {
       citations: message.citations ?? [],
       actions: message.actions ?? [],
       chips: message.chips ?? [],
+      model: message.model ?? null,
       persist: false,
     });
   }
@@ -2118,6 +2123,7 @@ function assistantTranscript() {
   for (const message of state.assistant.history) {
     lines.push(`## ${message.role === "user" ? "User" : message.role === "error" ? "Error" : "Assistant"}`, "");
     lines.push(message.text || "", "");
+    if (message.model) lines.push(`- Model: ${message.model}`, "");
     for (const citation of message.citations || []) {
       lines.push(`- Citation: ${citation.label || citation.target} (${citation.target})`);
     }
@@ -2273,21 +2279,39 @@ function setAssistantBusy(busy) {
 function configureAssistant(info) {
   state.assistant.enabled = Boolean(info?.enabled);
   state.assistant.available = Boolean(info?.available);
-  state.assistant.model = info?.model ?? null;
   state.assistant.mode = state.assistant.enabled && state.assistant.available ? "agent" : "local";
   const model = document.getElementById("assistant-model");
+  const select = document.getElementById("assistant-model-select");
   const guide = document.getElementById("assistant-guide");
   if (guide) guide.hidden = state.assistant.mode !== "agent";
   if (state.assistant.mode === "agent") {
-    const short = String(info.model || "agent").split("/").pop();
-    if (model) model.textContent = `${short} · plan · read-only`;
+    const models = Array.isArray(info.models) && info.models.length ? info.models : [info.model];
+    const current = models.includes(state.assistant.model) ? state.assistant.model : info.model;
+    state.assistant.model = current;
+    if (select) {
+      select.replaceChildren(...models.map((modelId) =>
+        el("option", { value: modelId, selected: modelId === current }, modelId.split("/").pop()),
+      ));
+      select.value = current;
+      select.hidden = false;
+    }
+    if (model) model.hidden = true;
     assistantStatus("Enter sends · Shift+Enter adds a newline.");
-  } else if (info?.enabled && !info?.available) {
-    if (model) model.textContent = "local summary · opencode unavailable";
-    assistantStatus("opencode is not on the service PATH; using the local summary reader.");
   } else {
-    if (model) model.textContent = "local summary reader";
-    assistantStatus("LLM agent off; using the local summary reader.");
+    state.assistant.model = null;
+    if (select) {
+      select.hidden = true;
+      select.replaceChildren();
+    }
+    if (model) {
+      model.hidden = false;
+      model.textContent = info?.enabled && !info?.available
+        ? "local summary · opencode unavailable"
+        : "local summary reader";
+    }
+    assistantStatus(info?.enabled && !info?.available
+      ? "opencode is not on the service PATH; using the local summary reader."
+      : "LLM agent off; using the local summary reader.");
   }
 }
 
@@ -2366,6 +2390,7 @@ async function sendAssistant(message) {
             ? {
                 message: clean,
                 session: state.assistant.session,
+                model: state.assistant.model,
                 context: assistantContext(),
                 run: state.run?.id ?? null,
                 year: state.standYear,
@@ -2382,6 +2407,7 @@ async function sendAssistant(message) {
     }
     if (mode === "agent" && response.status === 403) {
       mode = state.assistant.mode = "local";
+      configureAssistant({ enabled: false, available: false, model: null });
       response = await request();
     }
     const payload = await response.json().catch(() => ({}));
@@ -2393,6 +2419,7 @@ async function sendAssistant(message) {
       actions: payload.actions ?? [],
       chips: payload.chips ?? [],
       citations: payload.citations ?? [],
+      model: payload.model || state.assistant.model,
     });
     assistantStatus(state.assistant.mode === "agent"
       ? "Enter sends · Shift+Enter adds a newline."
@@ -2432,6 +2459,10 @@ async function boot() {
   document.getElementById("assistant-export").addEventListener("click", exportAssistantTranscript);
   document.getElementById("assistant-stop").addEventListener("click", () => {
     state.assistant.controller?.abort();
+  });
+  document.getElementById("assistant-model-select").addEventListener("change", (event) => {
+    state.assistant.model = event.target.value;
+    assistantStatus(`Model set to ${event.target.value.split("/").pop()}.`);
   });
   const assistantInput = document.getElementById("assistant-input");
   assistantInput.addEventListener("keydown", (event) => {

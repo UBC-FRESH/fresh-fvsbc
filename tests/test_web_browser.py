@@ -16,6 +16,7 @@ import time
 import urllib.request
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -371,6 +372,64 @@ def test_the_assistant_sends_on_enter_and_adds_a_newline_on_shift_enter(cockpit:
             expect(input_box).to_have_value("")
             page.get_by_role("button", name="New", exact=True).click()
             expect(page.locator("#assistant-hint")).to_be_visible()
+        finally:
+            browser.close()
+
+
+def test_the_assistant_model_selector_sends_the_chosen_model(cockpit: str) -> None:
+    """The drawer lists the CLI models and records the selected model per reply."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        captured: dict[str, object] = {}
+
+        def agent_info(route: Any) -> None:  # noqa: ANN401
+            route.fulfill(
+                status=200,
+                content_type="application/json",
+                body=json.dumps(
+                    {
+                        "enabled": True,
+                        "available": True,
+                        "model": "provider/model",
+                        "models": ["provider/model", "provider/other"],
+                        "workspace": "/tmp",
+                        "timeout": 30.0,
+                    }
+                ),
+            )
+
+        def agent_chat(route: Any) -> None:  # noqa: ANN401
+            captured.update(route.request.post_data_json)
+            route.fulfill(
+                status=200,
+                content_type="application/json",
+                body=json.dumps(
+                    {
+                        "reply": "model answer",
+                        "session": "ses_test",
+                        "model": captured["model"],
+                        "actions": [],
+                        "chips": [],
+                    }
+                ),
+            )
+
+        page.route("**/api/agent", agent_info)
+        page.route("**/api/agent/chat", agent_chat)
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            select = page.locator("#assistant-model-select")
+            expect(select).to_be_visible()
+            expect(select.locator("option")).to_have_count(2)
+            select.select_option("provider/other")
+            page.locator("#assistant-input").fill("hello")
+            page.locator("#assistant-input").press("Enter")
+            expect(page.locator("#assistant-log")).to_contain_text("model answer")
+            expect(page.locator(".assistant-meta")).to_have_text("provider/other")
+            assert captured["model"] == "provider/other"
         finally:
             browser.close()
 
