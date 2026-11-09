@@ -31,6 +31,7 @@ const state = {
   tableOrder: [],
   tableLayoutTable: null,
   tableLayoutWarning: false,
+  tableExportVisible: false,
   tableColumnsOpen: false,
   tableFiltersOpen: false,
   tableSavedFilter: "",
@@ -802,10 +803,10 @@ function readTableLayout(table, columns) {
     const stored = JSON.parse(window.localStorage.getItem(TABLE_LAYOUTS_KEY) || "null");
     raw = stored?.tables?.[table] ?? null;
   } catch (_error) {
-    return { order: [...columns], hidden: [], ok: false };
+    return { order: [...columns], hidden: [], exportVisible: false, ok: false };
   }
   if (!raw || typeof raw !== "object") {
-    return { order: [...columns], hidden: [], ok: true };
+    return { order: [...columns], hidden: [], exportVisible: false, ok: true };
   }
   const order = normaliseColumnOrder(raw.order, columns);
   const known = new Set(columns);
@@ -814,10 +815,10 @@ function readTableLayout(table, columns) {
     : [];
   const unique = [...new Set(hidden)];
   if (unique.length >= order.length && order.length) unique.shift();
-  return { order, hidden: unique, ok: true };
+  return { order, hidden: unique, exportVisible: raw.exportVisible === true, ok: true };
 }
 
-function writeTableLayout(table, order, hidden) {
+function writeTableLayout(table, order, hidden, exportVisible = false) {
   try {
     let stored = null;
     try {
@@ -826,7 +827,11 @@ function writeTableLayout(table, order, hidden) {
       stored = null;
     }
     const tables = stored?.tables && typeof stored.tables === "object" ? stored.tables : {};
-    tables[table] = { order: [...order], hidden: [...hidden] };
+    tables[table] = {
+      order: [...order],
+      hidden: [...hidden],
+      exportVisible: exportVisible === true,
+    };
     window.localStorage.setItem(TABLE_LAYOUTS_KEY, JSON.stringify({ version: 1, tables }));
     return true;
   } catch (_error) {
@@ -859,6 +864,7 @@ function persistTableLayout() {
     state.table,
     state.tableOrder,
     state.tableHidden,
+    state.tableExportVisible,
   );
 }
 
@@ -956,6 +962,7 @@ async function renderTables(body) {
             state.tableOrder = [];
             state.tableLayoutTable = null;
             state.tableLayoutWarning = false;
+            state.tableExportVisible = false;
             state.tableColumnsOpen = false;
             state.tableFiltersOpen = false;
             state.tableSavedFilter = "";
@@ -980,6 +987,7 @@ async function renderTables(body) {
     state.tableOrder = [];
     state.tableLayoutTable = null;
     state.tableLayoutWarning = false;
+    state.tableExportVisible = false;
     state.tableColumnsOpen = false;
     state.tableFiltersOpen = false;
     state.tableSavedFilter = "";
@@ -1005,6 +1013,7 @@ async function renderTables(body) {
     const layout = readTableLayout(state.table, payload.columns);
     state.tableOrder = layout.order;
     state.tableHidden = layout.hidden;
+    state.tableExportVisible = layout.exportVisible;
     state.tableLayoutWarning = !layout.ok;
     state.tableLayoutTable = state.table;
   }
@@ -1023,6 +1032,7 @@ async function renderTables(body) {
   const csvParams = new URLSearchParams();
   if (state.tableQuery) csvParams.set("q", state.tableQuery);
   if (state.tableColumn) csvParams.set("column", state.tableColumn);
+  if (state.tableExportVisible) csvParams.set("columns", visibleColumns.join(","));
   const csvHref = `${tablePath}/csv${csvParams.toString() ? `?${csvParams}` : ""}`;
   const packageHref = `${tablePath}/export${csvParams.toString() ? `?${csvParams}` : ""}`;
   const selectedUnit = state.tableColumn ? payload.units?.[state.tableColumn] : undefined;
@@ -1092,13 +1102,17 @@ async function renderTables(body) {
         className: "button-like",
         href: csvHref,
         download: `${state.run.id}-${state.table}.csv`,
-        title: "CSV data only; use Package for units and provenance.",
+        title: state.tableExportVisible
+          ? "CSV with the visible columns in this order."
+          : "CSV data only; use Package for units and provenance.",
       }, "CSV"),
       el("a", {
         className: "button-like",
         href: packageHref,
         download: `${state.run.id}-${state.table}.zip`,
-        title: "CSV plus metadata.json and README.txt",
+        title: state.tableExportVisible
+          ? "CSV, metadata, and README for the visible columns in this order."
+          : "CSV plus metadata.json and README.txt",
       }, "Package"),
     ),
   );
@@ -1336,11 +1350,28 @@ async function renderTables(body) {
           );
         }),
       ),
+      el("label", { className: "table-columns-export" },
+        el("input", {
+          type: "checkbox",
+          id: "table-export-visible",
+          checked: state.tableExportVisible,
+          onchange: (event) => {
+            state.tableExportVisible = event.target.checked;
+            state.tableColumnsOpen = true;
+            persistTableLayout();
+            updateUrl();
+            renderPanel();
+          },
+        }),
+        el("span", {}, "CSV and package exports use these visible columns, in this order"),
+      ),
       el("p", {
         className: `table-columns-note${state.tableLayoutWarning ? " error" : ""}`,
       }, state.tableLayoutWarning
         ? "Browser storage is unavailable; this layout will not persist."
-        : "Layout changes are saved in this browser."),
+        : state.tableExportVisible
+          ? "Exports follow this layout."
+          : "Hidden columns stay in CSV and package exports."),
       el("div", { className: "table-columns-actions" },
         el("button", {
           type: "button",
@@ -1357,6 +1388,7 @@ async function renderTables(body) {
           onclick: () => {
             state.tableOrder = [...payload.columns];
             state.tableHidden = [];
+            state.tableExportVisible = false;
             state.tableColumnsOpen = true;
             state.tableLayoutTable = state.table;
             state.tableLayoutWarning = !clearTableLayout(state.table);

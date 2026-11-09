@@ -161,7 +161,8 @@ A **Columns** disclosure hides, restores, and reorders columns for the current t
 columns also leave the filter menu, at least one column always remains, and CSV/package exports
 still contain the full table. Order and visibility are saved per table in ``localStorage`` and
 restored on reload; **Show all columns** only unhides, while **Reset layout** clears both the saved
-order and the hidden set.
+order and the hidden set. An **Exports follow this layout** checkbox makes CSV and package exports
+use the visible columns in their current order; it is saved with the layout.
 
 A separate **Saved filters** disclosure stores the current literal query and column scope under a
 name, per table, in ``localStorage``. Loading one restores both and unhides its column if the saved
@@ -244,9 +245,10 @@ Endpoints
     one table, paged, with its columns, source, and declared units; ``q`` filters before paging
     and ``column`` restricts it
 ``GET /api/runs/{id}/tables/{name}/csv``
-    the filtered table as a CSV attachment
+    the filtered table as a CSV attachment; optional ``columns`` limits and orders its columns
 ``GET /api/runs/{id}/tables/{name}/export``
-    a ZIP with the filtered ``data.csv``, ``metadata.json``, and a README
+    a ZIP with the filtered ``data.csv``, ``metadata.json``, and a README; ``columns`` limits and
+    orders both the data and the listed metadata columns
 ``GET /api/runs/{id}/visuals?year=``
     the schematic stand payload: layout, trees, cut trees, species and the year's summary row
 ``GET /api/runs/{id}/keywords``

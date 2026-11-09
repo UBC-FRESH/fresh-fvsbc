@@ -888,6 +888,33 @@ def test_a_table_export_contains_data_metadata_and_units(tmp_path: Path) -> None
     assert "null unit" in readme
 
 
+def test_a_table_export_can_select_and_order_columns(tmp_path: Path) -> None:
+    """CSV and package exports accept a validated ordered column subset."""
+    _make_run(tmp_path / "run-c")
+    _add_metric_summary(tmp_path / "run-c")
+    client = TestClient(webapp.create_app([tmp_path]))
+    csv = client.get("/api/runs/run-c/tables/FVS_Summary_Metric/csv?columns=Tph,Year")
+    assert csv.status_code == 200
+    assert csv.text.splitlines()[0] == "Tph,Year"
+    assert (
+        client.get("/api/runs/run-c/tables/FVS_Summary_Metric/csv?columns=Nope").status_code == 400
+    )
+
+    package = client.get("/api/runs/run-c/tables/FVS_Summary_Metric/export?columns=Tph,Year")
+    assert package.status_code == 200
+    with zipfile.ZipFile(io.BytesIO(package.content)) as archive:
+        data = archive.read("data.csv").decode("utf-8")
+        metadata = json.loads(archive.read("metadata.json"))
+        readme = archive.read("README.txt").decode("utf-8")
+    assert data.splitlines()[0] == "Tph,Year"
+    assert [item["name"] for item in metadata["columns"]] == ["Tph", "Year"]
+    assert "columns: Tph, Year" in readme
+    assert (
+        client.get("/api/runs/run-c/tables/FVS_Summary_Metric/export?columns=Nope").status_code
+        == 400
+    )
+
+
 def test_main_starts_uvicorn_with_the_configured_bind(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

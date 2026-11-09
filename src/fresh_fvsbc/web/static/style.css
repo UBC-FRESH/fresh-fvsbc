@@ -1191,3 +1191,14 @@ tbody tr:hover td.sticky-key { background: var(--panel); }
   line-height: 1.4;
 }
 .table-filters-status.error { color: var(--warn); }
+
+.table-columns-export {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 8px 0 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.table-columns-export input { margin-top: 2px; }

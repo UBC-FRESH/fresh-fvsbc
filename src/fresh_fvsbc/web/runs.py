@@ -358,6 +358,8 @@ def table(
         A literal, case-insensitive filter applied before paging.
     column : str or None, optional
         Restrict the filter to this column; ``None`` searches every column.
+    columns : sequence of str or None, optional
+        The columns to write, in this order; ``None`` writes every column.
 
     Returns
     -------
@@ -389,7 +391,14 @@ def table(
     }
 
 
-def table_csv(run: Run, name: str, *, query: str | None = None, column: str | None = None) -> str:
+def table_csv(
+    run: Run,
+    name: str,
+    *,
+    query: str | None = None,
+    column: str | None = None,
+    columns: Sequence[str] | None = None,
+) -> str:
     """Return one exposed table as CSV, with the same literal filter as :func:`table`.
 
     Parameters
@@ -414,9 +423,16 @@ def table_csv(run: Run, name: str, *, query: str | None = None, column: str | No
         If the run has no database, or the table is not in it.
     """
     raw = _table_frame(run, name)
-    if column and column not in [str(item) for item in raw.columns]:
+    available = [str(item) for item in raw.columns]
+    if column and column not in available:
         raise RunError(f"the run {run.id} table {name!r} has no column {column!r}")
-    return _filter_frame(raw, query, column).to_csv(index=False)
+    frame = _filter_frame(raw, query, column)
+    if columns is not None:
+        unknown = [item for item in columns if item not in available]
+        if unknown:
+            raise RunError(f"the run {run.id} table {name!r} has no column {unknown[0]!r}")
+        frame = frame[list(columns)]
+    return frame.to_csv(index=False)
 
 
 def keywords(run: Run) -> str:
