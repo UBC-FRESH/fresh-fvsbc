@@ -851,3 +851,11 @@ svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }
     margin-right: 0;
   }
 }
+
+.table-pager label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+.table-pager input[type="number"] { width: 4.5rem; }

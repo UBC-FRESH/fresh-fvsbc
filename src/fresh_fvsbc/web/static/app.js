@@ -25,6 +25,7 @@ const state = {
   tableQuery: "",
   tableColumn: "",
   tableOffset: 0,
+  tableLimit: 200,
   standYear: null,
   pollTimer: null,
   ready: false,
@@ -811,7 +812,10 @@ async function renderTables(body) {
     updateUrl();
   }
   const tablePath = `api/runs/${encodeURIComponent(state.run.id)}/tables/${encodeURIComponent(state.table)}`;
-  const params = new URLSearchParams({ limit: "200", offset: String(state.tableOffset) });
+  const params = new URLSearchParams({
+    limit: String(state.tableLimit),
+    offset: String(state.tableOffset),
+  });
   if (state.tableQuery) params.set("q", state.tableQuery);
   if (state.tableColumn) params.set("column", state.tableColumn);
   const payload = await api(`${tablePath}?${params.toString()}`);
@@ -940,11 +944,44 @@ async function renderTables(body) {
   );
   const firstRow = payload.offset + 1;
   const lastRow = payload.offset + payload.rows.length;
+  const page = Math.floor(payload.offset / payload.limit) + 1;
+  const pages = Math.max(1, Math.ceil(payload.total / payload.limit));
+  const pageInput = el("input", {
+    type: "number",
+    min: "1",
+    max: String(pages),
+    value: String(page),
+    "aria-label": "Page number",
+    onchange: (event) => {
+      const requested = Number(event.target.value);
+      const target = Number.isFinite(requested)
+        ? Math.max(1, Math.min(pages, Math.floor(requested)))
+        : page;
+      state.tableOffset = (target - 1) * payload.limit;
+      updateUrl();
+      renderPanel();
+    },
+  });
+  const sizeSelect = el("select", {
+    "aria-label": "Rows per page",
+    onchange: (event) => {
+      state.tableLimit = Number(event.target.value);
+      state.tableOffset = 0;
+      updateUrl();
+      renderPanel();
+    },
+  },
+    ...[5, 10, 25, 50, 100, 200, 500, 1000].map((size) =>
+      el("option", { value: String(size), selected: size === payload.limit }, String(size)),
+    ),
+  );
   body.append(
     el("div", { className: "table-pager" },
       el("span", { className: "muted" },
-        `Rows ${fmt(firstRow)}–${fmt(lastRow)} of ${fmt(payload.total)}`,
+        `Page ${fmt(page)} of ${fmt(pages)} · Rows ${fmt(firstRow)}–${fmt(lastRow)} of ${fmt(payload.total)}`,
       ),
+      el("label", { className: "muted" }, "Rows ", sizeSelect),
+      el("label", { className: "muted" }, "Go to ", pageInput),
       el("button", {
         type: "button",
         disabled: payload.offset <= 0,
@@ -1686,6 +1723,7 @@ function readUrlState() {
     q: params.get("q"),
     column: params.get("column"),
     offset: params.get("offset"),
+    limit: params.get("limit"),
     a: params.get("a"),
     b: params.get("b"),
     metric: params.get("metric"),
@@ -1706,6 +1744,7 @@ function updateUrl() {
     params.set("table", state.table);
     if (state.tableQuery) params.set("q", state.tableQuery);
     if (state.tableColumn) params.set("column", state.tableColumn);
+    if (state.tableLimit !== 200) params.set("limit", String(state.tableLimit));
     if (state.tableOffset > 0) params.set("offset", String(state.tableOffset));
   }
   if (state.workspace === "results" && state.panel === "compare") {
@@ -2346,6 +2385,8 @@ async function boot() {
     state.tableColumn = initial.column || "";
     const offset = Number(initial.offset);
     state.tableOffset = Number.isInteger(offset) && offset > 0 ? offset : 0;
+    const limit = Number(initial.limit);
+    state.tableLimit = [5, 10, 25, 50, 100, 200, 500, 1000].includes(limit) ? limit : 200;
     if (initial.a) state.compareA = initial.a;
     if (initial.b) state.compareB = initial.b;
     if (initial.metric) state.compareMetric = initial.metric;

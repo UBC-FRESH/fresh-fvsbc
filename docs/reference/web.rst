@@ -83,7 +83,7 @@ Shareable analysis state
 The cockpit keeps the useful view in the URL:
 
 - ``workspace``, ``run``, ``panel``, and ``year`` for the open view;
-- ``table``, ``q``, and ``offset`` for a filtered table page;
+- ``table``, ``q``, ``column``, ``limit``, and ``offset`` for a filtered table page;
 - ``a``, ``b``, ``metric``, and ``ctable`` for the two-run comparison.
 
 Those values are restored on reload, so a reviewer can send a link to the exact table filter or

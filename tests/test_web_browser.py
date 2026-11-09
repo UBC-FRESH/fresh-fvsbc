@@ -250,6 +250,29 @@ def test_direct_links_restore_table_and_compare_state(cockpit: str) -> None:
             browser.close()
 
 
+def test_a_large_table_can_page_and_change_its_page_size(cockpit: str) -> None:
+    """The table pager exposes page size, page number, and the filtered row range."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}"
+                "&table=FVS_TreeList_Metric&limit=5",
+                wait_until="networkidle",
+            )
+            expect(page.locator("#panel-body")).to_contain_text("Page 1 of 2")
+            expect(page.locator("#panel-body")).to_contain_text("Rows 1")
+            page.get_by_role("button", name="Next").click()
+            expect(page.locator("#panel-body")).to_contain_text("Page 2 of 2")
+            expect(page.locator("#panel-body")).to_contain_text("Rows 6")
+            assert "limit=5" in page.evaluate("window.location.search")
+            assert "offset=5" in page.evaluate("window.location.search")
+        finally:
+            browser.close()
+
+
 def test_the_mobile_shell_does_not_overflow(cockpit: str) -> None:
     """The runs and summary views fit a phone-width viewport."""
     expect = playwright_module.expect
