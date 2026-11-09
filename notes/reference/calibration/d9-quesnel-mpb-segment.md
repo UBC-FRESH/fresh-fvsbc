@@ -28,7 +28,16 @@ Corrected 0.08× result at the 10-year MPB segment end:
 | `4031394` | 185.75 | 16.40 | 169.36 | **91.2%** |
 
 Observed PL mortality is 100% at the end of the full interval. The 10-year MPB segment at 0.08×
-removes 85–91% of the initial PL; the remaining 3–4-year background tail is not included.
+removes 85–91% of the initial PL.
+
+Final tree-list check at 2013/2014:
+
+- `4031355`: 85.0% dead at 0.08×, 89.6% at 0.15×; observed 100%.
+- `4031394`: 91.2% dead at 0.08×, 93.3% at 0.15×; observed 100%.
+
+The tail is included. Increasing INITMORT cannot force the last 7–15 points; the MPB model leaves
+some live PL even at 0.15×. The residual is a host/size threshold or non-MPB mortality, not a
+missing tail.
 
 ## 3. Interpretation
 
