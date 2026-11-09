@@ -476,6 +476,13 @@ def test_analysis_setup_bundle_round_trips(cockpit: str, tmp_path: Path) -> None
             expect(page.locator("#table-setup-preview")).to_contain_text("1 table")
             expect(page.locator("#table-setup-preview")).to_contain_text("1 layout")
             expect(page.locator("#table-setup-preview")).to_contain_text("FVS_Summary_Metric")
+            search = page.locator("#table-setup-preview-search")
+            search.fill("summary")
+            expect(page.locator("#table-setup-preview")).to_contain_text("FVS_Summary_Metric")
+            search.fill("zzz")
+            expect(page.locator("#table-setup-preview")).to_contain_text("No matching tables")
+            search.fill("")
+            expect(page.locator("#table-setup-preview")).to_contain_text("FVS_Summary_Metric")
             expect(page.locator("#table-columns summary")).to_contain_text("9 of 9 shown")
 
             page.get_by_role("button", name="Cancel", exact=True).click()

@@ -196,8 +196,9 @@ filters the preset list.
 
 The Tables workspace also has one **Analysis setup** bundle that combines every table's layout,
 named filters, recent filters, and export presets in a single versioned JSON file. Selecting an
-import shows a table/section preview first; **Import setup** commits and reloads the current table,
-while **Cancel** leaves every store untouched.
+import shows a table/section preview first; its search field filters the preview by table name or
+section. **Import setup** commits and reloads the current table, while **Cancel** leaves every store
+untouched.
 
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.

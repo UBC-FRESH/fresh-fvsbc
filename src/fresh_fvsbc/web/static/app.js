@@ -1709,12 +1709,45 @@ async function renderTables(body) {
   body.append(list);
   let pendingSetup = null;
   const setupPreviewSummary = el("p", { className: "table-filters-status" });
+  const setupPreviewSearch = el("input", {
+    id: "table-setup-preview-search",
+    type: "search",
+    className: "collection-search",
+    placeholder: "Search preview tables…",
+    "aria-label": "Search setup preview tables",
+  });
   const setupPreviewTables = el("ul", { className: "table-setup-list" });
+  const renderSetupPreviewTables = () => {
+    if (!pendingSetup) return;
+    const term = setupPreviewSearch.value.trim().toLowerCase();
+    const rows = pendingSetup.tables.filter((table) => {
+      const parts = [];
+      if (table.layout) parts.push("layout");
+      if (table.filters) parts.push(`${table.filters} filter${table.filters === 1 ? "" : "s"}`);
+      if (table.recents) parts.push(`${table.recents} recent`);
+      if (table.presets) parts.push(`${table.presets} preset${table.presets === 1 ? "" : "s"}`);
+      return !term || `${table.name} ${parts.join(" ")}`.toLowerCase().includes(term);
+    });
+    if (!rows.length) {
+      setupPreviewTables.replaceChildren(el("li", {}, "No matching tables"));
+      return;
+    }
+    setupPreviewTables.replaceChildren(...rows.map((table) => {
+      const parts = [];
+      if (table.layout) parts.push("layout");
+      if (table.filters) parts.push(`${table.filters} filter${table.filters === 1 ? "" : "s"}`);
+      if (table.recents) parts.push(`${table.recents} recent`);
+      if (table.presets) parts.push(`${table.presets} preset${table.presets === 1 ? "" : "s"}`);
+      return el("li", {}, `${table.name} — ${parts.join(", ")}`);
+    }));
+  };
+  setupPreviewSearch.addEventListener("input", renderSetupPreviewTables);
   const setupPreview = el(
     "div",
     { id: "table-setup-preview", className: "table-setup-preview", hidden: true },
     el("strong", {}, "Review setup import"),
     setupPreviewSummary,
+    setupPreviewSearch,
     setupPreviewTables,
     el("div", { className: "table-filters-portability" },
       el("button", {
@@ -1747,6 +1780,7 @@ async function renderTables(body) {
         type: "button",
         onclick: () => {
           pendingSetup = null;
+          setupPreviewSearch.value = "";
           setupPreview.hidden = true;
           setAnalysisSetupStatus("Import cancelled.");
         },
@@ -1780,14 +1814,8 @@ async function renderTables(body) {
         `${preview.counts.recents} recent`,
         `${preview.counts.presets} preset${preview.counts.presets === 1 ? "" : "s"}`,
       ].join(" · ");
-      setupPreviewTables.replaceChildren(...preview.tables.map((table) => {
-        const parts = [];
-        if (table.layout) parts.push("layout");
-        if (table.filters) parts.push(`${table.filters} filter${table.filters === 1 ? "" : "s"}`);
-        if (table.recents) parts.push(`${table.recents} recent`);
-        if (table.presets) parts.push(`${table.presets} preset${table.presets === 1 ? "" : "s"}`);
-        return el("li", {}, `${table.name} — ${parts.join(", ")}`);
-      }));
+      setupPreviewSearch.value = "";
+      renderSetupPreviewTables();
       setupPreview.hidden = false;
       setAnalysisSetupStatus("Review the import summary, then import or cancel.");
     } catch (error) {
