@@ -330,6 +330,54 @@ def test_a_large_page_only_renders_a_virtual_window(cockpit: str) -> None:
             browser.close()
 
 
+def test_table_columns_can_be_hidden_and_restored(cockpit: str) -> None:
+    """Column visibility changes the table and filter without changing exports."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            columns = page.locator("#table-columns")
+            expect(columns.locator("summary")).to_contain_text("9 of 9 shown")
+            columns.locator("summary").click()
+            age = columns.locator('input[value="Age"]')
+            expect(age).to_be_checked()
+            age.uncheck()
+            expect(columns.locator("summary")).to_contain_text("8 of 9 shown")
+            expect(
+                page.locator("th .column-name").filter(has_text=re.compile(r"^Age$"))
+            ).to_have_count(0)
+            expect(page.locator('#table-column option[value="Age"]')).to_have_count(0)
+            expect(columns.locator(".table-columns-note")).to_be_visible()
+
+            age = page.locator("#table-columns input[value='Age']")
+            expect(age).not_to_be_checked()
+            age.check()
+            expect(page.locator("#table-columns summary")).to_contain_text("9 of 9 shown")
+            expect(
+                page.locator("th .column-name").filter(has_text=re.compile(r"^Age$"))
+            ).to_have_count(1)
+            expect(page.locator('#table-column option[value="Age"]')).to_have_count(1)
+
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Cases",
+                wait_until="networkidle",
+            )
+            page.locator("#table-columns summary").click()
+            page.locator("#table-columns input[value='CaseID']").uncheck()
+            page.locator("#table-columns input[value='StandID']").uncheck()
+            expect(page.locator("#table-columns summary")).to_contain_text("1 of 3 shown")
+            last = page.locator("#table-columns input[value='Variant']")
+            last.click()
+            expect(last).to_be_checked()
+        finally:
+            browser.close()
+
+
 def test_the_table_key_column_stays_pinned_when_scrolling_sideways(cockpit: str) -> None:
     """The first useful key column stays at the left while the rest scrolls."""
     expect = playwright_module.expect

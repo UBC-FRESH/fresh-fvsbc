@@ -152,6 +152,10 @@ At phone widths the table toolbar becomes a compact grid: full-width search, col
 Apply/Clear, then the CSV and package actions. The pager uses two columns for page size and jump
 controls, with full-width Previous/Next buttons below the row summary.
 
+A **Columns** disclosure hides or restores columns for the current table. Hidden columns also leave
+the filter menu, at least one column always remains, and CSV/package exports still contain the full
+table. Visibility resets when another table is opened.
+
 A run is ``complete`` once ``summary.csv`` exists and ``running`` until then. The service never writes into
 a run directory, with one exception: starting a run creates a new one through the CLI.
 
