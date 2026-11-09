@@ -86,3 +86,15 @@ It writes `kamloops-candidate/metrics.csv` and
 `kamloops-candidate/model-card.json`. The card records the 20-site conditional
 rule evaluation; the rule is not applied because it does not improve held-out
 log loss.
+
+## `prince_george_background.yaml`
+
+Fifth background candidate and the first northern SBS test:
+
+```sh
+freshforge run workflows/freshforge/prince_george_background.yaml --workdir . \
+  --evidence runtime/freshforge-prince-george-evidence.json
+```
+
+It writes `prince-george-candidate/metrics.csv` and
+`prince-george-candidate/model-card.json`. No local calibration is applied.
