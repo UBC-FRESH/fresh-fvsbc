@@ -757,6 +757,58 @@ def test_an_assistant_chat_can_be_pinned_loaded_and_deleted(cockpit: str) -> Non
             browser.close()
 
 
+def test_a_saved_chat_can_be_renamed_and_exported(cockpit: str, tmp_path: Path) -> None:
+    """Renaming keeps the transcript, and the JSON export carries it."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-input").fill("Rename export smoke")
+            page.locator("#assistant-input").press("Enter")
+            expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+
+            page.locator("#assistant-saved summary").click()
+            page.locator("#assistant-pin-name").fill("Original chat")
+            page.get_by_role("button", name="Pin current").click()
+            expect(page.locator("#assistant-saved-select option:checked")).to_have_text(
+                "Original chat"
+            )
+
+            page.locator("#assistant-pin-name").fill("Renamed chat")
+            page.get_by_role("button", name="Rename", exact=True).click()
+            expect(page.locator("#assistant-saved-status")).to_contain_text("Renamed to")
+            saved = page.locator("#assistant-saved-select")
+            expect(saved).to_contain_text("Renamed chat")
+            expect(saved).not_to_contain_text("Original chat")
+
+            with page.expect_download() as download_info:
+                page.locator("#assistant-saved-export").click()
+            exported = tmp_path / "assistant-chats.json"
+            download_info.value.save_as(exported)
+            payload = json.loads(exported.read_text(encoding="utf-8"))
+            assert payload["version"] == 1
+            assert payload["chats"][0]["name"] == "Renamed chat"
+            assert payload["chats"][0]["history"][0]["role"] == "user"
+            assert "Rename export smoke" in payload["chats"][0]["history"][0]["text"]
+            assert "session" in payload["chats"][0]
+
+            page.locator("#assistant-pin-name").fill("Original chat")
+            page.get_by_role("button", name="Pin current").click()
+            page.locator("#assistant-pin-name").fill("Renamed chat")
+            page.get_by_role("button", name="Rename", exact=True).click()
+            expect(page.locator("#assistant-saved-status")).to_contain_text("already uses")
+
+            page.reload(wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-saved summary").click()
+            expect(page.locator("#assistant-saved-select")).to_contain_text("Renamed chat")
+        finally:
+            browser.close()
+
+
 def test_the_details_drawer_restores_focus_and_escape_closes(cockpit: str) -> None:
     """The evidence drawer traps attention, reports its state, and returns focus."""
     expect = playwright_module.expect

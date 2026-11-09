@@ -129,10 +129,12 @@
             <select id="assistant-saved-select" aria-label="Saved conversations"></select>
             <button id="assistant-saved-load" class="ghost" type="button">Load</button>
             <button id="assistant-saved-delete" class="ghost" type="button">Delete</button>
+            <button id="assistant-saved-export" class="ghost" type="button" title="Download every saved chat as JSON">Export JSON</button>
           </div>
           <div class="assistant-saved-row">
-            <input id="assistant-pin-name" type="text" maxlength="80" placeholder="Name this chat…" aria-label="Saved chat name">
+            <input id="assistant-pin-name" type="text" maxlength="80" placeholder="Name for pin or rename…" aria-label="Saved chat name">
             <button id="assistant-pin" class="ghost" type="button">Pin current</button>
+            <button id="assistant-rename" class="ghost" type="button">Rename</button>
           </div>
           <p id="assistant-saved-status" class="assistant-saved-status" aria-live="polite">Saved chats stay in this browser.</p>
         </div>
