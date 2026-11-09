@@ -99,8 +99,8 @@ The cockpit keeps the useful view in the URL:
 
 - ``workspace``, ``run``, ``panel``, and ``year`` for the open view;
 - ``table``, ``q``, ``column``, ``limit``, and ``offset`` for a filtered table page;
-- ``a``, ``b``, ``metric``, ``ctable``, and ``ccolumns`` for the two-run comparison and its
-  selected diff columns.
+- ``a``, ``b``, ``metric``, ``ctable``, ``ccolumns``, and ``ckey`` for the two-run comparison,
+  its selected diff columns, and its row-matching key columns.
 
 Those values are restored on reload, so a reviewer can send a link to the exact table filter or
 comparison instead of describing where to click. Named comparisons are also kept in the browser's
@@ -109,11 +109,14 @@ comparison instead of describing where to click. Named comparisons are also kept
 **Export JSON** writes those named comparisons to a versioned file with ``version``,
 ``exported_at``, and ``comparisons``. **Import JSON** accepts that file or a bare comparison array,
 validates every row, merges by name, and keeps at most 20 entries. Each comparison includes its
-``ccolumns`` diff selection. The service never stores the file; the browser owns this state.
+``ccolumns`` diff selection and ``ckey`` key-column selection. The service never stores the file;
+the browser owns this state.
 
 The row-level diff has its own **Diff columns** disclosure. Selecting a subset changes which deltas
-are shown and which rows rank highest; the summary metrics above it are unaffected. The selection
-is encoded in ``ccolumns`` and saved with named comparisons.
+are shown and which rows rank highest; the summary metrics above it are unaffected. A **Key
+columns** disclosure chooses the identity columns used to match rows across runs; key columns are
+excluded from the deltas. The selections are encoded in ``ccolumns`` and ``ckey`` and saved with
+named comparisons.
 
 What it reads
 -------------

@@ -23,6 +23,8 @@ const state = {
   compareMetric: "BA",
   compareColumns: [],
   compareColumnsOpen: false,
+  compareKeyColumns: [],
+  compareKeysOpen: false,
   compareSaved: "",
   summaryColumn: null,
   tableQuery: "",
@@ -2270,8 +2272,14 @@ function normaliseComparison(item) {
       .map((column) => column.trim().slice(0, 100))
       .slice(0, 100)
     : [];
+  const ckey = Array.isArray(item.ckey)
+    ? item.ckey
+      .filter((column) => typeof column === "string" && column.trim())
+      .map((column) => column.trim().slice(0, 100))
+      .slice(0, 20)
+    : [];
   if (!name || !a || !b || !metric) return null;
-  return { name, a, b, metric, ctable, ccolumns };
+  return { name, a, b, metric, ctable, ccolumns, ckey };
 }
 
 function readSavedComparisons() {
@@ -2313,6 +2321,7 @@ function saveCurrentComparison(name) {
     metric: state.compareMetric,
     ctable: state.compareTable ?? "",
     ccolumns: [...state.compareColumns],
+    ckey: [...state.compareKeyColumns],
   });
   writeSavedComparisons(items);
   state.compareSaved = clean.slice(0, 80);
@@ -2476,6 +2485,7 @@ async function renderCompare(body) {
             state.compareMetric = item.metric;
             state.compareTable = item.ctable || null;
             state.compareColumns = [...item.ccolumns];
+            state.compareKeyColumns = [...item.ckey];
             updateUrl();
             renderPanel();
           },
@@ -2644,17 +2654,86 @@ async function renderCompare(body) {
     api(`api/runs/${state.compareA}/tables/${encodeURIComponent(state.compareTable)}?limit=5000`),
     api(`api/runs/${state.compareB}/tables/${encodeURIComponent(state.compareTable)}?limit=5000`),
   ]);
-  // The database carries a different CaseID per run. Use the table's real identity instead:
-  // Year for the summary, and plot + tree index for the per-tree tables.
-  const keyCandidates = state.compareTable === "FVS_Summary_Metric"
+  // The database carries a different CaseID per run. Use real identity columns instead, with
+  // the table-specific defaults preserved but overridable.
+  const keyOptions = ["StandID", "Year", "PtIndex", "TreeIndex", "TreeId"]
+    .filter((column) => a.columns.includes(column));
+  const preferredKeys = state.compareTable === "FVS_Summary_Metric"
     ? ["Year"]
     : state.compareTable.includes("TreeList") || state.compareTable.includes("CutList")
       ? ["Year", "PtIndex", "TreeIndex"]
       : ["Year", "TreeId", "TreeIndex"];
-  const keyColumns = keyCandidates.filter((column) => a.columns.includes(column));
-  const key = keyColumns.length ? keyColumns : ["Year"];
+  let defaultKeys = preferredKeys.filter((column) => keyOptions.includes(column));
+  if (!defaultKeys.length) defaultKeys = keyOptions.length ? [keyOptions[0]] : a.columns.slice(0, 1);
+  const selectedKeys = keyOptions.filter((column) =>
+    state.compareKeyColumns.includes(column),
+  );
+  if (selectedKeys.length !== state.compareKeyColumns.length) {
+    state.compareKeyColumns = selectedKeys;
+    updateUrl();
+  }
+  const key = selectedKeys.length ? selectedKeys : defaultKeys;
+  if (keyOptions.length > 1) {
+    const checkedKeys = new Set(key);
+    const keysDetails = el(
+      "details",
+      {
+        id: "compare-keys",
+        className: "compare-columns compare-keys",
+        open: state.compareKeysOpen,
+      },
+      el("summary", {}, `Key columns · ${key.join(", ")}`),
+      el("div", { className: "compare-columns-body" },
+        el("div", { className: "compare-columns-grid" },
+          ...keyOptions.map((column) =>
+            el("label", { className: "compare-column-toggle" },
+              el("input", {
+                type: "checkbox",
+                value: column,
+                checked: checkedKeys.has(column),
+                onchange: (event) => {
+                  if (!event.target.checked && checkedKeys.size <= 1) {
+                    event.target.checked = true;
+                    return;
+                  }
+                  if (event.target.checked) checkedKeys.add(column);
+                  else checkedKeys.delete(column);
+                  const chosen = keyOptions.filter((name) => checkedKeys.has(name));
+                  const isDefault = chosen.length === defaultKeys.length
+                    && chosen.every((name, index) => name === defaultKeys[index]);
+                  state.compareKeyColumns = isDefault ? [] : chosen;
+                  state.compareKeysOpen = true;
+                  updateUrl();
+                  renderPanel();
+                },
+              }),
+              el("span", {}, column),
+            ),
+          ),
+        ),
+        el("div", { className: "compare-columns-actions" },
+          el("button", {
+            type: "button",
+            onclick: () => {
+              state.compareKeyColumns = [];
+              state.compareKeysOpen = true;
+              updateUrl();
+              renderPanel();
+            },
+          }, "Use default keys"),
+        ),
+        el("p", { className: "compare-columns-note" },
+          "Rows match only when these values agree; key columns are excluded from the deltas.",
+        ),
+      ),
+    );
+    keysDetails.addEventListener("toggle", () => {
+      state.compareKeysOpen = keysDetails.open;
+    });
+    body.append(keysDetails);
+  }
   const valueColumnsAll = a.columns.filter(
-    (column) => !keyColumns.includes(column) && isNumeric(a.rows, column),
+    (column) => !key.includes(column) && isNumeric(a.rows, column),
   );
   const knownSelection = [...new Set(
     state.compareColumns.filter((column) => valueColumnsAll.includes(column)),
@@ -2790,6 +2869,7 @@ function readUrlState() {
     metric: params.get("metric"),
     ctable: params.get("ctable"),
     ccolumns: params.get("ccolumns"),
+    ckey: params.get("ckey"),
   };
 }
 
@@ -2815,6 +2895,7 @@ function updateUrl() {
     if (state.compareMetric) params.set("metric", state.compareMetric);
     if (state.compareTable) params.set("ctable", state.compareTable);
     if (state.compareColumns.length) params.set("ccolumns", state.compareColumns.join(","));
+    if (state.compareKeyColumns.length) params.set("ckey", state.compareKeyColumns.join(","));
   }
   const query = params.toString();
   window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
@@ -3809,6 +3890,9 @@ async function boot() {
     state.compareTable = initial.ctable;
     state.compareColumns = initial.ccolumns
       ? initial.ccolumns.split(",").filter(Boolean)
+      : [];
+    state.compareKeyColumns = initial.ckey
+      ? initial.ckey.split(",").filter(Boolean)
       : [];
     state.ready = true;
     restoreAssistantHistory();
