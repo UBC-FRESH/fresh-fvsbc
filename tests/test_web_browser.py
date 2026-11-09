@@ -373,6 +373,67 @@ def test_a_named_comparison_survives_reload(cockpit: str) -> None:
             browser.close()
 
 
+def test_saved_comparisons_can_be_exported_and_imported(cockpit: str, tmp_path: Path) -> None:
+    """A comparison file round-trips names, runs, metric, and table through the UI."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=compare&run={RUN_ID}"
+                f"&a={RUN_ID}&b={RUN_ID}-b&metric=Tph",
+                wait_until="networkidle",
+            )
+            page.locator("#compare-save-name").fill("Export smoke")
+            page.get_by_role("button", name="Save", exact=True).click()
+            with page.expect_download() as download_info:
+                page.get_by_role("button", name="Export JSON").click()
+            exported = tmp_path / "exported.json"
+            download_info.value.save_as(exported)
+            payload = json.loads(exported.read_text(encoding="utf-8"))
+            assert payload["version"] == 1
+            assert payload["comparisons"][0]["name"] == "Export smoke"
+            assert payload["comparisons"][0]["a"] == RUN_ID
+            assert payload["comparisons"][0]["b"] == f"{RUN_ID}-b"
+            assert payload["comparisons"][0]["metric"] == "Tph"
+
+            imported = tmp_path / "imported.json"
+            imported.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "comparisons": [
+                            {
+                                "name": "Imported smoke",
+                                "a": f"{RUN_ID}-b",
+                                "b": RUN_ID,
+                                "metric": "BA",
+                                "ctable": "FVS_Summary_Metric",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            page.locator("#compare-import-file").set_input_files(str(imported))
+            expect(page.locator("#compare-saved")).to_have_value("Imported smoke")
+            expect(page.locator("#compare-saved-status")).to_contain_text("Imported 1 comparison")
+            page.get_by_role("button", name="Load").click()
+            expect(page.locator(".compare-pickers select").nth(0)).to_have_value(f"{RUN_ID}-b")
+            expect(page.locator(".compare-pickers select").nth(1)).to_have_value(RUN_ID)
+            assert "metric=BA" in page.evaluate("window.location.search")
+
+            malformed = tmp_path / "malformed.json"
+            malformed.write_text("{}", encoding="utf-8")
+            page.locator("#compare-import-file").set_input_files(str(malformed))
+            expect(page.locator("#compare-saved-status")).to_contain_text(
+                "Expected a comparisons array"
+            )
+        finally:
+            browser.close()
+
+
 def test_the_mobile_shell_does_not_overflow(cockpit: str) -> None:
     """The runs and summary views fit a phone-width viewport."""
     expect = playwright_module.expect

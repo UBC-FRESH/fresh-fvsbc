@@ -923,3 +923,11 @@ svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }
   font-size: 0;
   line-height: 0;
 }
+
+.compare-saved-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.compare-saved-status.error { color: var(--warn); }
