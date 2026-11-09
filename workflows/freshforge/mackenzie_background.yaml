@@ -1,0 +1,34 @@
+workflow:
+  id: mackenzie_background_calibration
+  name: MacKenzie background candidate
+  description: >
+    Fit the target-excluded growth-free candidate for MacKenzie, evaluate the
+    conditional 20-site rule, and freeze aggregate base metrics and
+    coefficients. The workflow writes no site-level rows.
+
+nodes:
+  - id: fit_and_freeze_mackenzie
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_candidate.py
+      args:
+        - --target-tsa
+        - MacKenzie TSA
+        - --model-id
+        - mackenzie-background-v0
+        - --calibration
+        - conditional
+        - --evaluate-local
+        - --calibration-sites
+        - "20"
+        - --bootstrap
+        - "40"
+        - --min-target-trees
+        - "500"
+        - --metrics
+        - notes/reference/calibration/mackenzie-candidate/metrics.csv
+        - --model-card
+        - notes/reference/calibration/mackenzie-candidate/model-card.json
+    artifacts:
+      metrics: notes/reference/calibration/mackenzie-candidate/metrics.csv
+      model_card: notes/reference/calibration/mackenzie-candidate/model-card.json

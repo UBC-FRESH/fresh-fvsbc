@@ -351,6 +351,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-fraser-candidate.md` | The D9.91 Fraser candidate |
 | `fraser-candidate/metrics.csv` | The frozen Fraser aggregate metrics |
 | `fraser-candidate/model-card.json` | Frozen Fraser coefficients and pins |
+| `d9-mackenzie-candidate.md` | The D9.92 MacKenzie candidate |
+| `mackenzie-candidate/metrics.csv` | The frozen MacKenzie aggregate metrics |
+| `mackenzie-candidate/model-card.json` | Frozen MacKenzie coefficients and pins |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |
