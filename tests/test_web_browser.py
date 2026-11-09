@@ -1715,6 +1715,48 @@ def test_an_assistant_chat_can_be_pinned_loaded_and_deleted(cockpit: str) -> Non
             browser.close()
 
 
+def test_saved_assistant_chats_can_be_sorted(cockpit: str) -> None:
+    """Saved chats can sort by recency or name without losing the active selection."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-input").fill("Chat sort smoke")
+            page.locator("#assistant-input").press("Enter")
+            expect(page.locator("#assistant-log")).to_contain_text(RUN_ID)
+            page.locator("#assistant-saved summary").click()
+            for name in ("Charlie chat", "Alpha chat", "Bravo chat"):
+                page.locator("#assistant-pin-name").fill(name)
+                page.get_by_role("button", name="Pin current").click()
+
+            options = page.locator("#assistant-saved-select option")
+            expect(options.nth(1)).to_have_text("Bravo chat")
+            expect(options.nth(2)).to_have_text("Alpha chat")
+            expect(options.nth(3)).to_have_text("Charlie chat")
+            page.locator("#assistant-saved-sort").select_option("name")
+            expect(options.nth(1)).to_have_text("Alpha chat")
+            expect(options.nth(2)).to_have_text("Bravo chat")
+            expect(options.nth(3)).to_have_text("Charlie chat")
+            expect(page.locator("#assistant-saved-select option:checked")).to_have_text(
+                "Bravo chat"
+            )
+            page.locator("#assistant-saved-sort").select_option("name-desc")
+            expect(options.nth(1)).to_have_text("Charlie chat")
+            expect(options.nth(2)).to_have_text("Bravo chat")
+            expect(options.nth(3)).to_have_text("Alpha chat")
+
+            page.locator("#assistant-saved-search").fill("cha")
+            expect(page.locator("#assistant-saved-sort")).to_have_value("name-desc")
+            expect(page.locator("#assistant-saved-select option:checked")).to_have_text(
+                "Bravo chat"
+            )
+        finally:
+            browser.close()
+
+
 def test_saved_assistant_chats_can_be_searched(cockpit: str) -> None:
     """Search filters saved chats while keeping the active chat visible."""
     expect = playwright_module.expect

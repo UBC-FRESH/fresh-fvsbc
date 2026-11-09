@@ -62,6 +62,7 @@ const state = {
     available: false,
     savedChat: "",
     savedSearch: "",
+    savedSort: "recent",
   },
 };
 
@@ -4897,9 +4898,12 @@ function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
   const selected = allChats.some((chat) => chat.id === selectedId) ? selectedId : "";
   const term = state.assistant.savedSearch.trim().toLowerCase();
   const activeChat = allChats.find((chat) => chat.id === selected) ?? null;
-  const matches = term
-    ? allChats.filter((chat) => chat.name.toLowerCase().includes(term))
-    : allChats;
+  const matches = sortPresetCollection(
+    term
+      ? allChats.filter((chat) => chat.name.toLowerCase().includes(term))
+      : allChats,
+    state.assistant.savedSort,
+  );
   const chats = activeChat && !matches.some((chat) => chat.id === activeChat.id)
     ? [activeChat, ...matches]
     : matches;
@@ -5558,6 +5562,10 @@ async function boot() {
   });
   document.getElementById("assistant-saved-search").addEventListener("input", (event) => {
     state.assistant.savedSearch = event.target.value;
+    refreshAssistantSaved();
+  });
+  document.getElementById("assistant-saved-sort").addEventListener("change", (event) => {
+    state.assistant.savedSort = event.target.value;
     refreshAssistantSaved();
   });
   const pinName = document.getElementById("assistant-pin-name");
