@@ -23,3 +23,16 @@ nodes:
       args: []
     artifacts:
       summary: notes/reference/calibration/d9-provincial-calibration-summary.csv
+
+  - id: freeze_model
+    provider: fresh_fvsbc.freshforge.native_script
+    needs:
+      - fit_provincial
+      - calibrate_quesnel
+    parameters:
+      script: notes/reference/calibration/freeze_model.py
+      args:
+        - --output
+        - notes/reference/calibration/quesnel-candidate/model-card.json
+    artifacts:
+      model_card: notes/reference/calibration/quesnel-candidate/model-card.json

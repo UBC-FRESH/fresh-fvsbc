@@ -12,8 +12,9 @@ The workflow has two executable nodes:
 | --- | --- | --- | --- |
 | `fit_provincial` | `fresh_fvsbc.freshforge.native_script` | `bcmort_provincial.py` | `d9-provincial-crown-si-summary.csv` |
 | `calibrate_quesnel` | `fresh_fvsbc.freshforge.native_script` | `bcmort_provincial_calibration.py` | `d9-provincial-calibration-summary.csv` |
+| `freeze_model` | `fresh_fvsbc.freshforge.native_script` | `freeze_model.py` | `quesnel-candidate/model-card.json` |
 
-`calibrate_quesnel` depends on `fit_provincial`. The provider records stdout, stderr, return code,
+`calibrate_quesnel` depends on `fit_provincial`; `freeze_model` depends on both. The provider records stdout, stderr, return code,
 and declared artifact paths.
 
 ## 2. Reproduction
@@ -29,7 +30,7 @@ The checked run:
 
 - workflow id: `quesnel_background_calibration`
 - status: **success**
-- nodes: `fit_provincial` success, `calibrate_quesnel` success
+- nodes: `fit_provincial` success, `calibrate_quesnel` success, `freeze_model` success
 - evidence: `runtime/freshforge-quesnel-evidence.json`
 
 ## 3. Provider

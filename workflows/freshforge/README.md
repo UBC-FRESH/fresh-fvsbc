@@ -14,5 +14,5 @@ The provider is `fresh_fvsbc.freshforge.native_script`. It runs the declared
 repository script with an explicit argument list, records stdout/stderr and the
 return code, and resolves declared artifacts against the work directory.
 
-The workflow writes aggregate CSVs only. Raw PSP and site-level data stay under
-the external data path.
+The workflow writes aggregate CSVs and the frozen `model-card.json` only. Raw
+PSP and site-level data stay under the external data path.
