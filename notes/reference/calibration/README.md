@@ -333,6 +333,11 @@ snapshot with the same row counts still needs a new manifest.
 | `fit_candidate.py` | The target-excluded candidate template |
 | `okanagan-candidate/metrics.csv` | The frozen Okanagan aggregate metrics |
 | `okanagan-candidate/model-card.json` | Frozen Okanagan coefficients and pins |
+| `d9-candidate-review-package.md` | The D9.85 review package |
+| `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
+| `review-manifest.json` | The D9.85 artifact checksums and scope |
+| `build_review_manifest.py` | The review-manifest builder |
+| `../reports/d9-candidate-review-template.md` | The reviewer report template |
 | `bcmort_provincial_temporal.py` | The D9.45 temporal prototype |
 | `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
