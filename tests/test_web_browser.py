@@ -316,7 +316,7 @@ def test_a_large_page_only_renders_a_virtual_window(cockpit: str) -> None:
                 wait_until="networkidle",
             )
             expect(page.locator("tr.data-row").first).to_be_visible()
-            assert 0 < page.locator("tr.data-row").count() < 500
+            assert 20 <= page.locator("tr.data-row").count() < 500
             page.locator(".table-scroll").evaluate(
                 "(node) => { node.scrollTop = node.scrollHeight; }"
             )

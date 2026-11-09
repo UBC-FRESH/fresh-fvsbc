@@ -948,13 +948,9 @@ async function renderTables(body) {
   );
   const rowAt = (index) => {
     const row = payload.rows[index];
-    return el(
+    const node = el(
       "tr",
-      {
-        className: "data-row",
-        "data-row-index": String(index),
-        "aria-rowindex": String(index + 2),
-      },
+      { className: "data-row" },
       ...payload.columns.map((column) =>
         el(
           "td",
@@ -963,15 +959,14 @@ async function renderTables(body) {
         ),
       ),
     );
+    node.dataset.rowIndex = String(index);
+    node.setAttribute("aria-rowindex", String(index + 2));
+    return node;
   };
   const rowCount = payload.rows.length;
   const tbody = el("tbody");
-  const table = el(
-    "table",
-    { "aria-rowcount": String(rowCount + 1) },
-    el("thead", {}, header),
-    tbody,
-  );
+  const table = el("table", {}, el("thead", {}, header), tbody);
+  table.setAttribute("aria-rowcount", String(rowCount + 1));
   const scroll = el("div", { className: "scroll table-scroll" }, table);
   body.append(scroll);
 
@@ -990,8 +985,9 @@ async function renderTables(body) {
     const spacer = (height) => {
       const cell = el("td", { colSpan: payload.columns.length });
       cell.style.height = `${height}px`;
-      const row = el("tr", { className: "virtual-spacer", "aria-hidden": "true" }, cell);
+      const row = el("tr", { className: "virtual-spacer" }, cell);
       row.style.height = `${height}px`;
+      row.setAttribute("aria-hidden", "true");
       return row;
     };
     const paint = () => {
@@ -1025,6 +1021,15 @@ async function renderTables(body) {
       });
     };
     scroll.addEventListener("scroll", schedule, { passive: true });
+    const observer = new ResizeObserver(() => {
+      if (!scroll.isConnected) {
+        observer.disconnect();
+        return;
+      }
+      paint();
+    });
+    observer.observe(scroll);
+    paint();
     window.requestAnimationFrame(paint);
   }
   const firstRow = payload.offset + 1;
