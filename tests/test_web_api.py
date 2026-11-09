@@ -821,3 +821,22 @@ def test_a_table_export_contains_data_metadata_and_units(tmp_path: Path) -> None
     assert units["Year"] == "year"
     assert units["Tph"] == "trees/ha"
     assert "null unit" in readme
+
+
+def test_main_starts_uvicorn_with_the_configured_bind(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The service entry point reaches uvicorn with the parsed host and port."""
+    import sys
+    import types
+
+    called: dict[str, object] = {}
+
+    def run(application: object, *, host: str, port: int, log_level: str) -> None:
+        called.update({"host": host, "port": port, "log_level": log_level})
+
+    fake = types.SimpleNamespace(run=run)
+    monkeypatch.setitem(sys.modules, "uvicorn", fake)
+    code = webapp.main(["--runs", str(tmp_path), "--host", "127.0.0.1", "--port", "8779"])
+    assert code == 0
+    assert called == {"host": "127.0.0.1", "port": 8779, "log_level": "info"}
