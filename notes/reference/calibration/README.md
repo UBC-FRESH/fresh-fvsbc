@@ -354,6 +354,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-mackenzie-candidate.md` | The D9.92 MacKenzie candidate |
 | `mackenzie-candidate/metrics.csv` | The frozen MacKenzie aggregate metrics |
 | `mackenzie-candidate/model-card.json` | Frozen MacKenzie coefficients and pins |
+| `d9-haida-gwaii-candidate.md` | The D9.93 Haida Gwaii candidate |
+| `haida-gwaii-candidate/metrics.csv` | The frozen Haida Gwaii aggregate metrics |
+| `haida-gwaii-candidate/model-card.json` | Frozen Haida Gwaii coefficients and pins |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |

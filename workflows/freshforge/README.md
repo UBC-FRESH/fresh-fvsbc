@@ -149,3 +149,16 @@ freshforge run workflows/freshforge/mackenzie_background.yaml --workdir . \
 It writes `mackenzie-candidate/metrics.csv` and
 `mackenzie-candidate/model-card.json`. The card records the conditional rule and
 the boreal PL gap; deployment offsets are not embedded.
+
+## `haida_gwaii_background.yaml`
+
+Tenth background candidate and the hypermaritime CWH test:
+
+```sh
+freshforge run workflows/freshforge/haida_gwaii_background.yaml --workdir . \
+  --evidence runtime/freshforge-haida-gwaii-evidence.json
+```
+
+It writes `haida-gwaii-candidate/metrics.csv` and
+`haida-gwaii-candidate/model-card.json`. PL is below the support minimum and is
+omitted.
