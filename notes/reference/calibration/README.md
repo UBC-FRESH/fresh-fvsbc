@@ -315,6 +315,7 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-quesnel-small-tree-base.md` | The D9.70 base-vs-MPB small-PL check |
 | `quesnel-candidate/README.md` | The frozen Quesnel non-PL candidate dossier |
 | `quesnel-candidate/metrics.csv` | The frozen Quesnel candidate metrics |
+| `quesnel-candidate/JOINT-REPORT.md` | The assembled Quesnel joint report |
 | `bcmort_provincial_temporal.py` | The D9.45 temporal prototype |
 | `bcmort_multi_tsa.py` | The D9.44 multi-TSA prototype |
 | `bcmort_provincial_calibration.py` | The D9.43 calibration prototype |
