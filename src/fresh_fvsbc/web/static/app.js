@@ -41,6 +41,7 @@ const state = {
     busy: false,
     enabled: false,
     available: false,
+    savedChat: "",
   },
 };
 
@@ -2284,16 +2285,140 @@ function saveAssistantHistory() {
   }
 }
 
-function restoreAssistantHistory() {
+const SAVED_CHATS_KEY = "fresh-fvsbc.assistant-chats";
+const SAVED_CHAT_LIMIT = 10;
+
+function normaliseAssistantMessage(message) {
+  if (!message || typeof message !== "object") return null;
+  const role = ["user", "assistant", "error"].includes(message.role) ? message.role : "assistant";
+  const text = typeof message.text === "string" ? message.text.slice(0, 8000) : "";
+  if (!text) return null;
+  const objects = (value) =>
+    Array.isArray(value)
+      ? value.filter((item) => item && typeof item === "object").slice(0, 20)
+      : [];
+  return {
+    role,
+    text,
+    citations: objects(message.citations),
+    actions: objects(message.actions),
+    chips: objects(message.chips),
+    model: typeof message.model === "string" ? message.model.slice(0, 200) : null,
+  };
+}
+
+function readSavedChats() {
   let stored = null;
   try {
-    stored = JSON.parse(window.sessionStorage.getItem("fresh-fvsbc.assistant") || "null");
+    stored = JSON.parse(window.localStorage.getItem(SAVED_CHATS_KEY) || "null");
   } catch (_error) {
     stored = null;
   }
-  if (!stored || !Array.isArray(stored.history) || !stored.history.length) return;
-  state.assistant.session = typeof stored.session === "string" ? stored.session : null;
-  state.assistant.history = stored.history.slice(-40);
+  const raw = Array.isArray(stored) ? stored : stored?.chats;
+  if (!Array.isArray(raw)) return [];
+  const chats = [];
+  for (const candidate of raw) {
+    if (!candidate || typeof candidate !== "object") continue;
+    const name = typeof candidate.name === "string" ? candidate.name.trim().slice(0, 80) : "";
+    const history = Array.isArray(candidate.history)
+      ? candidate.history.map(normaliseAssistantMessage).filter(Boolean).slice(-40)
+      : [];
+    if (!name || !history.length) continue;
+    chats.push({
+      id: typeof candidate.id === "string" ? candidate.id : `chat-${chats.length}`,
+      name,
+      saved_at: typeof candidate.saved_at === "string" ? candidate.saved_at : "",
+      session: typeof candidate.session === "string" ? candidate.session : null,
+      history,
+    });
+    if (chats.length === SAVED_CHAT_LIMIT) break;
+  }
+  return chats;
+}
+
+function writeSavedChats(chats) {
+  try {
+    window.localStorage.setItem(SAVED_CHATS_KEY, JSON.stringify({
+      version: 1,
+      chats: chats.slice(0, SAVED_CHAT_LIMIT),
+    }));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function assistantSavedStatus(text, kind = "") {
+  const node = document.getElementById("assistant-saved-status");
+  if (!node) return;
+  node.textContent = text;
+  node.className = `assistant-saved-status ${kind}`.trim();
+}
+
+function refreshAssistantSaved(selectedId = state.assistant.savedChat) {
+  const select = document.getElementById("assistant-saved-select");
+  if (!select) return;
+  const chats = readSavedChats();
+  const selected = chats.some((chat) => chat.id === selectedId) ? selectedId : "";
+  select.replaceChildren(
+    el("option", { value: "" }, chats.length ? "Choose a saved chat…" : "No saved chats"),
+    ...chats.map((chat) => {
+      const option = el("option", { value: chat.id }, chat.name);
+      if (chat.saved_at) option.title = new Date(chat.saved_at).toLocaleString();
+      return option;
+    }),
+  );
+  select.value = selected;
+  state.assistant.savedChat = selected;
+  const load = document.getElementById("assistant-saved-load");
+  const remove = document.getElementById("assistant-saved-delete");
+  if (load) load.disabled = !selected;
+  if (remove) remove.disabled = !selected;
+  const count = document.getElementById("assistant-saved-count");
+  if (count) count.textContent = chats.length ? `(${chats.length})` : "";
+}
+
+function pinAssistantChat() {
+  if (!state.assistant.history.length) {
+    assistantSavedStatus("Ask something before pinning this chat.", "error");
+    return;
+  }
+  const input = document.getElementById("assistant-pin-name");
+  const firstQuestion = state.assistant.history.find((message) => message.role === "user")?.text;
+  const fallback = firstQuestion
+    ? firstQuestion.trim().slice(0, 48)
+    : `Chat ${new Date().toLocaleString()}`;
+  const name = String(input?.value || fallback).trim().slice(0, 80);
+  if (!name) {
+    assistantSavedStatus("Give the chat a name first.", "error");
+    return;
+  }
+  const chats = readSavedChats();
+  const existing = chats.find((chat) => chat.name === name);
+  const entry = {
+    id: existing?.id ?? (
+      window.crypto?.randomUUID?.()
+      ?? `chat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    ),
+    name,
+    saved_at: new Date().toISOString(),
+    session: state.assistant.session,
+    history: JSON.parse(JSON.stringify(state.assistant.history)),
+  };
+  const next = [
+    entry,
+    ...chats.filter((chat) => chat.id !== entry.id && chat.name !== name),
+  ].slice(0, SAVED_CHAT_LIMIT);
+  if (!writeSavedChats(next)) {
+    assistantSavedStatus("Browser storage is full or unavailable; could not pin this chat.", "error");
+    return;
+  }
+  if (input) input.value = "";
+  refreshAssistantSaved(entry.id);
+  assistantSavedStatus(`Pinned “${entry.name}”.`);
+}
+
+function renderAssistantHistory() {
   const log = document.getElementById("assistant-log");
   if (!log) return;
   log.replaceChildren();
@@ -2307,6 +2432,56 @@ function restoreAssistantHistory() {
       persist: false,
     });
   }
+}
+
+function loadAssistantChat() {
+  const select = document.getElementById("assistant-saved-select");
+  const id = select?.value || state.assistant.savedChat;
+  const chat = readSavedChats().find((entry) => entry.id === id);
+  if (!chat) {
+    assistantSavedStatus("Choose a saved chat first.", "error");
+    return;
+  }
+  state.assistant.session = chat.session;
+  state.assistant.history = JSON.parse(JSON.stringify(chat.history));
+  state.assistant.savedChat = chat.id;
+  renderAssistantHistory();
+  saveAssistantHistory();
+  refreshAssistantSaved(chat.id);
+  assistantSavedStatus(`Loaded “${chat.name}”.`);
+  assistantStatus("Conversation loaded · Enter sends · Shift+Enter adds a newline.");
+}
+
+function deleteAssistantChat() {
+  const select = document.getElementById("assistant-saved-select");
+  const id = select?.value || state.assistant.savedChat;
+  const chats = readSavedChats();
+  const chat = chats.find((entry) => entry.id === id);
+  if (!chat) {
+    assistantSavedStatus("Choose a saved chat to delete.", "error");
+    return;
+  }
+  const next = chats.filter((entry) => entry.id !== chat.id);
+  if (!writeSavedChats(next)) {
+    assistantSavedStatus("Browser storage is unavailable; could not delete this chat.", "error");
+    return;
+  }
+  state.assistant.savedChat = next[0]?.id ?? "";
+  refreshAssistantSaved();
+  assistantSavedStatus(`Deleted “${chat.name}”.`);
+}
+
+function restoreAssistantHistory() {
+  let stored = null;
+  try {
+    stored = JSON.parse(window.sessionStorage.getItem("fresh-fvsbc.assistant") || "null");
+  } catch (_error) {
+    stored = null;
+  }
+  if (!stored || !Array.isArray(stored.history) || !stored.history.length) return;
+  state.assistant.session = typeof stored.session === "string" ? stored.session : null;
+  state.assistant.history = stored.history.slice(-40);
+  renderAssistantHistory();
   assistantStatus("Conversation restored · Enter sends · Shift+Enter adds a newline.");
 }
 
@@ -2552,6 +2727,7 @@ function openAssistant() {
   document.getElementById("assistant-button").setAttribute("aria-expanded", "true");
   document.body.classList.add("drawer-open");
   syncDrawerBackground();
+  refreshAssistantSaved();
   const input = document.getElementById("assistant-input");
   input?.focus();
   resizeAssistantInput();
@@ -2669,6 +2845,23 @@ async function boot() {
     state.assistant.model = event.target.value;
     assistantStatus(`Model set to ${event.target.value.split("/").pop()}.`);
   });
+  document.getElementById("assistant-pin").addEventListener("click", pinAssistantChat);
+  document.getElementById("assistant-saved-load").addEventListener("click", loadAssistantChat);
+  document.getElementById("assistant-saved-delete").addEventListener("click", deleteAssistantChat);
+  const savedSelect = document.getElementById("assistant-saved-select");
+  savedSelect.addEventListener("change", (event) => {
+    state.assistant.savedChat = event.target.value;
+    const disabled = !event.target.value;
+    document.getElementById("assistant-saved-load").disabled = disabled;
+    document.getElementById("assistant-saved-delete").disabled = disabled;
+  });
+  const pinName = document.getElementById("assistant-pin-name");
+  pinName.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || event.isComposing) return;
+    event.preventDefault();
+    pinAssistantChat();
+  });
+  refreshAssistantSaved();
   const assistantInput = document.getElementById("assistant-input");
   assistantInput.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;

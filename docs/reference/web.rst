@@ -78,6 +78,11 @@ the selector changes. **Stop waiting** aborts the browser request, but the local
 may still finish in the background, and the panel says so rather than pretending the model was
 cancelled.
 
+**Saved chats** pins the current transcript and session under a name in ``localStorage``. The
+drawer can load or delete a pinned chat; **New** clears the active conversation but leaves pinned
+ones alone. At most ten are kept, they never reach the service, and **Load** restores the same
+session id so the next turn can continue it when the local agent still knows that session.
+
 In the browser, **Enter sends** and **Shift+Enter inserts a newline**. The composer grows with the
 message, the header selector switches between the models the local CLI reports, and each reply
 shows its model. Tool use appears as read-only chips, and the local summary reader remains the

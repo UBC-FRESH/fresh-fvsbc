@@ -931,3 +931,37 @@ svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }
   line-height: 1.4;
 }
 .compare-saved-status.error { color: var(--warn); }
+
+.assistant-saved {
+  flex: 0 0 auto;
+  padding: 8px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.assistant-saved summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.assistant-saved summary:hover { color: var(--accent); }
+.assistant-saved-body {
+  display: grid;
+  gap: 6px;
+  padding-top: 8px;
+}
+.assistant-saved-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+.assistant-saved-row select { flex: 1 1 160px; min-width: 0; }
+.assistant-saved-row input { flex: 1 1 150px; min-width: 0; }
+.assistant-saved-row button { font-size: 11px; padding: 4px 8px; }
+.assistant-saved-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.assistant-saved-status.error { color: var(--warn); }
