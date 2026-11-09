@@ -50,6 +50,10 @@ All-period mean is within 1 point. Post-2000 AUC 0.713, mean under by about
 - The 10-year MPB cap and small-tree residual remain.
 - No temporal production validation.
 
+## Joint report
+
+See `JOINT-REPORT.md` for the assembled scope, metrics, PL/MPB separation, and decisions.
+
 ## Reproduction
 
 - D9.42 provincial model: `../d9-provincial-crown-si.md`
