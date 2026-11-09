@@ -623,6 +623,42 @@ def test_export_presets_restore_filter_and_visible_layout(cockpit: str) -> None:
             browser.close()
 
 
+def test_recent_table_filters_can_be_searched(cockpit: str) -> None:
+    """Searching recents filters the select and keeps a matching selection."""
+    expect = playwright_module.expect
+    with playwright_module.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        try:
+            page.goto(
+                f"{cockpit}/?workspace=results&panel=tables&run={RUN_ID}&table=FVS_Summary_Metric",
+                wait_until="networkidle",
+            )
+            page.locator("#table-column").select_option("Year")
+            page.locator("#table-filter").fill("10")
+            page.get_by_role("button", name="Apply").click()
+            page.locator("#table-column").select_option("Tph")
+            page.locator("#table-filter").fill("210")
+            page.get_by_role("button", name="Apply").click()
+            page.locator("#table-filters summary").click()
+
+            search = page.locator("#table-filter-recent-search")
+            recent = page.locator("#table-filter-recent")
+            search.fill("year")
+            expect(recent).to_contain_text("Year = 10")
+            expect(recent).not_to_contain_text("Tph = 210")
+            expect(page.locator("#table-filter-recent option:checked")).to_have_text("Year = 10")
+            search.fill("")
+            expect(recent).to_contain_text("Tph = 210")
+            search.fill("year")
+            page.get_by_role("button", name="Load recent").click()
+            expect(page.locator("#table-filter")).to_have_value("10")
+            expect(page.locator("#table-column")).to_have_value("Year")
+            expect(page.locator("#table-filter-recent")).to_contain_text("Tph = 210")
+        finally:
+            browser.close()
+
+
 def test_recent_table_filters_can_be_pinned_and_removed(cockpit: str) -> None:
     """A recent filter can become a named filter or be dropped from history."""
     expect = playwright_module.expect

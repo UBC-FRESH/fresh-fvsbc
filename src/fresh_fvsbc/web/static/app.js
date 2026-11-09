@@ -2113,6 +2113,14 @@ async function renderTables(body) {
       return option;
     }),
   );
+  const recentSearch = el("input", {
+    id: "table-filter-recent-search",
+    type: "search",
+    className: "collection-search",
+    placeholder: "Search recent filters…",
+    "aria-label": "Search recent filters",
+  });
+  attachSelectSearch(recentSearch, recentSelect);
   const applyFilterValues = (query, column) => {
     state.tableQuery = query;
     state.tableColumn = payload.columns.includes(column) ? column : "";
@@ -2330,6 +2338,9 @@ async function renderTables(body) {
       ),
       el("div", { className: "table-filters-row" },
         el("span", { className: "table-filters-label" }, "Recent"),
+        recentSearch,
+      ),
+      el("div", { className: "table-filters-row" },
         recentSelect,
         el("button", {
           id: "table-filter-recent-load",

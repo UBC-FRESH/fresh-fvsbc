@@ -179,8 +179,9 @@ A separate **Saved filters** disclosure stores the current literal query and col
 name, per table, in ``localStorage``; its search field filters the named list. **Rename** changes
 only the name and **Duplicate** copies the query/column under a unique copy name. Loading one
 restores both and unhides its column if the saved layout had hidden it. Applying a filter also records it in a per-table **Recent** list (up to eight
-distinct query/column pairs), which can be reapplied from the same panel. A recent entry can be
-pinned as a named filter or removed from history without changing the active filter. **Export filters**
+distinct query/column pairs), which can be reapplied from the same panel and searched by name,
+column, or value. A recent entry can be pinned as a named filter or removed from history without
+changing the active filter. **Export filters**
 downloads named and recent history for every table as versioned JSON; **Import filters** validates,
 previews, and then merges it by table, name, and query/column pair. Filters remain in the URL after loading; the
 named and recent lists are browser-local.
