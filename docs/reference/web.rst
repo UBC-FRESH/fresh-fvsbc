@@ -87,7 +87,8 @@ The cockpit keeps the useful view in the URL:
 - ``a``, ``b``, ``metric``, and ``ctable`` for the two-run comparison.
 
 Those values are restored on reload, so a reviewer can send a link to the exact table filter or
-comparison instead of describing where to click.
+comparison instead of describing where to click. Named comparisons are also kept in the browser's
+``localStorage`` for reuse; loading one replaces the current A/B/metric/table state.
 
 What it reads
 -------------
