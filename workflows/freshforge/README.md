@@ -45,3 +45,17 @@ supports the boundary: more than 1 PL/ac above 15 cm, or a maximum live DBH abov
 The provider is `fresh_fvsbc.freshforge.native_script`. It runs the declared
 repository script with an explicit argument list, records stdout/stderr and the
 return code, and resolves declared artifacts against the work directory.
+
+## `okanagan_background.yaml`
+
+Second-TSA replication of the background template. It fits the target-excluded
+growth-free model, scores Okanagan, and freezes aggregate metrics and
+coefficients:
+
+```sh
+freshforge run workflows/freshforge/okanagan_background.yaml --workdir . \
+  --evidence runtime/freshforge-okanagan-evidence.json
+```
+
+It writes `okanagan-candidate/metrics.csv` and
+`okanagan-candidate/model-card.json`. No site-level rows are written.
