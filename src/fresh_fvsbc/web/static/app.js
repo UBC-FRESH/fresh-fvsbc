@@ -1227,15 +1227,8 @@ function setTableLayoutStatus(text, kind = "") {
 
 const TABLE_EXPORT_PRESETS_KEY = "fresh-fvsbc.table-export-presets";
 
-function readTableExportPresets(table) {
-  let raw = null;
-  try {
-    const stored = JSON.parse(window.localStorage.getItem(TABLE_EXPORT_PRESETS_KEY) || "null");
-    raw = stored?.tables?.[table] ?? null;
-  } catch (_error) {
-    return { presets: [], ok: false };
-  }
-  if (!Array.isArray(raw)) return { presets: [], ok: true };
+function normaliseExportPresetEntries(raw) {
+  if (!Array.isArray(raw)) return [];
   const presets = [];
   const seen = new Set();
   for (const candidate of raw) {
@@ -1246,7 +1239,7 @@ function readTableExportPresets(table) {
     presets.push({
       id: typeof candidate.id === "string" && candidate.id
         ? candidate.id.slice(0, 200)
-        : `preset-${presets.length}`,
+        : `preset-${presets.length}-${Date.now()}`,
       name,
       query: typeof candidate.query === "string" ? candidate.query.slice(0, 200) : "",
       column: typeof candidate.column === "string" ? candidate.column.slice(0, 100) : "",
@@ -1260,7 +1253,92 @@ function readTableExportPresets(table) {
     });
     if (presets.length === 20) break;
   }
-  return { presets, ok: true };
+  return presets;
+}
+
+function readTableExportPresets(table) {
+  let raw = null;
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TABLE_EXPORT_PRESETS_KEY) || "null");
+    raw = stored?.tables?.[table] ?? null;
+  } catch (_error) {
+    return { presets: [], ok: false };
+  }
+  return { presets: normaliseExportPresetEntries(raw), ok: true };
+}
+
+function readExportPresetEnvelope() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TABLE_EXPORT_PRESETS_KEY) || "null");
+    const tables = stored?.tables && typeof stored.tables === "object"
+      && !Array.isArray(stored.tables)
+      ? stored.tables
+      : {};
+    return { tables, ok: true };
+  } catch (_error) {
+    return { tables: {}, ok: false };
+  }
+}
+
+function writeExportPresetEnvelope(tables) {
+  try {
+    window.localStorage.setItem(TABLE_EXPORT_PRESETS_KEY, JSON.stringify({
+      version: 1,
+      tables,
+    }));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function tableExportPresetsExportText() {
+  const envelope = readExportPresetEnvelope();
+  const tables = {};
+  for (const table of Object.keys(envelope.tables)) {
+    const presets = normaliseExportPresetEntries(envelope.tables[table]);
+    if (presets.length) tables[table] = presets;
+  }
+  return `${JSON.stringify({
+    version: 1,
+    exported_at: new Date().toISOString(),
+    tables,
+  }, null, 2)}\n`;
+}
+
+function importTableExportPresets(text) {
+  let parsed = null;
+  try {
+    parsed = JSON.parse(text);
+  } catch (_error) {
+    throw new Error("That file is not valid JSON.");
+  }
+  const raw = parsed?.tables;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new Error("Expected a tables object in that preset file.");
+  }
+  const merged = { ...readExportPresetEnvelope().tables };
+  let tables = 0;
+  let presets = 0;
+  for (const [table, value] of Object.entries(raw)) {
+    if (!table || table.length > 100) continue;
+    if (["__proto__", "constructor", "prototype"].includes(table)) continue;
+    const incoming = normaliseExportPresetEntries(value);
+    if (!incoming.length) continue;
+    const existing = normaliseExportPresetEntries(merged[table]);
+    const names = new Set(incoming.map((preset) => preset.name));
+    merged[table] = [
+      ...incoming,
+      ...existing.filter((preset) => !names.has(preset.name)),
+    ].slice(0, 20);
+    tables += 1;
+    presets += incoming.length;
+  }
+  if (!tables) throw new Error("No export presets found in that file.");
+  if (!writeExportPresetEnvelope(merged)) {
+    throw new Error("Browser storage is unavailable; could not import presets.");
+  }
+  return { tables, presets };
 }
 
 function writeTableExportPresets(table, presets) {
@@ -1831,6 +1909,40 @@ async function renderTables(body) {
   if (!exportPresets.some((preset) => preset.id === state.tableExportPreset)) {
     state.tableExportPreset = "";
   }
+  const presetEnvelope = readExportPresetEnvelope();
+  const hasPortablePresets = Object.values(presetEnvelope.tables).some(
+    (items) => Array.isArray(items) && items.length,
+  );
+  const presetImportFile = el("input", {
+    id: "table-export-preset-import",
+    type: "file",
+    accept: ".json,application/json",
+    hidden: true,
+    "aria-label": "Import export presets JSON",
+  });
+  presetImportFile.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 500_000) {
+      setExportPresetStatus("That file is too large; choose a preset export under 500 KB.", "error");
+      event.target.value = "";
+      return;
+    }
+    try {
+      const result = importTableExportPresets(await file.text());
+      state.tableExportPreset = "";
+      state.tableExportPresetsOpen = true;
+      await renderPanel();
+      setExportPresetStatus(
+        `Imported ${result.presets} preset${result.presets === 1 ? "" : "s"} for `
+          + `${result.tables} table${result.tables === 1 ? "" : "s"}.`,
+      );
+    } catch (error) {
+      setExportPresetStatus(error?.message ?? "That preset file could not be imported.", "error");
+    } finally {
+      event.target.value = "";
+    }
+  });
   const presetSelect = el("select", {
     id: "table-export-preset-select",
     "aria-label": "Export presets",
@@ -1993,6 +2105,42 @@ async function renderTables(body) {
         className: "table-filters-status",
         "aria-live": "polite",
       }),
+      el("div", { className: "table-filters-portability" },
+        el("button", {
+          type: "button",
+          disabled: !hasPortablePresets,
+          onclick: async () => {
+            const envelope = readExportPresetEnvelope();
+            const count = Object.values(envelope.tables)
+              .reduce((total, items) => total + normaliseExportPresetEntries(items).length, 0);
+            if (!count) {
+              setExportPresetStatus("No export presets to export.", "error");
+              return;
+            }
+            const url = URL.createObjectURL(
+              new Blob([tableExportPresetsExportText()], { type: "application/json" }),
+            );
+            const link = el("a", {
+              href: url,
+              download: "fresh-fvsbc-table-export-presets.json",
+            });
+            document.body.append(link);
+            link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            state.tableExportPresetsOpen = true;
+            await renderPanel();
+            setExportPresetStatus(
+              `Exported ${count} preset${count === 1 ? "" : "s"}.`,
+            );
+          },
+        }, "Export presets"),
+        el("button", {
+          type: "button",
+          onclick: () => presetImportFile.click(),
+        }, "Import presets"),
+        presetImportFile,
+      ),
     ),
   );
   presetsDetails.addEventListener("toggle", () => {
