@@ -136,3 +136,16 @@ freshforge run workflows/freshforge/fraser_background.yaml --workdir . \
 It writes `fraser-candidate/metrics.csv` and
 `fraser-candidate/model-card.json`. The card records the conditional local-rule
 evaluation; deployment offsets are not embedded.
+
+## `mackenzie_background.yaml`
+
+Ninth background candidate and the first northern boreal test:
+
+```sh
+freshforge run workflows/freshforge/mackenzie_background.yaml --workdir . \
+  --evidence runtime/freshforge-mackenzie-evidence.json
+```
+
+It writes `mackenzie-candidate/metrics.csv` and
+`mackenzie-candidate/model-card.json`. The card records the conditional rule and
+the boreal PL gap; deployment offsets are not embedded.
