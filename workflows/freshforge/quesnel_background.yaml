@@ -1,0 +1,25 @@
+workflow:
+  id: quesnel_background_calibration
+  name: Quesnel background calibration
+  description: >
+    Reproducible provincial fit and Quesnel target-calibration workflow. It
+    writes the aggregate evidence tables used by the candidate dossier.
+
+nodes:
+  - id: fit_provincial
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/bcmort_provincial.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-provincial-crown-si-summary.csv
+
+  - id: calibrate_quesnel
+    provider: fresh_fvsbc.freshforge.native_script
+    needs:
+      - fit_provincial
+    parameters:
+      script: notes/reference/calibration/bcmort_provincial_calibration.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-provincial-calibration-summary.csv
