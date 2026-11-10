@@ -1,0 +1,13 @@
+workflow:
+  id: calibration_policy_check
+  name: Candidate calibration policy check
+  description: >
+    Validate the supported symmetric cases, minimums, not-frozen Invermere
+    decision, and excluded layers against the frozen candidate cards.
+
+nodes:
+  - id: check_policy
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/check_calibration_policy.py
+      args: []

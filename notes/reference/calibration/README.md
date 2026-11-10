@@ -366,6 +366,10 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-symmetric-audit.md` | The D9.96 symmetric calibration audit |
 | `d9-symmetric-audit.csv` | The aggregate symmetric-rule comparison |
 | `audit_symmetric.py` | The symmetric-audit script |
+| `d9-calibration-policy.md` | The D9.97 calibration policy note |
+| `CALIBRATION-POLICY.md` | The deployment calibration policy |
+| `calibration-policy.json` | The machine-readable candidate policy |
+| `check_calibration_policy.py` | The policy validator |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |

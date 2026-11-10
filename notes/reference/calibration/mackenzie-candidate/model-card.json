@@ -8,15 +8,17 @@
       "evaluated": true,
       "holdout_sites": 216,
       "mean_metrics": {
-        "auc": 0.7697720651481649,
-        "brier": 0.12220061292692166,
+        "auc": 0.7777506268512411,
+        "brier": 0.11888996211580438,
         "event_rate": 0.16971170151138187,
-        "log_loss": 0.3936964242530201,
-        "mean_pred": 0.1343204316098479,
+        "log_loss": 0.3854448732767991,
+        "mean_pred": 0.15554425739762823,
         "n": 81369.0
       }
     },
-    "rule": "Fit target-excluded species-group intercepts only when a group has at least 500 target trees and overpredicts by more than 3 points."
+    "mode": "conditional-symmetric",
+    "recommended": true,
+    "rule": "Fit target-excluded species-group intercepts when a group has at least 500 target trees and is over- or underpredicted by more than 3 points."
   },
   "claim": "Frozen diagnostic candidate layer. Not a yield, AAC, legal, whole-block, or certificate claim.",
   "data_checksums": {
