@@ -1,0 +1,15 @@
+workflow:
+  id: tsa_calibration_sweep
+  name: Full TSA calibration sweep
+  description: >
+    Run the current target-excluded growth-free recipe on every TSA label and
+    write one aggregate calibration-quality table. The sweep is evidence only.
+
+nodes:
+  - id: run_sweep
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/sweep_tsas_parallel.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-tsa-calibration-sweep.csv
