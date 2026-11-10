@@ -421,6 +421,25 @@ def test_the_score_inventory_workflow_validates_with_the_provider() -> None:
     assert [node.id for node in spec.nodes] == ["score_rows"]
 
 
+def test_the_tsa_sweep_workflow_validates_with_the_provider() -> None:
+    """The checked-in TSA sweep workflow resolves its node."""
+    from freshforge.loading import load_workflow
+    from freshforge.providers import ProviderRegistry
+    from freshforge.validation import validate_workflow_with_providers
+
+    spec, diagnostics = load_workflow("workflows/freshforge/tsa_sweep.yaml")
+    assert spec is not None
+    registry = ProviderRegistry()
+    registry.register(NativeScriptProvider())
+    errors = validate_workflow_with_providers(
+        spec, registry=registry, structural_diagnostics=diagnostics
+    )
+    assert [
+        diagnostic for diagnostic in errors if diagnostic.code.startswith("node.provider")
+    ] == []
+    assert [node.id for node in spec.nodes] == ["run_sweep"]
+
+
 def test_the_mpb_segment_workflow_validates_with_the_provider() -> None:
     """The checked-in MPB segment workflow resolves its native-script node."""
     from freshforge.loading import load_workflow

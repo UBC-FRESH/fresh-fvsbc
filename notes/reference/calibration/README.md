@@ -380,6 +380,10 @@ snapshot with the same row counts still needs a new manifest.
 | `score_inventory.py` | The raw inventory scorer |
 | `d9-imputation-sensitivity.md` | The D9.101 train-only imputation sensitivity |
 | `d9-review-addendum-1.md` | The D9.102 review addendum |
+| `d9-tsa-calibration-sweep.md` | The D9.103 full TSA calibration sweep |
+| `d9-tsa-calibration-sweep.csv` | The full aggregate sweep table |
+| `sweep_tsas.py` | The per-TSA sweep script |
+| `sweep_tsas_parallel.py` | The parallel sweep driver |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |
