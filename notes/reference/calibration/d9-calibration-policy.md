@@ -16,7 +16,8 @@ The symmetric audit is now a policy, not a standalone experiment.
 - Kootenay Lake, Haida Gwaii, and Arrow are optional symmetric.
 - North Island, Okanagan, Kamloops, Prince George, and Cranbrook use no local
   rule.
-- Invermere is explicitly **not frozen**.
+- Invermere and 100 Mile House were initially not frozen; D9.104 now freezes
+  their base cards as evidence-only, with no local calibration.
 
 ## 2. Invermere decision
 

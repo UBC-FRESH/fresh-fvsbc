@@ -1,60 +1,11 @@
 {
-  "policy_id": "d9-candidate-calibration-v0",
-  "status": "frozen_policy",
+  "claim": "Diagnostic candidate calibration policy. No bundle, certificate, yield, AAC, legal, or whole-block claim.",
   "default_rule": "none",
-  "rules": {
-    "none": "Use the target-excluded base layer directly.",
-    "one_sided": "Fit a species-group intercept only when the group has support and overpredicts by more than 3 points.",
-    "symmetric": "Fit a species-group intercept when the group has support and is over- or underpredicted by more than 3 points."
-  },
-  "minimums": {
-    "calibration_sites": 20,
-    "group_trees": 500,
-    "trigger_points": 0.03,
-    "bootstrap_splits": 40
-  },
-  "supported": {
-    "boundary": {
-      "model_id": "boundary-background-v0",
-      "card": "notes/reference/calibration/boundary-candidate/model-card.json",
-      "rule": "symmetric",
-      "base_log_loss": 0.3989,
-      "calibrated_log_loss": 0.3874,
-      "evidence": "notes/reference/calibration/d9-symmetric-audit.csv"
-    },
-    "mackenzie": {
-      "model_id": "mackenzie-background-v0",
-      "card": "notes/reference/calibration/mackenzie-candidate/model-card.json",
-      "rule": "symmetric",
-      "base_log_loss": 0.3945,
-      "calibrated_log_loss": 0.3854,
-      "evidence": "notes/reference/calibration/d9-symmetric-audit.csv"
-    }
-  },
-  "one_sided": {
-    "quesnel": {
-      "model_id": "quesnel-sbsmw-background-v0",
-      "card": "notes/reference/calibration/quesnel-candidate/model-card.json",
-      "note": "Non-PL background; review pending; MPB and small-tree boundary are separate."
-    }
-  },
-  "optional_symmetric": [
-    "kootenay-lake",
-    "haida-gwaii",
-    "arrow"
+  "evidence_only": [
+    "invermere",
+    "100-mile-house"
   ],
-  "optional_one_sided": [
-    "fraser"
-  ],
-  "not_frozen": {
-    "invermere": {
-      "model_id": "invermere-background-v0",
-      "card": "notes/reference/calibration/invermere-candidate/model-card.json",
-      "reason": "Base AUC 0.704 and symmetric local log loss 0.4404 vs 0.4403 base; not worth freezing as a candidate.",
-      "base_auc": 0.7038,
-      "base_log_loss": 0.4403
-    }
-  },
+  "evidence_only_note": "Base evidence cards with no local calibration. The 100 Mile exclusion applies to the SBPS ingrowth candidate, not the mortality card.",
   "excluded": [
     "100 Mile House TSA (retracted)",
     "IDFdk (no bundle)",
@@ -63,5 +14,50 @@
     "SBPSmk mature",
     "new TSAs and global screens"
   ],
-  "claim": "Diagnostic candidate calibration policy. No bundle, certificate, yield, AAC, legal, or whole-block claim."
+  "minimums": {
+    "bootstrap_splits": 40,
+    "calibration_sites": 20,
+    "group_trees": 500,
+    "trigger_points": 0.03
+  },
+  "one_sided": {
+    "quesnel": {
+      "card": "notes/reference/calibration/quesnel-candidate/model-card.json",
+      "model_id": "quesnel-sbsmw-background-v0",
+      "note": "Non-PL background; review pending; MPB and small-tree boundary are separate."
+    }
+  },
+  "optional_one_sided": [
+    "fraser"
+  ],
+  "optional_symmetric": [
+    "kootenay-lake",
+    "haida-gwaii",
+    "arrow"
+  ],
+  "policy_id": "d9-candidate-calibration-v0",
+  "rules": {
+    "none": "Use the target-excluded base layer directly.",
+    "one_sided": "Fit a species-group intercept only when the group has support and overpredicts by more than 3 points.",
+    "symmetric": "Fit a species-group intercept when the group has support and is over- or underpredicted by more than 3 points."
+  },
+  "status": "frozen_policy",
+  "supported": {
+    "boundary": {
+      "base_log_loss": 0.3989,
+      "calibrated_log_loss": 0.3874,
+      "card": "notes/reference/calibration/boundary-candidate/model-card.json",
+      "evidence": "notes/reference/calibration/d9-symmetric-audit.csv",
+      "model_id": "boundary-background-v0",
+      "rule": "symmetric"
+    },
+    "mackenzie": {
+      "base_log_loss": 0.3945,
+      "calibrated_log_loss": 0.3854,
+      "card": "notes/reference/calibration/mackenzie-candidate/model-card.json",
+      "evidence": "notes/reference/calibration/d9-symmetric-audit.csv",
+      "model_id": "mackenzie-background-v0",
+      "rule": "symmetric"
+    }
+  }
 }

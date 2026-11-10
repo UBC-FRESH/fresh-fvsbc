@@ -384,6 +384,8 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-tsa-calibration-sweep.csv` | The full aggregate sweep table |
 | `sweep_tsas.py` | The per-TSA sweep script |
 | `sweep_tsas_parallel.py` | The parallel sweep driver |
+| `d9-all-tsa-cards.md` | The D9.104 remaining-TSA card summary |
+| `freeze_all_candidates.py` | The batch card freezer |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |

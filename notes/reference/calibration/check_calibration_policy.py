@@ -49,18 +49,24 @@ def main() -> None:
         if float(audit[name]["delta_log_loss"]) >= 0:
             raise SystemExit(f"{name} has a non-negative audit delta")
 
-    not_frozen = policy.get("not_frozen", {})
-    if "invermere" not in not_frozen:
-        raise SystemExit("invermere must be recorded as not frozen")
-    if Path(not_frozen["invermere"]["card"]).exists():
-        raise SystemExit("invermere card exists, but the policy says it is not frozen")
+    evidence_only = set(policy.get("evidence_only", []))
+    for required in ("invermere", "100-mile-house"):
+        if required not in evidence_only:
+            raise SystemExit(f"{required} must be recorded as evidence-only")
+    for slug in evidence_only:
+        card_path = Path("notes/reference/calibration") / f"{slug}-candidate" / "model-card.json"
+        if not card_path.is_file():
+            raise SystemExit(f"missing evidence-only card: {card_path}")
+        card = json.loads(card_path.read_text())
+        if card.get("calibration", {}).get("mode") != "none":
+            raise SystemExit(f"{slug} evidence card must use no local calibration")
 
     excluded = " ".join(policy.get("excluded", []))
     for phrase in ("100 Mile", "IDFdk", "ICHmw2", "CWH", "SBPSmk"):
         if phrase not in excluded:
             raise SystemExit(f"excluded list is missing {phrase}")
 
-    print(f"policy ok: {len(supported)} supported symmetric cases, invermere not frozen")
+    print(f"policy ok: {len(supported)} supported symmetric cases, evidence-only cards present")
 
 
 if __name__ == "__main__":
