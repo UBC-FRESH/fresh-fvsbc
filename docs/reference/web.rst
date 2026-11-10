@@ -110,7 +110,8 @@ Those values are restored on reload, so a reviewer can send a link to the exact 
 comparison instead of describing where to click. Named comparisons are also kept in the browser's
 ``localStorage`` for reuse; loading one replaces the current A/B/metric/table/diff-column state. A
 search field filters the named comparison list without changing the underlying preset, and a sort
-control orders it by recent use or name.
+control orders it by recent use or name. Sort choices are remembered per collection in
+``localStorage``.
 
 **Export JSON** writes those named comparisons to a versioned file with ``version``,
 ``exported_at``, and ``comparisons``. **Import JSON** accepts that file or a bare comparison array,

@@ -185,6 +185,40 @@ function attachSelectSearch(input, select) {
   });
 }
 
+const SORT_PREFERENCES_KEY = "fresh-fvsbc.sort-preferences";
+const SORT_MODES = new Set(["recent", "name", "name-desc"]);
+
+function readSortPreferences() {
+  const defaults = {
+    compare: "recent",
+    filter: "recent",
+    preset: "recent",
+    assistant: "recent",
+  };
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(SORT_PREFERENCES_KEY) || "null");
+    if (!stored || typeof stored !== "object") return defaults;
+    return {
+      compare: SORT_MODES.has(stored.compare) ? stored.compare : "recent",
+      filter: SORT_MODES.has(stored.filter) ? stored.filter : "recent",
+      preset: SORT_MODES.has(stored.preset) ? stored.preset : "recent",
+      assistant: SORT_MODES.has(stored.assistant) ? stored.assistant : "recent",
+    };
+  } catch (_error) {
+    return defaults;
+  }
+}
+
+function setSortPreference(key, value) {
+  const preferences = readSortPreferences();
+  preferences[key] = SORT_MODES.has(value) ? value : "recent";
+  try {
+    window.localStorage.setItem(SORT_PREFERENCES_KEY, JSON.stringify(preferences));
+  } catch (_error) {
+    /* storage can be unavailable */
+  }
+}
+
 function sortPresetCollection(items, mode) {
   if (mode === "name") {
     return [...items].sort((left, right) => left.name.localeCompare(right.name));
@@ -2071,6 +2105,7 @@ async function renderTables(body) {
     "aria-label": "Sort saved filters",
     onchange: (event) => {
       state.tableFilterSort = event.target.value;
+      setSortPreference("filter", event.target.value);
       renderPanel();
     },
   },
@@ -2594,6 +2629,7 @@ async function renderTables(body) {
     "aria-label": "Sort export presets",
     onchange: (event) => {
       state.tablePresetSort = event.target.value;
+      setSortPreference("preset", event.target.value);
       renderPanel();
     },
   },
@@ -3956,6 +3992,7 @@ async function renderCompare(body) {
     "aria-label": "Sort saved comparisons",
     onchange: (event) => {
       state.compareSort = event.target.value;
+      setSortPreference("compare", event.target.value);
       renderPanel();
     },
   },
@@ -5566,6 +5603,7 @@ async function boot() {
   });
   document.getElementById("assistant-saved-sort").addEventListener("change", (event) => {
     state.assistant.savedSort = event.target.value;
+    setSortPreference("assistant", event.target.value);
     refreshAssistantSaved();
   });
   const pinName = document.getElementById("assistant-pin-name");
@@ -5640,6 +5678,12 @@ async function boot() {
     state.compareKeyColumns = initial.ckey
       ? initial.ckey.split(",").filter(Boolean)
       : [];
+    const sortPreferences = readSortPreferences();
+    state.compareSort = sortPreferences.compare;
+    state.tableFilterSort = sortPreferences.filter;
+    state.tablePresetSort = sortPreferences.preset;
+    state.assistant.savedSort = sortPreferences.assistant;
+    document.getElementById("assistant-saved-sort").value = state.assistant.savedSort;
     state.ready = true;
     restoreAssistantHistory();
     renderShell();

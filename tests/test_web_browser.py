@@ -1246,6 +1246,11 @@ def test_saved_comparisons_can_be_sorted(cockpit: str) -> None:
             page.locator("#compare-saved-sort").select_option("name-desc")
             expect(options.nth(1)).to_have_text("Beta preset")
             expect(options.nth(2)).to_have_text("Alpha preset")
+            page.reload(wait_until="networkidle")
+            expect(page.locator("#compare-saved-sort")).to_have_value("name-desc")
+            options = page.locator("#compare-saved option")
+            expect(options.nth(1)).to_have_text("Beta preset")
+            expect(options.nth(2)).to_have_text("Alpha preset")
         finally:
             browser.close()
 
@@ -1753,6 +1758,14 @@ def test_saved_assistant_chats_can_be_sorted(cockpit: str) -> None:
             expect(page.locator("#assistant-saved-select option:checked")).to_have_text(
                 "Bravo chat"
             )
+            page.reload(wait_until="networkidle")
+            page.get_by_role("button", name="Ask the FVS assistant").click()
+            page.locator("#assistant-saved summary").click()
+            expect(page.locator("#assistant-saved-sort")).to_have_value("name-desc")
+            options = page.locator("#assistant-saved-select option")
+            expect(options.nth(1)).to_have_text("Charlie chat")
+            expect(options.nth(2)).to_have_text("Bravo chat")
+            expect(options.nth(3)).to_have_text("Alpha chat")
         finally:
             browser.close()
 
