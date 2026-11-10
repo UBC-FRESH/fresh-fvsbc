@@ -370,6 +370,10 @@ snapshot with the same row counts still needs a new manifest.
 | `CALIBRATION-POLICY.md` | The deployment calibration policy |
 | `calibration-policy.json` | The machine-readable candidate policy |
 | `check_calibration_policy.py` | The policy validator |
+| `d9-candidate-registry.md` | The D9.98 candidate registry note |
+| `candidate-registry.json` | The checksummed candidate registry |
+| `CANDIDATE-REGISTRY.md` | The generated candidate table |
+| `build_candidate_registry.py` | The registry builder and checker |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |

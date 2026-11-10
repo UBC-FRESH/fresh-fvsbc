@@ -212,3 +212,15 @@ freshforge run workflows/freshforge/calibration_policy.yaml --workdir . \
 
 The check covers the supported symmetric Boundary/MacKenzie cards, the frozen
 minimums, the not-frozen Invermere decision, and the excluded layers.
+
+## `candidate_registry.yaml`
+
+Checks the checksummed candidate registry against the frozen cards:
+
+```sh
+freshforge run workflows/freshforge/candidate_registry.yaml --workdir . \
+  --evidence runtime/freshforge-candidate-registry-evidence.json
+```
+
+The check covers card and metrics checksums, calibration-rule mapping, review
+status, and the generated Markdown table.
