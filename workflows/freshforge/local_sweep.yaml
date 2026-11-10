@@ -1,0 +1,15 @@
+workflow:
+  id: local_rule_sweep
+  name: Local-rule sweep
+  description: >
+    Evaluate one-sided and symmetric local rules for every TSA label and write
+    one mode-comparison table. This is evidence only; no card is modified.
+
+nodes:
+  - id: run_local_sweep
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/sweep_local_parallel.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-tsa-local-sweep.csv
