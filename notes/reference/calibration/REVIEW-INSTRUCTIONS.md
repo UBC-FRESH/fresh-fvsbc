@@ -18,7 +18,7 @@ a bundle, a certificate, or production use.
 1. Check out the review pull request commit.
 2. Run `sha256sum -c`-style verification against `review-manifest.json`, or
    recompute the listed hashes with `sha256sum <path>`.
-3. Read `d9-candidate-review-package.md` and the four candidate artifacts:
+3. Read `d9-candidate-review-package.md`, `d9-review-addendum-1.md`, and the four candidate artifacts:
    - `quesnel-candidate/model-card.json`
    - `quesnel-candidate/JOINT-REPORT.md`
    - `quesnel-candidate/small-tree-boundary.json`

@@ -5,6 +5,7 @@ Package id: `d9-candidate-review-v0`
 Decision: **pending**
 Manifest: `review-manifest.json`
 Instructions: `REVIEW-INSTRUCTIONS.md`
+Addendum 1: `d9-review-addendum-1.md` (imputation sensitivity and deployment evidence)
 
 ## 1. Purpose
 
