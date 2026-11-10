@@ -1,0 +1,15 @@
+workflow:
+  id: bec_hierarchy_fit
+  name: Hierarchical BEC holdout fit
+  description: >
+    Fit the first parent-zone plus partial-pooled-subzone model and evaluate it
+    on the 40 leave-one-TSA-out holdouts. Evidence only; no card is modified.
+
+nodes:
+  - id: run_hierarchy
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/fit_bec_hierarchy_parallel.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-bec-hierarchy-holdout.csv

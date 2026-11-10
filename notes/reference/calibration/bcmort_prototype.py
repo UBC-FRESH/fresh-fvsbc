@@ -46,16 +46,21 @@ def _design(frame: pd.DataFrame) -> np.ndarray:
     return np.column_stack(cols)
 
 
-def _fit(x: np.ndarray, y: np.ndarray, exposure: np.ndarray) -> np.ndarray:
+def _fit(
+    x: np.ndarray,
+    y: np.ndarray,
+    exposure: np.ndarray,
+    offset: np.ndarray | None = None,
+) -> np.ndarray:
     beta = np.zeros(x.shape[1])
-    offset = np.log(exposure)
+    base = np.log(exposure) if offset is None else np.log(exposure) + offset
     for _ in range(60):
-        eta = np.clip(x @ beta + offset, -20, 20)
+        eta = np.clip(x @ beta + base, -20, 20)
         mu = np.exp(eta)
         w = np.clip(mu, 1e-8, None)
         z = eta + (y - mu) / w
         lhs = x.T @ (w[:, None] * x) + np.eye(x.shape[1]) * 1.0
-        beta = np.linalg.solve(lhs, x.T @ (w * (z - offset)))
+        beta = np.linalg.solve(lhs, x.T @ (w * (z - base)))
     return beta
 
 

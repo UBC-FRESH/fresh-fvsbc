@@ -398,6 +398,10 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-bec-stratification.csv` | BEC zone/subzone/variant support |
 | `d9-bec-strata.csv` | Pooled ecological units |
 | `bec_stratification.py` | The BEC stratification audit script |
+| `d9-bec-hierarchy.md` | The D9.108 hierarchical BEC fit note |
+| `d9-bec-hierarchy-holdout.csv` | The hierarchical holdout metrics |
+| `fit_bec_hierarchy.py` | The per-TSA hierarchical fit |
+| `fit_bec_hierarchy_parallel.py` | The parallel hierarchical fit driver |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |
