@@ -200,3 +200,15 @@ freshforge run workflows/freshforge/symmetric_audit.yaml --workdir . \
 
 It writes one aggregate row per target to `d9-symmetric-audit.csv`. No candidate
 card is modified.
+
+## `calibration_policy.yaml`
+
+Validates the candidate calibration contract:
+
+```sh
+freshforge run workflows/freshforge/calibration_policy.yaml --workdir . \
+  --evidence runtime/freshforge-calibration-policy-evidence.json
+```
+
+The check covers the supported symmetric Boundary/MacKenzie cards, the frozen
+minimums, the not-frozen Invermere decision, and the excluded layers.
