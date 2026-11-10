@@ -363,6 +363,9 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-boundary-candidate.md` | The D9.95 Boundary candidate |
 | `boundary-candidate/metrics.csv` | The frozen Boundary aggregate metrics |
 | `boundary-candidate/model-card.json` | Frozen Boundary coefficients and pins |
+| `d9-symmetric-audit.md` | The D9.96 symmetric calibration audit |
+| `d9-symmetric-audit.csv` | The aggregate symmetric-rule comparison |
+| `audit_symmetric.py` | The symmetric-audit script |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |

@@ -326,6 +326,25 @@ def test_the_boundary_workflow_validates_with_the_provider() -> None:
     assert [node.id for node in spec.nodes] == ["fit_and_freeze_boundary"]
 
 
+def test_the_symmetric_audit_workflow_validates_with_the_provider() -> None:
+    """The checked-in symmetric audit workflow resolves its native-script node."""
+    from freshforge.loading import load_workflow
+    from freshforge.providers import ProviderRegistry
+    from freshforge.validation import validate_workflow_with_providers
+
+    spec, diagnostics = load_workflow("workflows/freshforge/symmetric_audit.yaml")
+    assert spec is not None
+    registry = ProviderRegistry()
+    registry.register(NativeScriptProvider())
+    errors = validate_workflow_with_providers(
+        spec, registry=registry, structural_diagnostics=diagnostics
+    )
+    assert [
+        diagnostic for diagnostic in errors if diagnostic.code.startswith("node.provider")
+    ] == []
+    assert [node.id for node in spec.nodes] == ["run_audit"]
+
+
 def test_the_mpb_segment_workflow_validates_with_the_provider() -> None:
     """The checked-in MPB segment workflow resolves its native-script node."""
     from freshforge.loading import load_workflow

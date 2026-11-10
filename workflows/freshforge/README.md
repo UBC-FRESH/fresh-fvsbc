@@ -187,3 +187,16 @@ freshforge run workflows/freshforge/boundary_background.yaml --workdir . \
 It writes `boundary-candidate/metrics.csv` and
 `boundary-candidate/model-card.json`. The card records the symmetric 20-site
 local-rule evaluation; deployment offsets are not embedded.
+
+## `symmetric_audit.yaml`
+
+Compares the base candidate metrics with the symmetric 20-site local rule across
+the candidate set:
+
+```sh
+freshforge run workflows/freshforge/symmetric_audit.yaml --workdir . \
+  --evidence runtime/freshforge-symmetric-audit-evidence.json
+```
+
+It writes one aggregate row per target to `d9-symmetric-audit.csv`. No candidate
+card is modified.

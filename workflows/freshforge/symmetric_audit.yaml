@@ -1,0 +1,16 @@
+workflow:
+  id: symmetric_local_audit
+  name: Symmetric local calibration audit
+  description: >
+    Compare the base candidate metrics with the symmetric 20-site local rule
+    across the candidate set. The workflow writes one aggregate summary row per
+    target and no site-level rows.
+
+nodes:
+  - id: run_audit
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/audit_symmetric.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-symmetric-audit.csv
