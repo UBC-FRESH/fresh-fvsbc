@@ -1,0 +1,15 @@
+workflow:
+  id: partial_rule_sweep
+  name: Partial-pooled local-rule sweep
+  description: >
+    Evaluate shrunk one-sided and symmetric local rules for every TSA label and
+    write one comparison table. Evidence only; no card is modified.
+
+nodes:
+  - id: run_partial_sweep
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/sweep_partial_parallel.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-tsa-partial-sweep.csv
