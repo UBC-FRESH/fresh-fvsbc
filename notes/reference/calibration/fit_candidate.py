@@ -260,6 +260,7 @@ def main() -> None:
         "target_tsa": target_name,
         "excluded_from_training": [target_name],
         "features": feature_names,
+        "preprocessing": frame.attrs.get("preprocessing", {}),
         "species_groups": groups,
         "metrics": rows,
         "calibration": calibration,

@@ -1,0 +1,21 @@
+workflow:
+  id: score_inventory
+  name: Score raw inventory
+  description: >
+    Score an external raw feature table with a frozen candidate card and write
+    the eta table used by deployment calibration. No raw rows are tracked.
+
+nodes:
+  - id: score_rows
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/score_inventory.py
+      args:
+        - --card
+        - notes/reference/calibration/boundary-candidate/model-card.json
+        - --input
+        - runtime/inventory.csv
+        - --output
+        - runtime/scored-inventory.csv
+    artifacts:
+      scored: runtime/scored-inventory.csv

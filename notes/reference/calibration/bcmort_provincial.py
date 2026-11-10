@@ -33,6 +33,7 @@ def load() -> pd.DataFrame:
             "TSA_DESC",
             "PLOT",
             "TREE_NO",
+            "species",
             "group",
             "dbh",
             "ba0",
@@ -48,6 +49,14 @@ def load() -> pd.DataFrame:
     frame = frame[(frame["known"] == 1) & (frame["exposure"] > 0)].copy()
     frame["group"] = frame["group"].astype(str).str.upper()
     frame.loc[~frame["group"].isin(GROUPS[:-1]), "group"] = "OTHER"
+    species_groups = (
+        frame[["species", "group"]]
+        .dropna()
+        .assign(species=lambda part: part["species"].astype(str).str.upper())
+        .drop_duplicates()
+        .sort_values("species")
+    )
+    medians: dict[str, float] = {}
     parts = frame["interval_id"].str.split("|", expand=True)
     frame["site"] = parts[0].astype(str)
     intervals = pd.read_csv(INTERVALS, usecols=["interval_id", "visit0"])
@@ -64,15 +73,25 @@ def load() -> pd.DataFrame:
     raw = raw.groupby(["site", "visit0", "PLOT", "TREE_NO"], as_index=False)[["crown", "si"]].mean()
     frame = frame.merge(raw, on=["site", "visit0", "PLOT", "TREE_NO"], how="left")
     for column in ("crown", "si"):
+        medians[column] = float(frame[column].median())
         frame[column + "_missing"] = frame[column].isna().astype(float)
-        frame[column] = frame[column].fillna(frame[column].median())
+        frame[column] = frame[column].fillna(medians[column])
     frame["qmd"] = 100.0 * np.sqrt(4.0 * frame["ba0"] / (np.pi * frame["tph0"]))
     frame["rel_dbh"] = frame["dbh"] / frame.groupby(["interval_id", "PLOT"])["dbh"].transform("max")
     frame["hd"] = frame["HEIGHT"] / (frame["dbh"] / 100.0)
     for column in ("hd", "growth"):
+        medians[column] = float(frame[column].median())
         frame[column + "_missing"] = frame[column].isna().astype(float)
-        frame[column] = frame[column].fillna(frame[column].median())
+        frame[column] = frame[column].fillna(medians[column])
     frame["zone"] = frame["BEC"].astype(str).str.extract(r"^([A-Za-z]+)")[0].str.upper()
+    frame.attrs["preprocessing"] = {
+        "feature_recipe": "bcmort-provincial-growth-free-v1",
+        "medians": medians,
+        "zones": sorted(frame["zone"].dropna().unique()),
+        "missing_flags": ["crown_missing", "si_missing", "hd_missing", "growth_missing"],
+        "species_groups": {str(row.species): str(row.group) for row in species_groups.itertuples()},
+        "imputation": "full-frame medians; see the candidate review package",
+    }
     return frame
 
 

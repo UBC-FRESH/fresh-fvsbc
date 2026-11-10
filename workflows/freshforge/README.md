@@ -237,3 +237,15 @@ freshforge run workflows/freshforge/deployment_calibration.yaml --workdir . \
 It expects `runtime/scored-target.csv` with `site,group,eta,exposure,dead` and
 writes aggregate offsets plus optional calibrated predictions under `runtime/`.
 It does not re-score raw inventory.
+
+## `score_inventory.yaml`
+
+Scores an external raw feature table with a frozen card:
+
+```sh
+freshforge run workflows/freshforge/score_inventory.yaml --workdir . \
+  --evidence runtime/freshforge-score-inventory-evidence.json
+```
+
+It expects `runtime/inventory.csv` and writes `runtime/scored-inventory.csv`
+with `site,plot,group,eta`. The card supplies the preprocessing metadata.
