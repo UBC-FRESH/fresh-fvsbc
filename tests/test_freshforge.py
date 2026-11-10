@@ -440,6 +440,25 @@ def test_the_tsa_sweep_workflow_validates_with_the_provider() -> None:
     assert [node.id for node in spec.nodes] == ["run_sweep"]
 
 
+def test_the_all_tsa_cards_workflow_validates_with_the_provider() -> None:
+    """The checked-in all-TSA card workflow resolves both nodes."""
+    from freshforge.loading import load_workflow
+    from freshforge.providers import ProviderRegistry
+    from freshforge.validation import validate_workflow_with_providers
+
+    spec, diagnostics = load_workflow("workflows/freshforge/all_tsa_cards.yaml")
+    assert spec is not None
+    registry = ProviderRegistry()
+    registry.register(NativeScriptProvider())
+    errors = validate_workflow_with_providers(
+        spec, registry=registry, structural_diagnostics=diagnostics
+    )
+    assert [
+        diagnostic for diagnostic in errors if diagnostic.code.startswith("node.provider")
+    ] == []
+    assert [node.id for node in spec.nodes] == ["freeze_missing", "rebuild_registry"]
+
+
 def test_the_mpb_segment_workflow_validates_with_the_provider() -> None:
     """The checked-in MPB segment workflow resolves its native-script node."""
     from freshforge.loading import load_workflow

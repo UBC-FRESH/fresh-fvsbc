@@ -1,6 +1,27 @@
 {
   "candidates": [
     {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/100-mile-house-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:23f0a75a819a2c136f59d4136d2fb35a13185e3eef784a7e963dd7c6c7d945c4",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/100-mile-house-candidate/metrics.csv",
+      "metrics_sha256": "sha256:dc03da5e0caa23cb9d3517cf08ce8dfe8106c9b3c7fc3b08732f62fd4359c115",
+      "model_id": "100-mile-house-background-v0",
+      "n": 32394,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "100-mile-house",
+      "target_tsa": "100 Mile House TSA"
+    },
+    {
       "calibration_rule": "symmetric (optional)",
       "card": "notes/reference/calibration/arrow-candidate/model-card.json",
       "card_mode": "unrecorded",
@@ -20,6 +41,26 @@
       "scope": "all supported groups",
       "slug": "arrow",
       "target_tsa": "Arrow TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/arrowsmith-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:3849ce32ce70b4ed5d25fe172ee3e022055367e468d96cfbd8542791af925956",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL"
+      ],
+      "metrics": "notes/reference/calibration/arrowsmith-candidate/metrics.csv",
+      "metrics_sha256": "sha256:bd27f9b424e211458496ba049358860fa1aa1ad74f27dd66cd6d2d07434254e6",
+      "model_id": "arrowsmith-background-v0",
+      "n": 111381,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "arrowsmith",
+      "target_tsa": "Arrowsmith TSA"
     },
     {
       "calibration_rule": "symmetric (supported)",
@@ -44,6 +85,67 @@
     },
     {
       "calibration_rule": "none",
+      "card": "notes/reference/calibration/bulkley-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:53960a66852b6a51f161d2ab257f608ac39ed0cf57c2d8fa02d1980eaa86cd8b",
+      "groups": [
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/bulkley-candidate/metrics.csv",
+      "metrics_sha256": "sha256:eaf4475cfb30bf796d73a326c99c8a295b0abdb4b7079527f90211890b2e3d3e",
+      "model_id": "bulkley-background-v0",
+      "n": 2116,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "bulkley",
+      "target_tsa": "Bulkley TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/cascadia-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:3f4f6865da849098ec4d9ff63d3b3f9852b4c404054efd6c4feb7adc1554f29a",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/cascadia-candidate/metrics.csv",
+      "metrics_sha256": "sha256:92dca3ecab0435c7e5bf9474caae30ab4b06d9f4d5a4257d7c3a91a5c4c0259a",
+      "model_id": "cascadia-background-v0",
+      "n": 51582,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "cascadia",
+      "target_tsa": "Cascadia TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/cassiar-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:a4f6ddcdbcd8311390b29fc1b191be5fc5840b83d48bc217c479d5e1f3573c0b",
+      "groups": [
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/cassiar-candidate/metrics.csv",
+      "metrics_sha256": "sha256:8290b6f3e04f93698a5e513b6e6b9822f5ca99a80aa445ec5a7315b2d882fb8d",
+      "model_id": "cassiar-background-v0",
+      "n": 2876,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "cassiar",
+      "target_tsa": "Cassiar TSA"
+    },
+    {
+      "calibration_rule": "none",
       "card": "notes/reference/calibration/cranbrook-candidate/model-card.json",
       "card_mode": "unrecorded",
       "card_sha256": "sha256:293e46aa6deefd6b5a1441d1074e0f74ec2b3d47716c58f588262cb0077daf38",
@@ -62,6 +164,66 @@
       "scope": "all supported groups",
       "slug": "cranbrook",
       "target_tsa": "Cranbrook TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/dawson-creek-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:ac4f3e5a4b6b225c6ee819d62129fc6b2ca5af47bbc14c92a07f268c26f6bc25",
+      "groups": [
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/dawson-creek-candidate/metrics.csv",
+      "metrics_sha256": "sha256:d2859d1749ca4274a7ee73bcaac594361cb13c5d15358b8a690404aac96fc780",
+      "model_id": "dawson-creek-background-v0",
+      "n": 31433,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "dawson-creek",
+      "target_tsa": "Dawson Creek TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/fort-nelson-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:9d9c72f58bf782e0604c4ba5f5c3516a1e520cd3e324cf977ae2727b9248e187",
+      "groups": [
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/fort-nelson-candidate/metrics.csv",
+      "metrics_sha256": "sha256:d3c405b769b4d466522965c764d8cbde69eaca92e0133388e129b160f4dfbcf8",
+      "model_id": "fort-nelson-background-v0",
+      "n": 23055,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "fort-nelson",
+      "target_tsa": "Fort Nelson TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/fort-st-john-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:4bd492626ec49f9f6a8b86e56eab1128ed77b682ee52a718bcae180bc66cc7a8",
+      "groups": [
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/fort-st-john-candidate/metrics.csv",
+      "metrics_sha256": "sha256:05ac323c3a94053af538fa6ee2f8f59821a0379947d7d3ba59076ad0b85feb86",
+      "model_id": "fort-st-john-background-v0",
+      "n": 23001,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "fort-st-john",
+      "target_tsa": "Fort St. John TSA"
     },
     {
       "calibration_rule": "one-sided (optional)",
@@ -83,6 +245,66 @@
       "target_tsa": "Fraser TSA"
     },
     {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/gbr-north-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:9dc9a3eca34814ec6b50677d888e2d37613115420da236f29fd5a266a30542a4",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL"
+      ],
+      "metrics": "notes/reference/calibration/gbr-north-candidate/metrics.csv",
+      "metrics_sha256": "sha256:109be8da10643acfea93cd89697bda98059d30f61ead3e268cf45e4042ee9c00",
+      "model_id": "gbr-north-background-v0",
+      "n": 29868,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "gbr-north",
+      "target_tsa": "GBR North TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/gbr-south-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:371347312d6a1254374fa247d62b377cd28b4ad8776efe01734e0df313bf30fe",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER"
+      ],
+      "metrics": "notes/reference/calibration/gbr-south-candidate/metrics.csv",
+      "metrics_sha256": "sha256:06a71247314309845ed876f2c30d0a40dfb85fdcdf26d651075c30ef0b0ca1f5",
+      "model_id": "gbr-south-background-v0",
+      "n": 40730,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "gbr-south",
+      "target_tsa": "GBR South TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/golden-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:a8689194351402c254cba909d1f5805b57aa0090e9b06967b8bcec7ab5f238d9",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/golden-candidate/metrics.csv",
+      "metrics_sha256": "sha256:433ccd20862b919325b3b77c1bfe7a04e574b760251df1aac8f60791528f9943",
+      "model_id": "golden-background-v0",
+      "n": 3028,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "golden",
+      "target_tsa": "Golden TSA"
+    },
+    {
       "calibration_rule": "symmetric (optional)",
       "card": "notes/reference/calibration/haida-gwaii-candidate/model-card.json",
       "card_mode": "unrecorded",
@@ -99,6 +321,46 @@
       "scope": "supported groups only; PL omitted",
       "slug": "haida-gwaii",
       "target_tsa": "Haida Gwaii TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/invermere-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:f9ac9689ecdbb4b566fea6a84925cb8a8ffee0e86bc2fe03e5d1c44edd74d18e",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/invermere-candidate/metrics.csv",
+      "metrics_sha256": "sha256:7650d4b89f4853b46adfc571bdc9a6561c5a6d5bc44927770f16ba1441c89185",
+      "model_id": "invermere-background-v0",
+      "n": 25615,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "invermere",
+      "target_tsa": "Invermere TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/kalum-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:02a8d2e33bf0b46af570b9477dd5027b6f4a68a7cdb42a1c97ec0906ee32179a",
+      "groups": [
+        "HW",
+        "OTHER",
+        "PL"
+      ],
+      "metrics": "notes/reference/calibration/kalum-candidate/metrics.csv",
+      "metrics_sha256": "sha256:d303adea22d3b8a4b1f0d5b98ec2a10ec964ca419f86e265fdf8157b447e0b2b",
+      "model_id": "kalum-background-v0",
+      "n": 12468,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "kalum",
+      "target_tsa": "Kalum TSA"
     },
     {
       "calibration_rule": "none",
@@ -122,6 +384,46 @@
       "target_tsa": "Kamloops TSA"
     },
     {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/kingcome-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:3c774dd88a3f298fe0db265f8d27618b4902278d8ad1f2880354a58dd8e1047b",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL"
+      ],
+      "metrics": "notes/reference/calibration/kingcome-candidate/metrics.csv",
+      "metrics_sha256": "sha256:81bfe0232adca929ddfee832993b609f538776ff2c7b2ad765a26d8dbaf6e02e",
+      "model_id": "kingcome-background-v0",
+      "n": 6467,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "kingcome",
+      "target_tsa": "Kingcome TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/kispiox-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:c648752b5a12896723eafd0588fb480dc72333c7f258b5fa14887c1fdef5f28c",
+      "groups": [
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/kispiox-candidate/metrics.csv",
+      "metrics_sha256": "sha256:77d47f5331a08a4fd2331631574ea69e5150dd4277e3343e200732e4cbc8e783",
+      "model_id": "kispiox-background-v0",
+      "n": 34177,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "kispiox",
+      "target_tsa": "Kispiox TSA"
+    },
+    {
       "calibration_rule": "symmetric (optional)",
       "card": "notes/reference/calibration/kootenay-lake-candidate/model-card.json",
       "card_mode": "unrecorded",
@@ -143,6 +445,46 @@
       "target_tsa": "Kootenay Lake TSA"
     },
     {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/lakes-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:f818cd3facb96fb86ec19659d32433a0ae64f775b639d3bab23390d0fc63f307",
+      "groups": [
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/lakes-candidate/metrics.csv",
+      "metrics_sha256": "sha256:b605fcb4c14a2aceafcfa0fc2fa0b25ffe788456e0a026aae2279e05457047b2",
+      "model_id": "lakes-background-v0",
+      "n": 3807,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "lakes",
+      "target_tsa": "Lakes TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/lillooet-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:d575736e04b6e19da49c79070ae70ec0f026fd2ea3b1b486b32e4abd2bec4fcf",
+      "groups": [
+        "FD",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/lillooet-candidate/metrics.csv",
+      "metrics_sha256": "sha256:ec0cc16d3ffa00b1e627697d1bf5aa5d8f09ea5bfda9bdfb126f11887396749b",
+      "model_id": "lillooet-background-v0",
+      "n": 1997,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "lillooet",
+      "target_tsa": "Lillooet TSA"
+    },
+    {
       "calibration_rule": "symmetric (supported)",
       "card": "notes/reference/calibration/mackenzie-candidate/model-card.json",
       "card_mode": "conditional-symmetric",
@@ -161,6 +503,84 @@
       "scope": "supported groups only; FD omitted",
       "slug": "mackenzie",
       "target_tsa": "MacKenzie TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/merritt-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:d99ff46fde8d2cf077f90812fc29888fe37c9acf9294fbcee3fb6386c0769447",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/merritt-candidate/metrics.csv",
+      "metrics_sha256": "sha256:1e9119d7d0f71538e7048a396149a93233008fe68850eb8f3280a7224ba8cb1a",
+      "model_id": "merritt-background-v0",
+      "n": 49728,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "merritt",
+      "target_tsa": "Merritt TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/mid-coast-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:c1ba58debf3da4076ea3ff945f82149ceed6a80dcf1cb079078cf99a57fdc69f",
+      "groups": [
+        "HW",
+        "OTHER"
+      ],
+      "metrics": "notes/reference/calibration/mid-coast-candidate/metrics.csv",
+      "metrics_sha256": "sha256:e4acc34277d9a5a90b4b6b82e4a86508ca897ef487a0e9699958d197ccfed508",
+      "model_id": "mid-coast-background-v0",
+      "n": 1437,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "mid-coast",
+      "target_tsa": "Mid Coast TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/morice-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:ca2bfbd1a4e9a44c5c0dfc14b08040d087574745f79e1f7c79d6f8d27777d1c4",
+      "groups": [
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/morice-candidate/metrics.csv",
+      "metrics_sha256": "sha256:753bd9665592e438782c8971072721b168b1d1792394b84dfb04a1e14bb5af97",
+      "model_id": "morice-background-v0",
+      "n": 19971,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "morice",
+      "target_tsa": "Morice TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/nass-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:6e8f9eeef8ffc93217a870cf01e913672dd9992c71be4496972198cc1622f42e",
+      "groups": [
+        "HW",
+        "OTHER",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/nass-candidate/metrics.csv",
+      "metrics_sha256": "sha256:c0cae3283b6a709cda7995d80655f6908caa64f6837a19f30cb57ba519ba21ae",
+      "model_id": "nass-background-v0",
+      "n": 969,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "nass",
+      "target_tsa": "Nass TSA"
     },
     {
       "calibration_rule": "none",
@@ -204,6 +624,26 @@
     },
     {
       "calibration_rule": "none",
+      "card": "notes/reference/calibration/pacific-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:f9229b1e1fdc92b00e4e7238ccbcd12c4a44d69b885345deca803eb51f26f7bc",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL"
+      ],
+      "metrics": "notes/reference/calibration/pacific-candidate/metrics.csv",
+      "metrics_sha256": "sha256:98761106237cb90ce55ade4803749f5a4a9191cf951e598c9ea3e2326506e95d",
+      "model_id": "pacific-background-v0",
+      "n": 49638,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "pacific",
+      "target_tsa": "Pacific TSA"
+    },
+    {
+      "calibration_rule": "none",
       "card": "notes/reference/calibration/prince-george-candidate/model-card.json",
       "card_mode": "unrecorded",
       "card_sha256": "sha256:7e4d4473ac299320993d3abf87fe723e34f44c3dbcbe13c71360085f96c3fdfe",
@@ -242,10 +682,133 @@
       "scope": "non-PL background; PL is excluded",
       "slug": "quesnel",
       "target_tsa": "Quesnel TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/revelstoke-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:ea050e779c6b62bc9a3d36b867549b7ad6211f6a00aecc48e5429fad2447b387",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/revelstoke-candidate/metrics.csv",
+      "metrics_sha256": "sha256:761a566b570d747e5873b07093c70e23b04d45475d11e32161c6b81dc2b336ec",
+      "model_id": "revelstoke-background-v0",
+      "n": 2701,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "revelstoke",
+      "target_tsa": "Revelstoke TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/robson-valley-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:3d83d248e9ac92c5f365197d0bfb627b9b4a4e1d15e8f24a8b5203f022eb1de4",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/robson-valley-candidate/metrics.csv",
+      "metrics_sha256": "sha256:218bc71b9bda45e3967a0792e85b66561e5127b3e19dc61afc1993eb209f605b",
+      "model_id": "robson-valley-background-v0",
+      "n": 4199,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "robson-valley",
+      "target_tsa": "Robson Valley TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/soo-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:60e5c13b7d2106aac8cefb8c8689d534d0799f05eff7b2e9308bfc26fb8ade26",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL"
+      ],
+      "metrics": "notes/reference/calibration/soo-candidate/metrics.csv",
+      "metrics_sha256": "sha256:1f3cf97a0bbc2bde46b0de233de306cd408cb65882c5a8da4cb64189be16f2c6",
+      "model_id": "soo-background-v0",
+      "n": 3283,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "soo",
+      "target_tsa": "Soo TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/strathcona-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:61306eb8520cb3ea089d21ad319432de57ddfa9cc3dee9a46fe8e1915bec2cab",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL"
+      ],
+      "metrics": "notes/reference/calibration/strathcona-candidate/metrics.csv",
+      "metrics_sha256": "sha256:6490a98309fac558852aa58bc698dd380bdd92e40b7ec4ae2e65cafb91363444",
+      "model_id": "strathcona-background-v0",
+      "n": 13042,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "strathcona",
+      "target_tsa": "Strathcona TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/sunshine-coast-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:510c9ba863d0a29eb7420b7640adbc61b4c9efd33f6fb7e5967ad3bbd79bc111",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL"
+      ],
+      "metrics": "notes/reference/calibration/sunshine-coast-candidate/metrics.csv",
+      "metrics_sha256": "sha256:869203307d21cf8fec1d87b7e708587644ea31260b5482f2be218fad9778e983",
+      "model_id": "sunshine-coast-background-v0",
+      "n": 58458,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "sunshine-coast",
+      "target_tsa": "Sunshine Coast TSA"
+    },
+    {
+      "calibration_rule": "none",
+      "card": "notes/reference/calibration/williams-lake-candidate/model-card.json",
+      "card_mode": "none",
+      "card_sha256": "sha256:eaa06e162c218e4b330034e82f71c6b198c002a55e9e8c3d7570afbd2913f9b7",
+      "groups": [
+        "FD",
+        "HW",
+        "OTHER",
+        "PL",
+        "SE"
+      ],
+      "metrics": "notes/reference/calibration/williams-lake-candidate/metrics.csv",
+      "metrics_sha256": "sha256:2c623db5d1d5d2340a04f7a8260beed432541c7e845a8242f26764d2180fa76e",
+      "model_id": "williams-lake-background-v0",
+      "n": 38812,
+      "review_status": "not_in_current_review",
+      "scope": "all supported groups",
+      "slug": "williams-lake",
+      "target_tsa": "Williams Lake TSA"
     }
   ],
   "counts": {
-    "not_in_current_review": 10,
+    "not_in_current_review": 38,
     "review_pending": 2
   },
   "policy": "notes/reference/calibration/calibration-policy.json",

@@ -69,16 +69,18 @@ Evidence: `d9-symmetric-audit.csv`.
 Optional means: use only with 20 sites, record the offsets, and do not silently
 apply it to the frozen card.
 
-## 5. Not frozen
+## 5. Evidence-only cards
 
-**Invermere** is not frozen:
+D9.104 freezes base cards for the remaining TSA labels, including **Invermere**
+and **100 Mile House**. These are evidence-only:
 
-- base AUC 0.704;
-- base log loss 0.4403;
-- symmetric local log loss 0.4404;
-- no meaningful improvement.
+- no local calibration is applied;
+- Invermere's weak base metrics remain visible (AUC 0.704, log loss 0.440);
+- the 100 Mile exclusion applies to the SBPS ingrowth candidate, not the
+  mortality card.
 
-Adding it would fill a map, not improve calibration.
+The cards are for the full calibration-quality picture. They are not supported
+local-calibration cases.
 
 ## 6. Excluded
 

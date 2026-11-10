@@ -1,0 +1,24 @@
+workflow:
+  id: all_tsa_cards
+  name: Freeze remaining TSA cards
+  description: >
+    Freeze base model cards for every TSA label that lacks one, then rebuild the
+    candidate registry. The cards use the current recipe and no local
+    calibration.
+
+nodes:
+  - id: freeze_missing
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/freeze_all_candidates.py
+      args: []
+  - id: rebuild_registry
+    provider: fresh_fvsbc.freshforge.native_script
+    needs:
+      - freeze_missing
+    parameters:
+      script: notes/reference/calibration/build_candidate_registry.py
+      args: []
+    artifacts:
+      registry: notes/reference/calibration/candidate-registry.json
+      table: notes/reference/calibration/CANDIDATE-REGISTRY.md
