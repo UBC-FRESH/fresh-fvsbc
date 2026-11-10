@@ -402,6 +402,25 @@ def test_the_deployment_calibration_workflow_validates_with_the_provider() -> No
     assert [node.id for node in spec.nodes] == ["estimate_offsets"]
 
 
+def test_the_score_inventory_workflow_validates_with_the_provider() -> None:
+    """The checked-in raw scoring workflow resolves its node."""
+    from freshforge.loading import load_workflow
+    from freshforge.providers import ProviderRegistry
+    from freshforge.validation import validate_workflow_with_providers
+
+    spec, diagnostics = load_workflow("workflows/freshforge/score_inventory.yaml")
+    assert spec is not None
+    registry = ProviderRegistry()
+    registry.register(NativeScriptProvider())
+    errors = validate_workflow_with_providers(
+        spec, registry=registry, structural_diagnostics=diagnostics
+    )
+    assert [
+        diagnostic for diagnostic in errors if diagnostic.code.startswith("node.provider")
+    ] == []
+    assert [node.id for node in spec.nodes] == ["score_rows"]
+
+
 def test_the_mpb_segment_workflow_validates_with_the_provider() -> None:
     """The checked-in MPB segment workflow resolves its native-script node."""
     from freshforge.loading import load_workflow

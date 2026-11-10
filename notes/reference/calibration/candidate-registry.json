@@ -25,7 +25,7 @@
       "calibration_rule": "symmetric (supported)",
       "card": "notes/reference/calibration/boundary-candidate/model-card.json",
       "card_mode": "conditional-symmetric",
-      "card_sha256": "sha256:02decc29258853a1d00a226742f7c010d6e3eea412ebd8e5308ad9b8cdf1f4da",
+      "card_sha256": "sha256:8a0760bbe8a6e0a1ad6a3f5873e4e9eb3fd2285a960deea93309d5baf29c1cb1",
       "groups": [
         "FD",
         "HW",
@@ -146,7 +146,7 @@
       "calibration_rule": "symmetric (supported)",
       "card": "notes/reference/calibration/mackenzie-candidate/model-card.json",
       "card_mode": "conditional-symmetric",
-      "card_sha256": "sha256:fcb238cda2339309346d9d67e597f893cbc8d2ddbcce2ff69f7db746b04d5863",
+      "card_sha256": "sha256:45d3c901bba172271e69c9582631f1a5a5ff9125f4e81a9cfbef99c780edc5d5",
       "groups": [
         "HW",
         "OTHER",
