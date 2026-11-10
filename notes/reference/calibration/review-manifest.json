@@ -1,20 +1,20 @@
 {
   "artifacts": {
     "notes/reference/calibration/REVIEW-INSTRUCTIONS.md": {
-      "bytes": 4582,
-      "sha256": "sha256:c4f48d768e83064c0621cda2bbc4b1f3719d6d852bfe68465a00dab4f12af812"
+      "bytes": 4610,
+      "sha256": "sha256:b4453e0b4d4d7280b42b9b5b25201d7f113b0ac728a86cd6a2491ee40ceeca61"
     },
     "notes/reference/calibration/bcmort_provincial.py": {
-      "bytes": 6893,
-      "sha256": "sha256:f33c866d59157786571a41dfd584a68590dadbc00673ccb08ed156c1fd1e627a"
+      "bytes": 8422,
+      "sha256": "sha256:0c5a8e12a737be21b9e5a8ae7e2d92766659f29dd3b4a568f74a8054c504c087"
     },
     "notes/reference/calibration/bcmort_provincial_calibration.py": {
       "bytes": 4308,
       "sha256": "sha256:0ea2c6924428d63a4cddc1b42133d9f82da4ddbe0da91334c38d89b67b17e18b"
     },
     "notes/reference/calibration/d9-candidate-review-package.md": {
-      "bytes": 3397,
-      "sha256": "sha256:76a5b6da39428f9f04ecee365437617beb5e8f4b23d90aae981117871a7b61ad"
+      "bytes": 3484,
+      "sha256": "sha256:d39a7639931b56676bc9d75d03cb72e063eefeae2d6317a29d3daf9f1151d21a"
     },
     "notes/reference/calibration/d9-freshforge-boundary.md": {
       "bytes": 1735,
@@ -52,6 +52,10 @@
       "bytes": 2656,
       "sha256": "sha256:6d7e97535ad0e639d2fac50b66071ee1ccd046239f8434c094eac126226432d9"
     },
+    "notes/reference/calibration/d9-review-addendum-1.md": {
+      "bytes": 2161,
+      "sha256": "sha256:0cb27fb2deab6fe3c708ed9059224611b4d61b678817a95935148e4ae362a194"
+    },
     "notes/reference/calibration/d9-small-tree-panel-summary.csv": {
       "bytes": 292,
       "sha256": "sha256:5faa488e1f80368aa1b0912bf68ff2f42ab1ad43d46f014fa0cf2194183518b3"
@@ -61,8 +65,8 @@
       "sha256": "sha256:2eb0404ce197ddadcabb298074e52ece1245eae1ebc78f6b0cf7ad95efb28ac0"
     },
     "notes/reference/calibration/fit_candidate.py": {
-      "bytes": 5628,
-      "sha256": "sha256:15ed4ffa4e03240e5834d8fdcda886155a728e452e95a9559efba09a69efc8ac"
+      "bytes": 11204,
+      "sha256": "sha256:787b93b85d11d0ca44a2e3f007b6649acd9c0a19e94c132200fd370f9a4cd31a"
     },
     "notes/reference/calibration/freeze_boundary.py": {
       "bytes": 4416,

@@ -17,6 +17,7 @@ from fresh_fvsbc.provenance import FVS_SOURCE_COMMIT, PYFVS_COMMIT
 
 ARTIFACTS = (
     "notes/reference/calibration/d9-candidate-review-package.md",
+    "notes/reference/calibration/d9-review-addendum-1.md",
     "notes/reference/calibration/REVIEW-INSTRUCTIONS.md",
     "notes/reports/d9-candidate-review-template.md",
     "notes/reference/calibration/quesnel-candidate/README.md",
