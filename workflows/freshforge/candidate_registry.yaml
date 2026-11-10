@@ -1,0 +1,14 @@
+workflow:
+  id: candidate_registry_check
+  name: Candidate registry check
+  description: >
+    Verify that the checksummed candidate registry and its Markdown table match
+    the frozen cards, the calibration policy, and the review statuses.
+
+nodes:
+  - id: check_registry
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/build_candidate_registry.py
+      args:
+        - --check
