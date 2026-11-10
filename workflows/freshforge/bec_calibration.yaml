@@ -1,0 +1,15 @@
+workflow:
+  id: bec_unit_calibration
+  name: BEC-unit calibration sweep
+  description: >
+    Evaluate BEC-unit-by-group local calibration with parent-zone fallback across
+    all TSA holdouts. Evidence only; no card is modified.
+
+nodes:
+  - id: run_bec_calibration
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/sweep_bec_calibration_parallel.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-bec-calibration.csv
