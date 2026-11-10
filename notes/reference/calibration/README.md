@@ -403,6 +403,10 @@ snapshot with the same row counts still needs a new manifest.
 | `bec_units.py` | The shared BEC-unit assignment |
 | `sweep_bec_calibration.py` | The per-TSA BEC calibration sweep |
 | `sweep_bec_calibration_parallel.py` | The parallel BEC calibration driver |
+| `d9-domain-calibration.md` | The D9.110 train-domain calibration note |
+| `d9-domain-calibration.csv` | The train-domain calibration table |
+| `sweep_domain_calibration.py` | The per-TSA domain calibration sweep |
+| `sweep_domain_calibration_parallel.py` | The parallel domain calibration driver |
 | `d9-bec-hierarchy.md` | The D9.108 hierarchical BEC fit note |
 | `d9-bec-hierarchy-holdout.csv` | The hierarchical holdout metrics |
 | `fit_bec_hierarchy.py` | The per-TSA hierarchical fit |

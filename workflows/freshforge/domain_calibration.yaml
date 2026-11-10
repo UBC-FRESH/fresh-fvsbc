@@ -1,0 +1,15 @@
+workflow:
+  id: domain_calibration
+  name: Train-TSA domain calibration
+  description: >
+    Estimate BEC-domain offsets from training TSAs and apply them to each
+    leave-one-TSA-out holdout. Evidence only; no card is modified.
+
+nodes:
+  - id: run_domain_calibration
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/sweep_domain_calibration_parallel.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-domain-calibration.csv
