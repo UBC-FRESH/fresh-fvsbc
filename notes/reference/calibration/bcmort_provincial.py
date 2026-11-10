@@ -23,8 +23,15 @@ TARGETS = ("Okanagan TSA", "Quesnel TSA")
 GROUPS = ("FD", "PL", "SE", "HW", "OTHER")
 
 
-def load() -> pd.DataFrame:
-    """Load and prepare the provincial tree-survival table."""
+def load(exclude_tsa: str | tuple[str, ...] | None = None) -> pd.DataFrame:
+    """Load and prepare the provincial tree-survival table.
+
+    Parameters
+    ----------
+    exclude_tsa : str or tuple of str, optional
+        TSAs excluded from the imputation medians. The default uses the full
+        frame, matching the historical cards.
+    """
     frame = pd.read_csv(
         DATA,
         usecols=[
@@ -47,6 +54,12 @@ def load() -> pd.DataFrame:
         ],
     )
     frame = frame[(frame["known"] == 1) & (frame["exposure"] > 0)].copy()
+    excluded = (
+        ()
+        if exclude_tsa is None
+        else ((exclude_tsa,) if isinstance(exclude_tsa, str) else exclude_tsa)
+    )
+    train_mask = ~frame["TSA_DESC"].astype(str).isin(excluded)
     frame["group"] = frame["group"].astype(str).str.upper()
     frame.loc[~frame["group"].isin(GROUPS[:-1]), "group"] = "OTHER"
     species_groups = (
@@ -72,15 +85,16 @@ def load() -> pd.DataFrame:
     raw["si"] = pd.to_numeric(raw["SI_TREE"], errors="coerce")
     raw = raw.groupby(["site", "visit0", "PLOT", "TREE_NO"], as_index=False)[["crown", "si"]].mean()
     frame = frame.merge(raw, on=["site", "visit0", "PLOT", "TREE_NO"], how="left")
+    train_mask = ~frame["TSA_DESC"].astype(str).isin(excluded)
     for column in ("crown", "si"):
-        medians[column] = float(frame[column].median())
+        medians[column] = float(frame.loc[train_mask, column].median())
         frame[column + "_missing"] = frame[column].isna().astype(float)
         frame[column] = frame[column].fillna(medians[column])
     frame["qmd"] = 100.0 * np.sqrt(4.0 * frame["ba0"] / (np.pi * frame["tph0"]))
     frame["rel_dbh"] = frame["dbh"] / frame.groupby(["interval_id", "PLOT"])["dbh"].transform("max")
     frame["hd"] = frame["HEIGHT"] / (frame["dbh"] / 100.0)
     for column in ("hd", "growth"):
-        medians[column] = float(frame[column].median())
+        medians[column] = float(frame.loc[train_mask, column].median())
         frame[column + "_missing"] = frame[column].isna().astype(float)
         frame[column] = frame[column].fillna(medians[column])
     frame["zone"] = frame["BEC"].astype(str).str.extract(r"^([A-Za-z]+)")[0].str.upper()
@@ -90,7 +104,12 @@ def load() -> pd.DataFrame:
         "zones": sorted(frame["zone"].dropna().unique()),
         "missing_flags": ["crown_missing", "si_missing", "hd_missing", "growth_missing"],
         "species_groups": {str(row.species): str(row.group) for row in species_groups.itertuples()},
-        "imputation": "full-frame medians; see the candidate review package",
+        "imputation": (
+            "training-only medians"
+            if excluded
+            else "full-frame medians; see the candidate review package"
+        ),
+        "imputation_excluded": list(excluded),
     }
     return frame
 

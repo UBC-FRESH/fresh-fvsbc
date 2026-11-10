@@ -157,10 +157,16 @@ def main() -> None:
     )
     parser.add_argument("--calibration-sites", type=int, default=20)
     parser.add_argument("--bootstrap", type=int, default=40)
+    parser.add_argument(
+        "--imputation",
+        choices=("full", "train"),
+        default="full",
+        help="Use full-frame or target-excluded medians.",
+    )
     args = parser.parse_args()
 
-    frame = bp.load()
     target_name = str(args.target_tsa)
+    frame = bp.load(exclude_tsa=target_name if args.imputation == "train" else None)
     train = frame[frame["TSA_DESC"].astype(str) != target_name]
     target = frame[frame["TSA_DESC"].astype(str) == target_name].copy()
     if target.empty:

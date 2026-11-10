@@ -378,6 +378,7 @@ snapshot with the same row counts still needs a new manifest.
 | `deployment_calibration.py` | The deployment offset estimator |
 | `d9-raw-scoring.md` | The D9.100 raw scoring note |
 | `score_inventory.py` | The raw inventory scorer |
+| `d9-imputation-sensitivity.md` | The D9.101 train-only imputation sensitivity |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |
