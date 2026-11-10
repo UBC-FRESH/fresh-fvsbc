@@ -224,3 +224,16 @@ freshforge run workflows/freshforge/candidate_registry.yaml --workdir . \
 
 The check covers card and metrics checksums, calibration-rule mapping, review
 status, and the generated Markdown table.
+
+## `deployment_calibration.yaml`
+
+Estimates supported deployment offsets from an external scored target table:
+
+```sh
+freshforge run workflows/freshforge/deployment_calibration.yaml --workdir . \
+  --evidence runtime/freshforge-deployment-calibration-evidence.json
+```
+
+It expects `runtime/scored-target.csv` with `site,group,eta,exposure,dead` and
+writes aggregate offsets plus optional calibrated predictions under `runtime/`.
+It does not re-score raw inventory.

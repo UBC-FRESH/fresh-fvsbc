@@ -1,0 +1,25 @@
+workflow:
+  id: deployment_calibration
+  name: Deployment calibration offsets
+  description: >
+    Estimate and record the supported deployment offsets from an external scored
+    target table. The scored table stays outside the repository; the workflow
+    writes only aggregate offsets and optional predictions under runtime/.
+
+nodes:
+  - id: estimate_offsets
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/deployment_calibration.py
+      args:
+        - --card
+        - notes/reference/calibration/boundary-candidate/model-card.json
+        - --scored
+        - runtime/scored-target.csv
+        - --output
+        - runtime/deployment-calibration.json
+        - --apply
+        - runtime/calibrated-predictions.csv
+    artifacts:
+      offsets: runtime/deployment-calibration.json
+      predictions: runtime/calibrated-predictions.csv
