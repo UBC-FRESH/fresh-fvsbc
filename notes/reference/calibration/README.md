@@ -374,6 +374,8 @@ snapshot with the same row counts still needs a new manifest.
 | `candidate-registry.json` | The checksummed candidate registry |
 | `CANDIDATE-REGISTRY.md` | The generated candidate table |
 | `build_candidate_registry.py` | The registry builder and checker |
+| `d9-deployment-calibration.md` | The D9.99 deployment helper note |
+| `deployment_calibration.py` | The deployment offset estimator |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |
