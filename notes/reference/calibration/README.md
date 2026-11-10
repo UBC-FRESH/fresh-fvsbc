@@ -394,6 +394,10 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-tsa-partial-sweep.csv` | The partial-pooled comparison table |
 | `sweep_partial.py` | The per-TSA partial sweep |
 | `sweep_partial_parallel.py` | The parallel partial sweep driver |
+| `d9-bec-stratification.md` | The D9.107 BEC hierarchy audit |
+| `d9-bec-stratification.csv` | BEC zone/subzone/variant support |
+| `d9-bec-strata.csv` | Pooled ecological units |
+| `bec_stratification.py` | The BEC stratification audit script |
 | `d9-candidate-review-package.md` | The D9.85 review package |
 | `REVIEW-INSTRUCTIONS.md` | The D9.85 reviewer instructions |
 | `review-manifest.json` | The D9.85 artifact checksums and scope |

@@ -1,0 +1,16 @@
+workflow:
+  id: bec_stratification_audit
+  name: BEC ecological stratification audit
+  description: >
+    Tabulate BEC zone, subzone, and variant support and assign pooled ecological
+    units. This is the hierarchy audit for the next model; it does not fit one.
+
+nodes:
+  - id: run_audit
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/bec_stratification.py
+      args: []
+    artifacts:
+      audit: notes/reference/calibration/d9-bec-stratification.csv
+      units: notes/reference/calibration/d9-bec-strata.csv
