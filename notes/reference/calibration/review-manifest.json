@@ -89,8 +89,8 @@
       "sha256": "sha256:ec0a00c8a90f9d33ced43325a428bdfec2c08be9aae95b0ac9677f4c6e2da0cc"
     },
     "notes/reference/calibration/okanagan-candidate/model-card.json": {
-      "bytes": 40064,
-      "sha256": "sha256:37776af42f0d17e66fc96142024ffd22777d1f01a1927392ee10c7aba38278f0"
+      "bytes": 42657,
+      "sha256": "sha256:64de7ed52feaeddbff1813632071b8816520220266de4795261c1cb72a7660d0"
     },
     "notes/reference/calibration/quesnel-candidate/JOINT-REPORT.md": {
       "bytes": 2897,
@@ -105,8 +105,8 @@
       "sha256": "sha256:a391515d0ff7694d758b99a1391307dcf3ac89e7b61096169966410723191750"
     },
     "notes/reference/calibration/quesnel-candidate/model-card.json": {
-      "bytes": 39452,
-      "sha256": "sha256:dfe6a1efd74e9be797a9dbe1399aad630652997321795cd2e56e22f349361ab3"
+      "bytes": 41999,
+      "sha256": "sha256:31a000257e2bbaad1db10e3b690481313df0c7b117fe569a9c7ff1a67579cc6a"
     },
     "notes/reference/calibration/quesnel-candidate/small-tree-boundary.json": {
       "bytes": 1087,

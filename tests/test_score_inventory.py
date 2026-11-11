@@ -114,8 +114,10 @@ def test_the_scorer_maps_species_codes(tmp_path: Path) -> None:
 
 
 def test_the_scorer_requires_preprocessing_metadata(tmp_path: Path) -> None:
-    """An older card without medians fails instead of guessing."""
+    """A card without medians fails instead of guessing."""
+    card = tmp_path / "card.json"
+    card.write_text('{"model_id": "no-preprocessing"}')
     source = _inventory(tmp_path / "inventory.csv")
-    completed = _run(QUESNEL, source, tmp_path / "scored.csv")
+    completed = _run(card, source, tmp_path / "scored.csv")
     assert completed.returncode != 0
     assert "no preprocessing" in completed.stderr

@@ -1,0 +1,14 @@
+workflow:
+  id: full_bc_review_bundle
+  name: Full-BC review bundle check
+  description: >
+    Verify that the full-BC review manifest pins 40 cards with preprocessing
+    metadata, metrics, policy evidence, and deployment artifacts.
+
+nodes:
+  - id: check_bundle
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/build_full_review_bundle.py
+      args:
+        - --check
