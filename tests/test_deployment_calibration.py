@@ -28,6 +28,8 @@ def _scored(path: Path, sites: int = 20) -> Path:
                     "eta": -2.0,
                     "exposure": 1.0,
                     "dead": 1,
+                    "unit": f"u{index:02d}",
+                    "bec_zone": "ICH",
                 }
             )
             rows.append(
@@ -37,6 +39,8 @@ def _scored(path: Path, sites: int = 20) -> Path:
                     "eta": 0.0,
                     "exposure": 1.0,
                     "dead": 0,
+                    "unit": f"u{index:02d}",
+                    "bec_zone": "ICH",
                 }
             )
     frame = pd.DataFrame(rows)
@@ -56,6 +60,8 @@ def _run(card: Path, scored: Path, output: Path, *extra: str) -> subprocess.Comp
             str(scored),
             "--policy",
             str(POLICY),
+            "--mode",
+            "fixed",
             "--output",
             str(output),
             *extra,
@@ -113,3 +119,28 @@ def test_the_helper_requires_a_policy_rule(tmp_path: Path) -> None:
     completed = _run(card, scored, tmp_path / "offsets.json")
     assert completed.returncode != 0
     assert "no policy rule" in completed.stderr
+
+
+def test_nested_policy_selects_and_applies_a_mode(tmp_path: Path) -> None:
+    """The nested policy chooses a mode and writes calibrated predictions."""
+    scored = _scored(tmp_path / "scored.csv")
+    output = tmp_path / "offsets.json"
+    completed = _run(
+        BOUNDARY,
+        scored,
+        output,
+        "--mode",
+        "nested",
+        "--apply",
+        str(tmp_path / "applied.csv"),
+    )
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(output.read_text())
+    assert payload["mode"] == "nested"
+    assert payload["rule"] in {
+        "base",
+        "tsa_partial_symmetric",
+        "bec_partial_symmetric",
+    }
+    applied = pd.read_csv(tmp_path / "applied.csv")
+    assert "calibrated_prediction" in applied.columns

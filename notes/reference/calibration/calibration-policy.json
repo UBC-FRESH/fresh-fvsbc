@@ -1,5 +1,6 @@
 {
   "claim": "Diagnostic candidate calibration policy. No bundle, certificate, yield, AAC, legal, or whole-block claim.",
+  "default_calibration": "nested support-aware policy",
   "default_rule": "none",
   "evidence_only": [
     "invermere",
@@ -42,6 +43,7 @@
     "symmetric": "Fit a species-group intercept when the group has support and is over- or underpredicted by more than 3 points."
   },
   "status": "frozen_policy",
+  "support_policy": "notes/reference/calibration/support-policy.json",
   "supported": {
     "boundary": {
       "base_log_loss": 0.3989,

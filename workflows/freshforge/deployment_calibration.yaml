@@ -16,6 +16,8 @@ nodes:
         - notes/reference/calibration/boundary-candidate/model-card.json
         - --scored
         - runtime/scored-target.csv
+        - --mode
+        - nested
         - --output
         - runtime/deployment-calibration.json
         - --apply

@@ -61,6 +61,17 @@ def main() -> None:
         if card.get("calibration", {}).get("mode") != "none":
             raise SystemExit(f"{slug} evidence card must use no local calibration")
 
+    support = json.loads(Path("notes/reference/calibration/support-policy.json").read_text())
+    if support.get("status") != "frozen_policy":
+        raise SystemExit("support policy is not frozen")
+    if support.get("default") != "nested":
+        raise SystemExit("support policy default is not nested")
+    evidence = support.get("evidence", {})
+    if int(evidence.get("improved", 0)) != 33:
+        raise SystemExit("support policy evidence is not the D9.111 result")
+    if not Path(str(evidence.get("summary", ""))).is_file():
+        raise SystemExit("support policy evidence file is missing")
+
     excluded = " ".join(policy.get("excluded", []))
     for phrase in ("100 Mile", "IDFdk", "ICHmw2", "CWH", "SBPSmk"):
         if phrase not in excluded:

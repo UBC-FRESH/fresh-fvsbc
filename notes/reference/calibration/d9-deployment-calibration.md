@@ -66,7 +66,18 @@ The workflow expects `runtime/scored-target.csv` and writes aggregate offsets an
 predictions under `runtime/`. It is a template until a scored target table is
 supplied.
 
-## 6. Claim boundary
+## 6. Nested policy default
+
+The helper now defaults to the D9.111 nested support-aware policy:
+
+- requires `unit` and `bec_zone` in the scored table;
+- chooses base, TSA partial, or BEC partial by nested site cross-validation;
+- records the selected mode and offsets;
+- `--mode fixed` retains the earlier one-sided/symmetric behavior.
+
+Evidence: `support-policy.json`, `d9-support-policy.csv`.
+
+## 7. Claim boundary
 
 Deployment calibration offsets only. Not a bundle, certificate, yield, AAC,
 legal, or whole-block claim. The Quesnel/Okanagan review package is unchanged.
