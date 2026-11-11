@@ -5375,30 +5375,18 @@ function configureAssistant(info) {
   state.assistant.available = Boolean(info?.available);
   state.assistant.mode = state.assistant.enabled && state.assistant.available ? "agent" : "local";
   const model = document.getElementById("assistant-model");
-  const select = document.getElementById("assistant-model-select");
   const guide = document.getElementById("assistant-guide");
   if (guide) guide.hidden = state.assistant.mode !== "agent";
   if (state.assistant.mode === "agent") {
-    const models = Array.isArray(info.models) && info.models.length ? info.models : [info.model];
-    const current = models.includes(state.assistant.model) ? state.assistant.model : info.model;
-    state.assistant.model = current;
-    if (select) {
-      select.replaceChildren(...models.map((modelId) =>
-        el("option", { value: modelId, selected: modelId === current }, modelId.split("/").pop()),
-      ));
-      select.value = current;
-      select.hidden = false;
+    state.assistant.model = info?.model ?? null;
+    if (model) {
+      const short = String(info?.model || "agent").split("/").pop();
+      model.textContent = `${short} · plan · read-only · locked`;
     }
-    if (model) model.hidden = true;
     assistantStatus("Enter sends · Shift+Enter adds a newline.");
   } else {
     state.assistant.model = null;
-    if (select) {
-      select.hidden = true;
-      select.replaceChildren();
-    }
     if (model) {
-      model.hidden = false;
       model.textContent = info?.enabled && !info?.available
         ? "local summary · opencode unavailable"
         : "local summary reader";
@@ -5490,7 +5478,6 @@ async function sendAssistant(message) {
             ? {
                 message: clean,
                 session: state.assistant.session,
-                model: state.assistant.model,
                 context: assistantContext(),
                 run: state.run?.id ?? null,
                 year: state.standYear,
@@ -5559,14 +5546,6 @@ async function boot() {
   document.getElementById("assistant-export").addEventListener("click", exportAssistantTranscript);
   document.getElementById("assistant-stop").addEventListener("click", () => {
     state.assistant.controller?.abort();
-  });
-  document.getElementById("assistant-model-select").addEventListener("change", (event) => {
-    state.assistant.model = event.target.value;
-    const chats = readSavedChats();
-    updateAssistantSavedContext(
-      chats.find((chat) => chat.id === state.assistant.savedChat) ?? null,
-    );
-    assistantStatus(`Model set to ${event.target.value.split("/").pop()}.`);
   });
   document.getElementById("assistant-pin").addEventListener("click", pinAssistantChat);
   document.getElementById("assistant-saved-load").addEventListener("click", loadAssistantChat);

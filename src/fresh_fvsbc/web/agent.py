@@ -16,7 +16,6 @@ import re
 import shutil
 import subprocess
 from collections.abc import Mapping
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -28,7 +27,6 @@ __all__ = [
     "FRESH_WORKSPACES",
     "AgentError",
     "agent_info",
-    "agent_models",
     "parse_agent_events",
     "run_agent",
     "split_actions",
@@ -102,29 +100,6 @@ class AgentError(RuntimeError):
         super().__init__(message)
 
 
-@lru_cache(maxsize=1)
-def agent_models() -> tuple[str, ...]:
-    """Return the model ids the installed OpenCode CLI reports, or an empty tuple."""
-    executable = shutil.which("opencode")
-    if executable is None:
-        return ()
-    try:
-        completed = subprocess.run(
-            [executable, "models"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return ()
-    if completed.returncode != 0:
-        return ()
-    return tuple(
-        line.strip() for line in completed.stdout.splitlines() if "/" in line and line.strip()
-    )
-
-
 def agent_info(
     *,
     enabled: bool,
@@ -148,13 +123,12 @@ def agent_info(
     Returns
     -------
     dict
-        ``enabled``, ``available``, ``model``, ``models``, ``workspace``, and ``timeout``.
+        ``enabled``, ``available``, ``model``, ``workspace``, and ``timeout``.
     """
     return {
         "enabled": enabled,
         "available": shutil.which("opencode") is not None,
         "model": model,
-        "models": list(agent_models()),
         "workspace": str(workspace),
         "timeout": timeout,
     }

@@ -518,7 +518,7 @@ def test_the_agent_endpoint_reports_disabled_by_default(client: TestClient) -> N
     payload = client.get("/api/agent").json()
     assert payload["enabled"] is False
     assert payload["model"]
-    assert isinstance(payload["models"], list)
+    assert "models" not in payload
     assert "workspace" in payload
     assert "timeout" in payload
 
@@ -611,10 +611,10 @@ def test_agent_chat_enriches_context_and_validates_chips(
     assert captured["timeout"] == 12.0
 
 
-def test_agent_chat_accepts_a_listed_model_and_rejects_an_unknown_one(
+def test_agent_chat_locks_the_configured_model(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """The selected model must be the default or one the CLI actually reports."""
+    """A client-supplied model cannot override the startup model."""
     _make_run(tmp_path / "run-a")
     captured: dict[str, object] = {}
 
@@ -637,27 +637,21 @@ def test_agent_chat_accepts_a_listed_model_and_rejects_an_unknown_one(
         }
 
     monkeypatch.setattr(webapp, "run_agent", fake_run)
-    monkeypatch.setattr(webapp, "agent_models", lambda: ("provider/model", "provider/other"))
     client = TestClient(
         webapp.create_app(
             [tmp_path],
             allow_agent=True,
-            agent_model="provider/model",
+            agent_model="provider/locked",
             agent_workspace=tmp_path,
         )
     )
     response = client.post(
         "/api/agent/chat",
-        json={"message": "hello", "run": "run-a", "model": "provider/other"},
+        json={"message": "hello", "run": "run-a", "model": "provider/costly"},
     )
     assert response.status_code == 200
-    assert captured["model"] == "provider/other"
-    assert response.json()["model"] == "provider/other"
-    refused = client.post(
-        "/api/agent/chat",
-        json={"message": "hello", "run": "run-a", "model": "provider/unknown"},
-    )
-    assert refused.status_code == 400
+    assert captured["model"] == "provider/locked"
+    assert response.json()["model"] == "provider/locked"
 
 
 def test_agent_chat_refuses_a_bad_session_and_missing_run(

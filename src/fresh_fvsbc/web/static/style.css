@@ -919,19 +919,6 @@ svg.chart .chart-legend { fill: var(--muted); font-size: 11px; }
 .compare-saved-row input { min-width: 180px; flex: 1 1 180px; }
 .compare-saved-row button { font-size: 12px; }
 
-.assistant-model-select {
-  display: block;
-  max-width: 100%;
-  margin-top: 4px;
-  padding: 2px 6px;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  background: var(--panel);
-  color: var(--muted);
-  font: inherit;
-  font-size: 10px;
-}
-.assistant-model-select:hover { color: var(--accent); border-color: var(--accent); }
 .assistant-meta {
   margin-top: 5px;
   color: var(--muted);
