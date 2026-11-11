@@ -1,0 +1,15 @@
+workflow:
+  id: support_calibration_policy
+  name: Nested support-aware calibration policy
+  description: >
+    Choose base, TSA partial, or BEC partial calibration by nested site
+    cross-validation and evaluate on outer site folds. Evidence only.
+
+nodes:
+  - id: run_support_policy
+    provider: fresh_fvsbc.freshforge.native_script
+    parameters:
+      script: notes/reference/calibration/sweep_support_policy_parallel.py
+      args: []
+    artifacts:
+      summary: notes/reference/calibration/d9-support-policy.csv
