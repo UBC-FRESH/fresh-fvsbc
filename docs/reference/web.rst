@@ -60,12 +60,11 @@ service also strips common provider and cloud secrets from the child environment
 risk-reduction measure, not a sandbox or an authentication boundary.
 
 ``GET /api/agent`` reports whether the agent is enabled, whether ``opencode`` is on the path, the
-default model, the models reported by ``opencode models``, the workspace, and the timeout.
-``GET /api/agent/guide.md`` returns the instruction sheet. ``POST /api/agent/chat`` accepts
-``message``, optional ``session``, optional ``model``, compact UI ``context``, ``run``, and
-``year``; the server injects the run's summary, provenance pins, and calibration review state. A
-non-default model must appear in the CLI's reported list, so the browser cannot invent a provider
-or model string.
+locked model, the workspace, and the timeout. ``GET /api/agent/guide.md`` returns the instruction
+sheet. ``POST /api/agent/chat`` accepts ``message``, optional ``session``, compact UI ``context``,
+``run``, and ``year``; the server injects the run's summary, provenance pins, and calibration
+review state. The model is fixed by ``--agent-model`` and cannot be changed by the request, so the
+browser cannot select another provider or model.
 A validated reply may carry safe UI chips for opening a workspace, panel, run, or stand year,
 for opening a table filtered to a cited column/value, or for putting a follow-up prompt in the
 input. The server checks a table citation against the open run before returning it.
@@ -73,8 +72,7 @@ input. The server checks a table citation against the open run before returning 
 The browser keeps the current assistant conversation and OpenCode session in ``sessionStorage``
 for that tab; **New** clears both. **Copy** and **Export** write a Markdown transcript with the
 run, context, mode, model, session, messages, citations, tool use, and follow-up chips. Each
-assistant reply also records the model that produced it, so a transcript remains accurate after
-the selector changes. **Stop waiting** aborts the browser request, but the local OpenCode process
+assistant reply also records the model that produced it. **Stop waiting** aborts the browser request, but the local OpenCode process
 may still finish in the background, and the panel says so rather than pretending the model was
 cancelled.
 
@@ -84,7 +82,7 @@ but leaves pinned ones alone. The name bar under the drawer header shows the act
 **Rename** directly; it shows “Unsaved chat” after **New**. A search field filters the saved-chat
 list but always keeps the active chat visible, and a sort control orders chats by recency or name.
 The context line names the saved model (full id in its tooltip) and flags when the currently
-selected model differs. At most ten are kept, they never reach the service, and **Load** restores the same
+configured model differs. At most ten are kept, they never reach the service, and **Load** restores the same
 session id so the next turn can continue it when the local agent still knows that session.
 **Export JSON** downloads every saved chat with ``version``, ``exported_at``, names, timestamps,
 sessions, saved run/view/model context, and message metadata; rename refuses a name already used by

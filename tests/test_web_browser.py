@@ -1522,8 +1522,8 @@ def test_the_assistant_sends_on_enter_and_adds_a_newline_on_shift_enter(cockpit:
             browser.close()
 
 
-def test_the_assistant_model_selector_sends_the_chosen_model(cockpit: str) -> None:
-    """The drawer lists the CLI models and records the selected model per reply."""
+def test_the_assistant_uses_the_locked_server_model(cockpit: str) -> None:
+    """The drawer shows the configured model and cannot send a different one."""
     expect = playwright_module.expect
     with playwright_module.sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -1539,7 +1539,6 @@ def test_the_assistant_model_selector_sends_the_chosen_model(cockpit: str) -> No
                         "enabled": True,
                         "available": True,
                         "model": "provider/model",
-                        "models": ["provider/model", "provider/other"],
                         "workspace": "/tmp",
                         "timeout": 30.0,
                     }
@@ -1555,7 +1554,7 @@ def test_the_assistant_model_selector_sends_the_chosen_model(cockpit: str) -> No
                     {
                         "reply": "model answer",
                         "session": "ses_test",
-                        "model": captured["model"],
+                        "model": "provider/model",
                         "actions": [],
                         "chips": [],
                     }
@@ -1567,27 +1566,25 @@ def test_the_assistant_model_selector_sends_the_chosen_model(cockpit: str) -> No
         try:
             page.goto(f"{cockpit}/?workspace=stand&run={RUN_ID}", wait_until="networkidle")
             page.get_by_role("button", name="Ask the FVS assistant").click()
-            select = page.locator("#assistant-model-select")
-            expect(select).to_be_visible()
-            expect(select.locator("option")).to_have_count(2)
-            select.select_option("provider/other")
+            expect(page.locator("#assistant-model-select")).to_have_count(0)
+            expect(page.locator("#assistant-model")).to_contain_text(
+                "model · plan · read-only · locked"
+            )
             page.locator("#assistant-input").fill("hello")
             page.locator("#assistant-input").press("Enter")
             expect(page.locator("#assistant-log")).to_contain_text("model answer")
-            expect(page.locator(".assistant-meta")).to_have_text("provider/other")
-            assert captured["model"] == "provider/other"
+            expect(page.locator(".assistant-meta")).to_have_text("provider/model")
+            assert "model" not in captured
 
             page.locator("#assistant-saved summary").click()
             page.locator("#assistant-pin-name").fill("Model chat")
             page.get_by_role("button", name="Pin current").click()
             context = page.locator("#assistant-saved-context")
-            expect(context).to_contain_text("saved model other")
-            assert context.get_attribute("title") == "Saved model: provider/other"
+            expect(context).to_contain_text("saved model model")
+            assert context.get_attribute("title") == "Saved model: provider/model"
             expect(page.locator("#assistant-saved-select option:checked")).to_have_attribute(
-                "title", re.compile(r"provider/other")
+                "title", re.compile(r"provider/model")
             )
-            select.select_option("provider/model")
-            expect(context).to_contain_text("current model model")
         finally:
             browser.close()
 
