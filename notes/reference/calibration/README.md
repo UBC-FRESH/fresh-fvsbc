@@ -412,6 +412,10 @@ snapshot with the same row counts still needs a new manifest.
 | `sweep_support_policy.py` | The per-TSA nested policy |
 | `sweep_support_policy_parallel.py` | The parallel policy driver |
 | `support-policy.json` | The frozen nested support-aware policy |
+| `d9-full-bc-review-bundle.md` | The D9.113 full-BC review bundle |
+| `FULL-BC-REVIEW-INSTRUCTIONS.md` | The full-BC reviewer instructions |
+| `full-bc-review-manifest.json` | The full-BC bundle manifest |
+| `build_full_review_bundle.py` | The full-BC bundle builder/checker |
 | `d9-bec-hierarchy.md` | The D9.108 hierarchical BEC fit note |
 | `d9-bec-hierarchy-holdout.csv` | The hierarchical holdout metrics |
 | `fit_bec_hierarchy.py` | The per-TSA hierarchical fit |

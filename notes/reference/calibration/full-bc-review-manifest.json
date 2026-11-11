@@ -1,0 +1,451 @@
+{
+  "artifacts": {
+    "notes/reference/calibration/100-mile-house-candidate/metrics.csv": {
+      "bytes": 698,
+      "sha256": "sha256:dc03da5e0caa23cb9d3517cf08ce8dfe8106c9b3c7fc3b08732f62fd4359c115"
+    },
+    "notes/reference/calibration/100-mile-house-candidate/model-card.json": {
+      "bytes": 42900,
+      "sha256": "sha256:23f0a75a819a2c136f59d4136d2fb35a13185e3eef784a7e963dd7c6c7d945c4"
+    },
+    "notes/reference/calibration/CALIBRATION-POLICY.md": {
+      "bytes": 3905,
+      "sha256": "sha256:030c184a5e5db3ea0153b4aacb47d1201b2a3b2a743237abb576b44bc417969e"
+    },
+    "notes/reference/calibration/CANDIDATE-REGISTRY.md": {
+      "bytes": 4934,
+      "sha256": "sha256:a8724bb169a79371279b4d9aff5e57d08adc96088e32663aa94ed9fd759d6064"
+    },
+    "notes/reference/calibration/FULL-BC-REVIEW-INSTRUCTIONS.md": {
+      "bytes": 2602,
+      "sha256": "sha256:911c57fd08bbf5c828ff454bf336ad8d062a34965180f7f7f56c72b944123933"
+    },
+    "notes/reference/calibration/REVIEW-INSTRUCTIONS.md": {
+      "bytes": 4610,
+      "sha256": "sha256:b4453e0b4d4d7280b42b9b5b25201d7f113b0ac728a86cd6a2491ee40ceeca61"
+    },
+    "notes/reference/calibration/arrow-candidate/metrics.csv": {
+      "bytes": 706,
+      "sha256": "sha256:7d232b3e8ef373f6b14890148093e6e664ab631b16988c45c976999619d34c07"
+    },
+    "notes/reference/calibration/arrow-candidate/model-card.json": {
+      "bytes": 43158,
+      "sha256": "sha256:a59c7e8bf185872bdaf8605e874db4f20229aff4a36e69129fad32c9dc4eddfc"
+    },
+    "notes/reference/calibration/arrowsmith-candidate/metrics.csv": {
+      "bytes": 594,
+      "sha256": "sha256:bd27f9b424e211458496ba049358860fa1aa1ad74f27dd66cd6d2d07434254e6"
+    },
+    "notes/reference/calibration/arrowsmith-candidate/model-card.json": {
+      "bytes": 35881,
+      "sha256": "sha256:3849ce32ce70b4ed5d25fe172ee3e022055367e468d96cfbd8542791af925956"
+    },
+    "notes/reference/calibration/boundary-candidate/metrics.csv": {
+      "bytes": 701,
+      "sha256": "sha256:b3c440f0ea7ea33fdcc6e2052a23c781edb7cb4c2782e2f616ede5f0c5863f1d"
+    },
+    "notes/reference/calibration/boundary-candidate/model-card.json": {
+      "bytes": 43350,
+      "sha256": "sha256:8a0760bbe8a6e0a1ad6a3f5873e4e9eb3fd2285a960deea93309d5baf29c1cb1"
+    },
+    "notes/reference/calibration/bulkley-candidate/metrics.csv": {
+      "bytes": 590,
+      "sha256": "sha256:eaf4475cfb30bf796d73a326c99c8a295b0abdb4b7079527f90211890b2e3d3e"
+    },
+    "notes/reference/calibration/bulkley-candidate/model-card.json": {
+      "bytes": 36223,
+      "sha256": "sha256:53960a66852b6a51f161d2ab257f608ac39ed0cf57c2d8fa02d1980eaa86cd8b"
+    },
+    "notes/reference/calibration/calibration-policy.json": {
+      "bytes": 2278,
+      "sha256": "sha256:d249ccf3620d16c8efeb37570a3e2aed878c71282eb07375729c98806f0a89c9"
+    },
+    "notes/reference/calibration/candidate-registry.json": {
+      "bytes": 29716,
+      "sha256": "sha256:76026d8fcb89178a3f1b0b5a7b8fe76bda1205141abde36d94d5cd7201b29149"
+    },
+    "notes/reference/calibration/cascadia-candidate/metrics.csv": {
+      "bytes": 699,
+      "sha256": "sha256:92dca3ecab0435c7e5bf9474caae30ab4b06d9f4d5a4257d7c3a91a5c4c0259a"
+    },
+    "notes/reference/calibration/cascadia-candidate/model-card.json": {
+      "bytes": 43152,
+      "sha256": "sha256:3f4f6865da849098ec4d9ff63d3b3f9852b4c404054efd6c4feb7adc1554f29a"
+    },
+    "notes/reference/calibration/cassiar-candidate/metrics.csv": {
+      "bytes": 581,
+      "sha256": "sha256:8290b6f3e04f93698a5e513b6e6b9822f5ca99a80aa445ec5a7315b2d882fb8d"
+    },
+    "notes/reference/calibration/cassiar-candidate/model-card.json": {
+      "bytes": 35976,
+      "sha256": "sha256:a4f6ddcdbcd8311390b29fc1b191be5fc5840b83d48bc217c479d5e1f3573c0b"
+    },
+    "notes/reference/calibration/cranbrook-candidate/metrics.csv": {
+      "bytes": 700,
+      "sha256": "sha256:d79bfca2124b6b3797c48bbd34e58df5dd12096d632fa66b64a62bfec2600c8f"
+    },
+    "notes/reference/calibration/cranbrook-candidate/model-card.json": {
+      "bytes": 43032,
+      "sha256": "sha256:19af9258b8a61c912be3636ba18795f4a9c63c3e15da9892be17620b51d44b1f"
+    },
+    "notes/reference/calibration/d9-bec-calibration.csv": {
+      "bytes": 18574,
+      "sha256": "sha256:12e4ece95c4f5faaf2feb15945aed0120213f13f10b1e77afe506bfa98e50e75"
+    },
+    "notes/reference/calibration/d9-bec-hierarchy.md": {
+      "bytes": 1879,
+      "sha256": "sha256:38da63691fc5975d1779bf473e1b244ae924341e572ffa4701f8e0a36c452da7"
+    },
+    "notes/reference/calibration/d9-bec-strata.csv": {
+      "bytes": 4049,
+      "sha256": "sha256:88d9c15fe8cbd0e9164504e355ad5a53333a2b2ccac5dc0b71423e614b3eeda0"
+    },
+    "notes/reference/calibration/d9-bec-stratification.csv": {
+      "bytes": 12572,
+      "sha256": "sha256:c0455c3520d71b3e2ca0fb3dfd8f8f303f9594598edeaefe27426302fc0d4d24"
+    },
+    "notes/reference/calibration/d9-bec-stratification.md": {
+      "bytes": 3055,
+      "sha256": "sha256:9ad28bc644678a4b82d115e3d5ac9341dfe2e6c21f61387944021a8b550a677c"
+    },
+    "notes/reference/calibration/d9-candidate-review-package.md": {
+      "bytes": 3484,
+      "sha256": "sha256:d39a7639931b56676bc9d75d03cb72e063eefeae2d6317a29d3daf9f1151d21a"
+    },
+    "notes/reference/calibration/d9-deployment-calibration.md": {
+      "bytes": 2444,
+      "sha256": "sha256:a7f417bdbc0a9ea8313adb1f330fb09b809ab125781072c8de697854a40f00f5"
+    },
+    "notes/reference/calibration/d9-domain-calibration.csv": {
+      "bytes": 17310,
+      "sha256": "sha256:63293e7fef7f7d3b3cae3c8c71012126b168edc124f5e7ef1418d21bc52f9e28"
+    },
+    "notes/reference/calibration/d9-full-bc-review-bundle.md": {
+      "bytes": 2753,
+      "sha256": "sha256:c5f3707e2d1152a7495fbc0d5e04a48643e73bcd7965f38e3350cfaeeb175dfc"
+    },
+    "notes/reference/calibration/d9-imputation-sensitivity.md": {
+      "bytes": 2079,
+      "sha256": "sha256:82d4ad26f82085d340e6bfa4dc968f0622239ddbc47c227eba3891f939dd7a62"
+    },
+    "notes/reference/calibration/d9-raw-scoring.md": {
+      "bytes": 2057,
+      "sha256": "sha256:1e28e479dcefa508a73eb3146abc51a8685589c0818a900b140bcb4a69da8056"
+    },
+    "notes/reference/calibration/d9-review-addendum-1.md": {
+      "bytes": 2161,
+      "sha256": "sha256:0cb27fb2deab6fe3c708ed9059224611b4d61b678817a95935148e4ae362a194"
+    },
+    "notes/reference/calibration/d9-support-policy.csv": {
+      "bytes": 5973,
+      "sha256": "sha256:ec84fb6dd92a7f939a7824bb5061b7efbbe31ad31d7b556401d06ac178551e95"
+    },
+    "notes/reference/calibration/d9-support-policy.md": {
+      "bytes": 5544,
+      "sha256": "sha256:b8f184b20aff4d0f558a014f8f5d0e859b93c9adb2fad3e02fd039f1f38140a3"
+    },
+    "notes/reference/calibration/d9-tsa-calibration-sweep.csv": {
+      "bytes": 28687,
+      "sha256": "sha256:eba34afb51b125a83406a0655161e0e4683eef7627b5408f2388a1f392fff18b"
+    },
+    "notes/reference/calibration/d9-tsa-local-sweep.csv": {
+      "bytes": 18863,
+      "sha256": "sha256:c0fdbcb5110f450b3748f2ecbc4a4b59237ee0b8933f6b4fcb1e9f6c4332d343"
+    },
+    "notes/reference/calibration/d9-tsa-partial-sweep.csv": {
+      "bytes": 20000,
+      "sha256": "sha256:997f261e86e72b635ef93d817b576780223f1ae4aae9e1d96eeb033801510dac"
+    },
+    "notes/reference/calibration/dawson-creek-candidate/metrics.csv": {
+      "bytes": 591,
+      "sha256": "sha256:d2859d1749ca4274a7ee73bcaac594361cb13c5d15358b8a690404aac96fc780"
+    },
+    "notes/reference/calibration/dawson-creek-candidate/model-card.json": {
+      "bytes": 36302,
+      "sha256": "sha256:ac4f3e5a4b6b225c6ee819d62129fc6b2ca5af47bbc14c92a07f268c26f6bc25"
+    },
+    "notes/reference/calibration/deployment_calibration.py": {
+      "bytes": 10137,
+      "sha256": "sha256:0caf92398ff19fee0fafbff9703553e04d73ad5a68f3e1991dc8b9772eff7f76"
+    },
+    "notes/reference/calibration/fort-nelson-candidate/metrics.csv": {
+      "bytes": 592,
+      "sha256": "sha256:d3c405b769b4d466522965c764d8cbde69eaca92e0133388e129b160f4dfbcf8"
+    },
+    "notes/reference/calibration/fort-nelson-candidate/model-card.json": {
+      "bytes": 36347,
+      "sha256": "sha256:9d9c72f58bf782e0604c4ba5f5c3516a1e520cd3e324cf977ae2727b9248e187"
+    },
+    "notes/reference/calibration/fort-st-john-candidate/metrics.csv": {
+      "bytes": 592,
+      "sha256": "sha256:05ac323c3a94053af538fa6ee2f8f59821a0379947d7d3ba59076ad0b85feb86"
+    },
+    "notes/reference/calibration/fort-st-john-candidate/model-card.json": {
+      "bytes": 36321,
+      "sha256": "sha256:4bd492626ec49f9f6a8b86e56eab1128ed77b682ee52a718bcae180bc66cc7a8"
+    },
+    "notes/reference/calibration/fraser-candidate/metrics.csv": {
+      "bytes": 487,
+      "sha256": "sha256:ffaf62abcc1a82179f36b4a5a29050b9d93b2f58ac7694c18d5dc7fe0e3c53dd"
+    },
+    "notes/reference/calibration/fraser-candidate/model-card.json": {
+      "bytes": 29129,
+      "sha256": "sha256:30281b7775d495f986894fa6ee2cce0f9e59b49ea83ed6f91b0c19ad6529e7e6"
+    },
+    "notes/reference/calibration/gbr-north-candidate/metrics.csv": {
+      "bytes": 575,
+      "sha256": "sha256:109be8da10643acfea93cd89697bda98059d30f61ead3e268cf45e4042ee9c00"
+    },
+    "notes/reference/calibration/gbr-north-candidate/model-card.json": {
+      "bytes": 35823,
+      "sha256": "sha256:9dc9a3eca34814ec6b50677d888e2d37613115420da236f29fd5a266a30542a4"
+    },
+    "notes/reference/calibration/gbr-south-candidate/metrics.csv": {
+      "bytes": 483,
+      "sha256": "sha256:06a71247314309845ed876f2c30d0a40dfb85fdcdf26d651075c30ef0b0ca1f5"
+    },
+    "notes/reference/calibration/gbr-south-candidate/model-card.json": {
+      "bytes": 28446,
+      "sha256": "sha256:371347312d6a1254374fa247d62b377cd28b4ad8776efe01734e0df313bf30fe"
+    },
+    "notes/reference/calibration/golden-candidate/metrics.csv": {
+      "bytes": 692,
+      "sha256": "sha256:433ccd20862b919325b3b77c1bfe7a04e574b760251df1aac8f60791528f9943"
+    },
+    "notes/reference/calibration/golden-candidate/model-card.json": {
+      "bytes": 43142,
+      "sha256": "sha256:a8689194351402c254cba909d1f5805b57aa0090e9b06967b8bcec7ab5f238d9"
+    },
+    "notes/reference/calibration/haida-gwaii-candidate/metrics.csv": {
+      "bytes": 381,
+      "sha256": "sha256:89634bd4f63c323097bad7c23b96a82345cc5cd0fdb5984546286e51b50f1c29"
+    },
+    "notes/reference/calibration/haida-gwaii-candidate/model-card.json": {
+      "bytes": 21635,
+      "sha256": "sha256:60457d4eded9377c616ef54766869dde811bc19485bc5ac1872fbe0339168e94"
+    },
+    "notes/reference/calibration/invermere-candidate/metrics.csv": {
+      "bytes": 695,
+      "sha256": "sha256:7650d4b89f4853b46adfc571bdc9a6561c5a6d5bc44927770f16ba1441c89185"
+    },
+    "notes/reference/calibration/invermere-candidate/model-card.json": {
+      "bytes": 43090,
+      "sha256": "sha256:f9ac9689ecdbb4b566fea6a84925cb8a8ffee0e86bc2fe03e5d1c44edd74d18e"
+    },
+    "notes/reference/calibration/kalum-candidate/metrics.csv": {
+      "bytes": 484,
+      "sha256": "sha256:d303adea22d3b8a4b1f0d5b98ec2a10ec964ca419f86e265fdf8157b447e0b2b"
+    },
+    "notes/reference/calibration/kalum-candidate/model-card.json": {
+      "bytes": 29185,
+      "sha256": "sha256:02a8d2e33bf0b46af570b9477dd5027b6f4a68a7cdb42a1c97ec0906ee32179a"
+    },
+    "notes/reference/calibration/kamloops-candidate/metrics.csv": {
+      "bytes": 701,
+      "sha256": "sha256:2fd31deea1cc46b6d2cb973118c2319c33b3c50d09ac51f4e001a92a746990f1"
+    },
+    "notes/reference/calibration/kamloops-candidate/model-card.json": {
+      "bytes": 43169,
+      "sha256": "sha256:6c475e2d1285397d6639f632d89cdc0cf204eb274ec6162e4e4de18d91a2d4e2"
+    },
+    "notes/reference/calibration/kingcome-candidate/metrics.csv": {
+      "bytes": 554,
+      "sha256": "sha256:81bfe0232adca929ddfee832993b609f538776ff2c7b2ad765a26d8dbaf6e02e"
+    },
+    "notes/reference/calibration/kingcome-candidate/model-card.json": {
+      "bytes": 36041,
+      "sha256": "sha256:3c774dd88a3f298fe0db265f8d27618b4902278d8ad1f2880354a58dd8e1047b"
+    },
+    "notes/reference/calibration/kispiox-candidate/metrics.csv": {
+      "bytes": 592,
+      "sha256": "sha256:77d47f5331a08a4fd2331631574ea69e5150dd4277e3343e200732e4cbc8e783"
+    },
+    "notes/reference/calibration/kispiox-candidate/model-card.json": {
+      "bytes": 36055,
+      "sha256": "sha256:c648752b5a12896723eafd0588fb480dc72333c7f258b5fa14887c1fdef5f28c"
+    },
+    "notes/reference/calibration/kootenay-lake-candidate/metrics.csv": {
+      "bytes": 694,
+      "sha256": "sha256:4d2500805586c2df73141f94a6c9e2f435a09cf610f52d600778121c0558997f"
+    },
+    "notes/reference/calibration/kootenay-lake-candidate/model-card.json": {
+      "bytes": 43165,
+      "sha256": "sha256:bddef77974f3348cc83fbad3c7bfdbead9dc978cdb57705a740856edb837b27d"
+    },
+    "notes/reference/calibration/lakes-candidate/metrics.csv": {
+      "bytes": 585,
+      "sha256": "sha256:b605fcb4c14a2aceafcfa0fc2fa0b25ffe788456e0a026aae2279e05457047b2"
+    },
+    "notes/reference/calibration/lakes-candidate/model-card.json": {
+      "bytes": 36286,
+      "sha256": "sha256:f818cd3facb96fb86ec19659d32433a0ae64f775b639d3bab23390d0fc63f307"
+    },
+    "notes/reference/calibration/lillooet-candidate/metrics.csv": {
+      "bytes": 582,
+      "sha256": "sha256:ec0cc16d3ffa00b1e627697d1bf5aa5d8f09ea5bfda9bdfb126f11887396749b"
+    },
+    "notes/reference/calibration/lillooet-candidate/model-card.json": {
+      "bytes": 34911,
+      "sha256": "sha256:d575736e04b6e19da49c79070ae70ec0f026fd2ea3b1b486b32e4abd2bec4fcf"
+    },
+    "notes/reference/calibration/mackenzie-candidate/metrics.csv": {
+      "bytes": 594,
+      "sha256": "sha256:05f8ac0f6b3f76e3f646940b642b954d485debc63dc20332f3fd207e9d31aba2"
+    },
+    "notes/reference/calibration/mackenzie-candidate/model-card.json": {
+      "bytes": 36928,
+      "sha256": "sha256:45d3c901bba172271e69c9582631f1a5a5ff9125f4e81a9cfbef99c780edc5d5"
+    },
+    "notes/reference/calibration/merritt-candidate/metrics.csv": {
+      "bytes": 700,
+      "sha256": "sha256:1e9119d7d0f71538e7048a396149a93233008fe68850eb8f3280a7224ba8cb1a"
+    },
+    "notes/reference/calibration/merritt-candidate/model-card.json": {
+      "bytes": 42848,
+      "sha256": "sha256:d99ff46fde8d2cf077f90812fc29888fe37c9acf9294fbcee3fb6386c0769447"
+    },
+    "notes/reference/calibration/mid-coast-candidate/metrics.csv": {
+      "bytes": 374,
+      "sha256": "sha256:e4acc34277d9a5a90b4b6b82e4a86508ca897ef487a0e9699958d197ccfed508"
+    },
+    "notes/reference/calibration/mid-coast-candidate/model-card.json": {
+      "bytes": 21586,
+      "sha256": "sha256:c1ba58debf3da4076ea3ff945f82149ceed6a80dcf1cb079078cf99a57fdc69f"
+    },
+    "notes/reference/calibration/morice-candidate/metrics.csv": {
+      "bytes": 587,
+      "sha256": "sha256:753bd9665592e438782c8971072721b168b1d1792394b84dfb04a1e14bb5af97"
+    },
+    "notes/reference/calibration/morice-candidate/model-card.json": {
+      "bytes": 36295,
+      "sha256": "sha256:ca2bfbd1a4e9a44c5c0dfc14b08040d087574745f79e1f7c79d6f8d27777d1c4"
+    },
+    "notes/reference/calibration/nass-candidate/metrics.csv": {
+      "bytes": 484,
+      "sha256": "sha256:c0cae3283b6a709cda7995d80655f6908caa64f6837a19f30cb57ba519ba21ae"
+    },
+    "notes/reference/calibration/nass-candidate/model-card.json": {
+      "bytes": 28489,
+      "sha256": "sha256:6e8f9eeef8ffc93217a870cf01e913672dd9992c71be4496972198cc1622f42e"
+    },
+    "notes/reference/calibration/north-island-candidate/metrics.csv": {
+      "bytes": 492,
+      "sha256": "sha256:59704eb79502c787e74e28ccb63aadea2e10e71533077b131873a939541247a5"
+    },
+    "notes/reference/calibration/north-island-candidate/model-card.json": {
+      "bytes": 28505,
+      "sha256": "sha256:6d1736dff1479df575fbc6e7c0262f908992537340499d923285ff781a0dcfa3"
+    },
+    "notes/reference/calibration/okanagan-candidate/metrics.csv": {
+      "bytes": 701,
+      "sha256": "sha256:ec0a00c8a90f9d33ced43325a428bdfec2c08be9aae95b0ac9677f4c6e2da0cc"
+    },
+    "notes/reference/calibration/okanagan-candidate/model-card.json": {
+      "bytes": 42657,
+      "sha256": "sha256:64de7ed52feaeddbff1813632071b8816520220266de4795261c1cb72a7660d0"
+    },
+    "notes/reference/calibration/pacific-candidate/metrics.csv": {
+      "bytes": 586,
+      "sha256": "sha256:98761106237cb90ce55ade4803749f5a4a9191cf951e598c9ea3e2326506e95d"
+    },
+    "notes/reference/calibration/pacific-candidate/model-card.json": {
+      "bytes": 36043,
+      "sha256": "sha256:f9229b1e1fdc92b00e4e7238ccbcd12c4a44d69b885345deca803eb51f26f7bc"
+    },
+    "notes/reference/calibration/prince-george-candidate/metrics.csv": {
+      "bytes": 703,
+      "sha256": "sha256:2fd74215a496d9aee697e19bd1c286c983894e214775b7320f2dd8170364195d"
+    },
+    "notes/reference/calibration/prince-george-candidate/model-card.json": {
+      "bytes": 43005,
+      "sha256": "sha256:e29aed87b9c0d845d875790b3156faf20dc75b8e1213b34fbe5bff5a77f13742"
+    },
+    "notes/reference/calibration/quesnel-candidate/metrics.csv": {
+      "bytes": 131,
+      "sha256": "sha256:a391515d0ff7694d758b99a1391307dcf3ac89e7b61096169966410723191750"
+    },
+    "notes/reference/calibration/quesnel-candidate/model-card.json": {
+      "bytes": 41999,
+      "sha256": "sha256:31a000257e2bbaad1db10e3b690481313df0c7b117fe569a9c7ff1a67579cc6a"
+    },
+    "notes/reference/calibration/revelstoke-candidate/metrics.csv": {
+      "bytes": 642,
+      "sha256": "sha256:761a566b570d747e5873b07093c70e23b04d45475d11e32161c6b81dc2b336ec"
+    },
+    "notes/reference/calibration/revelstoke-candidate/model-card.json": {
+      "bytes": 43140,
+      "sha256": "sha256:ea050e779c6b62bc9a3d36b867549b7ad6211f6a00aecc48e5429fad2447b387"
+    },
+    "notes/reference/calibration/review-manifest.json": {
+      "bytes": 6648,
+      "sha256": "sha256:0047d6c6a5c16b4c84aae0a5e5049dd14a66d1b6eee2e7a2db774475fedc283c"
+    },
+    "notes/reference/calibration/robson-valley-candidate/metrics.csv": {
+      "bytes": 693,
+      "sha256": "sha256:218bc71b9bda45e3967a0792e85b66561e5127b3e19dc61afc1993eb209f605b"
+    },
+    "notes/reference/calibration/robson-valley-candidate/model-card.json": {
+      "bytes": 42572,
+      "sha256": "sha256:3d83d248e9ac92c5f365197d0bfb627b9b4a4e1d15e8f24a8b5203f022eb1de4"
+    },
+    "notes/reference/calibration/score_inventory.py": {
+      "bytes": 5501,
+      "sha256": "sha256:89719665901aba37fa9542a5070452bfdcdaa7f7c0fe03bd690ec0ee25867938"
+    },
+    "notes/reference/calibration/soo-candidate/metrics.csv": {
+      "bytes": 585,
+      "sha256": "sha256:1f3cf97a0bbc2bde46b0de233de306cd408cb65882c5a8da4cb64189be16f2c6"
+    },
+    "notes/reference/calibration/soo-candidate/model-card.json": {
+      "bytes": 36039,
+      "sha256": "sha256:60e5c13b7d2106aac8cefb8c8689d534d0799f05eff7b2e9308bfc26fb8ade26"
+    },
+    "notes/reference/calibration/strathcona-candidate/metrics.csv": {
+      "bytes": 572,
+      "sha256": "sha256:6490a98309fac558852aa58bc698dd380bdd92e40b7ec4ae2e65cafb91363444"
+    },
+    "notes/reference/calibration/strathcona-candidate/model-card.json": {
+      "bytes": 36032,
+      "sha256": "sha256:61306eb8520cb3ea089d21ad319432de57ddfa9cc3dee9a46fe8e1915bec2cab"
+    },
+    "notes/reference/calibration/sunshine-coast-candidate/metrics.csv": {
+      "bytes": 586,
+      "sha256": "sha256:869203307d21cf8fec1d87b7e708587644ea31260b5482f2be218fad9778e983"
+    },
+    "notes/reference/calibration/sunshine-coast-candidate/model-card.json": {
+      "bytes": 36021,
+      "sha256": "sha256:510c9ba863d0a29eb7420b7640adbc61b4c9efd33f6fb7e5967ad3bbd79bc111"
+    },
+    "notes/reference/calibration/support-policy.json": {
+      "bytes": 891,
+      "sha256": "sha256:58fbb3a8da646601a34b81a345c1b419328d74d5c99032ddd42e20d35bbb8693"
+    },
+    "notes/reference/calibration/sweep_support_policy.py": {
+      "bytes": 8694,
+      "sha256": "sha256:7a397ed6685aaf5f195f2edf6d23c08d20af6ac2330d08435f7ff5c51074460f"
+    },
+    "notes/reference/calibration/williams-lake-candidate/metrics.csv": {
+      "bytes": 706,
+      "sha256": "sha256:2c623db5d1d5d2340a04f7a8260beed432541c7e845a8242f26764d2180fa76e"
+    },
+    "notes/reference/calibration/williams-lake-candidate/model-card.json": {
+      "bytes": 42446,
+      "sha256": "sha256:eaa06e162c218e4b330034e82f71c6b198c002a55e9e8c3d7570afbd2913f9b7"
+    }
+  },
+  "bundle": "notes/reference/calibration/d9-full-bc-review-bundle.md",
+  "bundle_id": "d9-full-bc-review-v0",
+  "claim": "Full-BC review bundle only. No production bundle, certificate, yield, AAC, legal, or whole-block claim.",
+  "decision": "pending",
+  "instructions": "notes/reference/calibration/FULL-BC-REVIEW-INSTRUCTIONS.md",
+  "scope": {
+    "cards": 40,
+    "evidence_only": [
+      "invermere",
+      "100-mile-house"
+    ],
+    "not_in_current_review": 38,
+    "review_pending": 2
+  },
+  "status": "published_for_review"
+}

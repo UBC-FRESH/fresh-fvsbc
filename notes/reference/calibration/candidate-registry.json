@@ -24,8 +24,8 @@
     {
       "calibration_rule": "symmetric (optional)",
       "card": "notes/reference/calibration/arrow-candidate/model-card.json",
-      "card_mode": "unrecorded",
-      "card_sha256": "sha256:b9dac8f72b71125a5f19f77c16f27437a447ec7b69b15832835a239041b58832",
+      "card_mode": "none",
+      "card_sha256": "sha256:a59c7e8bf185872bdaf8605e874db4f20229aff4a36e69129fad32c9dc4eddfc",
       "groups": [
         "FD",
         "HW",
@@ -147,8 +147,8 @@
     {
       "calibration_rule": "none",
       "card": "notes/reference/calibration/cranbrook-candidate/model-card.json",
-      "card_mode": "unrecorded",
-      "card_sha256": "sha256:293e46aa6deefd6b5a1441d1074e0f74ec2b3d47716c58f588262cb0077daf38",
+      "card_mode": "none",
+      "card_sha256": "sha256:19af9258b8a61c912be3636ba18795f4a9c63c3e15da9892be17620b51d44b1f",
       "groups": [
         "FD",
         "HW",
@@ -228,8 +228,8 @@
     {
       "calibration_rule": "one-sided (optional)",
       "card": "notes/reference/calibration/fraser-candidate/model-card.json",
-      "card_mode": "unrecorded",
-      "card_sha256": "sha256:53f552a9e9421bcfc4408ab57d458c91af49b1ed21eea8d5758553d72256001c",
+      "card_mode": "conditional-one-sided",
+      "card_sha256": "sha256:30281b7775d495f986894fa6ee2cce0f9e59b49ea83ed6f91b0c19ad6529e7e6",
       "groups": [
         "FD",
         "HW",
@@ -307,8 +307,8 @@
     {
       "calibration_rule": "symmetric (optional)",
       "card": "notes/reference/calibration/haida-gwaii-candidate/model-card.json",
-      "card_mode": "unrecorded",
-      "card_sha256": "sha256:45a879e8a07ae9d839b8f3f0056710d7deea58d4584f337e551b577a28cbe64a",
+      "card_mode": "none",
+      "card_sha256": "sha256:60457d4eded9377c616ef54766869dde811bc19485bc5ac1872fbe0339168e94",
       "groups": [
         "HW",
         "OTHER"
@@ -365,8 +365,8 @@
     {
       "calibration_rule": "none",
       "card": "notes/reference/calibration/kamloops-candidate/model-card.json",
-      "card_mode": "unrecorded",
-      "card_sha256": "sha256:ed60b1f2874a78a9389b5357a9ad4dc22839a8e5f3ef3bd4ef0e5283323bc871",
+      "card_mode": "conditional-one-sided",
+      "card_sha256": "sha256:6c475e2d1285397d6639f632d89cdc0cf204eb274ec6162e4e4de18d91a2d4e2",
       "groups": [
         "FD",
         "HW",
@@ -426,8 +426,8 @@
     {
       "calibration_rule": "symmetric (optional)",
       "card": "notes/reference/calibration/kootenay-lake-candidate/model-card.json",
-      "card_mode": "unrecorded",
-      "card_sha256": "sha256:a4deb45f45ad7238d78c63bf53d69ad3af7b85d6c85900f5a24ea87a8eac9eb3",
+      "card_mode": "none",
+      "card_sha256": "sha256:bddef77974f3348cc83fbad3c7bfdbead9dc978cdb57705a740856edb837b27d",
       "groups": [
         "FD",
         "HW",
@@ -585,8 +585,8 @@
     {
       "calibration_rule": "none",
       "card": "notes/reference/calibration/north-island-candidate/model-card.json",
-      "card_mode": "unrecorded",
-      "card_sha256": "sha256:833396462865e73658e5fac76605999d07a250109ad78625e3ab43bef6e7bd5d",
+      "card_mode": "none",
+      "card_sha256": "sha256:6d1736dff1479df575fbc6e7c0262f908992537340499d923285ff781a0dcfa3",
       "groups": [
         "FD",
         "HW",
@@ -604,8 +604,8 @@
     {
       "calibration_rule": "none",
       "card": "notes/reference/calibration/okanagan-candidate/model-card.json",
-      "card_mode": "unrecorded",
-      "card_sha256": "sha256:37776af42f0d17e66fc96142024ffd22777d1f01a1927392ee10c7aba38278f0",
+      "card_mode": "none",
+      "card_sha256": "sha256:64de7ed52feaeddbff1813632071b8816520220266de4795261c1cb72a7660d0",
       "groups": [
         "FD",
         "HW",
@@ -645,8 +645,8 @@
     {
       "calibration_rule": "none",
       "card": "notes/reference/calibration/prince-george-candidate/model-card.json",
-      "card_mode": "unrecorded",
-      "card_sha256": "sha256:7e4d4473ac299320993d3abf87fe723e34f44c3dbcbe13c71360085f96c3fdfe",
+      "card_mode": "none",
+      "card_sha256": "sha256:e29aed87b9c0d845d875790b3156faf20dc75b8e1213b34fbe5bff5a77f13742",
       "groups": [
         "FD",
         "HW",
@@ -667,7 +667,7 @@
       "calibration_rule": "one-sided",
       "card": "notes/reference/calibration/quesnel-candidate/model-card.json",
       "card_mode": "unrecorded",
-      "card_sha256": "sha256:dfe6a1efd74e9be797a9dbe1399aad630652997321795cd2e56e22f349361ab3",
+      "card_sha256": "sha256:31a000257e2bbaad1db10e3b690481313df0c7b117fe569a9c7ff1a67579cc6a",
       "groups": [
         "FD",
         "HW",
