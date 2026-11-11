@@ -10,7 +10,21 @@ This policy decides when a target-excluded candidate may use a local
 calibration intercept. It is a deployment contract for candidate layers, not a
 bundle, certificate, or production approval.
 
-## 2. Rules
+## 2. Default deployment policy
+
+**D9.111 nested support-aware calibration** is the default policy:
+
+- inner site folds choose base, TSA partial symmetric, or BEC partial symmetric;
+- outer site folds measure policy performance;
+- the policy may choose base when support is insufficient;
+- evidence: 33/40 TSA holdouts improve, median delta log loss −0.00574,
+  mean −0.01355;
+- machine-readable: `support-policy.json`.
+
+The fixed one-sided/symmetric rules below remain diagnostic and are retained for
+compatibility. They are not the default when the nested policy is available.
+
+## 3. Fixed rules
 
 ### Base layer
 
@@ -42,7 +56,7 @@ log-loss improvement:
 
 No global multiplier, provincial screen, or test-set tuning is allowed.
 
-## 3. Supported symmetric cases
+## 4. Supported symmetric cases
 
 | Candidate | Base log loss | Symmetric | Delta |
 | --- | ---: | ---: | ---: |
@@ -51,7 +65,7 @@ No global multiplier, provincial screen, or test-set tuning is allowed.
 
 Evidence: `d9-symmetric-audit.csv`.
 
-## 4. Other candidate rules
+## 5. Other candidate rules
 
 | Candidate | Rule | Note |
 | --- | --- | --- |
@@ -69,7 +83,7 @@ Evidence: `d9-symmetric-audit.csv`.
 Optional means: use only with 20 sites, record the offsets, and do not silently
 apply it to the frozen card.
 
-## 5. Evidence-only cards
+## 6. Evidence-only cards
 
 D9.104 freezes base cards for the remaining TSA labels, including **Invermere**
 and **100 Mile House**. These are evidence-only:
@@ -82,12 +96,12 @@ and **100 Mile House**. These are evidence-only:
 The cards are for the full calibration-quality picture. They are not supported
 local-calibration cases.
 
-## 6. Excluded
+## 7. Excluded
 
 100 Mile (retracted), IDFdk (no bundle), ICHmw2 (unsigned), CWH volume question,
 SBPSmk mature, new TSAs, and global screens.
 
-## 7. Deployment record
+## 8. Deployment record
 
 A calibrated deployment records:
 
@@ -98,7 +112,7 @@ A calibrated deployment records:
 - data checksum;
 - no site-level rows in tracked files.
 
-## 8. Claim boundary
+## 9. Claim boundary
 
 Diagnostic candidate calibration policy only. Not a yield, AAC, legal,
 whole-block, bundle, or certificate claim.

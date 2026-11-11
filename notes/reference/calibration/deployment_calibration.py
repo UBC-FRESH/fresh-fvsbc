@@ -1,9 +1,11 @@
 """Estimate and apply deployment calibration offsets from scored target rows.
 
 The helper consumes a frozen model card and a scored CSV with ``site``,
-``group``, ``eta``, ``exposure``, and ``dead``. It estimates the policy-defined
-group intercepts on a fixed number of sites, records the offsets, and can apply
-them to the scored rows.
+``group``, ``eta``, ``exposure``, and ``dead``. The default nested policy also
+needs ``unit`` and ``bec_zone``. It chooses base, TSA partial, or BEC partial by
+nested site cross-validation, records the selected mode and offsets, and can
+apply them to the scored rows. The fixed one-sided/symmetric rule remains
+available with ``--mode fixed``.
 
 The helper does not re-score raw inventory. The frozen card does not yet store
 preprocessing medians, so the scored table is the upstream contract.
@@ -18,6 +20,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sweep_support_policy import _bec_offsets, _choose_mode, _predict, _tsa_offsets
 
 REQUIRED = ("site", "group", "eta", "exposure", "dead")
 GROUPS = ("FD", "PL", "SE", "HW", "OTHER")
@@ -141,12 +144,17 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--apply", type=Path, default=None)
     parser.add_argument("--rule", choices=("one_sided", "symmetric"), default=None)
+    parser.add_argument(
+        "--mode",
+        choices=("nested", "fixed"),
+        default="nested",
+        help="Nested support-aware policy (default) or the fixed rule.",
+    )
     args = parser.parse_args()
 
     card = json.loads(args.card.read_text())
     policy = json.loads(args.policy.read_text())
     model_id = str(card["model_id"])
-    rule = _rule_for(policy, model_id, args.rule)
     frame = pd.read_csv(args.scored)
     missing = [column for column in REQUIRED if column not in frame.columns]
     if missing:
@@ -157,31 +165,68 @@ def main() -> None:
     if (frame["exposure"] <= 0).any():
         raise SystemExit("scored table contains non-positive exposure")
     sites = sorted(frame["site"].astype(str).unique())
-    if len(sites) < args.sites:
-        raise SystemExit(f"need at least {args.sites} sites, found {len(sites)}")
-    selected = set(sites[: args.sites])
-    calibration = frame[frame["site"].astype(str).isin(selected)]
-    offsets = _offsets(
-        calibration,
-        rule=rule,
-        minimum_trees=int(policy["minimums"]["group_trees"]),
-        trigger=float(policy["minimums"]["trigger_points"]),
-    )
-    payload = {
-        "calibration_id": f"{model_id}-deployment",
-        "model_id": model_id,
-        "rule": rule,
-        "calibration_sites": args.sites,
-        "site_count": len(sites),
-        "minimums": policy["minimums"],
-        "groups": offsets,
-        "applied_groups": sorted(name for name, entry in offsets.items() if entry["applied"]),
-        "card": str(args.card),
-        "card_sha256": _digest(args.card),
-        "scored": str(args.scored),
-        "scored_sha256": _digest(args.scored),
-        "claim": "Deployment calibration offsets only. Not a bundle or certificate.",
-    }
+    selected_mode = "fixed"
+    if args.mode == "nested":
+        if "unit" not in frame.columns or "bec_zone" not in frame.columns:
+            raise SystemExit("nested mode needs unit and bec_zone columns")
+        selected_mode = _choose_mode(frame, np.random.default_rng(42))
+        offsets = {}
+        applied_groups: list[str] = []
+        if selected_mode == "tsa_partial_symmetric":
+            tsa = _tsa_offsets(frame)
+            offsets = {"group": tsa}
+            applied_groups = sorted(name for name, value in tsa.items() if value)
+        elif selected_mode == "bec_partial_symmetric":
+            unit, zone = _bec_offsets(frame)
+            offsets = {
+                "unit": {f"{key[0]}|{key[1]}": value for key, value in unit.items()},
+                "zone": {f"{key[0]}|{key[1]}": value for key, value in zone.items()},
+            }
+            applied_groups = sorted({key.split("|")[1] for key in offsets["unit"]})
+        payload = {
+            "calibration_id": f"{model_id}-deployment",
+            "model_id": model_id,
+            "mode": "nested",
+            "rule": selected_mode,
+            "calibration_sites": len(sites),
+            "site_count": len(sites),
+            "minimums": policy["minimums"],
+            "offsets": offsets,
+            "applied_groups": applied_groups,
+            "card": str(args.card),
+            "card_sha256": _digest(args.card),
+            "scored": str(args.scored),
+            "scored_sha256": _digest(args.scored),
+            "claim": "Deployment calibration offsets only. Not a bundle or certificate.",
+        }
+    else:
+        rule = _rule_for(policy, model_id, args.rule)
+        if len(sites) < args.sites:
+            raise SystemExit(f"need at least {args.sites} sites, found {len(sites)}")
+        selected = set(sites[: args.sites])
+        calibration = frame[frame["site"].astype(str).isin(selected)]
+        offsets = _offsets(
+            calibration,
+            rule=rule,
+            minimum_trees=int(policy["minimums"]["group_trees"]),
+            trigger=float(policy["minimums"]["trigger_points"]),
+        )
+        payload = {
+            "calibration_id": f"{model_id}-deployment",
+            "model_id": model_id,
+            "mode": "fixed",
+            "rule": rule,
+            "calibration_sites": args.sites,
+            "site_count": len(sites),
+            "minimums": policy["minimums"],
+            "groups": offsets,
+            "applied_groups": sorted(name for name, entry in offsets.items() if entry["applied"]),
+            "card": str(args.card),
+            "card_sha256": _digest(args.card),
+            "scored": str(args.scored),
+            "scored_sha256": _digest(args.scored),
+            "claim": "Deployment calibration offsets only. Not a bundle or certificate.",
+        }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     if args.apply is not None:
@@ -190,24 +235,30 @@ def main() -> None:
             -applied["exposure"].to_numpy(dtype=float)
             * np.exp(np.clip(applied["eta"].to_numpy(dtype=float), -20, 20))
         )
-        deltas = (
-            applied["group"]
-            .map({name: entry["offset"] for name, entry in offsets.items()})
-            .fillna(0.0)
-        )
-        applied["calibrated_prediction"] = 1.0 - np.exp(
-            -applied["exposure"].to_numpy(dtype=float)
-            * np.exp(
-                np.clip(
-                    applied["eta"].to_numpy(dtype=float) + deltas.to_numpy(dtype=float),
-                    -20,
-                    20,
+        if args.mode == "nested":
+            applied["calibrated_prediction"] = _predict(applied, frame, selected_mode)
+        else:
+            deltas = (
+                applied["group"]
+                .map({name: entry["offset"] for name, entry in offsets.items()})
+                .fillna(0.0)
+            )
+            applied["calibrated_prediction"] = 1.0 - np.exp(
+                -applied["exposure"].to_numpy(dtype=float)
+                * np.exp(
+                    np.clip(
+                        applied["eta"].to_numpy(dtype=float) + deltas.to_numpy(dtype=float),
+                        -20,
+                        20,
+                    )
                 )
             )
-        )
         args.apply.parent.mkdir(parents=True, exist_ok=True)
         applied.to_csv(args.apply, index=False)
-    print(f"wrote {args.output} with {len(offsets)} groups")
+    if args.mode == "nested":
+        print(f"wrote {args.output} with nested mode {selected_mode}")
+    else:
+        print(f"wrote {args.output} with {len(offsets)} groups")
 
 
 if __name__ == "__main__":

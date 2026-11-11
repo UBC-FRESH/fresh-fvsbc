@@ -15,11 +15,22 @@ import bcmort_provincial as bp
 import numpy as np
 import pandas as pd
 from bec_units import assign_units
-from fit_candidate import _delta, _design
 
 MIN_TREES = 500
 PRIOR_TREES = 500
 MODES = ("base", "tsa_partial_symmetric", "bec_partial_symmetric")
+
+
+def _delta(eta: np.ndarray, dead: np.ndarray, exposure: np.ndarray) -> float:
+    """Return the maximum-likelihood group intercept at fixed coefficients."""
+    offset = np.log(exposure) + eta
+    value = 0.0
+    for _ in range(60):
+        mu = np.exp(np.clip(value + offset, -20, 20))
+        weight = np.clip(mu, 1e-8, None)
+        z = value + offset + (dead - mu) / weight
+        value = float(np.sum(weight * (z - offset)) / np.sum(weight))
+    return value
 
 
 def _tsa_offsets(frame: pd.DataFrame) -> dict[str, float]:
@@ -123,6 +134,8 @@ def main() -> None:
     parser.add_argument("--target", required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+
+    from fit_candidate import _design
 
     frame = assign_units(bp.load())
     zones = sorted(frame["zone"].dropna().unique())

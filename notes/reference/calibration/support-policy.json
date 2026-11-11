@@ -1,0 +1,30 @@
+{
+  "policy_id": "d9-support-calibration-v0",
+  "status": "frozen_policy",
+  "default": "nested",
+  "modes": [
+    "base",
+    "tsa_partial_symmetric",
+    "bec_partial_symmetric"
+  ],
+  "selection": "nested site cross-validation",
+  "minimums": {
+    "group_trees": 500,
+    "prior_trees": 500,
+    "trigger_points": 0.03
+  },
+  "evidence": {
+    "summary": "notes/reference/calibration/d9-support-policy.csv",
+    "note": "notes/reference/calibration/d9-support-policy.md",
+    "holdouts": 40,
+    "improved": 33,
+    "worse": 5,
+    "median_delta_log_loss": -0.005739256128775,
+    "mean_delta_log_loss": -0.01354981938087182,
+    "selected_base": 26,
+    "selected_tsa": 49,
+    "selected_bec": 123
+  },
+  "fallback": "base when local support or nested validation is insufficient",
+  "claim": "Frozen deployment calibration policy for scored target rows. Not a bundle or certificate."
+}
