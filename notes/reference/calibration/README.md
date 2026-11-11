@@ -407,6 +407,10 @@ snapshot with the same row counts still needs a new manifest.
 | `d9-domain-calibration.csv` | The train-domain calibration table |
 | `sweep_domain_calibration.py` | The per-TSA domain calibration sweep |
 | `sweep_domain_calibration_parallel.py` | The parallel domain calibration driver |
+| `d9-support-policy.md` | The D9.111 nested support-aware policy |
+| `d9-support-policy.csv` | The policy holdout table |
+| `sweep_support_policy.py` | The per-TSA nested policy |
+| `sweep_support_policy_parallel.py` | The parallel policy driver |
 | `d9-bec-hierarchy.md` | The D9.108 hierarchical BEC fit note |
 | `d9-bec-hierarchy-holdout.csv` | The hierarchical holdout metrics |
 | `fit_bec_hierarchy.py` | The per-TSA hierarchical fit |
