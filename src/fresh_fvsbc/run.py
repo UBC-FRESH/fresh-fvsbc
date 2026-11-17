@@ -811,7 +811,8 @@ def run_population(
     directory : str or Path
         Where the run writes.
     species : str, optional
-        The species code. Required, because `nemora` emits none.
+        The species code for every stem. When omitted, each population record must carry a
+        ``species`` field.
     tree_age : float, optional
         The age at breast height, in years. Required, for the same reason.
     keywords : Sequence of Keyword, optional

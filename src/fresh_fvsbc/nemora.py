@@ -187,8 +187,8 @@ def to_tree_list(
         `crown_ratio` are read; the spatial fields have no home in an FVS tree list, and the
         attribute fields are not columns FVS-BC reads.
     species : str, optional
-        The species code, from any of BC's three lists. Required: `nemora` emits none, and the
-        adapter fails rather than defaulting.
+        The species code, from any of BC's three lists. When omitted, each stem must carry a
+        ``species`` field and the adapter resolves it per tree.
     tree_age : float, optional
         The age at breast height, in years. Required, for the same reason.
     plot_fields : PlotFields, optional
@@ -213,10 +213,7 @@ def to_tree_list(
     SpeciesError
         If the species code resolves to no BC species, or to more than one.
     """
-    if species is None:
-        raise MissingAssignmentError(
-            "the adapter needs a species, because nemora emits none; pass one from BC's three lists"
-        )
+    # A per-tree species field is accepted when species is None.
     if tree_age is None:
         raise MissingAssignmentError(
             "the adapter needs a tree age, because nemora emits none; pass one in years"
@@ -236,7 +233,8 @@ def to_tree_list(
         )
     if plot_id_offset < 0 or plot_id_offset > 900:
         raise PopulationError("plot_id_offset must be between 0 and 900")
-    resolved = resolve_species(species)
+    resolved_default = resolve_species(species) if species is not None else None
+    resolved_by_tree: dict[str, str] = {}
     supplied = plot_fields or {}
     records: list[TreeListFields] = []
     plots: dict[str, int] = {}
@@ -246,6 +244,13 @@ def to_tree_list(
         plot_id = plots.setdefault(stand, plot_id_offset + len(plots) + 1)
         tree_number = tree_numbers.get(stand, 0) + 1
         tree_numbers[stand] = tree_number
+        if resolved_default is None:
+            stem_species = _text(stem, "species")
+            if stem_species not in resolved_by_tree:
+                resolved_by_tree[stem_species] = resolve_species(stem_species)
+            resolved = resolved_by_tree[stem_species]
+        else:
+            resolved = resolved_default
         record: TreeListFields = {
             "plot_id": plot_id,
             "tree_num": tree_number,
