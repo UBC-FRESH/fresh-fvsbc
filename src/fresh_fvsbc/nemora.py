@@ -176,6 +176,7 @@ def to_tree_list(
     species: str | None = None,
     tree_age: float | None = None,
     plot_fields: PlotFields | None = None,
+    plot_id_offset: int = 0,
 ) -> list[TreeListFields]:
     """Turn a synthetic stem population into tree-list fields.
 
@@ -192,6 +193,9 @@ def to_tree_list(
         The age at breast height, in years. Required, for the same reason.
     plot_fields : PlotFields, optional
         The plot-level fields, which belong to a run. Each defaults to zero.
+    plot_id_offset : int, optional
+        Add this value to the one-based plot number. Use 100 or more when a
+        caller needs a stable, fixed-width plot key in the FVS TreeId output.
 
     Returns
     -------
@@ -230,6 +234,8 @@ def to_tree_list(
             "and the tree number, so a plot can only number 999 trees. Subdivide the stand into "
             "plots, which is a modelling decision this adapter does not make for you"
         )
+    if plot_id_offset < 0 or plot_id_offset > 900:
+        raise PopulationError("plot_id_offset must be between 0 and 900")
     resolved = resolve_species(species)
     supplied = plot_fields or {}
     records: list[TreeListFields] = []
@@ -237,7 +243,7 @@ def to_tree_list(
     tree_numbers: dict[str, int] = {}
     for stem in population:
         stand = _text(stem, "stand_id")
-        plot_id = plots.setdefault(stand, len(plots) + 1)
+        plot_id = plots.setdefault(stand, plot_id_offset + len(plots) + 1)
         tree_number = tree_numbers.get(stand, 0) + 1
         tree_numbers[stand] = tree_number
         record: TreeListFields = {

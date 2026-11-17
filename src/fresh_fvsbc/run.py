@@ -790,6 +790,7 @@ def run_population(
     keywords: Sequence[Keyword] = (),
     variant: str = "bc",
     plot_fields: PlotFields | None = None,
+    plot_id_offset: int = 0,
     key_name: str = KEYWORD_FILE_NAME,
     calibration: CalibrationBundle | None = None,
     tsa: str | None = None,
@@ -819,6 +820,8 @@ def run_population(
         The variant to run. Defaults to ``bc``.
     plot_fields : PlotFields, optional
         The plot-level fields, which belong to a run.
+    plot_id_offset : int, optional
+        Add this value to the one-based plot number in the FVS tree list.
     key_name : str, optional
         The keyword file's name inside ``directory``.
     calibration : CalibrationBundle, optional
@@ -853,7 +856,13 @@ def run_population(
     RunError
         If the run cannot be set up, driven, or read.
     """
-    records = to_tree_list(population, species=species, tree_age=tree_age, plot_fields=plot_fields)
+    records = to_tree_list(
+        population,
+        species=species,
+        tree_age=tree_age,
+        plot_fields=plot_fields,
+        plot_id_offset=plot_id_offset,
+    )
     if min_dbh is not None:
         if min_dbh < 0:
             raise PopulationError("min_dbh must not be negative")
