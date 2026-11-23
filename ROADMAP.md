@@ -1522,6 +1522,7 @@ recorded here so the roadmap is not a plan of record that stops a month ago.
 | The web surface verified, and its badge corrected from 4 to 28 | #271 | `v0.19.1` |
 | A `manylinux_2_28` wheel with `libgfortran` bundled, and `wheels.yml` | #273, #276 | `v0.20.0` |
 | Both distributions published to PyPI | #279 | `v0.20.0` |
+| W5: BWBS V3 growth and mortality tables | #708 | — |
 
 **The records that matter are still kept**: `CHANGE_LOG.md` carries an entry per change, the triage
 carries the open items and what would reopen them, `docs/` carries the contracts, and the dashboard
