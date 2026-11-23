@@ -1,0 +1,33 @@
+{
+  "bundle_id": "bwbs-v3-base-2026-11-23",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": ["CAR", "KAM", "NEL"],
+    "tsas": [],
+    "becs": ["BWBS"],
+    "species_groups": [],
+    "dbh_classes": [],
+    "management": ["untreated"]
+  },
+  "parameters": [],
+  "training": {
+    "data_checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "split": "Dawson BWBS PSP intervals; site-grouped holdout",
+    "objective": "held-out BA and TPH bias",
+    "convergence": {
+      "iterations": 0,
+      "method": "no parameter fit: growth and mortality are compiled into w5-bwbs-v3"
+    }
+  },
+  "review": {
+    "reviewer": "W5 BWBS V3 calibration",
+    "date": "2026-11-23",
+    "signed_off": false
+  },
+  "claim": "BWBS V3 base: the growth and mortality tables are in w5-bwbs-v3, so BAIMULT and MORTMULT are 1. Provenance only; unsigned pilot until the w5 build is pinned."
+}

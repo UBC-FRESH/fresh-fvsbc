@@ -1,5 +1,9 @@
 # D8.3 BWBS growth pilot: three TSA holdouts
 
+> **Superseded.** This is a V2 pilot; `BAIMULT 5.5` and `MORTMULT 0.2` do not transfer to the V3 path.
+> Use `bwbs-v3-bundle.json` and `w5-bwbs-v3.patch.gz` instead. The record is kept for its method and
+> its holdout result, not as the current BWBS calibration.
+
 Build: `fresh-fvsbc-pyfvs 0.4.1`; wrapper `0.21.4`. Public tree detail only.
 
 ## Design

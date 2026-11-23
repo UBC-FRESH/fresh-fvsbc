@@ -40,6 +40,8 @@ outside the repository because they carry site identifiers.
 | `w3-bec-boundary.md` | The W3.1 `KAM`+`MS` boundary finding and fix |
 | `w3-habtyp-boundary.patch.gz` | The Habtyp zone-boundary patch, applied after W2.3 |
 | `w4-sbps-small-tree.patch.gz` | The SBPS small-tree height-model selection fix, applied after W3.1 |
+| `w5-bwbs-v3.patch.gz` | The BWBS V3 growth and mortality tables, applied after `w2-five-zone.patch.gz` |
+| `bwbs-v3-bundle.json` | The BWBS V3 base bundle; supersedes `d8-bwbs-bundle.json` |
 | `d6-sbps-growth.md` | The D6.1 SBPS diameter-growth diagnosis and next instrument |
 | `d6-small-tree-growth.md` | The D6.2 small-tree growth threshold, one-tree matrix, and corrected build comparison |
 | `d6-small-tree-output.md` | The D6.3 finding that the growth model is normal and the DBH/output state explodes |
@@ -64,7 +66,7 @@ outside the repository because they carry site identifiers.
 | `d7-idfdk-bundle.json` | The D7.4/D7.6 pilot bundle with the ingrowth section |
 | `d7-sbs-bundle.json`, `d7-sbs-summary.csv` | The D7.7 SBS MORTMULT 2.0 pilot and spatial holdout |
 | `d7-cwh-screen.md`, `d7-cwh-summary.csv`, `d7-cwh-bundle.json` | The D8.2 CWH growth pilot: three TSA + temporal holdouts, high BAIMULT; unsigned |
-| `d8-bwbs-screen.md`, `d8-bwbs-summary.csv`, `d8-bwbs-bundle.json` | The D8.3 BWBS growth pilot: three TSA holdouts, high BAIMULT and low MORTMULT; unsigned |
+| `d8-bwbs-screen.md`, `d8-bwbs-summary.csv`, `d8-bwbs-bundle.json` | The D8.3 BWBS growth pilot: three TSA holdouts, high BAIMULT and low MORTMULT; unsigned and **superseded by `bwbs-v3-bundle.json`** |
 | `d8-cdf-screen.md` | The D8.5 CDF screen: one TSA, site fold 0 fails BA; no bundle |
 | `d8-mh-cma-screen.md` | The D8.6 MH/CMA screens: GBR North fails; CMA validation-only; no bundle |
 | `d8-review-packet.md`, `d8-review-manifest.json`, `d8-sbs-second-holdout.csv` | D8.7 review packet for IDFdk/SBS/CWH; SBS Prince George second holdout |
