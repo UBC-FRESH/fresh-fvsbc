@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections.abc import Mapping, Sequence
 
 import pandas as pd
@@ -22,6 +23,7 @@ __all__ = [
     "insert_parameters",
     "interval_checksum",
     "parameter_keywords",
+    "split_cycles",
     "summarise_probe",
 ]
 
@@ -77,6 +79,38 @@ def eligible_intervals(
         & (frame["mortality_fraction"].fillna(0.0) <= max_mortality_fraction)
     )
     return frame[keep].reset_index(drop=True)
+
+
+def split_cycles(years: float, max_cycle_years: float) -> tuple[int, float]:
+    """Split an interval into equal cycles no longer than a ceiling.
+
+    FVS growth and mortality models are fitted on multi-year cycles; projecting a 25-year
+    interval as one cycle is a stress test, not a calibration observation. This returns the
+    cycle count and the equal cycle length for an interval.
+
+    Parameters
+    ----------
+    years : float
+        The interval length, in years.
+    max_cycle_years : float
+        The longest cycle the run should use.
+
+    Returns
+    -------
+    tuple of (int, float)
+        The cycle count and the cycle length, in years.
+
+    Raises
+    ------
+    ValueError
+        If either argument is not a positive finite number.
+    """
+    if not math.isfinite(years) or years <= 0:
+        raise ValueError("years must be a positive finite number")
+    if not math.isfinite(max_cycle_years) or max_cycle_years <= 0:
+        raise ValueError("max_cycle_years must be a positive finite number")
+    cycles = max(1, math.ceil(years / max_cycle_years - 1e-9))
+    return cycles, years / cycles
 
 
 def interval_checksum(frame: pd.DataFrame) -> str:

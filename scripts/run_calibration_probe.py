@@ -38,6 +38,7 @@ from fresh_fvsbc.calibration_probe import (
     insert_parameters,
     interval_checksum,
     parameter_keywords,
+    split_cycles,
     summarise_probe,
 )
 from fresh_fvsbc.keywords import Keyword
@@ -94,6 +95,14 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--cycles", type=int, default=1, metavar="N")
     parser.add_argument("--cycle-years", type=float, default=None, metavar="YEARS")
+    parser.add_argument(
+        "--max-cycle-years",
+        type=float,
+        default=None,
+        metavar="YEARS",
+        help="split each interval into equal cycles no longer than this; cannot be combined "
+        "with --cycles or --cycle-years",
+    )
     parser.add_argument("--tree-age", type=float, default=60.0, metavar="YEARS")
     return parser
 
@@ -137,6 +146,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             raise ValueError("cycles must be at least one")
         if args.min_dbh < 0:
             raise ValueError("min_dbh must not be negative")
+        if args.max_cycle_years is not None and (args.cycles != 1 or args.cycle_years is not None):
+            raise ValueError("--max-cycle-years cannot be combined with --cycles or --cycle-years")
     except (OSError, ValueError, json.JSONDecodeError, KeyError) as error:
         print(f"run_calibration_probe: {error}")
         return EXIT_BAD_INPUT
@@ -192,20 +203,22 @@ def main(argv: Sequence[str] | None = None) -> int:
                 & (visits["VISIT_NUMBER"] == interval["visit1"])
                 & (visits["PLOT"] == interval["PLOT"])
             ].iloc[0]
-            cycle_years = (
-                args.cycle_years
-                if args.cycle_years is not None
-                else float(interval["years"]) / args.cycles
-            )
-            if args.cycles > 1 and bundle is None:
-                raise ValueError("more than one cycle needs a bundle ingrowth model")
+            if args.max_cycle_years is not None:
+                cycles, cycle_years = split_cycles(float(interval["years"]), args.max_cycle_years)
+            else:
+                cycles = args.cycles
+                cycle_years = (
+                    args.cycle_years
+                    if args.cycle_years is not None
+                    else float(interval["years"]) / cycles
+                )
             if bundle is not None:
                 ingrowth_keyword_value = bundle.ingrowth_keyword(
                     bec=str(interval["BEC"]),
                     years=float(interval["years"]),
                     ba=float(interval["ba0"]),
                     qmd=float(interval["qmd"]),
-                    cycles=args.cycles,
+                    cycles=cycles,
                     cycle_years=cycle_years,
                 )
             else:
@@ -217,11 +230,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
             block = (*parameters, ingrowth_keyword_value) if ingrowth_keyword_value else parameters
             base_keywords = list(keywords_for(interval))
-            if args.cycles > 1:
+            if cycles > 1:
                 base_keywords = [
                     Keyword("TIMEINT", ("", f"{cycle_years:g}"))
                     if keyword.name == "TIMEINT"
-                    else Keyword("NUMCYCLE", (str(args.cycles),))
+                    else Keyword("NUMCYCLE", (str(cycles),))
                     if keyword.name == "NUMCYCLE"
                     else keyword
                     for keyword in base_keywords
@@ -254,6 +267,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "interval_id": interval["interval_id"],
                     "ba0": round(float(interval["ba0"]), 3),
                     "qmd": round(float(interval["qmd"]), 3),
+                    "cycles": cycles,
+                    "cycle_years": round(cycle_years, 3),
                     "mortality_fraction": round(float(interval["mortality_fraction"]), 4),
                     "observed_ba1": round(float(observed["ba"]), 3),
                     "predicted_ba1": round(float(predicted["ba"]), 3),
@@ -295,6 +310,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "bundle": str(args.bundle) if args.bundle is not None else "",
                 "cycles": args.cycles,
                 "cycle_years": args.cycle_years,
+                "max_cycle_years": args.max_cycle_years,
                 "intervals": int(frame["interval_id"].nunique()),
                 "rows": len(frame),
             },
