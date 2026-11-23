@@ -83,7 +83,10 @@ Then build the BC wheel as in ADR 0004. The patch is verified to apply against t
 ## 5. Claim boundary and open items
 
 - `BWBSwk2` is the weak cell: +5.1 percent on the held-out interval, +42.8 percent on three training
-  intervals. Do not make a zone-wide `wk2` claim.
+  intervals. The three are **single 25-year cycles**; the held-out interval is 10 years, and the
+  coefficients were fitted on 8-15 year intervals. Read the 25-year runs as a cycle-length stress
+  test, not as evidence about `wk2`; the multi-cycle run is the next check. Do not make a zone-wide
+  `wk2` claim until it is done.
 - `BWBSdk`, `BWBSmk`, and `BWBSwk1` outside Dawson are not in this fold.
 - Recruitment is not validated here.
 - The bundle is unsigned. A signed review and a pin change are required before this is a claim about
