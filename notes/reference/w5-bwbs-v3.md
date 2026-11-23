@@ -83,10 +83,10 @@ Then build the BC wheel as in ADR 0004. The patch is verified to apply against t
 ## 5. Claim boundary and open items
 
 - `BWBSwk2` was a **cycle-length artifact, not a zone defect**. The three failing training intervals
-  are single 25-year cycles (the passing held-out one is 10 years). Run as three cycles, the four
-  `wk2` intervals give BA +1.26 m2/ha: +3.6, -6.4, -1.1, and +14.6 percent per interval. The last is
-  a young stand and remains the largest residual. The probe should split intervals over 20 years
-  into cycles rather than project them as one; until it does, `wk2` is not a zone-wide claim.
+  are single 25-year cycles (the passing held-out one is 10 years). `run_calibration_probe.py` now
+  takes `--max-cycle-years`; at 10 the four `wk2` intervals give BA +1.51 m2/ha and per-interval
+  errors of +5.1, -6.4, -1.1, and +14.6 percent. The last is a young stand and remains the largest
+  residual. Use `--max-cycle-years 10` for intervals longer than the 8-15 year calibration range.
 - `BWBSdk`, `BWBSmk`, and `BWBSwk1` outside Dawson are not in this fold.
 - Recruitment is not validated here.
 - The bundle is unsigned. A signed review and a pin change are required before this is a claim about

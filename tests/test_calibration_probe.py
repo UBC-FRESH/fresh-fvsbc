@@ -16,6 +16,7 @@ from fresh_fvsbc.calibration_probe import (
     insert_parameters,
     interval_checksum,
     parameter_keywords,
+    split_cycles,
     summarise_probe,
 )
 from fresh_fvsbc.keywords import Keyword
@@ -293,3 +294,20 @@ def test_ingrowth_keyword_builds_natural_regeneration() -> None:
 def test_ingrowth_keyword_returns_none_without_a_rate() -> None:
     """A BEC with no recruitment does not add an empty ESTAB block."""
     assert ingrowth_keyword(bec="IDFdk3", years=10.0, rates={}) is None
+
+
+def test_split_cycles_keeps_each_cycle_within_the_ceiling() -> None:
+    """A long interval becomes equal cycles no longer than the ceiling."""
+    assert split_cycles(10.0, 20.0) == (1, 10.0)
+    assert split_cycles(25.0, 20.0) == (2, 12.5)
+    assert split_cycles(40.0, 20.0) == (2, 20.0)
+    cycles, cycle_years = split_cycles(41.0, 20.0)
+    assert cycles == 3
+    assert cycle_years == pytest.approx(41.0 / 3)
+
+
+@pytest.mark.parametrize(("years", "max_years"), [(0.0, 20.0), (-1.0, 20.0), (10.0, 0.0)])
+def test_split_cycles_refuses_non_positive_input(years: float, max_years: float) -> None:
+    """A zero or negative length is a caller error, not a one-cycle run."""
+    with pytest.raises(ValueError, match="positive finite"):
+        split_cycles(years, max_years)
