@@ -1,9 +1,9 @@
 # CWH and MH: V2 stand-level calibrations while V3 is built
 
-> **CWH is superseded by W8.** `w8-cwh-v3` moves CWH to V3 with a fitted large-tree model and
-> `BAIMULT 8`. The CWH section below is the V2 history; MH and CDF remain on the V2 path.
+> **CWH, MH, and CDF are superseded by W8 and W9.** `w8-cwh-v3` moved CWH to V3; `w9-mh-cdf-v3`
+> moved MH and CDF to V3. This note is the V2 history only.
 
-Status: **MH and CDF calibrated on the legacy V2 path; CWH moved to V3 in W8.** Unsigned pilots, tier C.
+Status: **V2 history: all three zones moved to V3 in W8/W9.** Kept for the V2 evidence.
 
 Pins: PyFVS `e95172b`, FVS source `ef5fa847`, variant `bc`.
 Bundles: `cwh-v2-bundle.json`, `mh-v2-bundle.json`, `cdf-v2-bundle.json` (all `BAIMULT 10`).

@@ -65,8 +65,8 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "CDF",
         SupportTier.PROVISIONAL,
-        "V2 legacy path; BAIMULT 10 pilot; V3 tables pending",
-        "coastal-v2-calibration",
+        "V3 coastal donor DG; BAIMULT 8",
+        "w9-mh-cdf-v3",
     ),
     (
         "CMA",
@@ -77,8 +77,8 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "MH",
         SupportTier.PROVISIONAL,
-        "V2 legacy path; BAIMULT 10 pilot on a 3-interval fold; V3 tables pending",
-        "coastal-v2-calibration",
+        "V3 coastal donor DG; BAIMULT 8; 3-interval fold",
+        "w9-mh-cdf-v3",
     ),
     ("BWBS", SupportTier.PROVISIONAL, "V3 pilot; W5 growth and mortality tables", "w5-bwbs-v3"),
     (
