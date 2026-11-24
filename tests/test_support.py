@@ -42,3 +42,8 @@ def test_unknown_bec_is_unsupported() -> None:
 def test_unknown_species_is_unsupported() -> None:
     """Only the BC variant's fifteen codes can be graded."""
     assert classify("BWBSmw", "ZZ").tier is SupportTier.UNSUPPORTED
+
+
+def test_region_prefix_does_not_hide_the_zone() -> None:
+    """Provenance carries ``CAR BWBSmw/01``; the classifier still finds BWBS."""
+    assert classify("CAR BWBSmw/01", "AT").tier is SupportTier.PROVISIONAL

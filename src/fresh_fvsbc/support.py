@@ -142,7 +142,7 @@ def classify(bec: str, species: str) -> SupportRecord:
             evidence="blkdat.f",
         )
     for zone, tier, reason, evidence in _ZONE_TIERS:
-        if label.upper().startswith(zone):
+        if zone in label.upper():
             return SupportRecord(
                 bec=label, species=code, tier=tier, reason=reason, evidence=evidence
             )

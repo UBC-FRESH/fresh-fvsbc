@@ -26,6 +26,7 @@ from fresh_fvsbc.provenance import (
     from_cases,
     treelist_hash,
 )
+from fresh_fvsbc.support import classify
 from fresh_fvsbc.treelist import TreeListFields, write_tree_list
 from nemora_fixtures import synthetic_population
 
@@ -48,6 +49,7 @@ CONTRACT_FIELDS: tuple[str, ...] = (
     "case_id",
     "run_datetime",
     "random_seed",
+    "support",
 )
 
 # What pyfvs.list_variants() returned in this project's build.
@@ -280,3 +282,23 @@ def test_a_record_for_the_whole_chain_from_the_fixture_to_the_database() -> None
     assert str(as_record["treelist_hash"]).startswith("sha256:")
     assert as_record["case_id"] == REAL_CASE_ROW["CaseID"]
     assert as_record["random_seed"] == 1
+
+
+def test_support_records_travel_with_the_provenance() -> None:
+    """A run carries each species' support grade instead of a prose caveat."""
+    record = Provenance(
+        variant="bc",
+        keyword_set_hash="sha256:0",
+        treelist_hash="sha256:0",
+        case_id="case",
+        run_datetime="now",
+        support=(classify("CAR BWBSmw/01", "AT"),),
+    ).as_record()
+    assert record["support"] == [
+        {
+            "species": "AT",
+            "tier": "C",
+            "reason": "V3 pilot; W5 growth and mortality tables",
+            "evidence": "w5-bwbs-v3",
+        }
+    ]
