@@ -1,0 +1,210 @@
+{
+  "bundle_id": "mh-v3-ba8-2026-11-24",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": [
+      "CAR",
+      "KAM",
+      "NEL"
+    ],
+    "tsas": [],
+    "becs": [
+      "MH"
+    ],
+    "species_groups": [],
+    "dbh_classes": [],
+    "management": [
+      "untreated"
+    ]
+  },
+  "parameters": [
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PL",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "SE",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "AT",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "BL",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "AC",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "EP",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "FD",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PY",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "CW",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "BG",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "HW",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PW",
+        "8.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    }
+  ],
+  "training": {
+    "data_checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "split": "MH PSP intervals; site-grouped holdout",
+    "objective": "held-out BA bias",
+    "convergence": {
+      "iterations": 0,
+      "method": "W9 coastal donor large-tree DG; BAIMULT grid"
+    }
+  },
+  "review": {
+    "reviewer": "W9 MH V3 calibration",
+    "date": "2026-11-24",
+    "signed_off": false
+  },
+  "claim": "MH V3: coastal large-tree DG donor, BAIMULT 8; unsigned pilot."
+}

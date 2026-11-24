@@ -26,6 +26,7 @@ on:
       - "notes/reference/calibration/w6-sbs-large-tree.patch.gz"
       - "notes/reference/calibration/w7-sbps-large-tree.patch.gz"
       - "notes/reference/calibration/w8-cwh-v3.patch.gz"
+      - "notes/reference/calibration/w9-mh-cdf-v3.patch.gz"
       - ".github/workflows/wheels.yml"
   workflow_dispatch:
     inputs:
@@ -80,6 +81,7 @@ jobs:
           gunzip -c notes/reference/calibration/w6-sbs-large-tree.patch.gz > ${{ runner.temp }}/w6-sbs-large-tree.patch
           gunzip -c notes/reference/calibration/w7-sbps-large-tree.patch.gz > ${{ runner.temp }}/w7-sbps-large-tree.patch
           gunzip -c notes/reference/calibration/w8-cwh-v3.patch.gz > ${{ runner.temp }}/w8-cwh-v3.patch
+          gunzip -c notes/reference/calibration/w9-mh-cdf-v3.patch.gz > ${{ runner.temp }}/w9-mh-cdf-v3.patch
           gunzip -c notes/reference/calibration/d9-mpb-bc.patch.gz > ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS apply --check ${{ runner.temp }}/pyfvs.patch
           git -C ${{ runner.temp }}/PyFVS apply ${{ runner.temp }}/pyfvs.patch
@@ -107,6 +109,9 @@ jobs:
           # W8 puts CWH on the V3 path with fitted large-tree DG and donor small-tree/height/mortality.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w8-cwh-v3.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w8-cwh-v3.patch
+          # W9 puts MH and CDF on V3 with the coastal donor rows.
+          git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w9-mh-cdf-v3.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w9-mh-cdf-v3.patch
           # D9.71 links the real LPMPB extension for the BC variant instead of the stub.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/d9-mpb-bc.patch

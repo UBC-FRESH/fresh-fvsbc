@@ -44,11 +44,13 @@ outside the repository because they carry site identifiers.
 | `w6-sbs-large-tree.patch.gz` | The SBS V3 site-series row for large-tree diameter growth, applied after W5; SBPS excluded |
 | `w7-sbps-large-tree.patch.gz` | Fitted SBPS large-tree diameter growth and its site-series row, applied after W6 |
 | `w8-cwh-v3.patch.gz` | CWH on the V3 path with fitted large-tree DG, applied after W7 |
+| `w9-mh-cdf-v3.patch.gz` | MH and CDF on the V3 path with coastal donor rows, applied after W8 |
+| `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
 | `sbps-v3-bundle.json` | The SBPS V3 base bundle (`MORTMULT 2`) |
 | `cwh-v2-bundle.json` | The CWH V2 stand-level bundle (`BAIMULT 10`) |
-| `mh-v2-bundle.json` | The MH V2 stand-level bundle (`BAIMULT 10`) |
-| `cdf-v2-bundle.json` | The CDF V2 stand-level bundle (`BAIMULT 10`) |
+| `mh-v2-bundle.json` | The MH V2 bundle (`BAIMULT 10`); **superseded by W9** |
+| `cdf-v2-bundle.json` | The CDF V2 bundle (`BAIMULT 10`); **superseded by W9** |
 | `bwbs-v3-bundle.json` | The BWBS V3 base bundle; supersedes `d8-bwbs-bundle.json` |
 | `d6-sbps-growth.md` | The D6.1 SBPS diameter-growth diagnosis and next instrument |
 | `d6-small-tree-growth.md` | The D6.2 small-tree growth threshold, one-tree matrix, and corrected build comparison |
