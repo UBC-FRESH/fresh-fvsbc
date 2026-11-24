@@ -23,6 +23,7 @@ on:
       - "notes/reference/calibration/w2-five-zone.patch.gz"
       - "notes/reference/calibration/w4-sbps-small-tree.patch.gz"
       - "notes/reference/calibration/w5-bwbs-v3.patch.gz"
+      - "notes/reference/calibration/w6-sbs-sbps-large-tree.patch.gz"
       - ".github/workflows/wheels.yml"
   workflow_dispatch:
     inputs:
@@ -74,6 +75,7 @@ jobs:
           gunzip -c notes/reference/calibration/w2-five-zone.patch.gz > ${{ runner.temp }}/w2-five-zone.patch
           gunzip -c notes/reference/calibration/w4-sbps-small-tree.patch.gz > ${{ runner.temp }}/w4-sbps-small-tree.patch
           gunzip -c notes/reference/calibration/w5-bwbs-v3.patch.gz > ${{ runner.temp }}/w5-bwbs-v3.patch
+          gunzip -c notes/reference/calibration/w6-sbs-sbps-large-tree.patch.gz > ${{ runner.temp }}/w6-sbs-sbps-large-tree.patch
           gunzip -c notes/reference/calibration/d9-mpb-bc.patch.gz > ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS apply --check ${{ runner.temp }}/pyfvs.patch
           git -C ${{ runner.temp }}/PyFVS apply ${{ runner.temp }}/pyfvs.patch
@@ -91,6 +93,9 @@ jobs:
           # which is what makes the BWBS labels resolve in the first place.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w5-bwbs-v3.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w5-bwbs-v3.patch
+          # W6 gives SBS and SBPS the site-series row their large-tree diameter growth needs.
+          git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w6-sbs-sbps-large-tree.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w6-sbs-sbps-large-tree.patch
           # D9.71 links the real LPMPB extension for the BC variant instead of the stub.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/d9-mpb-bc.patch

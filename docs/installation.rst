@@ -31,7 +31,7 @@ From source
 -----------
 
 If there is no wheel for your platform, the build recipe is ADR 0004, ADR 0006, and ADR 0013: clone the pinned
-fork, apply seven patch sets, and build. It needs `gfortran`, `meson`, `ninja` and `patchelf`, and it
+fork, apply eight patch sets, and build. It needs `gfortran`, `meson`, `ninja` and `patchelf`, and it
 takes a few minutes:
 
 .. code-block:: console
@@ -46,6 +46,7 @@ takes a few minutes:
    $ gunzip -c notes/reference/calibration/w2-five-zone.patch.gz | git -C PyFVS/fvs apply -
    $ gunzip -c notes/reference/calibration/w4-sbps-small-tree.patch.gz | git -C PyFVS/fvs apply -
    $ gunzip -c notes/reference/calibration/w5-bwbs-v3.patch.gz | git -C PyFVS/fvs apply -
+   $ gunzip -c notes/reference/calibration/w6-sbs-sbps-large-tree.patch.gz | git -C PyFVS/fvs apply -
    $ SETUPTOOLS_SCM_PRETEND_VERSION=0.4.1 pip install --no-build-isolation ./PyFVS \
        --config-settings=setup-args="-Dfvsvariants=bc"
    $ pip install fresh-fvsbc
