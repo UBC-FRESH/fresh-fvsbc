@@ -84,14 +84,14 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "SBPS",
         SupportTier.PROVISIONAL,
-        "V3 pilot; W6 large-tree row, SBPS fold pending",
-        "w6-sbs-sbps-large-tree",
+        "V3 pilot; large-tree DG still zero and BA overpredicts; site-series intercept not fitted",
+        "d6-sbps-small-tree",
     ),
     (
         "SBS",
         SupportTier.PROVISIONAL,
         "V3 pilot; W6 large-tree row with the D7 mortality bundle",
-        "w6-sbs-sbps-large-tree",
+        "w6-sbs-large-tree",
     ),
     ("ICH", SupportTier.PROVISIONAL, "V3 pilot; unsigned", "d9-full-bc-review-bundle"),
     ("IDF", SupportTier.PROVISIONAL, "V3 pilot; unsigned", "d9-full-bc-review-bundle"),

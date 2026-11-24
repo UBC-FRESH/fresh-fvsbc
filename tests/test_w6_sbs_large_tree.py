@@ -14,8 +14,7 @@ from fresh_fvsbc.run import run_case
 from fresh_fvsbc.treelist import TreeListFields
 
 _PATCH = (
-    Path(__file__).resolve().parents[1]
-    / "notes/reference/calibration/w6-sbs-sbps-large-tree.patch.gz"
+    Path(__file__).resolve().parents[1] / "notes/reference/calibration/w6-sbs-large-tree.patch.gz"
 )
 
 
@@ -23,7 +22,7 @@ def test_w6_patch_carries_sbs_and_sbps() -> None:
     """The banked patch adds both site-series tokens to the zonal row."""
     text = gzip.decompress(_PATCH.read_bytes()).decode("utf-8")
     assert "SBS/all" in text
-    assert "SBPS/all" in text
+    assert "SBPS/all" not in text
     assert "SSKONST" in text
 
 
@@ -67,7 +66,7 @@ def _large_sbs_stand() -> list[TreeListFields]:
 
 @pytest.mark.skipif(
     os.environ.get("FVSBC_W6") != "1",
-    reason="needs a build carrying w6-sbs-sbps-large-tree; set FVSBC_W6=1 in that job",
+    reason="needs a build carrying w6-sbs-large-tree; set FVSBC_W6=1 in that job",
 )
 def test_sbs_large_trees_grow(tmp_path: Path) -> None:
     """A stand above 10 cm gains basal area instead of standing still.

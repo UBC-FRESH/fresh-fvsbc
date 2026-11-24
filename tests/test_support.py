@@ -16,8 +16,8 @@ def test_sbps_is_not_matched_as_sbs() -> None:
     """The longer token wins; SBPS has its own pending fold."""
     record = classify("SBPSmc/01", "PL")
     assert record.tier is SupportTier.PROVISIONAL
-    assert record.evidence == "w6-sbs-sbps-large-tree"
-    assert "SBPS fold pending" in record.reason
+    assert record.evidence == "d6-sbps-small-tree"
+    assert "large-tree DG still zero" in record.reason
 
 
 def test_sbs_cites_the_w6_large_tree_row() -> None:
