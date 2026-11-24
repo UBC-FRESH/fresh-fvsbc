@@ -37,6 +37,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fresh_fvsbc import __version__
+from fresh_fvsbc.support import SupportRecord
 
 __all__ = [
     "FVS_SOURCE_COMMIT",
@@ -183,6 +184,8 @@ class Provenance:
         The build's variant list, from :func:`built_variants`.
     random_seed : int, optional
         The seed, when the run used one.
+    support : tuple of SupportRecord, optional
+        One grade per species in the stand, from :func:`fresh_fvsbc.support.classify`.
     """
 
     variant: str
@@ -202,6 +205,7 @@ class Provenance:
     fvs_source_commit: str = FVS_SOURCE_COMMIT
     variant_list: tuple[str, ...] = ()
     random_seed: int | None = None
+    support: tuple[SupportRecord, ...] = ()
 
     def as_record(self) -> dict[str, object]:
         """Return the record as a JSON-ready mapping, in the contract's field order.
@@ -230,6 +234,15 @@ class Provenance:
             "case_id": self.case_id,
             "run_datetime": self.run_datetime,
             "random_seed": self.random_seed,
+            "support": [
+                {
+                    "species": record.species,
+                    "tier": record.tier.value,
+                    "reason": record.reason,
+                    "evidence": record.evidence,
+                }
+                for record in self.support
+            ],
         }
 
     def to_json(self) -> str:

@@ -69,6 +69,7 @@ from fresh_fvsbc.keywords import Keyword, KeywordSet
 from fresh_fvsbc.nemora import PlotFields, PopulationError, to_tree_list
 from fresh_fvsbc.outputs import check_run, read_cases
 from fresh_fvsbc.provenance import Provenance, built_variants, from_cases, treelist_hash
+from fresh_fvsbc.support import classify
 from fresh_fvsbc.treelist import BC_TREFMT, TreeListFields, write_tree_file
 
 __all__ = [
@@ -650,6 +651,10 @@ def run_case(
         If the projection ends badly, or the run recorded no case.
     """
     bec = _bec_of(keywords)
+    support = tuple(
+        classify(str(bec), species)
+        for species in sorted({str(record["species"]).upper() for record in records})
+    )
     qmd = _qmd(records)
     ba = _ba(records)
     if calibration is not None:
@@ -699,6 +704,7 @@ def run_case(
         calibration_id=calibration.bundle_id if calibration is not None else "",
         variant_list=driven.variants,
         random_seed=_seed_of(handoff),
+        support=support,
     )
     provenance.write(target / PROVENANCE_FILE_NAME)
     return RunResult(
