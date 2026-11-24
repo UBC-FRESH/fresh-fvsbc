@@ -58,9 +58,9 @@ class SupportRecord:
 _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "CWH",
-        SupportTier.UNSUPPORTED,
-        "parser only; no growth, mortality, crown, or volume tables",
-        "w2-source-audit",
+        SupportTier.PROVISIONAL,
+        "V2 legacy path; BAIMULT 10 pilot; V3 tables pending",
+        "cwh-v2-calibration",
     ),
     (
         "CDF",
