@@ -1,9 +1,9 @@
 # CWH and MH: V2 stand-level calibrations while V3 is built
 
-Status: **CWH and MH calibrated on the legacy V2 path; V3 migration pending.** Unsigned pilots, tier C.
+Status: **CWH, MH, and CDF calibrated on the legacy V2 path; V3 migration pending.** Unsigned pilots, tier C.
 
 Pins: PyFVS `e95172b`, FVS source `ef5fa847`, variant `bc`.
-Bundles: `cwh-v2-bundle.json`, `mh-v2-bundle.json` (both `BAIMULT 10`).
+Bundles: `cwh-v2-bundle.json`, `mh-v2-bundle.json`, `cdf-v2-bundle.json` (all `BAIMULT 10`).
 
 ## 1. Why this is a V2 calibration
 
@@ -48,16 +48,18 @@ suggestive, not a validation.
 
 ## 4. CDF and CMA
 
-- **CDF** does not respond enough to the lever: base test -28.44, `BAIMULT 8` -22.50, `BAIMULT 10`
-  -20.30, `BAIMULT 12` -18.77. The fold is also lopsided (15 test intervals from one site, 5 train),
-  so a multiplier is not identified. CDF stays **D** until a V3 fit.
+- **CDF** responds once the sample is site-diverse. The first fold was lopsided — 15 of 20 test
+  intervals came from one site — and gave -28.44 at base and -18.77 at `BAIMULT 12`. Sampling one
+  interval per site (21 sites, 6 test / 13 train) gives base -8.22/-9.50, `BAIMULT 8` -2.05/-2.11,
+  and **`BAIMULT 10` -0.72/-0.65** (MAE 6.58/5.03). CDF is **C** with `cdf-v2-bundle.json`.
 - **CMA** has 6 intervals on 2 sites. It cannot support a site-grouped fold and stays **D**.
 
 ## 5. Tier
 
 - CWH **C**: solid stand-level evidence on a 49/56 fold.
 - MH **C**: the same lever, but a 3-interval held-out fold.
-- CDF, CMA **D**: no identified calibration.
+- CDF **C**: site-diverse 6/13 fold.
+- CMA **D**: six intervals on two sites; no calibration is identified.
 
 The V3 migration for CWH and MH — entries in `regent.f`, `dgf.f`, `htgf.f`, and `morts.f`, fitted from
 the 7,124 CWH and 31 MH intervals — is the next task for both.

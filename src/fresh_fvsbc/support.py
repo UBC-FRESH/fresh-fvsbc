@@ -64,9 +64,9 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     ),
     (
         "CDF",
-        SupportTier.UNSUPPORTED,
-        "parser only; no growth or mortality tables",
-        "w2-source-audit",
+        SupportTier.PROVISIONAL,
+        "V2 legacy path; BAIMULT 10 pilot; V3 tables pending",
+        "coastal-v2-calibration",
     ),
     (
         "CMA",
