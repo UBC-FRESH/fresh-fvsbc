@@ -133,3 +133,12 @@ Record the result in the changelog entry for the milestone.
   tested place, never by ad hoc string formatting at a call site.
 - **Treat BC inventory data as restricted until proven open.** This repository is public. Confirm the
   license of any data before it is committed, and prefer synthetic fixtures.
+- **Scratch lives on the shared disk, never `/tmp`.** The container's root disk is small. Put every
+  scratch file, calibration dataset, run directory, and generated artefact under
+  `~/workspace/` (`$HOME/workspace`, the shared data disk), in a named directory such as
+  `~/workspace/bwbs-work/`; use the repo's ignored `runtime/` only for small run artefacts. Never
+  write to `/tmp`, `/var/tmp`, or the container root. This has been corrected repeatedly; treat it as
+  a hard rule, not a preference.
+- **BEC is the unit.** Calibration domains, validation splits, and landscape aggregation use BEC
+  (zone / subzone / site series). A TSA is an administrative rollup; it is not a growth-calibration or
+  landscape unit, and earlier work here showed it is a poor one. Use TSA only for reporting.

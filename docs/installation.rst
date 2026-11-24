@@ -31,7 +31,7 @@ From source
 -----------
 
 If there is no wheel for your platform, the build recipe is ADR 0004, ADR 0006, and ADR 0013: clone the pinned
-fork, apply seven patch sets, and build. It needs `gfortran`, `meson`, `ninja` and `patchelf`, and it
+fork, apply eight patch sets, and build. It needs `gfortran`, `meson`, `ninja` and `patchelf`, and it
 takes a few minutes:
 
 .. code-block:: console
@@ -46,6 +46,7 @@ takes a few minutes:
    $ gunzip -c notes/reference/calibration/w2-five-zone.patch.gz | git -C PyFVS/fvs apply -
    $ gunzip -c notes/reference/calibration/w4-sbps-small-tree.patch.gz | git -C PyFVS/fvs apply -
    $ gunzip -c notes/reference/calibration/w5-bwbs-v3.patch.gz | git -C PyFVS/fvs apply -
+   $ gunzip -c notes/reference/calibration/w6-sbs-large-tree.patch.gz | git -C PyFVS/fvs apply -
    $ SETUPTOOLS_SCM_PRETEND_VERSION=0.4.1 pip install --no-build-isolation ./PyFVS \
        --config-settings=setup-args="-Dfvsvariants=bc"
    $ pip install fresh-fvsbc
@@ -53,7 +54,7 @@ takes a few minutes:
 The third patch adds the 19 W2.3 subzones and their provisional defaults. Without it the variant still
 builds, but those codes fall back to ``ICHmw2/01``; ``run_case`` refuses that fallback rather than
 returning a plausible run. The fourth fixes the ``KAM`` + ``MS`` boundary collision that made
-``MSxk1`` resolve as ``MSmm``. The final three patches add the five-zone prototype, fix the SBPS small-tree height branch, and add the BWBS V3 growth and mortality tables. The
+``MSxk1`` resolve as ``MSmm``. The final four patches add the five-zone prototype, fix the SBPS small-tree height branch, add the BWBS V3 growth and mortality tables, and restore SBS large-tree growth. The
 patched wheel is versioned ``0.4.1`` and is the ``fvs`` extra for ``fresh-fvsbc 0.21.4``. The wrapper
 now accepts the five prototype zones; the binary carries their provisional parser and defaults. That
 is deployment plumbing, not calibration: IDFdk and SBS have passed holdouts; CWH has an

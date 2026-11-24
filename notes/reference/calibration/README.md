@@ -41,6 +41,7 @@ outside the repository because they carry site identifiers.
 | `w3-habtyp-boundary.patch.gz` | The Habtyp zone-boundary patch, applied after W2.3 |
 | `w4-sbps-small-tree.patch.gz` | The SBPS small-tree height-model selection fix, applied after W3.1 |
 | `w5-bwbs-v3.patch.gz` | The BWBS V3 growth and mortality tables, applied after `w2-five-zone.patch.gz` |
+| `w6-sbs-large-tree.patch.gz` | The SBS V3 site-series row for large-tree diameter growth, applied after W5; SBPS excluded |
 | `bwbs-v3-bundle.json` | The BWBS V3 base bundle; supersedes `d8-bwbs-bundle.json` |
 | `d6-sbps-growth.md` | The D6.1 SBPS diameter-growth diagnosis and next instrument |
 | `d6-small-tree-growth.md` | The D6.2 small-tree growth threshold, one-tree matrix, and corrected build comparison |
