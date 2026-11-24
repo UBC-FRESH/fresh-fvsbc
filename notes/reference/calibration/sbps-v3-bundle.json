@@ -1,0 +1,234 @@
+{
+  "bundle_id": "sbps-v3-base-2026-11-24",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": [
+      "CAR",
+      "KAM",
+      "NEL"
+    ],
+    "tsas": [],
+    "becs": [
+      "SBPS"
+    ],
+    "species_groups": [],
+    "dbh_classes": [],
+    "management": [
+      "untreated"
+    ]
+  },
+  "parameters": [
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "PL",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "SE",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "AT",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "BL",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "FD",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "EP",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "AC",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "HW",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "CW",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "BG",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "PW",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "PY",
+        "2.0000",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    }
+  ],
+  "training": {
+    "data_checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "split": "SBPS PSP intervals; BEC-stratified holdout",
+    "objective": "held-out BA bias",
+    "convergence": {
+      "iterations": 0,
+      "method": "W7 fitted large-tree DG; mortality multiplier fixed"
+    }
+  },
+  "review": {
+    "reviewer": "W7 SBPS V3 calibration",
+    "date": "2026-11-24",
+    "signed_off": false
+  },
+  "claim": "SBPS V3: W7 fitted large-tree DG with MORTMULT 2; unsigned pilot."
+}
