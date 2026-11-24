@@ -38,7 +38,14 @@ def test_cwh_is_provisional_on_the_v2_bundle() -> None:
     """CWH runs on the legacy path with a stand-level calibration."""
     record = classify("CWHvm1", "HW")
     assert record.tier is SupportTier.PROVISIONAL
-    assert record.evidence == "cwh-v2-calibration"
+    assert record.evidence == "coastal-v2-calibration"
+
+
+def test_mh_is_provisional_on_the_v2_bundle() -> None:
+    """MH uses the same V2 lever, on a thin fold."""
+    record = classify("MHmm1", "HW")
+    assert record.tier is SupportTier.PROVISIONAL
+    assert record.evidence == "coastal-v2-calibration"
 
 
 def test_unknown_bec_is_unsupported() -> None:
