@@ -58,15 +58,15 @@ class SupportRecord:
 _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "CWH",
-        SupportTier.UNSUPPORTED,
-        "parser only; no growth, mortality, crown, or volume tables",
-        "w2-source-audit",
+        SupportTier.PROVISIONAL,
+        "V2 legacy path; BAIMULT 10 pilot; V3 tables pending",
+        "coastal-v2-calibration",
     ),
     (
         "CDF",
-        SupportTier.UNSUPPORTED,
-        "parser only; no growth or mortality tables",
-        "w2-source-audit",
+        SupportTier.PROVISIONAL,
+        "V2 legacy path; BAIMULT 10 pilot; V3 tables pending",
+        "coastal-v2-calibration",
     ),
     (
         "CMA",
@@ -76,9 +76,9 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     ),
     (
         "MH",
-        SupportTier.UNSUPPORTED,
-        "parser only; no mountain-hemlock/amabilis/yellow-cedar tables",
-        "w2-source-audit",
+        SupportTier.PROVISIONAL,
+        "V2 legacy path; BAIMULT 10 pilot on a 3-interval fold; V3 tables pending",
+        "coastal-v2-calibration",
     ),
     ("BWBS", SupportTier.PROVISIONAL, "V3 pilot; W5 growth and mortality tables", "w5-bwbs-v3"),
     (

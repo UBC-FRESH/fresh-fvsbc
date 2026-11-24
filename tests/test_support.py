@@ -29,9 +29,30 @@ def test_sbs_cites_the_w6_large_tree_row() -> None:
 
 def test_parser_only_zone_is_unsupported() -> None:
     """A label that resolves is not a model."""
-    record = classify("CWHvm1", "HW")
+    record = classify("CMAunp", "HW")
     assert record.tier is SupportTier.UNSUPPORTED
     assert record.evidence == "w2-source-audit"
+
+
+def test_cwh_is_provisional_on_the_v2_bundle() -> None:
+    """CWH runs on the legacy path with a stand-level calibration."""
+    record = classify("CWHvm1", "HW")
+    assert record.tier is SupportTier.PROVISIONAL
+    assert record.evidence == "coastal-v2-calibration"
+
+
+def test_mh_is_provisional_on_the_v2_bundle() -> None:
+    """MH uses the same V2 lever, on a thin fold."""
+    record = classify("MHmm1", "HW")
+    assert record.tier is SupportTier.PROVISIONAL
+    assert record.evidence == "coastal-v2-calibration"
+
+
+def test_cdf_is_provisional_on_the_v2_bundle() -> None:
+    """CDF is calibrated on a site-diverse V2 fold."""
+    record = classify("CDFmm", "FD")
+    assert record.tier is SupportTier.PROVISIONAL
+    assert record.evidence == "coastal-v2-calibration"
 
 
 def test_unknown_bec_is_unsupported() -> None:

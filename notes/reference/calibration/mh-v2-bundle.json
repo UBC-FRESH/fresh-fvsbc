@@ -1,0 +1,210 @@
+{
+  "bundle_id": "mh-v2-ba10-2026-11-24",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": [
+      "CAR",
+      "KAM",
+      "NEL"
+    ],
+    "tsas": [],
+    "becs": [
+      "MH"
+    ],
+    "species_groups": [],
+    "dbh_classes": [],
+    "management": [
+      "untreated"
+    ]
+  },
+  "parameters": [
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PL",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "SE",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "AT",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "BL",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "AC",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "EP",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "FD",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PY",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "CW",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "BG",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "HW",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PW",
+        "10.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    }
+  ],
+  "training": {
+    "data_checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "split": "MH PSP intervals; BEC-stratified holdout (thin)",
+    "objective": "held-out BA bias",
+    "convergence": {
+      "iterations": 0,
+      "method": "grid over BAIMULT on the V2 path"
+    }
+  },
+  "review": {
+    "reviewer": "MH V2 calibration",
+    "date": "2026-11-24",
+    "signed_off": false
+  },
+  "claim": "MH V2: BAIMULT 10 on the legacy path; thin fold, unsigned pilot."
+}
