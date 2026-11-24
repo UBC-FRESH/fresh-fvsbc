@@ -43,6 +43,8 @@ outside the repository because they carry site identifiers.
 | `w5-bwbs-v3.patch.gz` | The BWBS V3 growth and mortality tables, applied after `w2-five-zone.patch.gz` |
 | `w6-sbs-large-tree.patch.gz` | The SBS V3 site-series row for large-tree diameter growth, applied after W5; SBPS excluded |
 | `w7-sbps-large-tree.patch.gz` | Fitted SBPS large-tree diameter growth and its site-series row, applied after W6 |
+| `w8-cwh-v3.patch.gz` | CWH on the V3 path with fitted large-tree DG, applied after W7 |
+| `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
 | `sbps-v3-bundle.json` | The SBPS V3 base bundle (`MORTMULT 2`) |
 | `cwh-v2-bundle.json` | The CWH V2 stand-level bundle (`BAIMULT 10`) |
 | `mh-v2-bundle.json` | The MH V2 stand-level bundle (`BAIMULT 10`) |
