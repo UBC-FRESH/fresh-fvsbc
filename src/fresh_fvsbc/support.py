@@ -1,12 +1,14 @@
 """Machine-readable support tiers for FVS-BC runs.
 
-The tiers replace prose caveats. Every BEC-by-species cell is one of four grades, and a run or a
+The tiers replace prose caveats. Every BEC-by-species cell is one of five grades, and a run or a
 dataset can carry the grade as data:
 
 - ``A`` fitted and validated;
 - ``B`` explicit donor species, validated at stand level;
 - ``C`` provisional: it runs, and the evidence is a pilot, not a signed calibration;
-- ``D`` unsupported: the parser accepts the label but there is no growth/mortality model.
+- ``D`` unsupported: the parser accepts the label but there is no growth/mortality model;
+- ``X`` out of scope: a deliberate exclusion, not a gap. ``CMA`` is the case: it is not a forested
+  BEC zone and is immaterial to the modelling projects this package serves.
 
 No cell is ``A`` or ``B`` yet: the supported zones carry unsigned pilots. That is stated once here
 rather than repeated per run.
@@ -21,12 +23,13 @@ __all__ = ["SupportRecord", "SupportTier", "classify"]
 
 
 class SupportTier(StrEnum):
-    """The four support grades."""
+    """The five support grades."""
 
     FITTED = "A"
     DONOR = "B"
     PROVISIONAL = "C"
     UNSUPPORTED = "D"
+    OUT_OF_SCOPE = "X"
 
 
 @dataclass(frozen=True)
@@ -70,9 +73,9 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     ),
     (
         "CMA",
-        SupportTier.UNSUPPORTED,
-        "parser only; no model tables or suitability evidence",
-        "w2-source-audit",
+        SupportTier.OUT_OF_SCOPE,
+        "not a forested BEC zone; out of scope by project decision",
+        "cma-out-of-scope",
     ),
     (
         "MH",

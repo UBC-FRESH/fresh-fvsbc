@@ -55,8 +55,8 @@ CDF's V3 MAE is roughly half the V2 bundle's, with the same bias gate.
 ## 4. Tier and claim
 
 MH and CDF are **C**: V3 structure, donor large-tree coefficients, stand-level evidence, unsigned.
-The V3 bundles supersede the V2 ones. CMA remains **D**: 6 intervals on 2 sites cannot support a
-site-grouped calibration.
+The V3 bundles supersede the V2 ones. CMA is **X** (out of scope): it is not a forested BEC zone, and the two sites are not a
+calibration target.
 
 ## 5. Build
 

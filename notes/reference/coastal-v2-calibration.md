@@ -62,7 +62,7 @@ suggestive, not a validation.
 - CWH **C**: solid stand-level evidence on a 49/56 fold.
 - MH **C**: the same lever, but a 3-interval held-out fold.
 - CDF **C**: site-diverse 6/13 fold.
-- CMA **D**: six intervals on two sites; no calibration is identified.
+- CMA **X**: out of scope by decision; it is not a forested BEC zone and the two sites are not a calibration target.
 
 The V3 migration for CWH and MH — entries in `regent.f`, `dgf.f`, `htgf.f`, and `morts.f`, fitted from
 the 7,124 CWH and 31 MH intervals — is the next task for both.
