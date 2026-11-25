@@ -1,4 +1,47 @@
-# fresh-fvsbc 0.22.0
+# fresh-fvsbc 0.23.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.22.0
+
+- **Recruitment v1.** A BC-wide `ESTAB` model: 2,255 mean annual rates by BEC × all fifteen species
+  × initial-BA bin, in `recruitment-bc-v1-bundle.json`. New trees are the trees present at the second
+  visit whose tree number was absent at the first. `recruitment_table`/`fit_rates` now carry all
+  fifteen species.
+- **The year-0 fix.** `estab_keyword` skips the inventory year for a multi-cycle projection and
+  spreads the same total TPH over cycles 2..N; establishment at year 0 was re-selecting FVS's sample
+  trees. Single-cycle `ESTAB` keeps the old behaviour and is not the validated path.
+- **Held-out recruitment evidence.** Data model: 416 observed new TPH vs 388 predicted (−6.8%,
+  corr 0.33). Through three FVS cycles, scale 1.0 is +26% TPH; the train-fit **scale 0.4** is
+  **+1.3% TPH** on the held-out sites.
+- **The multi-scale dataset.** `fresh_fvsbc.dataset.build_dataset(manifest, out_dir)` writes
+  `runs`, `stands`, `trees`, `neighbourhoods`, `events`, and `landscape`, plus every pass-through
+  table named in the manifest and a `dataset.json` with the source hash and schema. **BEC is the
+  unit**; TSA is descriptive. Support travels in `runs.support`.
+- **Events and disturbances as data.** Cut and mortality normalise into `events`; `FMIN`/`THINBBA`
+  schedules are expressible as nested manifest keywords; a 20-stand Dawson pilot produced 95 events
+  and the full disturbance set. Parquet is written beside CSV when `pyarrow` is present.
+
+The engine remains **`fresh-fvsbc-pyfvs 0.4.2`** (W5–W9). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.23.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- CWH small-tree growth, large-tree height, and part of mortality are donors; MH/CDF large-tree rows
+  are coastal donors.
+- Recruitment is a mean-rate model; it has no QMD bin, seed year, climate, or dispersal, and the
+  scale must be refit if the growth/mortality engine changes.
+- Disturbance calibration is not done: fire severity, consumption, and harvest response need BC
+  validation data.
+- The dataset has no whole-TSA run, spatial neighbourhood geometry, SQLite writer, or DOI yet.
+
+## fresh-fvsbc 0.22.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
