@@ -1,4 +1,53 @@
-# fresh-fvsbc 0.21.4
+# fresh-fvsbc 0.22.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
+list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
+run.
+
+Pre-1.0, and the public API can change. The gaps that remain are listed at the end.
+
+## What changed since 0.21.4
+
+- **BWBS runs V3, with fitted growth and mortality (W5).** Small-tree height entries fitted from
+  same-tree PSP pairs; large-tree diameter entries, the missing site-series row, and the mortality
+  entry that a missing BWBS string had turned into complete mortality (`RIP=99`). Held-out Dawson
+  fold: BA **+2.33 m2/ha (+4.3%)**, TPH **+0.2%**. The young and mature checks pass.
+- **SBS and SBPS large trees grow on V3 (W6/W7).** `SSKONST` held only ICH/IDF, so SBS and SBPS
+  large-tree DG was zero. SBS is −2.66 with the D7 bundle; SBPS needed its own fitted rows and is
+  **+2.01** with `MORTMULT 2`. W6's zero-intercept SBPS row was rejected after it overflowed to BA
+  53,188.
+- **CWH, MH, and CDF run V3 (W8/W9).** CWH has fitted large-tree DG for ten species and `BAIMULT 8`
+  (**+0.31** held out); MH and CDF use the coastal donor rows (`BAIMULT 8`, **+2.47** and **−2.05**).
+  Their V2 bundles are superseded.
+- **Support is data, not prose.** `provenance.json` carries a `support` array per species with a tier:
+  **A** fitted/validated, **B** donor/validated, **C** provisional, **D** unsupported, **X** out of
+  scope. Every forested zone is C today; CMA is X by decision; no cell is A or B until a signed review.
+- **CMA is out of scope.** Two sites and six intervals, both at `BAMAX`, in a non-forested zone. It is
+  removed from the calibration backlog and graded X.
+- **Disturbance wiring is validated on a calibrated zone.** Fire and removal write mortality, snag,
+  DWD, fuels, potfire, consumption, carbon, cut, and attribute tables, and leave a live, growing
+  residual. This is wiring, not a disturbance calibration.
+
+The engine wheel moves to **`fresh-fvsbc-pyfvs 0.4.2`**, which applies W5–W9. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.22.0"
+```
+
+## Gaps that remain
+
+- **No A or B cells.** Every forested zone is an unsigned C pilot; the only route to A/B is a signed
+  review.
+- **CWH small-tree growth, large-tree height, and part of mortality are donors**; MH and CDF
+  large-tree DG is the CWH donor. Fitting them from each zone's pairs is the next refinement.
+- **Recruitment** is still the ad-hoc Dawson table; a year-0 `ESTAB` distorts the sample and the
+  multi-cycle harness has not been run.
+- **Disturbance calibration** is not done: fire severity, consumption, and harvest response need BC
+  validation data.
+- **The multi-scale dataset** (schema, manifest-driven orchestration, tree-through-landscape pilot)
+  is not built.
+
+## fresh-fvsbc 0.21.4
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator. It writes the FVS-BC tree
 list, validates a keyword set, runs a case, reads the outputs back, and records the provenance of every
