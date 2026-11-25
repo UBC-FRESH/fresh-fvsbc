@@ -139,8 +139,9 @@ the aggregate is `d7-sbpsmk-mature-loso-summary.csv`.
 - The external Williams Lake / 100 Mile screen fails BA (+11.03% pooled); the candidate is
   Quesnel-only.
 - The bundle checksum covers interval identifiers and initial/final values, not pandas float formatting.
-- The BA gate uses the unrounded tree list; FVS writes tree counts `F6.0`. Two of the 48 accepted
-  intervals start at FVS BA 19, so the gate is not exact at the 20 m2/ha boundary.
+- The BA gate uses the unrounded tree list. Two of the 48 accepted intervals start at FVS BA 19, so
+  the gate is not exact at the 20 m2/ha boundary. (From 0.26.0 the wrapper declares
+  `TREEFMT` with `F6.2` for `tree_count`, so the run's starting BA matches the unrounded list.)
 - The domain covers one TSA / one BEC.
 - The four low-QMD, high-productivity sites are excluded; they still have no working model.
 - 25 sites and 48 intervals are enough for a candidate, not a certificate.

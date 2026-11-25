@@ -1,4 +1,40 @@
-# fresh-fvsbc 0.25.0
+# fresh-fvsbc 0.26.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.25.0
+
+- **Tree counts keep their decimals.** The wrapper wrote `tree_count` under the variant's compiled
+  `F6.0`, so a PSP expansion factor of 2.47 became 2 and a dense stand started up to 19% below its
+  measured basal area. The wrapper now declares `TREEFMT` with `F6.2` (same width, same layout), and
+  a real CDFmm interval starts at 111 m²/ha against 112.5 measured instead of 90.
+- **Every zone fold re-run.** CDF's held-out BA bias at `BAIMULT 8` moves from −16.1 to **−5.1**
+  m²/ha; CWH holds `BAIMULT 8` with held-out bias **+0.15** and MAE **4.01**; MH's held-out bias
+  improves to **+1.47**. SBPS and SBS stay on `MORTMULT 2` with no BAIMULT. No bundle moved.
+- **A wrong conclusion corrected.** Part of what read as a coastal growth gap was lost density, not
+  a growth problem. The CDF dense-stand gap is smaller than the W10 note recorded, and the remaining
+  bias there is genuine high-BA mortality error.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.4`** (W5–W11); this release is wrapper-side. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.26.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- CDF dense stands still lose about 5 m²/ha on the held-out site; SBS holds a −6 m²/ha bias with a
+  large MAE.
+- MH and CDF keep the coastal large-tree donor outside HW/BG and FD/AT.
+- Recruitment is a mean-rate model; it has no QMD bin, seed year, climate, or dispersal.
+- Disturbance calibration is not done.
+- The dataset has no whole-TSA run, spatial neighbourhood geometry, SQLite writer, or DOI yet.
+
+## fresh-fvsbc 0.25.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

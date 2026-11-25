@@ -54,8 +54,13 @@ __all__ = [
     "write_tree_record",
 ]
 
-#: BC's tree-record format, from ``canada/bc/blkdat.f``, in ``BLOCK DATA BLKDAT``.
-BC_TREFMT: str = "(I4,T1,I7,F6.0,I1,A3,F5.1,F4.1,2F5.1,F5.1,I1,3(I2,I2),2I1,I2,2I3,2I1,F3.0)"
+#: The tree-record format the wrapper declares with ``TREEFMT``.
+#:
+#: The variant's compiled default (``canada/bc/blkdat.f``) writes ``tree_count`` with ``F6.0``.
+#: That default cannot represent a PSP expansion factor below one tree, and rounding 2.47 to 2
+#: silently costs a dense stand a fifth of its density. The field is the same width here with two
+#: decimals, so the record layout is unchanged and the declared format keeps the counts exact.
+BC_TREFMT: str = "(I4,T1,I7,F6.2,I1,A3,F5.1,F4.1,2F5.1,F5.1,I1,3(I2,I2),2I1,I2,2I3,2I1,F3.0)"
 
 #: The line that ends a tree-data file. ``intree.f`` reads until a line contains ``-999``.
 TREE_LIST_END: str = "-999\n"

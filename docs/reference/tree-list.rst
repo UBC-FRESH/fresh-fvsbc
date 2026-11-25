@@ -48,9 +48,11 @@ this record that was found.
      - Integer, width 7, **read from columns 1 to 7** because ``T1`` preceded it. Its first four
        columns are shared with ``plot_id``, so only columns 5 to 7 are a writer's
    * - 4
-     - ``F6.0``
+     - ``F6.2``
      - ``tree_count``
-     - Real, width 6, no decimals. The tree's expansion factor
+     - Real, width 6, two decimals. The tree's expansion factor. The wrapper declares this with
+       ``TREEFMT``: the variant's compiled default is ``F6.0``, and rounding a PSP expansion factor of
+       2.47 to 2 costs a dense stand a fifth of its density.
    * - 5
      - ``I1``
      - ``tree_history``
