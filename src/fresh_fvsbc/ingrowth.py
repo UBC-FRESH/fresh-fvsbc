@@ -22,6 +22,24 @@ import pandas as pd
 
 from fresh_fvsbc.keywords import Keyword
 
+_SPECIES_CODES = (
+    "PW",
+    "LW",
+    "FD",
+    "BG",
+    "HW",
+    "CW",
+    "PL",
+    "SE",
+    "BL",
+    "PY",
+    "EP",
+    "AT",
+    "AC",
+    "OC",
+    "OH",
+)
+
 __all__ = ["IngrowthModel", "IngrowthRate"]
 
 
@@ -241,7 +259,9 @@ class IngrowthModel:
         qmd : float or None, optional
             The stand's initial QMD, in cm.
         cycles : int, optional
-            The number of establishment cycles. Defaults to one.
+            The number of establishment cycles. Defaults to one. A multi-cycle block skips the
+            first cycle (establishment at year 0 re-selects FVS's sample trees) and spreads the
+            same total TPH over the later cycles.
         cycle_years : float or None, optional
             The length of each cycle. Defaults to ``years / cycles``.
         cycle : int, optional
@@ -267,11 +287,21 @@ class IngrowthModel:
         selected = self.selected(bec, ba, qmd)
         if not selected:
             return None
+        # Establishment at the inventory year makes FVS re-select its sample trees, which distorts
+        # the run. For a multi-cycle projection, skip the first cycle and spread the same total over
+        # the later cycles.
+        start = cycle
+        count = cycles
+        factor = 1.0
+        if cycles > 1:
+            start = cycle + 1
+            count = cycles - 1
+            factor = cycles / count
         lines: list[Keyword] = []
-        for offset in range(cycles):
-            cycle_number = cycle + offset
+        for offset in range(count):
+            cycle_number = start + offset
             for species, rate in selected.items():
-                tph = rate * length * self.scale
+                tph = rate * length * factor * self.scale
                 if tph < 0.05:
                     continue
                 lines.append(
@@ -345,7 +375,6 @@ def recruitment_table(
     ValueError
         If a required column is missing.
     """
-    from fresh_fvsbc.calibration import SPECIES_GROUPS
     from fresh_fvsbc.treelist import DONOR_SPECIES
 
     tree_columns = {
@@ -385,38 +414,41 @@ def recruitment_table(
             continue
         old = set(start["TREE_NO"])
         new = end[~end["TREE_NO"].isin(old)]
-        by_group: dict[str, float] = {}
+        by_code: dict[str, float] = {}
+        other = 0.0
         for species, value in new.groupby("SPECIES")["PHF_TREE"].sum().items():
             code = DONOR_SPECIES.get(str(species).upper(), str(species).upper())
-            species_group = SPECIES_GROUPS.get(code, "UNKNOWN")
-            by_group[species_group] = by_group.get(species_group, 0.0) + float(value)
-        rows.append(
-            {
-                "BEC": interval.BEC,
-                "TSA_DESC": interval.TSA_DESC,
-                "interval_id": interval.interval_id,
-                "year0": int(getattr(interval, "year0", 0)),
-                "year1": int(getattr(interval, "year1", 0)),
-                "years": float(cast(float, interval.years)),
-                "ba0": float(cast(float, getattr(interval, "ba0", 0.0))),
-                "qmd": float(cast(float, getattr(interval, "qmd", 0.0))),
-                "tph0": float(cast(float, getattr(interval, "tph0", 0.0))),
-                "new_total": sum(by_group.values()),
-                "new_FD": by_group.get("FD", 0.0),
-                "new_PL": by_group.get("PL", 0.0),
-                "new_SE": by_group.get("SE", 0.0),
-                "new_HW": by_group.get("HW", 0.0),
-                "new_other": sum(
-                    v for k, v in by_group.items() if k not in {"FD", "PL", "SE", "HW"}
-                ),
-            }
-        )
+            if code in _SPECIES_CODES:
+                by_code[code] = by_code.get(code, 0.0) + float(value)
+            else:
+                other += float(value)
+        row: dict[str, object] = {
+            "BEC": interval.BEC,
+            "TSA_DESC": interval.TSA_DESC,
+            "interval_id": interval.interval_id,
+            "year0": int(getattr(interval, "year0", 0)),
+            "year1": int(getattr(interval, "year1", 0)),
+            "years": float(cast(float, interval.years)),
+            "ba0": float(cast(float, getattr(interval, "ba0", 0.0))),
+            "qmd": float(cast(float, getattr(interval, "qmd", 0.0))),
+            "tph0": float(cast(float, getattr(interval, "tph0", 0.0))),
+            "new_total": sum(by_code.values()) + other,
+            "new_FD": by_code.get("FD", 0.0),
+            "new_PL": by_code.get("PL", 0.0),
+            "new_SE": by_code.get("SE", 0.0),
+            "new_HW": by_code.get("HW", 0.0),
+            "new_other": other,
+        }
+        for code in _SPECIES_CODES:
+            row[f"new_{code}"] = by_code.get(code, 0.0)
+        rows.append(row)
     return pd.DataFrame(rows)
 
 
 def fit_rates(
     table: pd.DataFrame,
     *,
+    species: Sequence[str] = ("FD", "PL", "SE", "HW"),
     model_id: str = "derived",
     version: str = "0.0.0",
     ba_bins: Sequence[float] = (),
@@ -430,6 +462,8 @@ def fit_rates(
     ----------
     table : pandas.DataFrame
         A recruitment table from :func:`recruitment_table`.
+    species : sequence of str, optional
+        The FVS species codes to fit. Defaults to the four calibration groups.
     model_id : str, optional
         The model identifier.
     version : str, optional
@@ -457,7 +491,9 @@ def fit_rates(
     ValueError
         If a rate column is missing or a bin list is not increasing.
     """
-    required = {"BEC", "years", "new_FD", "new_PL", "new_SE", "new_HW", "ba0", "qmd"}
+    if not species:
+        raise ValueError("species must not be empty")
+    required = {"BEC", "years", "ba0", "qmd"} | {f"new_{code}" for code in species}
     missing = required - set(table.columns)
     if missing:
         raise ValueError(f"the recruitment table lacks {', '.join(sorted(missing))}")
@@ -470,7 +506,7 @@ def fit_rates(
     if len(set(qmd_bins)) != len(qmd_bins) or list(qmd_bins) != sorted(qmd_bins):
         raise ValueError("qmd_bins must be strictly increasing")
     frame: pd.DataFrame = table.copy()
-    groups = ("FD", "PL", "SE", "HW")
+    groups = tuple(species)
     for group in groups:
         frame[f"rate_{group}"] = frame[f"new_{group}"] / frame["years"].where(frame["years"] > 0)
         if max_rate is not None:
