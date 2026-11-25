@@ -60,14 +60,22 @@ A dataset row therefore says `C` or `X` in data, not in a caption.
 
 - **Neighbourhoods are declared, not spatial.** The manifest supplies an ID; no geometry, adjacency,
   or area weighting yet.
-- **No real-TSA pilot yet.** The test is two synthetic stands across BWBS and SBS.
+- **No whole-TSA pilot yet.** A four-stand real pilot (BWBSmw, BWBSwk1, BWBSwk2, SBSwk2 in
+  Dawson) produced 2,092 tree rows, 8 stand-year rows, and a BEC landscape; all four runs carried
+  support `C`. The test itself remains two synthetic stands.
 - **Disturbance events are in their own tables** (`FVS_CutList_Metric`, mortality, snags, DWD) as
   requested by the keywords; there is no normalised `events` table.
 - **CSV only.** Parquet/SQLite and a published DOI are later.
 - **No dataset-level validation** beyond the schema and the source-hash record.
 
+## Real pilot
+
+Four Dawson PSP stands (BWBSmw, BWBSwk1, BWBSwk2, SBSwk2), one interval each, untreated. The builder
+wrote 4 runs, 8 stand-year rows, 2,092 tree rows, and four BEC landscape rows; every run carried
+support `C`. The stand tree lists and manifest stay local because they carry PSP site identifiers.
+
 ## Next
 
-1. A one-TSA pilot with real PSP stands, a fire, and a removal.
+1. A whole-TSA pilot with a fire and a removal.
 2. A normalised `events` table (year, type, species, TPH, BA removed/killed).
 3. A Parquet writer and a schema version.
