@@ -158,6 +158,7 @@ def test_the_contract_format_string_is_the_one_that_was_read() -> None:
     """The format string is BC's, without its FORTRAN continuation wrapping."""
     assert BC_TREFMT.startswith("(I4,T1,I7,")
     assert BC_TREFMT.endswith("F3.0)")
+    assert "F6.2" in BC_TREFMT, "tree_count keeps two decimals so density is not rounded away"
     assert "\n" not in BC_TREFMT
 
 
@@ -187,7 +188,7 @@ def test_each_field_lands_in_the_columns_the_contract_gives_it() -> None:
     assert len(line) == RECORD_WIDTH
     assert line[0:4] == "  12"
     assert line[4:7] == "  7"
-    assert line[7:13] == "     3"
+    assert line[7:13] == "  3.00"
     assert line[13] == "1"
     assert line[14:17] == "FD "
     assert line[17:22] == " 21.4"
