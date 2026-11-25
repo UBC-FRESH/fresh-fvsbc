@@ -79,6 +79,7 @@ outside the repository because they carry site identifiers.
 | `d8-bwbs-screen.md`, `d8-bwbs-summary.csv`, `d8-bwbs-bundle.json` | The D8.3 BWBS growth pilot: three TSA holdouts, high BAIMULT and low MORTMULT; unsigned and **superseded by `bwbs-v3-bundle.json`** |
 | `d8-cdf-screen.md` | The D8.5 CDF screen: one TSA, site fold 0 fails BA; no bundle |
 | `d8-mh-cma-screen.md` | The D8.6 MH/CMA screens: GBR North fails; CMA validation-only; no bundle |
+| `../cma-out-of-scope.md` | The decision record: CMA is not a forested BEC zone and is out of scope |
 | `d8-review-packet.md`, `d8-review-manifest.json`, `d8-sbs-second-holdout.csv` | D8.7 review packet for IDFdk/SBS/CWH; SBS Prince George second holdout |
 | `d9-faib-nonpsp-catalogue.md`, `d9-faib-nonpsp-coverage.csv` | D9.1 FAIB non-PSP catalogue: temporary VRI and independent repeat cohort |
 | `d9-faib-nonpsp-external.csv` | D9.2 non-PSP external validation of IDFdk/SBS/CWH/BWBS |
@@ -133,9 +134,11 @@ outside the repository because they carry site identifiers.
 | BEC × species envelope rows | 594 |
 | Observed PSP species codes | 37 |
 
-The unsupported zones (`CWH`, `CDF`, `BWBS`, `CMA`, `MH`) are counted in
-`bec_coverage.csv` but contribute no interval, tree-survival, or envelope row.
-They need the upstream extension in W2 before they can be calibrated.
+The five prototype zones (`CWH`, `CDF`, `BWBS`, `CMA`, `MH`) are counted in
+`bec_coverage.csv` but contribute no interval, tree-survival, or envelope row in
+these committed aggregates. W5–W9 moved BWBS, CWH, MH, and CDF onto calibrated
+paths; `CMA` is out of scope by decision (`cma-out-of-scope.md`) and is not a
+backlog item.
 
 ## QA and exclusions
 

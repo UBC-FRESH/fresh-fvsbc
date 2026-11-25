@@ -60,7 +60,7 @@ A record has these fields.
    * - ``random_seed``
      - The seed, when the run used one. FVS exposes ``RANNSEED``
    * - ``support``
-     - One grade per species in the stand: ``species``, ``tier`` (A/B/C/D), the reason, and the evidence note
+     - One grade per species in the stand: ``species``, ``tier`` (A/B/C/D/X), the reason, and the evidence note
 
 The two hashes are of a canonical serialization, not of a file. A file hash changes with a trailing
 newline or a column width, and it would then say a run differed when it did not.

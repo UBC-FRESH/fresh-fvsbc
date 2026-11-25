@@ -79,9 +79,10 @@ Pre-1.0, and the public API can change. The gaps that remain are listed at the e
   calibration-ready, 2 validation-only). No parameter has been fitted and no domain has a certificate;
   W3–W5 are the next steps.
 
-- **The five missing zones remain out.** `CWH`, `CDF`, `BWBS`, `CMA`, and `MH` need new species and
-  growth/mortality/crown/bark/volume/regeneration tables. The W2.2 audit records them as **no-go
-  without a parameter source**; `CMA` may be a documented non-target.
+- **The five prototype zones.** The W2.2 audit recorded `CWH`, `CDF`, `BWBS`, `CMA`, and `MH` as
+  **no-go without a parameter source**. W5–W9 have since put BWBS, CWH, MH, and CDF on calibrated
+  paths. **`CMA` is a documented non-target: out of scope by decision, because it is not a forested
+  BEC zone** (`notes/reference/cma-out-of-scope.md`).
 
 - **Install:** `pip install "fresh-fvsbc[fvs]==0.21.0"`. The `fvs` extra pins
   `fresh-fvsbc-pyfvs==0.3.12`; if that wheel is not on your index yet, use the source recipe in

@@ -27,11 +27,11 @@ def test_sbs_cites_the_w6_large_tree_row() -> None:
     assert "D7 mortality bundle" in record.reason
 
 
-def test_parser_only_zone_is_unsupported() -> None:
-    """A label that resolves is not a model."""
+def test_cma_is_out_of_scope_not_a_gap() -> None:
+    """CMA is a deliberate exclusion, not an unsupported cell to chase."""
     record = classify("CMAunp", "HW")
-    assert record.tier is SupportTier.UNSUPPORTED
-    assert record.evidence == "w2-source-audit"
+    assert record.tier is SupportTier.OUT_OF_SCOPE
+    assert record.evidence == "cma-out-of-scope"
 
 
 def test_cwh_is_provisional_on_the_v2_bundle() -> None:
