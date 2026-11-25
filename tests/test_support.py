@@ -41,18 +41,20 @@ def test_cwh_is_provisional_on_the_v2_bundle() -> None:
     assert record.evidence == "w8-cwh-v3"
 
 
-def test_mh_is_provisional_on_the_v2_bundle() -> None:
-    """MH uses the same V2 lever, on a thin fold."""
+def test_mh_is_provisional_with_its_own_large_tree_rows() -> None:
+    """MH fits HW and BG from its own pairs and keeps the donor for the rest."""
     record = classify("MHmm1", "HW")
     assert record.tier is SupportTier.PROVISIONAL
-    assert record.evidence == "w9-mh-cdf-v3"
+    assert record.evidence == "w10-mh-cdf-own-dg"
+    assert "own HW/BG" in record.reason
 
 
-def test_cdf_is_provisional_on_the_v2_bundle() -> None:
-    """CDF is calibrated on a site-diverse V2 fold."""
+def test_cdf_is_provisional_with_its_own_large_tree_rows() -> None:
+    """CDF fits FD and AT from its own pairs and keeps the donor for the rest."""
     record = classify("CDFmm", "FD")
     assert record.tier is SupportTier.PROVISIONAL
-    assert record.evidence == "w9-mh-cdf-v3"
+    assert record.evidence == "w10-mh-cdf-own-dg"
+    assert "own FD/AT" in record.reason
 
 
 def test_unknown_bec_is_unsupported() -> None:

@@ -22,6 +22,8 @@ large-tree rows as donors and the CWH donor wiring for the other four tables:
   mortality.
 
 This is a donor calibration: the large-tree DG coefficients come from CWH, not from an MH or CDF fit.
+**W10 replaces the donor for MH HW/BG and CDF FD/AT** (`w10-mh-cdf-own-dg.md`); the other species
+still use it.
 The folds below are the evidence that the donor is usable at stand level.
 
 ## 2. MH

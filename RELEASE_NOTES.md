@@ -1,4 +1,43 @@
-# fresh-fvsbc 0.23.0
+# fresh-fvsbc 0.24.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.23.0
+
+- **MH and CDF get their own large-tree diameter rows.** W9 wired both zones onto the fitted coastal
+  (CWH) rows as a donor. W10 fits the four species with enough pairs from the zones' own data:
+  mountain hemlock (HW, n=536), amabilis fir (BG, n=358), coastal Douglas-fir (FD, n=3,642), and red
+  alder (AT, n=593). Every other MH/CDF species keeps the coastal donor.
+- **Why it matters.** The donor was visibly wrong: mountain hemlock grows ~40% slower than the
+  coastal hemlock row predicts, and coastal Douglas-fir ~45% faster than the CWH Douglas-fir row.
+- **Held-out evidence, same folds, donor vs own.** MH: held-out BA bias +2.47 → **+1.81**, MAE
+  2.47 → **1.81**. CDF: −16.12 → **−15.87**, MAE 17.07 → **16.07**. `BAIMULT 8` is unchanged in both
+  bundles.
+- **CDF's dense stands remain biased.** The CDF held-out sites are high-density CDFmm stands; both
+  builds under-predict them by 15–20 m²/ha. That is a mortality/height gap, not a diameter-growth-row
+  gap, and it stays open.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.3`** (W5–W10). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.24.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- CWH small-tree growth, large-tree height, and part of mortality are donors; MH/CDF keep the
+  coastal donor for the species outside HW/BG and FD/AT.
+- CDF dense-stand growth is under-predicted by 15–20 m²/ha on its held-out sites.
+- Recruitment is a mean-rate model; it has no QMD bin, seed year, climate, or dispersal, and the
+  scale must be refit if the growth/mortality engine changes.
+- Disturbance calibration is not done: fire severity, consumption, and harvest response need BC
+  validation data.
+- The dataset has no whole-TSA run, spatial neighbourhood geometry, SQLite writer, or DOI yet.
+
+## fresh-fvsbc 0.23.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
