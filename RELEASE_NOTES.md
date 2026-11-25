@@ -1,4 +1,43 @@
-# fresh-fvsbc 0.24.0
+# fresh-fvsbc 0.25.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.24.0
+
+- **CWH large-tree height growth is fitted, not borrowed.** Six single-species height-growth blocks
+  now lead the `LTHG` table, so a CWH stand matches them before the ICH/IDF site rows it used to
+  borrow: hemlock, Douglas-fir, amabilis fir, spruce, red alder, and lodgepole pine.
+- **Dominant trees were growing 20–45% faster than the donor allowed.** On 209,902 dominant and
+  codominant CWH pairs, the donor predicts 1.71 m per decade for hemlock against 2.45 observed, and
+  1.47 against 2.64 for spruce. The fitted rows bring the held-out bias on those pairs from −0.75 to
+  −0.15 m (hemlock), −1.25 to −0.28 m (spruce), and −0.54 to −0.15 m (Douglas-fir).
+- **CW keeps the donor deliberately.** Fitting cedar halved tall-cedar height growth on a real
+  CWHdm interval and cost stand volume; the donor is 4% low on dominants, so it stays.
+- **Stand level is neutral, as expected.** Over 246 CWH intervals, mean BA bias moves −4.184 →
+  −4.176 m²/ha and volume −105.27 → −105.55 m³/ha (−0.04% of the 712 m³/ha observed mean). Height
+  growth is a small part of standing volume over 5–16-year intervals.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.4`** (W5–W11). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.25.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- The fitted CWH height rows still under-predict the tallest trees (about 1.2 m versus 1.7 m per
+  decade at a 40 m hemlock); the variant's quadratic taper cannot fit both ends.
+- MH and CDF keep the coastal large-tree donor outside HW/BG and FD/AT.
+- CDF dense-stand growth is under-predicted by 15–20 m²/ha on its held-out sites.
+- Recruitment is a mean-rate model; it has no QMD bin, seed year, climate, or dispersal.
+- Disturbance calibration is not done.
+- The dataset has no whole-TSA run, spatial neighbourhood geometry, SQLite writer, or DOI yet.
+
+## fresh-fvsbc 0.24.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
