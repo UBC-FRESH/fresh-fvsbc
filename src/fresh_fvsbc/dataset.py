@@ -24,6 +24,7 @@ A manifest is a JSON object::
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 from collections.abc import Mapping
 from pathlib import Path
@@ -33,14 +34,14 @@ import pandas as pd
 
 from fresh_fvsbc.bundle import load_bundle
 from fresh_fvsbc.keywords import Keyword
-from fresh_fvsbc.outputs import read_table
+from fresh_fvsbc.outputs import EXPOSED_TABLES, UnknownTableError, read_table
 from fresh_fvsbc.run import run_case
 from fresh_fvsbc.treelist import TreeListFields
 
 __all__ = ["DatasetError", "build_dataset"]
 
 #: The normalised tables the builder always writes.
-_TABLES = ("runs", "stands", "trees", "neighbourhoods", "landscape")
+_TABLES = ("runs", "stands", "trees", "neighbourhoods", "events", "landscape")
 
 
 class DatasetError(Exception):
@@ -53,9 +54,15 @@ def _keyword(record: Mapping[str, object]) -> Keyword:
         raise DatasetError("every keyword needs a name")
     fields = record.get("fields", [])
     lines = record.get("lines", [])
-    if not isinstance(fields, list) or not isinstance(lines, list):
-        raise DatasetError(f"keyword {name} needs list fields and lines")
-    return Keyword(name, tuple(str(v) for v in fields), tuple(str(v) for v in lines))
+    nested = record.get("nested", [])
+    if not isinstance(fields, list) or not isinstance(lines, list) or not isinstance(nested, list):
+        raise DatasetError(f"keyword {name} needs list fields, lines, and nested")
+    return Keyword(
+        name,
+        tuple(str(v) for v in fields),
+        tuple(str(v) for v in lines),
+        nested=tuple(_keyword(item) for item in nested if isinstance(item, dict)),
+    )
 
 
 def _manifest(path: Path) -> dict[str, object]:
@@ -79,6 +86,74 @@ def _manifest(path: Path) -> dict[str, object]:
 
 def _hash(path: Path) -> str:
     return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+_EVENT_COLUMNS = (
+    "run_id",
+    "stand_id",
+    "bec",
+    "year",
+    "event_type",
+    "species",
+    "size_class",
+    "dbh",
+    "tph",
+    "tph_total",
+    "source_table",
+)
+
+
+def _events(cut: pd.DataFrame | None, mortality: pd.DataFrame | None) -> pd.DataFrame:
+    """Normalise a cut list and a mortality table into one event table."""
+    rows: list[dict[str, object]] = []
+    if cut is not None and not cut.empty:
+        for _, row in cut.iterrows():
+            rows.append(
+                {
+                    "run_id": row["run_id"],
+                    "stand_id": row["stand_id"],
+                    "bec": row["bec"],
+                    "year": row.get("Year"),
+                    "event_type": "cut",
+                    "species": row.get("SpeciesFVS"),
+                    "size_class": None,
+                    "dbh": row.get("DBH"),
+                    "tph": row.get("TPH"),
+                    "tph_total": None,
+                    "source_table": "FVS_CutList_Metric",
+                }
+            )
+    if mortality is not None and not mortality.empty:
+        for _, row in mortality.iterrows():
+            for size in range(1, 7):
+                killed = row.get(f"Killed_class{size}")
+                if killed is None or pd.isna(killed) or float(killed) <= 0:
+                    continue
+                rows.append(
+                    {
+                        "run_id": row["run_id"],
+                        "stand_id": row["stand_id"],
+                        "bec": row["bec"],
+                        "year": row.get("Year"),
+                        "event_type": "mortality",
+                        "species": row.get("SpeciesFVS"),
+                        "size_class": size,
+                        "dbh": None,
+                        "tph": killed,
+                        "tph_total": row.get(f"Total_class{size}"),
+                        "source_table": "FVS_Mortality_Metric",
+                    }
+                )
+    return pd.DataFrame(rows, columns=list(_EVENT_COLUMNS))
+
+
+def _write(frame: pd.DataFrame, out: Path, name: str) -> Path:
+    """Write a table as CSV, and as Parquet when pyarrow is available."""
+    path = out / f"{name}.csv"
+    frame.to_csv(path, index=False)
+    if importlib.util.find_spec("pyarrow") is not None:
+        frame.to_parquet(out / f"{name}.parquet", index=False)
+    return path
 
 
 def build_dataset(manifest_path: str | Path, out_dir: str | Path) -> dict[str, Path]:
@@ -113,6 +188,13 @@ def build_dataset(manifest_path: str | Path, out_dir: str | Path) -> dict[str, P
     stands: list[pd.DataFrame] = []
     trees: list[pd.DataFrame] = []
     written: dict[str, Path] = {}
+    requested = manifest.get("tables", [])
+    if not isinstance(requested, list) or not all(isinstance(name, str) for name in requested):
+        raise DatasetError("tables must be a list of table names")
+    unknown = sorted(set(requested) - set(EXPOSED_TABLES))
+    if unknown:
+        raise DatasetError(f"the reader does not expose {', '.join(unknown)}")
+    extra: dict[str, list[pd.DataFrame]] = {}
 
     raw_stands = manifest.get("stands")
     if not isinstance(raw_stands, list):
@@ -175,10 +257,23 @@ def build_dataset(manifest_path: str | Path, out_dir: str | Path) -> dict[str, P
             tree_table.insert(0, "stand_id", stand_id)
             tree_table.insert(0, "run_id", run_id)
             trees.append(tree_table)
+        for table in requested:
+            try:
+                frame = read_table(result.database, table).copy()
+            except UnknownTableError:
+                continue
+            if frame.empty:
+                continue
+            frame.insert(0, "bec", bec)
+            frame.insert(0, "stand_id", stand_id)
+            frame.insert(0, "run_id", run_id)
+            extra.setdefault(table, []).append(frame)
 
     runs_frame = pd.DataFrame(runs)
     stands_frame = pd.concat(stands, ignore_index=True)
     trees_frame = pd.concat(trees, ignore_index=True) if trees else pd.DataFrame()
+    extras = {name: pd.concat(frames, ignore_index=True) for name, frames in extra.items()}
+    events = _events(extras.get("FVS_CutList_Metric"), extras.get("FVS_Mortality_Metric"))
 
     latest = stands_frame.sort_values(["run_id", "Year"]).groupby("run_id").tail(1)
     landscape = (
@@ -203,11 +298,11 @@ def build_dataset(manifest_path: str | Path, out_dir: str | Path) -> dict[str, P
         ("stands", stands_frame),
         ("trees", trees_frame),
         ("neighbourhoods", neighbourhoods),
+        ("events", events),
         ("landscape", landscape),
+        *extras.items(),
     ):
-        path = out / f"{name}.csv"
-        frame.to_csv(path, index=False)
-        written[name] = path
+        written[name] = _write(frame, out, name)
 
     (out / "dataset.json").write_text(
         json.dumps(
@@ -223,7 +318,10 @@ def build_dataset(manifest_path: str | Path, out_dir: str | Path) -> dict[str, P
                         ("runs", runs_frame),
                         ("stands", stands_frame),
                         ("trees", trees_frame),
+                        ("neighbourhoods", neighbourhoods),
+                        ("events", events),
                         ("landscape", landscape),
+                        *extras.items(),
                     )
                 },
             },

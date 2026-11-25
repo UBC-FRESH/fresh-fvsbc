@@ -89,13 +89,14 @@ def _keywords(bec: str) -> list[dict[str, object]]:
     ]
 
 
-def _manifest(tmp: Path) -> Path:
+def _manifest(tmp: Path, tables: list[str] | None = None) -> Path:
     (tmp / "trees").mkdir()
     _trees(tmp / "trees" / "bwbs.csv", "AT")
     _trees(tmp / "trees" / "sbs.csv", "PL")
     manifest = {
         "dataset_id": "pilot",
         "version": "0.1.0",
+        "tables": tables or [],
         "stands": [
             {
                 "stand_id": "B1",
@@ -199,6 +200,29 @@ def test_build_dataset_with_a_stub_runner(tmp_path: Path, monkeypatch: pytest.Mo
         return _Result()
 
     def fake_read(_db: object, table: str) -> pd.DataFrame:
+        if table == "FVS_CutList_Metric":
+            return pd.DataFrame([{"Year": 1990, "SpeciesFVS": "AT", "DBH": 14.0, "TPH": 40.0}])
+        if table == "FVS_Mortality_Metric":
+            return pd.DataFrame(
+                [
+                    {
+                        "Year": 1990,
+                        "SpeciesFVS": "AT",
+                        "Killed_class1": 20.0,
+                        "Total_class1": 500.0,
+                        "Killed_class2": 0.0,
+                        "Total_class2": 0.0,
+                        "Killed_class3": 0.0,
+                        "Total_class3": 0.0,
+                        "Killed_class4": 0.0,
+                        "Total_class4": 0.0,
+                        "Killed_class5": 0.0,
+                        "Total_class5": 0.0,
+                        "Killed_class6": 0.0,
+                        "Total_class6": 0.0,
+                    }
+                ]
+            )
         if table == "FVS_Summary_Metric":
             return pd.DataFrame(
                 [
@@ -225,9 +249,25 @@ def test_build_dataset_with_a_stub_runner(tmp_path: Path, monkeypatch: pytest.Mo
 
     monkeypatch.setattr(dataset, "run_case", fake_run)
     monkeypatch.setattr(dataset, "read_table", fake_read)
-    written = build_dataset(_manifest(tmp_path), tmp_path / "out")
+    written = build_dataset(
+        _manifest(tmp_path, ["FVS_CutList_Metric", "FVS_Mortality_Metric"]), tmp_path / "out"
+    )
+    events = pd.read_csv(written["events"])
+    assert set(events["event_type"]) == {"cut", "mortality"}
+    assert len(events) == 4
+    assert set(events["bec"]) == {"BWBSmw/01", "SBSmw/01"}
+    assert "FVS_CutList_Metric" in written
     runs = pd.read_csv(written["runs"])
     assert list(runs["neighbourhood"]) == ["N1", "N1"]
     landscape = pd.read_csv(written["landscape"])
     assert landscape["mean_BA"].tolist() == [24.0, 24.0]
     assert landscape["n_stands"].tolist() == [1, 1]
+
+
+def test_keyword_supports_a_nested_block() -> None:
+    """A manifest can express an FMIN block's nested keywords."""
+    from fresh_fvsbc.dataset import _keyword
+
+    keyword = _keyword({"name": "FMIN", "nested": [{"name": "MORTREPT", "fields": ["1"]}]})
+    assert keyword.name == "FMIN"
+    assert keyword.nested[0].name == "MORTREPT"

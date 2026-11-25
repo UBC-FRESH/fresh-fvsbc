@@ -14,7 +14,11 @@ FVS-BC and writes a normalised dataset:
 | `stands` | run × year | `BA`, `Tph`, `QMD`, `TCuM`, and the rest of `FVS_Summary_Metric` |
 | `trees` | run × year × tree | species, `DBH`, `DG`, `Ht`, `HtG`, `TPH`, `MortPH` |
 | `neighbourhoods` | neighbourhood × BEC | mean stand metrics, `n_stands` |
+| `events` | run × year × event | `event_type` (cut/mortality), species, size class, DBH, TPH |
 | `landscape` | BEC | mean stand metrics, `n_stands` |
+
+Every table named in the manifest's `tables` list is also written as its own CSV (cut list, mortality,
+snags, DWD, fuels, potfire, consumption, carbon, ATRT), with `run_id`/`stand_id`/`bec` prepended.
 
 The **unit is BEC**: every table carries the stand's BEC, the landscape aggregates by BEC, and TSA
 is only a descriptive column. The neighbourhood is a caller-supplied grouping (a polygon, a BEC
@@ -48,8 +52,17 @@ dataset names the exact input that produced it.
 }
 ```
 
-`trees` and `calibration` are relative to the manifest. The keyword list is the run's full set,
-so a disturbance schedule is expressed with the same `FMIN`/`THINBBA` blocks a normal run uses.
+`trees` and `calibration` are relative to the manifest. The keyword list is the run's full set, and
+it supports **nested** blocks, so a disturbance schedule is the same `FMIN`/`THINBBA` a normal run
+uses:
+
+```json
+{"name": "FMIN", "nested": [{"name": "MORTREPT", "fields": ["1"]}]}
+```
+
+A top-level `"tables"` list names the pass-through outputs (cut list, mortality, snags, DWD, fuels,
+potfire, consumption, carbon, ATRT). A table the run did not write is skipped; a name the reader does
+not expose is refused.
 
 ## Support travels with the data
 
@@ -60,22 +73,26 @@ A dataset row therefore says `C` or `X` in data, not in a caption.
 
 - **Neighbourhoods are declared, not spatial.** The manifest supplies an ID; no geometry, adjacency,
   or area weighting yet.
-- **No whole-TSA pilot yet.** A four-stand real pilot (BWBSmw, BWBSwk1, BWBSwk2, SBSwk2 in
-  Dawson) produced 2,092 tree rows, 8 stand-year rows, and a BEC landscape; all four runs carried
-  support `C`. The test itself remains two synthetic stands.
-- **Disturbance events are in their own tables** (`FVS_CutList_Metric`, mortality, snags, DWD) as
-  requested by the keywords; there is no normalised `events` table.
-- **CSV only.** Parquet/SQLite and a published DOI are later.
+- **No whole-TSA pilot yet.** A 20-stand Dawson pilot (BWBSmw, BWBSwk1, BWBSwk2, SBSwk2, five each)
+  produced 20 runs, 95 events (91 cut, 4 mortality), all disturbance tables, and a BEC landscape; every
+  run carried support `C`.
+- **Parquet is optional.** CSV is always written; a `.parquet` copy is written when `pyarrow` is
+  installed. It is not in this environment.
+- **No SQLite or DOI yet.**
 - **No dataset-level validation** beyond the schema and the source-hash record.
 
 ## Real pilot
 
-Four Dawson PSP stands (BWBSmw, BWBSwk1, BWBSwk2, SBSwk2), one interval each, untreated. The builder
-wrote 4 runs, 8 stand-year rows, 2,092 tree rows, and four BEC landscape rows; every run carried
-support `C`. The stand tree lists and manifest stay local because they carry PSP site identifiers.
+**Four stands, untreated:** 4 runs, 8 stand-year rows, 2,092 tree rows, four BEC landscape rows,
+support `C`.
+
+**Twenty stands, one fire and one removal:** 20 runs across BWBSmw, BWBSwk1, BWBSwk2, and SBSwk2
+(five each), **95 events** (91 cut, 4 mortality), the full disturbance table set on the fire stand,
+and a BEC landscape with `n_stands=5` per zone. Every run support `C`. The tree lists and manifest
+stay local because they carry PSP site identifiers.
 
 ## Next
 
-1. A whole-TSA pilot with a fire and a removal.
+1. A whole-TSA run (every PSP stand in a TSA), not a 20-stand sample.
 2. A normalised `events` table (year, type, species, TPH, BA removed/killed).
 3. A Parquet writer and a schema version.
