@@ -54,12 +54,13 @@ def test_estab_keyword_uses_trees_per_hectare() -> None:
     assert keyword.nested[0].parameters[2] == "566.0"
 
 
-def test_estab_keyword_renders_periodic_cycles() -> None:
-    """A two-cycle projection gets one NATURAL line per cycle."""
+def test_estab_keyword_skips_the_initial_cycle() -> None:
+    """A two-cycle projection establishes after year 0 and keeps the total TPH."""
     keyword = _model().estab_keyword(bec="IDFdk3", years=20.0, ba=20.0, qmd=10.0, cycles=2)
     assert keyword is not None
-    assert len(keyword.nested) == 2
-    assert [line.parameters[0] for line in keyword.nested] == ["1", "2"]
+    assert len(keyword.nested) == 1
+    assert keyword.nested[0].parameters[0] == "2"
+    assert keyword.nested[0].parameters[2] == "1132.0"
 
 
 def test_model_refuses_an_empty_range() -> None:
@@ -330,3 +331,60 @@ def test_the_binned_bundle_selects_by_ba_and_qmd() -> None:
     low = bundle.ingrowth.selected("IDFdk3", 20.0, 10.0)
     high = bundle.ingrowth.selected("IDFdk3", 30.0, 15.0)
     assert low["FD"] > high["FD"]
+
+
+def test_recruitment_table_records_every_resolved_species() -> None:
+    """A new aspen tree is new_AT, and an unmapped code is new_other."""
+    from fresh_fvsbc.ingrowth import recruitment_table
+
+    intervals, trees = _recruitment_frames()
+    extra = pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 1,
+                "VISIT_NUMBER": 2,
+                "PLOT": 1,
+                "TREE_NO": 3,
+                "SPECIES": "AT",
+                "LV_D": "L",
+                "PHF_TREE": 30.0,
+            },
+            {
+                "SITE_IDENTIFIER": 1,
+                "VISIT_NUMBER": 2,
+                "PLOT": 1,
+                "TREE_NO": 4,
+                "SPECIES": "ZZ",
+                "LV_D": "L",
+                "PHF_TREE": 10.0,
+            },
+        ]
+    )
+    table = recruitment_table(intervals, pd.concat([trees, extra], ignore_index=True))
+    assert table.loc[0, "new_FD"] == 50.0
+    assert table.loc[0, "new_AT"] == 30.0
+    assert table.loc[0, "new_other"] == 10.0
+    assert table.loc[0, "new_total"] == 90.0
+
+
+def test_fit_rates_accepts_a_species_list() -> None:
+    """A caller can fit a species outside the four calibration groups."""
+    from fresh_fvsbc.ingrowth import fit_rates, recruitment_table
+
+    intervals, trees = _recruitment_frames()
+    extra = pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 1,
+                "VISIT_NUMBER": 2,
+                "PLOT": 1,
+                "TREE_NO": 3,
+                "SPECIES": "AT",
+                "LV_D": "L",
+                "PHF_TREE": 30.0,
+            }
+        ]
+    )
+    table = recruitment_table(intervals, pd.concat([trees, extra], ignore_index=True))
+    model = fit_rates(table, species=("AT",))
+    assert model.selected("IDFdk3", 20.0, 10.0) == {"AT": 3.0}

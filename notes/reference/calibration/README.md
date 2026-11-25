@@ -47,6 +47,7 @@ outside the repository because they carry site identifiers.
 | `w9-mh-cdf-v3.patch.gz` | MH and CDF on the V3 path with coastal donor rows, applied after W8 |
 | `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
+| `recruitment-bc-v1-bundle.json` | The BC recruitment v1 bundle (BEC × species × BA bin, scale 0.4) |
 | `sbps-v3-bundle.json` | The SBPS V3 base bundle (`MORTMULT 2`) |
 | `cwh-v2-bundle.json` | The CWH V2 stand-level bundle (`BAIMULT 10`) |
 | `mh-v2-bundle.json` | The MH V2 bundle (`BAIMULT 10`); **superseded by W9** |

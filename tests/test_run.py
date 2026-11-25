@@ -731,10 +731,10 @@ def test_run_population_refuses_bad_cycle_controls(tmp_path: Path) -> None:
         )
 
 
-def test_run_population_sends_one_ingrowth_event_per_cycle(
+def test_run_population_skips_the_inventory_year_for_ingrowth(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """The bundle's ESTAB block carries the requested cycles, not a single pulse."""
+    """The bundle's ESTAB block establishes after year 0, not as a single pulse."""
     captured: list[Sequence[Keyword]] = []
 
     def stub(
@@ -770,8 +770,8 @@ def test_run_population_sends_one_ingrowth_event_per_cycle(
         directory=tmp_path / "run",
     )
     estab = next(keyword for keyword in captured[0] if keyword.name == "ESTAB")
-    assert len(estab.nested or ()) >= 2
-    assert {keyword.parameters[0] for keyword in estab.nested or ()} == {"1", "2"}
+    assert len(estab.nested or ()) >= 1
+    assert {keyword.parameters[0] for keyword in estab.nested or ()} == {"2"}
 
 
 def test_timeint_years_has_a_stated_fallback() -> None:
