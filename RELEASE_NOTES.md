@@ -1,4 +1,38 @@
-# fresh-fvsbc 0.30.0
+# fresh-fvsbc 0.31.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.30.0
+
+- **MS is on V3.** The largest remaining V2 zone (1,037 intervals, 307 sites) now has the full wiring:
+  the condition, the small-tree/height branches, seven large-tree diameter rows, five height blocks,
+  and the hardwood mortality row.
+- **The fold improves sharply.** MS held-out-free fold: BA bias **−9.01 → −2.81 m²/ha**, MAE 9.32 →
+  5.62, TPH bias −389 → −178. No bundle was added; a candidate sweep (`BAIMULT 4` → −1.82) is
+  recorded for a proper held-out pass.
+- **The registry now reads 9 V3 zones.** `check_zone_paths.py` reports MS among the V3 zones; ESSF and
+  PP remain V2, which is now the whole V2 list.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.7`** (W5–W15). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.31.0"
+```
+
+## Gaps that remain
+
+- ESSF (620 intervals) and PP (27) are the remaining V2 zones; PP also needs its growth path before it
+  can be calibrated.
+- MS has no held-out split or bundle, and CW/EP/AC keep their donors there.
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- `SBSmc2` over-predicts at high basal area (+20 m²/ha across ten intervals).
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- CDF dense stands still lose about 5 m²/ha on the held-out site.
+- Recruitment, disturbance calibration, and the dataset's SQLite/whole-TSA work remain.
+
+## fresh-fvsbc 0.30.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

@@ -66,6 +66,14 @@ def test_essf_names_the_site_series_restriction() -> None:
     assert record.evidence == "bec-substitution"
 
 
+def test_ms_is_v3_after_w15() -> None:
+    """MS carries its own fitted rows and the engine runs it on V3."""
+    record = classify("MSdm1", "PL")
+    assert record.path == "V3"
+    assert record.evidence == "w15-ms-v3"
+    assert "V3 fitted" in record.reason
+
+
 def test_pp_names_the_v2_path() -> None:
     """PP resolves to its own habitat but still runs the V2 growth path."""
     record = classify("PPxh2", "PL")

@@ -50,6 +50,7 @@ outside the repository because they carry site identifiers.
 | `w12-sbs-bamax.patch.gz` | SBS maximum basal area per subzone from the measured p99 envelope, applied after W11 |
 | `w13-pp-bamax.patch.gz` | PP maximum basal area from the measured p99 (PPxh 30, PPxh2 48), applied after W12 |
 | `w14-pp-site-series.patch.gz` | The missing PP site series map to the PP habitat instead of MSdk, applied after W13 |
+| `w15-ms-v3.patch.gz` | MS on the V3 path: fitted large-tree DG (7 species) and height (5), applied after W14 |
 | `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
 | `recruitment-bc-v1-bundle.json` | The BC recruitment v1 bundle (BEC × species × BA bin, scale 0.4) |

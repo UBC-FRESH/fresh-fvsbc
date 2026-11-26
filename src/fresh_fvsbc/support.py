@@ -73,7 +73,7 @@ ZONE_PATH: dict[str, str] = {
     "CWH": "V3",
     "MH": "V3",
     "CDF": "V3",
-    "MS": "V2",
+    "MS": "V3",
     "ESSF": "V2",
     "PP": "V2",
     "CMA": "X",
@@ -130,8 +130,9 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "MS",
         SupportTier.PROVISIONAL,
-        "V2 path; only the mapped MSdk/MSdm1/MSxk series run, an unmapped one runs as MSdk/01",
-        "bec-substitution",
+        "V3 fitted large-tree DG for AT/BL/FD/LW/PL/PY/SE and height for BL/FD/LW/PL/SE; "
+        "tabular mortality; unsigned",
+        "w15-ms-v3",
     ),
     (
         "PP",
