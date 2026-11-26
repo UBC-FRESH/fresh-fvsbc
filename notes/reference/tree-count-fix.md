@@ -72,12 +72,14 @@ six intervals and the bias is already small; a stand-level multiplier is not the
 
 | Candidate | Test BA | Test MAE | Train BA | Train MAE |
 | --- | ---: | ---: | ---: | ---: |
-| **`BAIMULT 1`** | **−5.74** | **8.29** | **−6.85** | **8.77** |
-| `BAIMULT 4` | −6.87 | 10.81 | −7.62 | 14.98 |
-| `BAIMULT 8` | −6.32 | 16.23 | −4.43 | 21.30 |
+| **`BAIMULT 1`** | **−1.21** | **6.17** | **+0.38** | **8.10** |
+| `BAIMULT 2` | +0.21 | 7.25 | +3.51 | 11.17 |
+| `BAIMULT 4` | +3.13 | 11.00 | +10.08 | 17.83 |
+| `BAIMULT 8` | +9.74 | 20.48 | +25.07 | 32.79 |
 
-Adding BAIMULT makes SBS much worse. The bundle stays `MORTMULT 2`; the remaining bias is the
-open SBS growth/mortality gap.
+Adding BAIMULT makes SBS much worse. The bundle stays `MORTMULT 2`. These are the numbers with the
+bundle's four species (`FD`, `PL`, `SE`, `HW`); an all-species `MORTMULT 2` over-kills the
+alder-rich `SBSmc2` stands and was the source of the zero-BA rows in an earlier probe.
 
 ## 4. What it means
 
