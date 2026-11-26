@@ -47,25 +47,30 @@ does not name. No other zone changes.
 
 ## 3. Evidence
 
-SBS fold, W11 engine against W12, same sites and `MORTMULT 2`:
+SBS fold, W11 engine against W12, same sites and the shipped bundle (`MORTMULT 2` on FD, PL, SE,
+and HW):
 
 | Build | Folder | Intervals | BA bias (m²/ha) | BA MAE |
 | --- | --- | ---: | ---: | ---: |
-| W11 | test | 38 | −5.74 | 8.29 |
-| **W12** | **test** | **38** | **−4.32** | **7.24** |
-| W11 | train | 106 | −6.85 | 8.77 |
-| **W12** | **train** | **106** | **−4.56** | **7.83** |
+| W11 (flat 55) | test | 38 | −2.53 | 6.12 |
+| **W12** | **test** | **38** | **−1.21** | **6.17** |
+| W11 (flat 55) | train | 106 | −1.19 | 7.97 |
+| **W12** | **train** | **106** | **+0.38** | **8.10** |
 
-The worst cell, `SBSmc2`, moves from −47.3 to −33.8 on the held-out sites and from −23.8 to −11.6 on
-the training sites. `SBSvk` moves from −15.0 to −13.0. A global cap sweep (55 → 75) showed the
-direction before the subzone table was built; the subzone table avoids lowering `dh1`, whose 75 was
-already right.
+The caps move the bias toward zero and leave MAE unchanged: this is a bias correction, not an
+accuracy gain. A global cap sweep (55 → 75) showed the direction before the subzone table was built;
+the subzone table avoids lowering `dh1`, whose 75 was already right.
 
 ## 4. What is left
 
-`SBSmc2` is still about −34 m²/ha on two held-out intervals even with its cap at the measured p99.
-That is a growth/mortality problem, not a cap problem, and it stays on the backlog. The zone bias is
-still −4.3 m²/ha, so the SBS rows are not finished.
+With the shipped bundle the ten `SBSmc2` intervals no longer collapse; their errors run from −23 to
++55 m²/ha and average **+20**, so the cell now over-predicts at high basal area instead of
+under-predicting. That is a growth/mortality shape problem and it stays on the backlog.
+
+A caution for anyone re-running these folds: an earlier probe applied `MORTMULT 2` to all twelve
+species rather than the bundle's four, and in the alder-rich `SBSmc2` stands that killed the whole
+stand (two intervals predicted 0 BA and 0 TPH). The bundle is per species for a reason; the fold
+numbers in this note use the shipped species set.
 
 ## 5. Tier and claim
 

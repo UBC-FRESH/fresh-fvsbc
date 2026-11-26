@@ -10,9 +10,9 @@ Pre-1.0, and the public API can change.
   SBS, while every subzone's measured p99 is 58–75. Ordinary stands therefore sat near the cap and a
   share of their growth was booked as mortality. The caps now follow the measured p99, the same
   convention CWH, CDF, and MH already use.
-- **The SBS fold improves.** Held-out BA bias moves from −5.74 to **−4.32 m²/ha** (MAE 8.29 → 7.24);
-  the training fold from −6.85 to **−4.56**. The worst cell, `SBSmc2`, moves from −47.3 to −33.8 on
-  the held-out sites.
+- **The SBS fold improves.** Held-out BA bias moves from −2.53 to **−1.21 m²/ha** and the training
+  fold from −1.19 to **+0.38**. MAE is essentially unchanged (6.12 → 6.17 test, 7.97 → 8.10 train):
+  the caps correct bias, not accuracy.
 - **No bundle moved.** `d7-sbs-bundle.json` still carries `MORTMULT 2`.
 
 The engine moves to **`fresh-fvsbc-pyfvs 0.4.5`** (W5–W12). Install:
