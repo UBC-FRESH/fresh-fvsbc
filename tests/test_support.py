@@ -87,3 +87,24 @@ def test_unknown_species_is_unsupported() -> None:
 def test_region_prefix_does_not_hide_the_zone() -> None:
     """Provenance carries ``CAR BWBSmw/01``; the classifier still finds BWBS."""
     assert classify("CAR BWBSmw/01", "AT").tier is SupportTier.PROVISIONAL
+
+
+def test_every_zone_has_a_path() -> None:
+    """A zone in the tier table must declare the growth path it runs."""
+    from fresh_fvsbc.support import _ZONE_TIERS, ZONE_PATH
+
+    zones = {zone for zone, _, _, _ in _ZONE_TIERS}
+    assert zones == set(ZONE_PATH), "a zone is in the tier table without a path, or the reverse"
+    assert set(ZONE_PATH.values()) <= {"V3", "V2", "X"}
+
+
+def test_the_path_is_in_the_reason() -> None:
+    """The reason text cannot claim V3 for a zone the engine runs as V2."""
+    from fresh_fvsbc.support import _ZONE_TIERS, ZONE_PATH
+
+    for zone, _, reason, _ in _ZONE_TIERS:
+        path = ZONE_PATH[zone]
+        if path == "V3":
+            assert reason.startswith("V3"), f"{zone} is V3 and its reason does not say so"
+        elif path == "V2":
+            assert reason.startswith("V2"), f"{zone} is V2 and its reason does not say so"

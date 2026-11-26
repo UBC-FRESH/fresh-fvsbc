@@ -48,11 +48,12 @@ this record that was found.
      - Integer, width 7, **read from columns 1 to 7** because ``T1`` preceded it. Its first four
        columns are shared with ``plot_id``, so only columns 5 to 7 are a writer's
    * - 4
-     - ``F6.2``
+     - ``F8.2``
      - ``tree_count``
-     - Real, width 6, two decimals. The tree's expansion factor. The wrapper declares this with
+     - Real, width 8, two decimals. The tree's expansion factor. The wrapper declares this with
        ``TREEFMT``: the variant's compiled default is ``F6.0``, and rounding a PSP expansion factor of
-       2.47 to 2 costs a dense stand a fifth of its density.
+       2.47 to 2 costs a dense stand a fifth of its density. The width is 8 rather than 6 because a
+       small MS plot represents about a thousand trees in one record.
    * - 5
      - ``I1``
      - ``tree_history``
@@ -122,7 +123,7 @@ The columns, as opposed to the widths
 The declared widths sum to 73 for BC and 71 for PyFVS, but that is not the length of the record FVS
 reads. ``T1`` is FORTRAN's *absolute column* directive and it targets **column 1**, so ``tree_num`` is
 read from columns 1 to 7 and every later field begins four columns earlier than the widths suggest. A
-BC record is **69 columns**, and ``plot_id`` and ``tree_num`` share their first four.
+BC record is **71 columns**, and ``plot_id`` and ``tree_num`` share their first four.
 
 Two independent checks, both reproducible. ``gfortran`` reads ``(I4,T1,I7)`` from the character string
 ``' 123  456  789  012 345'`` as ``123`` and ``1234``, where ``(I4,1X,I7)`` reads ``4567``; and FVS's

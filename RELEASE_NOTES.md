@@ -1,4 +1,48 @@
-# fresh-fvsbc 0.29.0
+# fresh-fvsbc 0.30.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.29.0
+
+- **The zone path is now data, not prose.** `support.ZONE_PATH` maps every zone to the growth path the
+  engine runs (`V3`, `V2`, `X`), every support record carries it, and the provenance writes `path` per
+  species. `scripts/check_zone_paths.py` compares the registry with the `LV2ATV` list in
+  `becset.f` and fails on any divergence, so a zone can no longer be *described* as V3 while the
+  engine runs V2.
+- **Tree counts fit their field again.** `F6.2` could not hold a count above 999.99, and a small MS
+  plot represents about a thousand trees per hectare in one record; the field is now `F8.2`
+  (0.01–999999.99). This was a regression introduced by the decimal-count fix in 0.26.0.
+- **The registry states the truth.** ICH, IDF, SBS, SBPS, BWBS, CWH, MH, and CDF are V3. MS, ESSF,
+  and PP are V2 — 1,684 intervals, about 10% of the calibration set, including MS's 1,037.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.6`** (W5–W14). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.30.0"
+```
+
+## Why the remaining zones are still V2
+
+`becset.f` decides V3 with one hard-coded list of eight zones, and 72 further
+`INDEX(BEC%Zone,...)` checks across `regent`, `dgf`, `htgf`, and `morts` each carry their own list.
+A zone needs coordinated rows in all four files, which is what W5–W9 did for eight zones. MS, ESSF,
+and PP were left out and the support text wrongly claimed otherwise. Measured now: **MS on V2 is
+−9.01 m²/ha** (134 intervals), worse than any V3 zone, so the wiring is the next work package.
+
+## Gaps that remain
+
+- MS (1,037 intervals), ESSF (620), and PP (27) need the V3 wiring: condition, small-tree branch,
+  large-tree rows, height blocks, and mortality routing.
+- PP resolves as PP now but still runs V2, which is why it barely grows.
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- `SBSmc2` over-predicts at high basal area (+20 m²/ha across ten intervals).
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- CDF dense stands still lose about 5 m²/ha on the held-out site.
+- Recruitment, disturbance calibration, and the dataset's SQLite/whole-TSA work remain.
+
+## fresh-fvsbc 0.29.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

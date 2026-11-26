@@ -253,6 +253,7 @@ class Provenance:
                     "tier": record.tier.value,
                     "reason": record.reason,
                     "evidence": record.evidence,
+                    "path": record.path,
                 }
                 for record in self.support
             ],

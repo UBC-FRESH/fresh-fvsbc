@@ -58,9 +58,10 @@ __all__ = [
 #:
 #: The variant's compiled default (``canada/bc/blkdat.f``) writes ``tree_count`` with ``F6.0``.
 #: That default cannot represent a PSP expansion factor below one tree, and rounding 2.47 to 2
-#: silently costs a dense stand a fifth of its density. The field is the same width here with two
-#: decimals, so the record layout is unchanged and the declared format keeps the counts exact.
-BC_TREFMT: str = "(I4,T1,I7,F6.2,I1,A3,F5.1,F4.1,2F5.1,F5.1,I1,3(I2,I2),2I1,I2,2I3,2I1,F3.0)"
+#: silently costs a dense stand a fifth of its density. The field is two columns wider here with two
+#: decimals, so a count is exact from 0.01 to 999999.99 trees per hectare; ``F6.2`` overflowed on a
+#: small MS plot whose single record represents about a thousand trees.
+BC_TREFMT: str = "(I4,T1,I7,F8.2,I1,A3,F5.1,F4.1,2F5.1,F5.1,I1,3(I2,I2),2I1,I2,2I3,2I1,F3.0)"
 
 #: The line that ends a tree-data file. ``intree.f`` reads until a line contains ``-999``.
 TREE_LIST_END: str = "-999\n"
@@ -230,7 +231,7 @@ def _write_columns() -> dict[str, tuple[int, int]]:
 #: The columns this writer places each field in. ``tree_num`` is three columns wide here.
 WRITE_COLUMNS: dict[str, tuple[int, int]] = _write_columns()
 
-#: The width of a record, in columns. It is 69, not the 73 that the declared widths sum to, because
+#: The width of a record, in columns. It is 71, not the 75 that the declared widths sum to, because
 #: ``plot_id`` and ``tree_num`` share their first four columns.
 RECORD_WIDTH: int = max(last for _, last in WRITE_COLUMNS.values())
 

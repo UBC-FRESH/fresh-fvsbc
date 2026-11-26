@@ -48,6 +48,8 @@ class SupportRecord:
         Why the cell has that grade.
     evidence : str
         The note or bundle that carries the evidence.
+    path : str
+        The growth path the engine runs for the zone: ``V3``, ``V2``, or ``X``.
     """
 
     bec: str
@@ -55,7 +57,27 @@ class SupportRecord:
     tier: SupportTier
     reason: str
     evidence: str
+    path: str = "V3"
 
+
+#: The growth path the variant runs for each zone, mirroring the ``LV2ATV`` list in
+#: ``canada/bc/becset.f``. A zone is V3 only when that list names it *and* the zone has rows in
+#: ``regent``, ``dgf``, ``htgf``, and ``morts``; the mapping is the single source of truth here,
+#: and ``scripts/check_zone_paths.py`` compares it with the source.
+ZONE_PATH: dict[str, str] = {
+    "ICH": "V3",
+    "IDF": "V3",
+    "SBS": "V3",
+    "SBPS": "V3",
+    "BWBS": "V3",
+    "CWH": "V3",
+    "MH": "V3",
+    "CDF": "V3",
+    "MS": "V2",
+    "ESSF": "V2",
+    "PP": "V2",
+    "CMA": "X",
+}
 
 # Ordered so a longer or ambiguous token is tested before a shorter one (SBPS before SBS).
 _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
@@ -149,11 +171,17 @@ def classify(bec: str, species: str) -> SupportRecord:
             tier=SupportTier.UNSUPPORTED,
             reason="species is not in the BC variant's fifteen-code grammar",
             evidence="blkdat.f",
+            path="X",
         )
     for zone, tier, reason, evidence in _ZONE_TIERS:
         if zone in label.upper():
             return SupportRecord(
-                bec=label, species=code, tier=tier, reason=reason, evidence=evidence
+                bec=label,
+                species=code,
+                tier=tier,
+                reason=reason,
+                evidence=evidence,
+                path=ZONE_PATH.get(zone, "X"),
             )
     return SupportRecord(
         bec=label,
@@ -161,4 +189,5 @@ def classify(bec: str, species: str) -> SupportRecord:
         tier=SupportTier.UNSUPPORTED,
         reason="BEC zone has no model entry",
         evidence="becset.f",
+        path="X",
     )
