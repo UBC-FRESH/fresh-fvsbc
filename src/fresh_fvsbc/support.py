@@ -74,7 +74,7 @@ ZONE_PATH: dict[str, str] = {
     "MH": "V3",
     "CDF": "V3",
     "MS": "V3",
-    "ESSF": "V2",
+    "ESSF": "V3",
     "PP": "V2",
     "CMA": "X",
 }
@@ -124,8 +124,9 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "ESSF",
         SupportTier.PROVISIONAL,
-        "V2 path; a site series with no habitat mapping runs as MSdk/01 and is recorded",
-        "bec-substitution",
+        "V3 fitted large-tree DG for BL/FD/HW/PL/SE and height for BL/PL/SE; "
+        "tabular mortality; unsigned",
+        "w16-essf-v3",
     ),
     (
         "MS",
