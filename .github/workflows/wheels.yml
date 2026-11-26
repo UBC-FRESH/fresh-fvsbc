@@ -30,6 +30,8 @@ on:
       - "notes/reference/calibration/w10-mh-cdf-own-dg.patch.gz"
       - "notes/reference/calibration/w11-cwh-height.patch.gz"
       - "notes/reference/calibration/w12-sbs-bamax.patch.gz"
+      - "notes/reference/calibration/w13-pp-bamax.patch.gz"
+      - "notes/reference/calibration/w14-pp-site-series.patch.gz"
       - ".github/workflows/wheels.yml"
   workflow_dispatch:
     inputs:
@@ -88,6 +90,8 @@ jobs:
           gunzip -c notes/reference/calibration/w10-mh-cdf-own-dg.patch.gz > ${{ runner.temp }}/w10-mh-cdf-own-dg.patch
           gunzip -c notes/reference/calibration/w11-cwh-height.patch.gz > ${{ runner.temp }}/w11-cwh-height.patch
           gunzip -c notes/reference/calibration/w12-sbs-bamax.patch.gz > ${{ runner.temp }}/w12-sbs-bamax.patch
+          gunzip -c notes/reference/calibration/w13-pp-bamax.patch.gz > ${{ runner.temp }}/w13-pp-bamax.patch
+          gunzip -c notes/reference/calibration/w14-pp-site-series.patch.gz > ${{ runner.temp }}/w14-pp-site-series.patch
           gunzip -c notes/reference/calibration/d9-mpb-bc.patch.gz > ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS apply --check ${{ runner.temp }}/pyfvs.patch
           git -C ${{ runner.temp }}/PyFVS apply ${{ runner.temp }}/pyfvs.patch
@@ -127,6 +131,11 @@ jobs:
           # W12 gives SBS a per-subzone maximum basal area instead of a flat 55.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w12-sbs-bamax.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w12-sbs-bamax.patch
+          # W13/W14 make PP resolve as PP: its missing site series and its measured caps.
+          git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w13-pp-bamax.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w13-pp-bamax.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w14-pp-site-series.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w14-pp-site-series.patch
           # D9.71 links the real LPMPB extension for the BC variant instead of the stub.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/d9-mpb-bc.patch
@@ -141,7 +150,7 @@ jobs:
           # meson itself, not only the backend: --no-build-isolation means pip installs no build
           # requirements, so the executable has to be here.
           $PY/pip install -q meson meson-python ninja numpy setuptools_scm auditwheel
-          SETUPTOOLS_SCM_PRETEND_VERSION=0.4.5 $PY/pip wheel \
+          SETUPTOOLS_SCM_PRETEND_VERSION=0.4.6 $PY/pip wheel \
             --no-build-isolation --no-deps ${{ runner.temp }}/PyFVS \
             --config-settings=setup-args="-Dfvsvariants=bc" -w dist
           # Without this the wheel only runs where gfortran is installed, which is the problem it

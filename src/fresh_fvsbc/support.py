@@ -102,19 +102,19 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "ESSF",
         SupportTier.PROVISIONAL,
-        "V3 via defaults; only mapped site series run, an unmapped one is refused",
+        "V2 path; a site series with no habitat mapping runs as MSdk/01 and is recorded",
         "bec-substitution",
     ),
     (
         "MS",
         SupportTier.PROVISIONAL,
-        "V3 via defaults; only the mapped MSdk/MSdm1/MSxk series run, others are refused",
+        "V2 path; only the mapped MSdk/MSdm1/MSxk series run, an unmapped one runs as MSdk/01",
         "bec-substitution",
     ),
     (
         "PP",
         SupportTier.PROVISIONAL,
-        "V3 via defaults; only PPxh1/01-07 and PPdh1/01 run, an unmapped PP series is refused",
+        "V2 path with the PP site series and p99 caps mapped; growth and mortality uncalibrated",
         "bec-substitution",
     ),
 )

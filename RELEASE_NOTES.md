@@ -1,4 +1,42 @@
-# fresh-fvsbc 0.28.0
+# fresh-fvsbc 0.29.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.28.0
+
+- **PP runs as PP.** The variant listed only a handful of PP site series, so `PPxh` and `PPxh2`
+  (written as `/01`) fell to the `MSdk/01` default. They now map to the PP habitat and reuse the
+  adjustment index of the listed series in the same subzone.
+- **PP gets its measured caps.** `PPxh` had no case and took a 10 m²/ha fallback with a warning;
+  `PPxh2` series 1–4 was capped at 32 against a measured p99 of 47.7. They are now 30 and 48.
+- **The PP fold is real and slightly better.** BA bias −5.26 → **−4.98 m²/ha**, TPH MAE 139.6 →
+  117.2, on 25 intervals that previously ran as MSdk.
+- **What it exposes.** PP, MS, and ESSF are not on the V3 path — `becset.f` keeps `LV2ATV` true for
+  them. PP's stands barely grow because of it, which is the −5 m²/ha above. The support matrix now
+  says "V2 path" for those zones instead of "V3 via defaults".
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.6`** (W5–W14). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.29.0"
+```
+
+## Gaps that remain
+
+- PP needs the V3 wiring W5–W9 gave the other zones before it can be calibrated; it is V2 today.
+- MS and ESSF keep the `MSdk/01` default for unmapped series; the substitution is recorded in
+  provenance.
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- `SBSmc2` over-predicts at high basal area (+20 m²/ha across ten intervals).
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- CDF dense stands still lose about 5 m²/ha on the held-out site.
+- Recruitment is a mean-rate model; it has no QMD bin, seed year, climate, or dispersal.
+- Disturbance calibration is not done.
+- The dataset has no whole-TSA run, spatial neighbourhood geometry, SQLite writer, or DOI yet.
+
+## fresh-fvsbc 0.28.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
