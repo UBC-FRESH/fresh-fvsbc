@@ -49,6 +49,7 @@ CONTRACT_FIELDS: tuple[str, ...] = (
     "case_id",
     "run_datetime",
     "random_seed",
+    "bec_substitution",
     "support",
 )
 

@@ -1465,3 +1465,47 @@ def test_a_synthetic_stand_runs_end_to_end(tmp_path: Path) -> None:
     assert not result.summary.empty
     assert result.warnings["Message"].map(lambda text: "ERROR" in str(text)).sum() == 0
     assert (result.directory / "provenance.json").is_file()
+
+
+def test_a_switched_bec_is_recorded_in_provenance(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The post-echo switch to the default habitat is recorded, not hidden."""
+
+    def drive(key_name: str, *, variant: str, directory: Path) -> run._Drive:
+        (directory / "run.out").write_text(
+            "STDINFO    BEC=PPxh2/01     ;\n"
+            "THE BEC VARIANT PPxh2/01 HAS NO EXACT LARGE-TREE RECALIBRATION MAPPING IN\n"
+            "THE KAM REGION; SWITCHING TO BEC VARIANT MSdk/01 USING DEFAULT HABITAT TYPE= 660\n",
+            encoding="latin-1",
+        )
+        a_database(directory / run.DATABASE_NAME)
+        return run._Drive(summary=pd.DataFrame({"Year": [0, 10]}), variants=("BC",))
+
+    monkeypatch.setattr(run, "_drive", drive)
+    keywords = (
+        Keyword("STDINFO", ("KAM", "PPxh2/01")),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_case([a_tree()], keywords, directory=tmp_path / "run")
+    assert result.provenance.bec_substitution == ("PPxh2/01", "MSdk/01")
+    assert result.provenance.as_record()["bec_substitution"] == {
+        "requested": "PPxh2/01",
+        "engine": "MSdk/01",
+    }
+
+
+def test_a_run_that_keeps_its_bec_records_no_substitution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A normal run carries ``None``, so a reader can tell the two apart."""
+    monkeypatch.setattr(run, "_drive", a_fake_drive())
+    keywords = (
+        Keyword("STDINFO", ("CAR", "IDFdk3/01")),
+        Keyword("PROCESS"),
+        Keyword("STOP"),
+    )
+    result = run.run_case([a_tree()], keywords, directory=tmp_path / "run")
+    assert result.provenance.bec_substitution is None
+    assert result.provenance.as_record()["bec_substitution"] is None

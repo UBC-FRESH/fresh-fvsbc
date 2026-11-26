@@ -549,6 +549,36 @@ def _echoed_bec(directory: Path) -> str | None:
     return None
 
 
+_SUBSTITUTION_MARK = "SWITCHING TO BEC VARIANT"
+
+
+def _substituted_bec(directory: Path) -> str | None:
+    """Return the BEC the variant switched to, when it abandoned the requested one.
+
+    ``becset.f`` rewrites the pretty name to ``MSdk/01`` for a site series it has no mapping for:
+    the ``STDINFO`` echo still shows the requested code, and only a later report line names the
+    switch. A run that takes that path is not the zone the caller asked for.
+
+    Parameters
+    ----------
+    directory : Path
+        The run's directory, which holds ``run.out``.
+
+    Returns
+    -------
+    str or None
+        The substituted code, or ``None`` when the run kept the requested one.
+    """
+    report = directory / "run.out"
+    if not report.is_file():
+        return None
+    for line in report.read_text(encoding="latin-1").splitlines():
+        if _SUBSTITUTION_MARK in line:
+            rest = line.split(_SUBSTITUTION_MARK, 1)[1].strip()
+            return rest.split()[0].rstrip(".") if rest else None
+    return None
+
+
 def _refuse_unresolved_bec(directory: Path, bec: BecCode) -> None:
     """Refuse a run whose build resolved a different BEC from the requested one.
 
@@ -705,6 +735,10 @@ def run_case(
         variant_list=driven.variants,
         random_seed=_seed_of(handoff),
         support=support,
+        bec_substitution=(bec.pretty, substituted)
+        if (substituted := _substituted_bec(target)) is not None
+        and substituted.upper() != bec.pretty.upper()
+        else None,
     )
     provenance.write(target / PROVENANCE_FILE_NAME)
     return RunResult(

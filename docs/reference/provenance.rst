@@ -59,6 +59,10 @@ A record has these fields.
      - The ``RunDateTime`` from ``FVS_Cases``
    * - ``random_seed``
      - The seed, when the run used one. FVS exposes ``RANNSEED``
+   * - ``bec_substitution``
+     - ``{"requested": ..., "engine": ...}`` when the variant kept the requested label but switched
+       its recalibration to another BEC, as ``becset.f`` does for a site series it has no habitat
+       mapping for; ``null`` otherwise
    * - ``support``
      - One grade per species in the stand: ``species``, ``tier`` (A/B/C/D/X), the reason, and the evidence note
 
