@@ -29,6 +29,7 @@ on:
       - "notes/reference/calibration/w9-mh-cdf-v3.patch.gz"
       - "notes/reference/calibration/w10-mh-cdf-own-dg.patch.gz"
       - "notes/reference/calibration/w11-cwh-height.patch.gz"
+      - "notes/reference/calibration/w12-sbs-bamax.patch.gz"
       - ".github/workflows/wheels.yml"
   workflow_dispatch:
     inputs:
@@ -86,6 +87,7 @@ jobs:
           gunzip -c notes/reference/calibration/w9-mh-cdf-v3.patch.gz > ${{ runner.temp }}/w9-mh-cdf-v3.patch
           gunzip -c notes/reference/calibration/w10-mh-cdf-own-dg.patch.gz > ${{ runner.temp }}/w10-mh-cdf-own-dg.patch
           gunzip -c notes/reference/calibration/w11-cwh-height.patch.gz > ${{ runner.temp }}/w11-cwh-height.patch
+          gunzip -c notes/reference/calibration/w12-sbs-bamax.patch.gz > ${{ runner.temp }}/w12-sbs-bamax.patch
           gunzip -c notes/reference/calibration/d9-mpb-bc.patch.gz > ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS apply --check ${{ runner.temp }}/pyfvs.patch
           git -C ${{ runner.temp }}/PyFVS apply ${{ runner.temp }}/pyfvs.patch
@@ -122,6 +124,9 @@ jobs:
           # W11 fits CWH large-tree height growth for six species and keeps the CW donor.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w11-cwh-height.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w11-cwh-height.patch
+          # W12 gives SBS a per-subzone maximum basal area instead of a flat 55.
+          git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w12-sbs-bamax.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w12-sbs-bamax.patch
           # D9.71 links the real LPMPB extension for the BC variant instead of the stub.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/d9-mpb-bc.patch
@@ -136,7 +141,7 @@ jobs:
           # meson itself, not only the backend: --no-build-isolation means pip installs no build
           # requirements, so the executable has to be here.
           $PY/pip install -q meson meson-python ninja numpy setuptools_scm auditwheel
-          SETUPTOOLS_SCM_PRETEND_VERSION=0.4.4 $PY/pip wheel \
+          SETUPTOOLS_SCM_PRETEND_VERSION=0.4.5 $PY/pip wheel \
             --no-build-isolation --no-deps ${{ runner.temp }}/PyFVS \
             --config-settings=setup-args="-Dfvsvariants=bc" -w dist
           # Without this the wheel only runs where gfortran is installed, which is the problem it

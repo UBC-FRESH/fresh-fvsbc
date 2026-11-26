@@ -47,6 +47,7 @@ outside the repository because they carry site identifiers.
 | `w9-mh-cdf-v3.patch.gz` | MH and CDF on the V3 path with coastal donor rows, applied after W8 |
 | `w10-mh-cdf-own-dg.patch.gz` | MH HW/BG and CDF FD/AT large-tree rows fitted from their own pairs, applied after W9 |
 | `w11-cwh-height.patch.gz` | Six fitted CWH large-tree height-growth blocks ahead of the donor rows; CW keeps the donor, applied after W10 |
+| `w12-sbs-bamax.patch.gz` | SBS maximum basal area per subzone from the measured p99 envelope, applied after W11 |
 | `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
 | `recruitment-bc-v1-bundle.json` | The BC recruitment v1 bundle (BEC × species × BA bin, scale 0.4) |
