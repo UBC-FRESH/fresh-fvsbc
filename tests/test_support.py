@@ -58,12 +58,12 @@ def test_cdf_is_provisional_with_its_own_large_tree_rows() -> None:
     assert "own FD/AT" in record.reason
 
 
-def test_essf_names_the_site_series_restriction() -> None:
-    """A zone that falls back to MSdk for an unmapped series says so."""
+def test_essf_is_v3_after_w16() -> None:
+    """ESSF carries its own fitted rows and the engine runs it on V3."""
     record = classify("ESSFdk2", "BL")
     assert record.tier is SupportTier.PROVISIONAL
-    assert "MSdk/01" in record.reason
-    assert record.evidence == "bec-substitution"
+    assert record.path == "V3"
+    assert record.evidence == "w16-essf-v3"
 
 
 def test_ms_is_v3_after_w15() -> None:

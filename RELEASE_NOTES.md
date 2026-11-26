@@ -1,4 +1,38 @@
-# fresh-fvsbc 0.31.0
+# fresh-fvsbc 0.32.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.31.0
+
+- **ESSF is on V3.** The last large V2 zone (620 intervals, 278 sites) gains the full wiring: the
+  condition, the small-tree/height branches, five large-tree diameter rows, three height blocks, and
+  the hardwood mortality row.
+- **The fold improves.** ESSF: BA bias **−7.86 → −1.91 m²/ha**, MAE 8.78 → 6.20. TPH bias −242 → −151.
+- **The MSdk substitution is gone for ESSF.** On V3 the run returns before the habitat table, so
+  `ESSFdk2`, `ESSFmv1`, and `ESSFwc4` all report `bec_substitution = null`.
+- **One honest compromise.** ESSF lodgepole's free height fit landed on its bounds and predicted
+  7.5 m per decade for a 2 m tree; that species uses a scale-only fit on the donor shape.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.8`** (W5–W16). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.32.0"
+```
+
+## Gaps that remain
+
+- PP (27 intervals) is the only zone left on V2, and it needs its growth rows before it can be
+  calibrated.
+- ESSF and MS have no held-out split or bundle, and their minor species keep donors.
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- `SBSmc2` over-predicts at high basal area (+20 m²/ha across ten intervals).
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- CDF dense stands still lose about 5 m²/ha on the held-out site.
+- Recruitment, disturbance calibration, and the dataset's SQLite/whole-TSA work remain.
+
+## fresh-fvsbc 0.31.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
