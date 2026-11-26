@@ -61,7 +61,7 @@ The third patch adds the 19 W2.3 subzones and their provisional defaults. Withou
 builds, but those codes fall back to ``ICHmw2/01``; ``run_case`` refuses that fallback rather than
 returning a plausible run. The fourth fixes the ``KAM`` + ``MS`` boundary collision that made
 ``MSxk1`` resolve as ``MSmm``. The final seven patches add the five-zone prototype, fix the SBPS small-tree height branch, add the BWBS V3 growth and mortality tables, restore SBS large-tree growth, put CWH, MH, and CDF on the V3 path with fitted large-tree diameter growth, fit CWH height growth for six species, and give SBS a per-subzone maximum basal area. The
-patched wheel is versioned ``0.4.5`` and is the ``fvs`` extra for ``fresh-fvsbc 0.27.0``. The wrapper
+patched wheel is versioned ``0.4.5`` and is the ``fvs`` extra for ``fresh-fvsbc 0.28.0``. The wrapper
 now accepts the five prototype zones; the binary carries their provisional parser and defaults. That
 is deployment plumbing, not calibration: IDFdk and SBS have passed holdouts; CWH has an
 unsigned growth pilot and BWBS carries the unsigned V3 calibration in ``w5-bwbs-v3``; none is certified. CDF and MH carry V3 candidates; CMA is out of scope by decision.

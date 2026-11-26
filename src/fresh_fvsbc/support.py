@@ -102,16 +102,21 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "ESSF",
         SupportTier.PROVISIONAL,
-        "V3 via defaults; subzone validation incomplete",
-        "w2-subzone-patch",
+        "V3 via defaults; only mapped site series run, an unmapped one is refused",
+        "bec-substitution",
     ),
     (
         "MS",
         SupportTier.PROVISIONAL,
-        "V3 via defaults; subzone validation incomplete",
-        "w2-subzone-patch",
+        "V3 via defaults; only the mapped MSdk/MSdm1/MSxk series run, others are refused",
+        "bec-substitution",
     ),
-    ("PP", SupportTier.PROVISIONAL, "V3 via defaults; unsigned", "d7-consolidation"),
+    (
+        "PP",
+        SupportTier.PROVISIONAL,
+        "V3 via defaults; only PPxh1/01-07 and PPdh1/01 run, an unmapped PP series is refused",
+        "bec-substitution",
+    ),
 )
 
 #: The BC variant's fifteen species codes (``blkdat.f`` ``JSP``).

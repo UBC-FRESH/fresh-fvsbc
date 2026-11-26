@@ -186,6 +186,10 @@ class Provenance:
         The seed, when the run used one.
     support : tuple of SupportRecord, optional
         One grade per species in the stand, from :func:`fresh_fvsbc.support.classify`.
+    bec_substitution : tuple of str, optional
+        ``(requested, engine)`` when the variant kept the requested label but switched its
+        recalibration to another BEC, as ``becset.f`` does for a site series it has no habitat
+        mapping for. ``None`` when the run used the requested BEC.
     """
 
     variant: str
@@ -206,6 +210,7 @@ class Provenance:
     variant_list: tuple[str, ...] = ()
     random_seed: int | None = None
     support: tuple[SupportRecord, ...] = ()
+    bec_substitution: tuple[str, str] | None = None
 
     def as_record(self) -> dict[str, object]:
         """Return the record as a JSON-ready mapping, in the contract's field order.
@@ -234,6 +239,14 @@ class Provenance:
             "case_id": self.case_id,
             "run_datetime": self.run_datetime,
             "random_seed": self.random_seed,
+            "bec_substitution": (
+                {
+                    "requested": self.bec_substitution[0],
+                    "engine": self.bec_substitution[1],
+                }
+                if self.bec_substitution is not None
+                else None
+            ),
             "support": [
                 {
                     "species": record.species,

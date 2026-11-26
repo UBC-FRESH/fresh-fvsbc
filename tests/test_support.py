@@ -58,6 +58,21 @@ def test_cdf_is_provisional_with_its_own_large_tree_rows() -> None:
     assert "own FD/AT" in record.reason
 
 
+def test_essf_names_the_site_series_restriction() -> None:
+    """A zone that falls back to MSdk for an unmapped series says so."""
+    record = classify("ESSFdk2", "BL")
+    assert record.tier is SupportTier.PROVISIONAL
+    assert "unmapped" in record.reason
+    assert record.evidence == "bec-substitution"
+
+
+def test_pp_names_the_mapped_series() -> None:
+    """PP only runs where the variant carries a habitat mapping."""
+    record = classify("PPxh2", "PL")
+    assert record.tier is SupportTier.PROVISIONAL
+    assert "PPxh1/01" in record.reason
+
+
 def test_unknown_bec_is_unsupported() -> None:
     """An unknown zone is refused rather than guessed."""
     assert classify("XYZmk", "PL").tier is SupportTier.UNSUPPORTED

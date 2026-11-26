@@ -1,4 +1,43 @@
-# fresh-fvsbc 0.27.0
+# fresh-fvsbc 0.28.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.27.0
+
+- **BEC substitution is recorded, not hidden.** For a site series outside the V3 zones that the
+  variant has no habitat mapping for, `becset.f` keeps the requested label and switches the
+  recalibration to `MSdk/01`. The `STDINFO` echo still shows the requested code, so nothing caught
+  it. `Provenance.bec_substitution` now carries `(requested, engine)`, and the record writes it as
+  `{"requested": ..., "engine": ...}` with `null` when the run kept its BEC.
+- **Measured reach.** `PPxh2`, `PPxh`, `MSdm1`, and `ESSFdk2` all run as `MSdk/01`; the V3 zones
+  (ICH, IDF, SBS, SBPS, BWBS, CWH, MH, CDF) return before that table and are unchanged.
+- **Support reasons say so.** PP, MS, and ESSF name their mapped site series and state that an
+  unmapped series is modelled as `MSdk/01`.
+- **Nothing is refused.** The W2 zone prototype gives these zones a default habitat on purpose; the
+  record makes the choice visible to a caller who wants strict zone fidelity.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.5`** (W5–W12); this release is wrapper-side. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.28.0"
+```
+
+## Gaps that remain
+
+- PP and MS have only 11 mapped site-series labels in total, so a zone calibration cannot start
+  until the zone's own series map to its habitat. A PP maximum-basal-area fix is prepared and
+  unshipped because a substituted run never reaches the PP caps.
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- `SBSmc2` now over-predicts at high basal area (+20 m²/ha across ten intervals).
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- CDF dense stands still lose about 5 m²/ha on the held-out site.
+- Recruitment is a mean-rate model; it has no QMD bin, seed year, climate, or dispersal.
+- Disturbance calibration is not done.
+- The dataset has no whole-TSA run, spatial neighbourhood geometry, SQLite writer, or DOI yet.
+
+## fresh-fvsbc 0.27.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
