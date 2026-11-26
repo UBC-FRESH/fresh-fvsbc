@@ -75,7 +75,7 @@ ZONE_PATH: dict[str, str] = {
     "CDF": "V3",
     "MS": "V3",
     "ESSF": "V3",
-    "PP": "V2",
+    "PP": "V3",
     "CMA": "X",
 }
 
@@ -138,8 +138,9 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "PP",
         SupportTier.PROVISIONAL,
-        "V2 path with the PP site series and p99 caps mapped; growth and mortality uncalibrated",
-        "bec-substitution",
+        "V3 fitted large-tree DG and height for FD/PY; SE/BL/AT keep donors; "
+        "measured p99 caps; 25-interval fold",
+        "w17-pp-v3",
     ),
 )
 
