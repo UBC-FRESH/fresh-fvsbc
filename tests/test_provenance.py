@@ -301,5 +301,6 @@ def test_support_records_travel_with_the_provenance() -> None:
             "tier": "C",
             "reason": "V3 pilot; W5 growth and mortality tables",
             "evidence": "w5-bwbs-v3",
+            "path": "V3",
         }
     ]

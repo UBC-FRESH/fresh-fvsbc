@@ -115,8 +115,8 @@ def test_t1_puts_the_tree_number_back_at_column_one() -> None:
     """``T1`` is FORTRAN's absolute-column directive, so it targets column 1 and not column 6."""
     assert READ_COLUMNS["plot_id"] == (1, 4)
     assert READ_COLUMNS["tree_num"] == (1, 7)
-    assert READ_COLUMNS["tree_count"] == (8, 13)
-    assert READ_COLUMNS["tree_age"] == (67, 69)
+    assert READ_COLUMNS["tree_count"] == (8, 15)
+    assert READ_COLUMNS["tree_age"] == (69, 71)
 
 
 def test_the_writer_places_the_tree_number_after_the_plot_id() -> None:
@@ -142,15 +142,15 @@ def test_the_written_spans_tile_the_record_with_no_gap_or_overlap() -> None:
     assert sorted(covered) == list(range(1, RECORD_WIDTH + 1))
 
 
-def test_the_record_is_sixty_nine_columns_not_seventy_three() -> None:
-    """The declared widths sum to 73, but ``plot_id`` and ``tree_num`` share four columns."""
+def test_the_record_is_seventy_one_columns_not_seventy_five() -> None:
+    """The declared widths sum to 75, but ``plot_id`` and ``tree_num`` share four columns."""
     declared = sum(
         int(match.group(1))
         for _, edit in FIELD_DESCRIPTORS
         if (match := re.fullmatch(r"[AIF](\d+)(?:\.\d+)?", edit)) is not None
     )
-    assert declared == 73
-    assert RECORD_WIDTH == 69
+    assert declared == 75
+    assert RECORD_WIDTH == 71
     assert declared - 4 == RECORD_WIDTH
 
 
@@ -158,7 +158,7 @@ def test_the_contract_format_string_is_the_one_that_was_read() -> None:
     """The format string is BC's, without its FORTRAN continuation wrapping."""
     assert BC_TREFMT.startswith("(I4,T1,I7,")
     assert BC_TREFMT.endswith("F3.0)")
-    assert "F6.2" in BC_TREFMT, "tree_count keeps two decimals so density is not rounded away"
+    assert "F8.2" in BC_TREFMT, "tree_count keeps two decimals so density is not rounded away"
     assert "\n" not in BC_TREFMT
 
 
@@ -188,21 +188,29 @@ def test_each_field_lands_in_the_columns_the_contract_gives_it() -> None:
     assert len(line) == RECORD_WIDTH
     assert line[0:4] == "  12"
     assert line[4:7] == "  7"
-    assert line[7:13] == "  3.00"
-    assert line[13] == "1"
-    assert line[14:17] == "FD "
-    assert line[17:22] == " 21.4"
-    assert line[22:26] == " 3.2"
-    assert line[26:31] == "105.0"
-    assert line[31:36] == "  0.0"
-    assert line[36:41] == "  0.5"
-    assert line[41] == "7"
-    assert line[42:44] == " 1"
-    assert line[44:46] == " 2"
-    assert line[56:58] == " 3"
-    assert line[58:61] == "180"
-    assert line[61:64] == "  5"
-    assert line[66:69] == " 80"
+    assert line[7:15] == "    3.00"
+    assert line[15] == "1"
+    assert line[16:19] == "FD "
+    assert line[19:24] == " 21.4"
+    assert line[24:28] == " 3.2"
+    assert line[28:33] == "105.0"
+    assert line[33:38] == "  0.0"
+    assert line[38:43] == "  0.5"
+    assert line[43] == "7"
+    assert line[44:46] == " 1"
+    assert line[46:48] == " 2"
+    assert line[58:60] == " 3"
+    assert line[60:63] == "180"
+    assert line[63:66] == "  5"
+    assert line[68:71] == " 80"
+
+
+def test_a_large_tree_count_fits_its_field() -> None:
+    """A small plot can represent thousands of trees per hectare in one record."""
+    line = write_tree_record(a_record(tree_count=12345.67))
+    assert line[7:15] == "12345.67"
+    huge = write_tree_record(a_record(tree_count=1500.25))
+    assert huge[7:15] == " 1500.25"
 
 
 def test_a_record_read_back_the_way_fvs_reads_it() -> None:
@@ -267,8 +275,8 @@ def test_the_three_species_lists_agree_in_length() -> None:
 def test_the_species_is_resolved_before_it_is_written() -> None:
     """A PLANTS symbol reaches the record as the BC species code."""
     line = write_tree_record(a_record(species="THPL"))
-    assert line[14:17] == "CW "
-    assert line[14:17].strip() == resolve_species("THPL")
+    assert line[16:19] == "CW "
+    assert line[16:19].strip() == resolve_species("THPL")
 
 
 def test_a_tree_number_too_wide_for_its_columns_is_refused() -> None:

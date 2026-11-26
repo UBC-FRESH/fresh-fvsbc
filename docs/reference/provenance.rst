@@ -64,7 +64,8 @@ A record has these fields.
        its recalibration to another BEC, as ``becset.f`` does for a site series it has no habitat
        mapping for; ``null`` otherwise
    * - ``support``
-     - One grade per species in the stand: ``species``, ``tier`` (A/B/C/D/X), the reason, and the evidence note
+     - One grade per species in the stand: ``species``, ``tier`` (A/B/C/D/X), the reason, the
+       evidence note, and ``path`` — the growth path the engine runs for the zone, ``V3`` or ``V2``
 
 The two hashes are of a canonical serialization, not of a file. A file hash changes with a trailing
 newline or a column width, and it would then say a run differed when it did not.
