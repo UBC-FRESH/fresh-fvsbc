@@ -1,4 +1,37 @@
-# fresh-fvsbc 0.32.0
+# fresh-fvsbc 0.33.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.32.0
+
+- **PP is on V3, and the V2 list is empty.** The last V2 zone gains fitted FD and PY diameter and
+  height rows, the small-tree branches, and the hardwood mortality row.
+- **The fold improves.** PP: BA bias **−4.98 → −2.58 m²/ha**, MAE 4.98 → 2.58, TPH bias −97 → **−0.1**,
+  TPH MAE 117 → 66.
+- **Eleven zones, one path.** ICH, IDF, SBS, SBPS, BWBS, CWH, MH, CDF, MS, ESSF, and PP all run V3;
+  `check_zone_paths.py` reports them all agreeing with `becset.f`. CMA remains out of scope.
+- **A caveat stated, not hidden.** PP's PY diameter fit explains nothing (r² −0.008 on 320 pairs);
+  only its level is defensible. It was preferred to the ICH donor on the fold, and the row is one line
+  to change if a future fold disagrees.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.9`** (W5–W17). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.33.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- No zone has a held-out split and bundle for MS, ESSF, or PP; MS/ESSF/PP minor species keep donors.
+- `SBSmc2` over-predicts at high basal area (+20 m²/ha across ten intervals).
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- CDF dense stands still lose about 5 m²/ha on the held-out site.
+- Recruitment, disturbance calibration, and the dataset's SQLite/whole-TSA work remain.
+
+## fresh-fvsbc 0.32.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

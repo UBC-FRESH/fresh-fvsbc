@@ -74,12 +74,12 @@ def test_ms_is_v3_after_w15() -> None:
     assert "V3 fitted" in record.reason
 
 
-def test_pp_names_the_v2_path() -> None:
-    """PP resolves to its own habitat but still runs the V2 growth path."""
+def test_pp_is_v3_after_w17() -> None:
+    """PP runs its own fitted rows on V3."""
     record = classify("PPxh2", "PL")
     assert record.tier is SupportTier.PROVISIONAL
-    assert "V2 path" in record.reason
-    assert "p99 caps" in record.reason
+    assert record.path == "V3"
+    assert record.evidence == "w17-pp-v3"
 
 
 def test_unknown_bec_is_unsupported() -> None:

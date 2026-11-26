@@ -52,6 +52,7 @@ outside the repository because they carry site identifiers.
 | `w14-pp-site-series.patch.gz` | The missing PP site series map to the PP habitat instead of MSdk, applied after W13 |
 | `w15-ms-v3.patch.gz` | MS on the V3 path: fitted large-tree DG (7 species) and height (5), applied after W14 |
 | `w16-essf-v3.patch.gz` | ESSF on the V3 path: fitted large-tree DG (5 species) and height (3), applied after W15 |
+| `w17-pp-v3.patch.gz` | PP on the V3 path: fitted FD/PY large-tree DG and height, applied after W16 |
 | `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
 | `recruitment-bc-v1-bundle.json` | The BC recruitment v1 bundle (BEC × species × BA bin, scale 0.4) |
