@@ -1,4 +1,39 @@
-# fresh-fvsbc 0.26.0
+# fresh-fvsbc 0.27.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.26.0
+
+- **SBS gets a maximum basal area per subzone.** The variant had one flat 55 m²/ha cap for all of
+  SBS, while every subzone's measured p99 is 58–75. Ordinary stands therefore sat near the cap and a
+  share of their growth was booked as mortality. The caps now follow the measured p99, the same
+  convention CWH, CDF, and MH already use.
+- **The SBS fold improves.** Held-out BA bias moves from −5.74 to **−4.32 m²/ha** (MAE 8.29 → 7.24);
+  the training fold from −6.85 to **−4.56**. The worst cell, `SBSmc2`, moves from −47.3 to −33.8 on
+  the held-out sites.
+- **No bundle moved.** `d7-sbs-bundle.json` still carries `MORTMULT 2`.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.5`** (W5–W12). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.27.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- `SBSmc2` is still about −34 m²/ha on its held-out intervals; that is a growth/mortality gap, not a
+  cap gap.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- CDF dense stands still lose about 5 m²/ha on the held-out site.
+- PPxh2's cap of 21 m²/ha binds for almost every PP interval; PP is unsigned and uncalibrated.
+- Recruitment is a mean-rate model; it has no QMD bin, seed year, climate, or dispersal.
+- Disturbance calibration is not done.
+- The dataset has no whole-TSA run, spatial neighbourhood geometry, SQLite writer, or DOI yet.
+
+## fresh-fvsbc 0.26.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
