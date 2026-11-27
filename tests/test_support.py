@@ -27,6 +27,7 @@ def test_sbs_cites_the_w6_large_tree_row() -> None:
     assert "W18 BL refit" in record.reason
     assert "W22 BL density" in record.reason
     assert "sbsmc2-v3" in record.evidence
+    assert "w28-sbsmc2-stem-shape" in record.evidence
 
 
 def test_cma_is_out_of_scope_not_a_gap() -> None:
