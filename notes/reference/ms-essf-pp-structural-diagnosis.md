@@ -70,3 +70,18 @@ The uniform mortality grid already showed the risk: held-out improves but train 
 (751.6 → 753–785). A shaped term would have to fix the high-density intervals without adding
 variance elsewhere, and the train/held-out disagreement remains the validation hurdle. That is
 a larger `morts.f` change than the row refit; it is not shipped here.
+
+## 5. MS density mortality term (W26)
+
+A direct `morts.f` term `X *= EXP(k * (CCF/100 - 1.5))` for MS, using the measured 0.87
+log-slope, was tested at several scales:
+
+| k | Test BA MAE | Test TPH MAE | Train BA MAE | Train TPH MAE |
+| --- | ---: | ---: | ---: | ---: |
+| 0 (shipped) | **3.80** | **258.3** | 5.92 | 751.6 |
+| +0.22 (0.25×) | 3.94 | 253.4 | **5.83** | **728.7** |
+| +0.435 (0.5×) | 4.05 | **248.4** | **5.87** | **702.9** |
+| −0.435 | **3.64** | 267.2 | 6.25 | 795.7 |
+
+Positive k improves TPH and train BA but worsens held-out BA; negative k does the reverse.
+No k improves both held-out BA and TPH MAE, so the density term is not shipped. Reverted.
