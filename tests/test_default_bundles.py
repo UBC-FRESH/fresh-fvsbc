@@ -57,6 +57,17 @@ def test_the_cdf_bundle_carries_the_dense_stand_mortality() -> None:
     assert morts == {"FD": "0.5000", "AC": "0.5000"}
 
 
+def test_the_essf_bundle_carries_the_coupled_rows() -> None:
+    """ESSF carries a partial basis correction and lighter mortality."""
+    bundle = load_default_bundle("essf-v3")
+    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
+    assert set(bai.values()) == {"2.5000"}
+    assert set(mort.values()) == {"0.9000"}
+    assert len(bai) == 12
+    assert len(mort) == 12
+
+
 def test_the_sbs_bundle_carries_only_the_mortality_rows() -> None:
     """BL's growth is the W18 row; the bundle carries no BAIMULT for it."""
     bundle = load_default_bundle("sbs-v3")

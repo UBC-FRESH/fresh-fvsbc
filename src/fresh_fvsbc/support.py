@@ -125,9 +125,9 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "ESSF",
         SupportTier.PROVISIONAL,
-        "V3 fitted large-tree DG for BL/FD/HW/PL/SE and height for BL/PL/SE; "
-        "tabular mortality; unsigned",
-        "w16-essf-v3",
+        "V3 fitted rows with the essf-v3 bundle (BAIMULT 2.5, MORTMULT 0.9); "
+        "partial ten-year-basis growth correction; unsigned",
+        "w16-essf-v3, essf-v3",
     ),
     (
         "MS",
