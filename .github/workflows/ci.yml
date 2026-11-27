@@ -203,9 +203,6 @@ jobs:
           python -m pip install --quiet pytest pandas six
           python -m pytest tests/test_run.py tests/test_w2_subzones.py tests/test_oracle.py \
             tests/test_oracle_standalone.py -q -o addopts="" -p no:cacheprovider
-          # The end-to-end smoke: shipped bundles, recruitment, and the dataset writer. The wrapper is
-          # not installed in this job, so the source tree goes on the path.
-          PYTHONPATH=src python scripts/engine_smoke.py
 
   dashboard:
     name: Green dashboard summary

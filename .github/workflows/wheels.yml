@@ -190,6 +190,16 @@ jobs:
           print("  libgfortran resolves inside the wheel")
           PY
 
+      # The extension job in `ci.yml` builds the variant without the W-series zone patches, so a
+      # CWH or PP code does not resolve there. This job builds the wheel the release ships, which
+      # does carry them; the smoke runs against that.
+      - name: Smoke the built engine with the shipped bundles
+        if: matrix.python == 'cp312'
+        run: |
+          PY=/opt/python/${{ matrix.python }}-${{ matrix.python }}/bin
+          $PY/pip install -q pandas
+          PYTHONPATH=src $PY/python scripts/engine_smoke.py --directory "${{ runner.temp }}/smoke"
+
       - name: Keep the wheel
         uses: actions/upload-artifact@v4
         with:
