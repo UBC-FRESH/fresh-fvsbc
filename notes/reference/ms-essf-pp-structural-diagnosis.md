@@ -85,3 +85,17 @@ log-slope, was tested at several scales:
 
 Positive k improves TPH and train BA but worsens held-out BA; negative k does the reverse.
 No k improves both held-out BA and TPH MAE, so the density term is not shipped. Reverted.
+
+## 6. MS small-stem mortality shape (W29)
+
+A direct `morts.f` term reducing MS `<10 cm` mortality (`X *= 0.7`) raises TPH with little BA,
+the direction both MS folds need:
+
+| Build | Test BA MAE | Test TPH MAE | Train BA MAE | Train TPH MAE |
+| --- | ---: | ---: | ---: | ---: |
+| base | **3.80** | **258.3** | **5.92** | **751.6** |
+| W29 | 3.85 | 250.0 | 6.07 | 773.6 |
+
+Biases improve (test TPH −46 → −31, train BA −2.78 → −2.49), but every MAE except test TPH
+worsens. The MS fold is variance-dominated; adding stems improves the mean and increases the
+spread. No ship; reverted.
