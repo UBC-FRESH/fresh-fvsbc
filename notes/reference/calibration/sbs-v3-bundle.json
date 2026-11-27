@@ -1,5 +1,5 @@
 {
-  "bundle_id": "sbs-v3-ba05bl-mm2-2026-11-27",
+  "bundle_id": "sbs-v3-mm2-2026-11-27",
   "version": "0.1.0",
   "pins": {
     "pyfvs_commit": "e95172b",
@@ -85,20 +85,6 @@
         "min": 0.25,
         "max": 4.0
       }
-    },
-    {
-      "keyword": "BAIMULT",
-      "fields": [
-        "1",
-        "BL",
-        "0.5000"
-      ],
-      "units": "multiplier",
-      "value_index": 2,
-      "bounds": {
-        "min": 0.25,
-        "max": 15.0
-      }
     }
   ],
   "training": {
@@ -111,9 +97,9 @@
     }
   },
   "review": {
-    "reviewer": "SBSmc2 high-BA check, not signed off",
+    "reviewer": "SBSmc2 BL refit check, not signed off",
     "date": "2026-11-27",
     "signed_off": false
   },
-  "claim": "SBS V3: MORTMULT 2.0 for FD/PL/SE/HW and BAIMULT 0.5 for BL, the dense SBSmc2 species; BA and TPH error both improve on the held-out fold; unsigned pilot."
+  "claim": "SBS V3: MORTMULT 2.0 for FD/PL/SE/HW; BL growth comes from the W18 refit of its large-tree row, not a multiplier; unsigned pilot."
 }

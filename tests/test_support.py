@@ -25,7 +25,7 @@ def test_sbs_cites_the_w6_large_tree_row() -> None:
     record = classify("SBSdw2/01", "PL")
     assert record.tier is SupportTier.PROVISIONAL
     assert "W6" in record.reason
-    assert "BAIMULT 0.5 for BL" in record.reason
+    assert "W18 BL refit" in record.reason
 
 
 def test_cma_is_out_of_scope_not_a_gap() -> None:

@@ -116,7 +116,7 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "SBS",
         SupportTier.PROVISIONAL,
-        "V3 W6 large-tree row; MORTMULT 2 (FD/PL/SE/HW) and BAIMULT 0.5 for BL",
+        "V3 W6 large-tree row with the W18 BL refit; MORTMULT 2 for FD/PL/SE/HW",
         "w6-sbs-large-tree",
     ),
     ("ICH", SupportTier.PROVISIONAL, "V3 pilot; unsigned", "d9-full-bc-review-bundle"),

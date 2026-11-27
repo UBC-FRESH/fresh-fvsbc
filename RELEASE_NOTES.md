@@ -1,4 +1,37 @@
-# fresh-fvsbc 0.40.0
+# fresh-fvsbc 0.41.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.40.0
+
+- **The SBS BL growth row is refitted, and the multiplier that masked it is gone.** The row predicted
+  1.9 cm/yr for a 10–20 cm BL against 0.21 measured. `ZNKONST(31)` is now fitted from 11,005 SBS BL
+  pairs with the 10–20 cm class weighted three times, and predicts 0.17 against 0.21.
+- **SBSmc2 is essentially fixed.** The cell moves from **+9.2 to +0.1 m²/ha** and from **−635 to −45
+  TPH**.
+- **The fold improves.** Train BA MAE 5.83 → **4.95**, TPH MAE 435.5 → **400.4**; held-out TPH MAE
+  686.7 → **650.7**. Held-out BA MAE rises from 6.00 to 6.20 while TPH improves — the one cost of
+  removing the crutch.
+- **`sbs-v3` drops `BAIMULT 0.5` for BL.** It changes the cell by 0.0 m²/ha once the row is fixed.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.10`** (W5–W18). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.0"
+```
+
+## Gaps that remain
+
+- The BL row drops the crown term; the pairs carry no crown ratio, so adding it is the next step.
+- The CDF dense stand is still 33 m²/ha short on BA.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- MS, ESSF, and PP have no bundle.
+- Disturbance calibration is not done.
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+
+## fresh-fvsbc 0.40.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
