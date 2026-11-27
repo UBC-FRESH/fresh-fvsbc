@@ -197,7 +197,7 @@ jobs:
         if: matrix.python == 'cp312'
         run: |
           PY=/opt/python/${{ matrix.python }}-${{ matrix.python }}/bin
-          $PY/pip install -q pandas
+          $PY/pip install -q pandas six
           PYTHONPATH=src $PY/python scripts/engine_smoke.py --directory "${{ runner.temp }}/smoke"
 
       - name: Keep the wheel
