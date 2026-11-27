@@ -1,5 +1,5 @@
 {
-  "bundle_id": "sbs-v3",
+  "bundle_id": "sbs-v3-ba05bl-mm2-2026-11-27",
   "version": "0.1.0",
   "pins": {
     "pyfvs_commit": "e95172b",
@@ -85,21 +85,35 @@
         "min": 0.25,
         "max": 4.0
       }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "BL",
+        "0.5000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
     }
   ],
   "training": {
     "data_checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-    "split": "SBS 5-per-BEC, 100 Mile House TSA held out",
-    "objective": "held-out BA/TPH bias",
+    "split": "SBS 38 held-out / 106 train intervals; SBSmc2 high-BA cell inspected",
+    "objective": "held-out BA and TPH error; dense small-tree SBSmc2",
     "convergence": {
       "iterations": 1,
       "method": "fixed candidate"
     }
   },
   "review": {
-    "reviewer": "W12/W15 joint check, not signed off",
+    "reviewer": "SBSmc2 high-BA check, not signed off",
     "date": "2026-11-27",
     "signed_off": false
   },
-  "claim": "SBS V3: MORTMULT 2.0 for FD/PL/SE/HW; held-out site fold and joint BA/TPH check, not a certificate."
+  "claim": "SBS V3: MORTMULT 2.0 for FD/PL/SE/HW and BAIMULT 0.5 for BL, the dense SBSmc2 species; BA and TPH error both improve on the held-out fold; unsigned pilot."
 }
