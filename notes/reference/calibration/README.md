@@ -58,6 +58,7 @@ outside the repository because they carry site identifiers.
 | `w22-sbs-bl-density.patch.gz` | SBS BL stand-density term, applied after W21 |
 | `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
+| `sbsmc2-v3-bundle.json` | SBSmc2 subzone bundle (`BAIMULT 0.3` + recruitment v1) |
 | `essf-v3-bundle.json` | The ESSF V3 bundle (`BAIMULT 2.5`, `MORTMULT 0.9`) |
 | `recruitment-bc-v1-bundle.json` | The BC recruitment v1 bundle (BEC × species × BA bin, scale 0.4) |
 | `sbps-v3-bundle.json` | The SBPS V3 base bundle (`MORTMULT 2`) |

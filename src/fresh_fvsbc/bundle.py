@@ -531,6 +531,7 @@ DEFAULT_BUNDLES: tuple[str, ...] = (
     "mh-v3",
     "sbps-v3",
     "sbs-v3",
+    "sbsmc2-v3",
     "recruitment-bc-v1",
 )
 
