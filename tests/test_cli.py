@@ -10,6 +10,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT: Path = Path(__file__).resolve().parents[1]
 SCRIPTS: Path = ROOT / "scripts"
 
@@ -91,3 +93,47 @@ def test_a_keyword_without_a_record_parses_as_before() -> None:
 
     assert _parse_keyword("TIMEINT=,5").supplemental == ()
     assert _parse_keyword("PROCESS").supplemental == ()
+
+
+def test_a_shipped_bundle_name_loads() -> None:
+    """`--calibration cwh-v3` resolves the bundle that ships in the wheel."""
+    from fresh_fvsbc import cli
+
+    bundle = cli._load_calibration("cwh-v3")
+    assert bundle.bundle_id.startswith("cwh-v3")
+    assert bundle.render()
+
+
+def test_a_bundle_path_still_loads(tmp_path: Path) -> None:
+    """A path keeps working for a local bundle."""
+    from fresh_fvsbc import cli
+    from fresh_fvsbc.bundle import default_bundle_path
+
+    bundle = cli._load_calibration(str(default_bundle_path("sbs-v3")))
+    assert bundle.bundle_id == "sbs-v3"
+
+
+def test_an_unknown_bundle_name_is_refused() -> None:
+    """A name that is neither shipped nor a file is a bad input, not a traceback."""
+    from fresh_fvsbc import cli
+    from fresh_fvsbc.bundle import BundleError
+
+    with pytest.raises(BundleError, match="neither a file nor a shipped bundle"):
+        cli._load_calibration("no-such-bundle")
+
+
+def test_a_block_keyword_is_refused_by_keyword() -> None:
+    """`--keyword DATABASE=...` would put a block's options on one line."""
+    from fresh_fvsbc import cli
+
+    with pytest.raises(cli.CommandInputError, match="takes a block, so it needs --block"):
+        cli._parse_keyword_argument("DATABASE=DSNOut,FVSOut.db,Summary")
+
+
+def test_a_block_keyword_parses_through_block() -> None:
+    """The same arguments through --block become separate lines."""
+    from fresh_fvsbc import cli
+
+    keyword = cli._parse_block("DATABASE|DSNOut|FVSOut.db|Summary")
+    assert keyword.name == "DATABASE"
+    assert keyword.lines == ("DSNOut", "FVSOut.db", "Summary")
