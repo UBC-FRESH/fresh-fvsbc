@@ -1,4 +1,37 @@
-# fresh-fvsbc 0.41.3
+# fresh-fvsbc 0.41.4
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.3
+
+- **The first ESSF bundle.** `essf-v3` carries **`BAIMULT 2.5`** and **`MORTMULT 0.9`** for all
+  twelve species, a coupled partial ten-year-basis growth correction plus lighter mortality.
+- **Both folds improve on both measures.** Held-out BA MAE 5.49 → **5.15**, TPH MAE 530.2 →
+  **528.8**; train BA MAE 6.31 → **6.14**, TPH MAE 553.4 → **551.2**. BA bias also improves from
+  −3.07 to −2.21 (held out).
+- **The full ten-year correction overshoots.** The ESSF rows are annual-basis, but a full ×10
+  diameter correction predicts about 6× growth where the fold needs ~1.6×. The train-only
+  coupled grid selected the partial correction (DG ×1.58) with mortality ×0.9; applying the
+  full basis change would over-predict BA and cost TPH.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.13`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.4"
+```
+
+## Gaps that remain
+
+- MS and PP still have no bundle; their held-out and train folds diverge.
+- The CDF dense stand is still 33 m²/ha short; it needs high-BA (>100) training data.
+- SBSmc2 is still +1.5 m²/ha / −81 TPH.
+- CW large-tree height is still the donor; the taper-free form failed stand-level A/B.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.3
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

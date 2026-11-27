@@ -66,7 +66,9 @@ def test_essf_is_v3_after_w16() -> None:
     record = classify("ESSFdk2", "BL")
     assert record.tier is SupportTier.PROVISIONAL
     assert record.path == "V3"
-    assert record.evidence == "w16-essf-v3"
+    assert "w16-essf-v3" in record.evidence
+    assert "essf-v3" in record.evidence
+    assert "BAIMULT 2.5" in record.reason
 
 
 def test_ms_is_v3_after_w15() -> None:
