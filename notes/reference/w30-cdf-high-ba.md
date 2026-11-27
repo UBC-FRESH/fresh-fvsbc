@@ -53,3 +53,22 @@ remeasurement change) rather than another growth/mortality term.
 
 - Dense-site runs: `~/workspace/bwbs-work/probe_cdf_w30/`, `probe_cdf_w30b/`.
 - Full fold: `probe_cdf_w30b/`.
+
+## 5. The growth half fails
+
+The other half of the interaction was tested: CDF growth ×2 above BA 90, on top of W30 mortality.
+
+| Interval | BA0 | Obs BA1 | W30 pred | W31 pred |
+| --- | ---: | ---: | ---: | ---: |
+| 1977–1987 | 93.6 | 102.8 | 99.0 | 128.0 |
+| 1987–1997 | 102.8 | 109.6 | 107.0 | 136.0 |
+| 1997–2008 | 109.6 | 112.5 | 113.0 | 143.0 |
+| 2008–2024 | 112.5 | 153.1 | 117.0 | 160.0 |
+
+The last interval improves (−30 → +7), but every pre-2008 interval overshoots by +25 to +30.
+The held-out fold BA MAE doubles (3.07 → 6.34); TPH MAE is flat-to-worse (51.4 → 52.6). The
+pre-2008 intervals are the selection set, and they reject the boost; a boost fitted only to the
+last interval is fitting the validation point.
+
+The dense site's final BA jump is therefore a measurement/history discontinuity, not a high-BA
+growth response. Reverted; W30 remains the shipped half.
