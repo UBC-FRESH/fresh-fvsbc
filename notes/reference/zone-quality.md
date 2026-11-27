@@ -13,7 +13,7 @@ decimal places.
 | IDF | V3 | 167 | train | −0.63 | 3.69 | none |
 | ICH | V3 | 213 | train | −1.26 | 5.53 | none |
 | CWH | V3 | 398 | 108 held out | +0.15 | 4.01 | `BAIMULT 8` |
-| SBS | V3 | 144 | 38 held out | −1.21 | 6.17 | `MORTMULT 2` |
+| SBS | V3 | 144 | 38 held out | −0.74 | 6.00 | `MORTMULT 2` + `BAIMULT 0.5` BL |
 | BWBS | V3 | 94 | train | +2.31 | 6.71 | none |
 | SBPS | V3 | 27 | 6 held out | +2.18 | 2.64 | `MORTMULT 2` |
 | MH | V3 | 18 | 3 held out | +1.47 | 1.71 | `BAIMULT 8` |

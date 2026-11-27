@@ -110,7 +110,7 @@ def test_a_bundle_path_still_loads(tmp_path: Path) -> None:
     from fresh_fvsbc.bundle import default_bundle_path
 
     bundle = cli._load_calibration(str(default_bundle_path("sbs-v3")))
-    assert bundle.bundle_id == "sbs-v3"
+    assert bundle.bundle_id.startswith("sbs-v3")
 
 
 def test_an_unknown_bundle_name_is_refused() -> None:

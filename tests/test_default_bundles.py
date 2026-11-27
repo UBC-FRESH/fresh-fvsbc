@@ -57,6 +57,15 @@ def test_the_cdf_bundle_carries_the_dense_stand_mortality() -> None:
     assert morts == {"FD": "0.5000", "AC": "0.5000"}
 
 
+def test_the_sbs_bundle_carries_the_high_ba_rows() -> None:
+    """BL takes half growth; the four main species take doubled mortality."""
+    bundle = load_default_bundle("sbs-v3")
+    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
+    assert bai == {"BL": "0.5000"}
+    assert mort == {"FD": "2.0000", "PL": "2.0000", "SE": "2.0000", "HW": "2.0000"}
+
+
 def test_an_unknown_name_is_refused() -> None:
     """A caller cannot ask for a bundle that is not shipped."""
     with pytest.raises(BundleError, match="not a shipped bundle"):
