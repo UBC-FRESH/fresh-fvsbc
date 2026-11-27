@@ -1,6 +1,6 @@
 # W30: CDF high-BA mortality interaction
 
-Status: **shipped in 0.41.10 on engine 0.4.15.** Tier stays C (unsigned).
+Status: **shipped in 0.41.10 on engine 0.4.15; verified from PyPI.** Tier stays C (unsigned).
 
 ## 1. The dense site
 
