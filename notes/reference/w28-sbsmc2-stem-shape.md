@@ -1,6 +1,6 @@
 # W28: SBSmc2 stem-shape mortality
 
-Status: **shipped in 0.41.6 on engine 0.4.14.** Tier stays C (unsigned).
+Status: **shipped in 0.41.6 on engine 0.4.14; verified from PyPI.** Tier stays C (unsigned).
 
 ## 1. Why
 
