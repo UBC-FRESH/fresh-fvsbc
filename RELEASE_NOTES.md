@@ -1,4 +1,34 @@
-# fresh-fvsbc 0.37.1
+# fresh-fvsbc 0.38.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.37.1
+
+- **`scripts/engine_smoke.py` checks the working surface end to end.** It loads every shipped bundle,
+  runs a stand with `cwh-v3` and the recruitment model over two cycles, and builds a two-stand dataset
+  with SQLite. `ci.yml` runs it in the job that has the BC extension, so "it works" is a gate rather
+  than a claim.
+- **The smoke reports failures instead of tracebacks**, and its own two tests run without the
+  extension (fakes) so the quality job still covers the script.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.9`** (W5–W17). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.38.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- MS, ESSF, and PP have no bundle; their held-out folds are in the record.
+- `SBSmc2` over-predicts at high basal area; CDF dense stands sit at −5 m²/ha.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- Disturbance calibration is not done.
+- The dataset has no whole-province run or DOI yet.
+
+## fresh-fvsbc 0.37.1
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
