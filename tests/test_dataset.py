@@ -257,6 +257,23 @@ def test_build_dataset_with_a_stub_runner(tmp_path: Path, monkeypatch: pytest.Mo
     assert len(events) == 4
     assert set(events["bec"]) == {"BWBSmw/01", "SBSmw/01"}
     assert "FVS_CutList_Metric" in written
+    import sqlite3
+
+    connection = sqlite3.connect(written["sqlite"])
+    names = {
+        row[0] for row in connection.execute("select name from sqlite_master where type='table'")
+    }
+    connection.close()
+    assert {
+        "runs",
+        "stands",
+        "trees",
+        "neighbourhoods",
+        "events",
+        "landscape",
+        "dataset_meta",
+        "FVS_CutList_Metric",
+    } <= names
     runs = pd.read_csv(written["runs"])
     assert list(runs["neighbourhood"]) == ["N1", "N1"]
     landscape = pd.read_csv(written["landscape"])

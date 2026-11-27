@@ -1,4 +1,39 @@
-# fresh-fvsbc 0.33.0
+# fresh-fvsbc 0.34.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.33.0
+
+- **The dataset writes SQLite.** `build_dataset` now writes `dataset.sqlite` beside the CSVs, one
+  table per dataset table plus `dataset_meta` with the id, version, and table list. `dataset.json`
+  names the file. CSV stays the canonical text form.
+- **A whole-TSA run, not a sample.** Every eligible Dawson interval: **221 runs, 442 stand-year rows,
+  123,424 tree rows, 85 events** (75 cut rows), four BEC landscape rows, and the full disturbance set
+  on the fire and removal stands. Site identifiers stay local.
+- **The three new zones are validated out of sample.** A 20% site split reproduces the V3 gains:
+  MS −9.25 → **−2.99 m²/ha**, ESSF −8.05 → **−3.07**, PP −3.73 → **−2.53**. A multiplier sweep trades
+  BA for TPH in every zone, so no bundle was written.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.9`** (W5–W17). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.34.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- MS, ESSF, and PP have no bundle; their folds are now held out, but the coefficients were fitted on
+  all pairs, so the bounds carry some leakage.
+- `SBSmc2` over-predicts at high basal area (+20 m²/ha across ten intervals).
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- CDF dense stands still lose about 5 m²/ha on the held-out site.
+- Disturbance calibration is still not done; the dataset carries the wiring, not the coefficients.
+- The dataset has no whole-province run or DOI yet.
+
+## fresh-fvsbc 0.33.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
