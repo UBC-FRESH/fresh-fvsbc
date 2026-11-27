@@ -1,6 +1,6 @@
 # W18: the SBS BL large-tree growth row, refit
 
-Status: **built and validated on the SBS fold.** Tier stays C.
+Status: **shipped in 0.41.1 on engine 0.4.11.** Tier stays C.
 Supersedes the `BAIMULT 0.5` for BL that shipped in 0.40.0.
 
 Pins: PyFVS `e95172b`, FVS source `ef5fa847`, variant `bc`.
