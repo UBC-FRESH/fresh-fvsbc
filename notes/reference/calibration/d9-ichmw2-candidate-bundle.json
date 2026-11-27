@@ -5,7 +5,7 @@
     "pyfvs_commit": "e95172b",
     "fvs_source_commit": "ef5fa847",
     "variant": "bc",
-    "wrapper_version": "0.35.0"
+    "wrapper_version": "0.36.0"
   },
   "domain": {
     "regions": [],

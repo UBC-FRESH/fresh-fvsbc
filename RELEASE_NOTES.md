@@ -1,4 +1,35 @@
-# fresh-fvsbc 0.35.0
+# fresh-fvsbc 0.36.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.35.0
+
+- **Recruitment finds its rates from the label a run actually carries.** `IngrowthRate.applies` now
+  normalises `CWHvm1/01` and `CAR CWHvm1/01` to the `CWHVM1` key the rates use. Before, a caller who
+  passed the run's own BEC label got `None` and no establishment block.
+- **End-to-end check.** From the installed wheel: `load_default_bundle("cwh-v3")` renders the
+  `BAIMULT` keywords, `load_default_bundle("recruitment-bc-v1").ingrowth_keyword(bec="CWHvm1/01", …)`
+  returns an `ESTAB` block with five `NATURAL` entries, and a two-cycle run grows a stand from 17 to
+  56 TPH.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.9`** (W5–W17). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.36.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- MS, ESSF, and PP have no bundle; their held-out folds are in the record.
+- `SBSmc2` over-predicts at high basal area; CDF dense stands sit at −5 m²/ha.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- Disturbance calibration is not done.
+- The dataset has no whole-province run or DOI yet.
+
+## fresh-fvsbc 0.35.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
