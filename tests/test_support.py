@@ -87,7 +87,8 @@ def test_pp_is_v3_after_w17() -> None:
     record = classify("PPxh2", "PL")
     assert record.tier is SupportTier.PROVISIONAL
     assert record.path == "V3"
-    assert record.evidence == "w17-pp-v3"
+    assert "w17-pp-v3" in record.evidence
+    assert "pp-v3" in record.evidence
 
 
 def test_unknown_bec_is_unsupported() -> None:

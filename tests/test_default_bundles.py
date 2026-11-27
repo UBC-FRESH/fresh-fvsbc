@@ -68,6 +68,17 @@ def test_the_essf_bundle_carries_the_coupled_rows() -> None:
     assert len(mort) == 12
 
 
+def test_the_pp_bundle_carries_the_loso_rows() -> None:
+    """PP carries the LOSO-selected growth and mortality multipliers."""
+    bundle = load_default_bundle("pp-v3")
+    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
+    assert set(bai.values()) == {"3.0000"}
+    assert set(mort.values()) == {"0.8000"}
+    assert len(bai) == 12
+    assert len(mort) == 12
+
+
 def test_the_ms_bundle_carries_the_growth_and_recruitment_rows() -> None:
     """MS carries the growth correction and the recruitment block."""
     bundle = load_default_bundle("ms-v3")

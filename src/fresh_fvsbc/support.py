@@ -139,9 +139,9 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "PP",
         SupportTier.PROVISIONAL,
-        "V3 fitted large-tree DG and height for FD/PY; SE/BL/AT keep donors; "
-        "measured p99 caps; 25-interval fold",
-        "w17-pp-v3",
+        "V3 fitted rows with the pp-v3 bundle (BAIMULT 3.0, MORTMULT 0.8); "
+        "SE/BL/AT keep donors; LOSO across 10 sites",
+        "w17-pp-v3, pp-v3",
     ),
 )
 
