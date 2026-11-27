@@ -59,7 +59,8 @@ def test_cdf_is_provisional_with_its_own_large_tree_rows() -> None:
     """CDF fits FD and AT from its own pairs and keeps the donor for the rest."""
     record = classify("CDFmm", "FD")
     assert record.tier is SupportTier.PROVISIONAL
-    assert record.evidence == "w10-mh-cdf-own-dg"
+    assert "w10-mh-cdf-own-dg" in record.evidence
+    assert "w30-cdf-high-ba-mort" in record.evidence
     assert "own FD/AT" in record.reason
 
 

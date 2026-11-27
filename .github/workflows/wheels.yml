@@ -39,6 +39,7 @@ on:
       - "notes/reference/calibration/w21-cwh-small-joint.patch.gz"
       - "notes/reference/calibration/w22-sbs-bl-density.patch.gz"
       - "notes/reference/calibration/w28-sbsmc2-stem-shape.patch.gz"
+      - "notes/reference/calibration/w30-cdf-high-ba-mort.patch.gz"
       - ".github/workflows/wheels.yml"
   workflow_dispatch:
     inputs:
@@ -106,6 +107,7 @@ jobs:
           gunzip -c notes/reference/calibration/w21-cwh-small-joint.patch.gz > ${{ runner.temp }}/w21-cwh-small-joint.patch
           gunzip -c notes/reference/calibration/w22-sbs-bl-density.patch.gz > ${{ runner.temp }}/w22-sbs-bl-density.patch
           gunzip -c notes/reference/calibration/w28-sbsmc2-stem-shape.patch.gz > ${{ runner.temp }}/w28-sbsmc2-stem-shape.patch
+          gunzip -c notes/reference/calibration/w30-cdf-high-ba-mort.patch.gz > ${{ runner.temp }}/w30-cdf-high-ba-mort.patch
           gunzip -c notes/reference/calibration/d9-mpb-bc.patch.gz > ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS apply --check ${{ runner.temp }}/pyfvs.patch
           git -C ${{ runner.temp }}/PyFVS apply ${{ runner.temp }}/pyfvs.patch
@@ -171,6 +173,9 @@ jobs:
           # W28 saves small SBSmc2 stems and thins large ones.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w28-sbsmc2-stem-shape.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w28-sbsmc2-stem-shape.patch
+          # W30 reduces CDF mortality above BA 90 m2/ha (dense-site check).
+          git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/w30-cdf-high-ba-mort.patch
+          git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/w30-cdf-high-ba-mort.patch
           # D9.71 links the real LPMPB extension for the BC variant instead of the stub.
           git -C ${{ runner.temp }}/PyFVS/fvs apply --check ${{ runner.temp }}/d9-mpb-bc.patch
           git -C ${{ runner.temp }}/PyFVS/fvs apply ${{ runner.temp }}/d9-mpb-bc.patch
@@ -185,7 +190,7 @@ jobs:
           # meson itself, not only the backend: --no-build-isolation means pip installs no build
           # requirements, so the executable has to be here.
           $PY/pip install -q meson meson-python ninja numpy setuptools_scm auditwheel
-          SETUPTOOLS_SCM_PRETEND_VERSION=0.4.14 $PY/pip wheel \
+          SETUPTOOLS_SCM_PRETEND_VERSION=0.4.15 $PY/pip wheel \
             --no-build-isolation --no-deps ${{ runner.temp }}/PyFVS \
             --config-settings=setup-args="-Dfvsvariants=bc" -w dist
           # Without this the wheel only runs where gfortran is installed, which is the problem it
