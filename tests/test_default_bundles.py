@@ -57,12 +57,11 @@ def test_the_cdf_bundle_carries_the_dense_stand_mortality() -> None:
     assert morts == {"FD": "0.5000", "AC": "0.5000"}
 
 
-def test_the_sbs_bundle_carries_the_high_ba_rows() -> None:
-    """BL takes half growth; the four main species take doubled mortality."""
+def test_the_sbs_bundle_carries_only_the_mortality_rows() -> None:
+    """BL's growth is the W18 row; the bundle carries no BAIMULT for it."""
     bundle = load_default_bundle("sbs-v3")
-    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    assert not any(p.keyword == "BAIMULT" for p in bundle.parameters)
     mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
-    assert bai == {"BL": "0.5000"}
     assert mort == {"FD": "2.0000", "PL": "2.0000", "SE": "2.0000", "HW": "2.0000"}
 
 
