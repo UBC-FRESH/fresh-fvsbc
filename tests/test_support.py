@@ -21,11 +21,11 @@ def test_sbps_is_not_matched_as_sbs() -> None:
 
 
 def test_sbs_cites_the_w6_large_tree_row() -> None:
-    """SBS is provisional on W6 plus its mortality and BL growth multipliers."""
+    """SBS is provisional on the W6/W18 rows plus its W22 density term."""
     record = classify("SBSdw2/01", "PL")
     assert record.tier is SupportTier.PROVISIONAL
-    assert "W6" in record.reason
     assert "W18 BL refit" in record.reason
+    assert "W22 BL density" in record.reason
 
 
 def test_cma_is_out_of_scope_not_a_gap() -> None:

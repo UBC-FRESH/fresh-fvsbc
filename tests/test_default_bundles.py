@@ -62,7 +62,7 @@ def test_the_sbs_bundle_carries_only_the_mortality_rows() -> None:
     bundle = load_default_bundle("sbs-v3")
     assert not any(p.keyword == "BAIMULT" for p in bundle.parameters)
     mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
-    assert mort == {"FD": "2.0000", "PL": "2.0000", "SE": "2.0000", "HW": "2.0000"}
+    assert mort == {"FD": "1.8500", "PL": "1.8500", "SE": "1.8500", "HW": "1.8500"}
 
 
 def test_an_unknown_name_is_refused() -> None:

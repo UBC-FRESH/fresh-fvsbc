@@ -1,5 +1,5 @@
 {
-  "bundle_id": "sbs-v3-mm2-2026-11-27",
+  "bundle_id": "sbs-v3-bl-ccf-mm185-2026-11-27",
   "version": "0.1.0",
   "pins": {
     "pyfvs_commit": "e95172b",
@@ -27,7 +27,7 @@
       "fields": [
         "1",
         "FD",
-        "2.0000",
+        "1.8500",
         "0",
         "999"
       ],
@@ -43,7 +43,7 @@
       "fields": [
         "1",
         "PL",
-        "2.0000",
+        "1.8500",
         "0",
         "999"
       ],
@@ -59,7 +59,7 @@
       "fields": [
         "1",
         "SE",
-        "2.0000",
+        "1.8500",
         "0",
         "999"
       ],
@@ -75,7 +75,7 @@
       "fields": [
         "1",
         "HW",
-        "2.0000",
+        "1.8500",
         "0",
         "999"
       ],
@@ -97,9 +97,9 @@
     }
   },
   "review": {
-    "reviewer": "SBSmc2 BL refit check, not signed off",
+    "reviewer": "SBSmc2 density check, not signed off",
     "date": "2026-11-27",
     "signed_off": false
   },
-  "claim": "SBS V3: MORTMULT 2.0 for FD/PL/SE/HW; BL growth comes from the W18 refit of its large-tree row, not a multiplier; unsigned pilot."
+  "claim": "SBS V3: MORTMULT 1.85 for FD/PL/SE/HW plus the W22 BL density term (CCFA -0.35); BA and TPH MAE improve on held-out and train, and the SBSmc2 cell improves from +2.8/-200 to +1.5/-81; unsigned pilot."
 }
