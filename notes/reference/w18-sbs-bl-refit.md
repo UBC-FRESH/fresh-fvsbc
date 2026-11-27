@@ -91,6 +91,7 @@ the stand's 45% crown ratio, which the row no longer reads.
 ## 7. What remains
 
 The row has no crown term because the calibration pairs carry only `CR_CL` (a class, not a
-percentage). Mapping those classes to midpoints and refitting would let the row respond to
-crown ratio again, and is the next improvement. The BAL terms are stand-level and were
-fitted across all SBS subzones.
+percentage). A crown term was fitted on the class midpoints the engine uses and **not
+shipped**: held-out BA was identical, and the 0.15–0.75 mapping contradicts measured BL crown
+ratios (0.55–0.64, nearly flat). See `w18-sbs-bl-crown-negative.md`. The BAL terms are
+stand-level and were fitted across all SBS subzones.
