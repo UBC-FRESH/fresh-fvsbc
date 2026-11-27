@@ -1,6 +1,6 @@
 # The first ESSF bundle: a coupled partial basis correction
 
-Status: **shipped in 0.41.4.** Engine unchanged at 0.4.13. Tier stays C (unsigned).
+Status: **shipped in 0.41.4; verified from PyPI.** Engine unchanged at 0.4.13. Tier stays C (unsigned).
 
 ## 1. Why a bundle
 
