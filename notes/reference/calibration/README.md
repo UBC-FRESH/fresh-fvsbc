@@ -54,6 +54,7 @@ outside the repository because they carry site identifiers.
 | `w16-essf-v3.patch.gz` | ESSF on the V3 path: fitted large-tree DG (5 species) and height (3), applied after W15 |
 | `w17-pp-v3.patch.gz` | PP on the V3 path: fitted FD/PY large-tree DG and height, applied after W16 |
 | `w18-sbs-bl-dg.patch.gz` | SBS BL large-tree DG refit, weighted to 10-20 cm, applied after W17 |
+| `w21-cwh-small-joint.patch.gz` | CWH small-tree density response in diameter and mortality, applied after W18 |
 | `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
 | `recruitment-bc-v1-bundle.json` | The BC recruitment v1 bundle (BEC × species × BA bin, scale 0.4) |

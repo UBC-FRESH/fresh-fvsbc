@@ -1,4 +1,36 @@
-# fresh-fvsbc 0.41.1
+# fresh-fvsbc 0.41.2
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.1
+
+- **CWH small trees now respond to stand density in both diameter and mortality.** Direct
+  remeasurement pairs show diameter growth falling from 0.48 cm/yr below CCF 100 to 0.08 above
+  300, and mortality rising from 0.7% to 5.5%/yr. The height-derived engine model was flat in
+  diameter and had no CCF term in mortality.
+- **The joint term fixes both fold errors.** With `BAIMULT 8`, held-out BA MAE 4.000 → **3.778**
+  and TPH MAE 273.0 → **234.9**; train BA 5.030 → **4.983** and TPH 357.3 → **337.2**.
+- **The diameter-only version was not enough.** It improved BA but raised TPH (297.8); pairing it
+  with the fitted density mortality was what brought TPH down by 38 stems on the held-out fold.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.12`** (W2–W18 + W21). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.2"
+```
+
+## Gaps that remain
+
+- CWH remains an unsigned **C** pilot; CW large-tree height is still the donor (W11 form limit).
+- The CDF dense stand is still 33 m²/ha short; it needs high-BA (>100) training data.
+- SBSmc2 is still +2.8 m²/ha / −200 TPH.
+- MS, ESSF, and PP have no bundle; their held-out and train folds diverge.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.1
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

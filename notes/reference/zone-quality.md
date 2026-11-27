@@ -12,7 +12,7 @@ decimal places.
 | --- | --- | ---: | --- | ---: | ---: | --- |
 | IDF | V3 | 167 | train | −0.63 | 3.69 | none |
 | ICH | V3 | 213 | train | −1.26 | 5.53 | none |
-| CWH | V3 | 398 | 108 held out | +0.15 | 4.01 | `BAIMULT 8` |
+| CWH | V3 | 398 | 108 held out | −0.71 | 3.78 | `BAIMULT 8` + W21 small-tree density |
 | SBS | V3 | 144 | 38 held out | −0.92 | 6.09 | `MORTMULT 2`; BL growth from W18 |
 | BWBS | V3 | 94 | train | +2.31 | 6.71 | none |
 | SBPS | V3 | 27 | 6 held out | +2.18 | 2.64 | `MORTMULT 2` |

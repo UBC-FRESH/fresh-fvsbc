@@ -85,8 +85,8 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
         "CWH",
         SupportTier.PROVISIONAL,
         "V3 fitted large-tree DG; fitted height for HW/FD/BG/SE/AT/PL, CW donor height; "
-        "donor small tree/mortality; BAIMULT 8",
-        "w11-cwh-height",
+        "W21 joint small-tree density term in diameter and mortality; BAIMULT 8",
+        "w11-cwh-height, w21-cwh-small-joint",
     ),
     (
         "CDF",
