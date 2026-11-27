@@ -73,12 +73,14 @@ A dataset row therefore says `C` or `X` in data, not in a caption.
 
 - **Neighbourhoods are declared, not spatial.** The manifest supplies an ID; no geometry, adjacency,
   or area weighting yet.
-- **No whole-TSA pilot yet.** A 20-stand Dawson pilot (BWBSmw, BWBSwk1, BWBSwk2, SBSwk2, five each)
+- **Whole-TSA pilot done.** Every eligible Dawson interval **221 runs, 442 stand-year rows, 123,424 tree rows, 85 events** (75 cut rows), 4 BEC landscape rows, and the full disturbance set on the fire and removal stands. A 20-stand Dawson pilot (BWBSmw, BWBSwk1, BWBSwk2, SBSwk2, five each)
   produced 20 runs, 95 events (91 cut, 4 mortality), all disturbance tables, and a BEC landscape; every
   run carried support `C`.
 - **Parquet is optional.** CSV is always written; a `.parquet` copy is written when `pyarrow` is
   installed. It is not in this environment.
-- **No SQLite or DOI yet.**
+- **SQLite is written.** `dataset.sqlite` carries one table per dataset table plus `dataset_meta`
+  (id, version, table list); `dataset.json` names it. CSV is still the canonical text form.
+- **No DOI yet.**
 - **No dataset-level validation** beyond the schema and the source-hash record.
 
 ## Real pilot
@@ -93,6 +95,6 @@ stay local because they carry PSP site identifiers.
 
 ## Next
 
-1. A whole-TSA run (every PSP stand in a TSA), not a 20-stand sample.
+1. A whole-province run, not one TSA.
 2. A normalised `events` table (year, type, species, TPH, BA removed/killed).
-3. A Parquet writer and a schema version.
+3. A schema version on the Parquet/SQLite pair.

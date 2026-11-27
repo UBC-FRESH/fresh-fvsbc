@@ -26,6 +26,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import sqlite3
 from collections.abc import Mapping
 from pathlib import Path
 from typing import cast
@@ -153,6 +154,40 @@ def _write(frame: pd.DataFrame, out: Path, name: str) -> Path:
     frame.to_csv(path, index=False)
     if importlib.util.find_spec("pyarrow") is not None:
         frame.to_parquet(out / f"{name}.parquet", index=False)
+    return path
+
+
+def _write_sqlite(
+    frames: dict[str, pd.DataFrame], out: Path, dataset_id: str, version: str
+) -> Path:
+    """Write every table to one SQLite database, plus a ``dataset_meta`` row.
+
+    Parameters
+    ----------
+    frames : dict of str to DataFrame
+        The tables, by name.
+    out : Path
+        The directory the dataset is written to.
+    dataset_id, version : str
+        Written into ``dataset_meta`` so a database carries its own identity.
+
+    Returns
+    -------
+    Path
+        The database path.
+    """
+    path = out / "dataset.sqlite"
+    path.unlink(missing_ok=True)
+    connection = sqlite3.connect(path)
+    try:
+        for name, frame in frames.items():
+            frame.to_sql(name, connection, if_exists="replace", index=False)
+        pd.DataFrame(
+            [{"dataset_id": dataset_id, "version": version, "tables": ", ".join(frames)}]
+        ).to_sql("dataset_meta", connection, if_exists="replace", index=False)
+        connection.commit()
+    finally:
+        connection.close()
     return path
 
 
@@ -293,16 +328,18 @@ def build_dataset(manifest_path: str | Path, out_dir: str | Path) -> dict[str, P
     )
     neighbourhoods["n_stands"] = latest.groupby(["neighbourhood", "bec"]).size().to_numpy()
 
-    for name, frame in (
-        ("runs", runs_frame),
-        ("stands", stands_frame),
-        ("trees", trees_frame),
-        ("neighbourhoods", neighbourhoods),
-        ("events", events),
-        ("landscape", landscape),
-        *extras.items(),
-    ):
+    tables = {
+        "runs": runs_frame,
+        "stands": stands_frame,
+        "trees": trees_frame,
+        "neighbourhoods": neighbourhoods,
+        "events": events,
+        "landscape": landscape,
+        **extras,
+    }
+    for name, frame in tables.items():
         written[name] = _write(frame, out, name)
+    written["sqlite"] = _write_sqlite(tables, out, dataset_id, version)
 
     (out / "dataset.json").write_text(
         json.dumps(
@@ -312,6 +349,7 @@ def build_dataset(manifest_path: str | Path, out_dir: str | Path) -> dict[str, P
                 "source_manifest": manifest,
                 "manifest_sha256": _hash(manifest_file),
                 "tables": list(_TABLES),
+                "sqlite": "dataset.sqlite",
                 "schema": {
                     name: list(frame.columns)
                     for name, frame in (
