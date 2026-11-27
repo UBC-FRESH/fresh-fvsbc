@@ -228,7 +228,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                     rates=ingrowth,
                     scale=args.ingrowth_scale,
                 )
-            block = (*parameters, ingrowth_keyword_value) if ingrowth_keyword_value else parameters
+            # A bundle carries parameters as well as, sometimes, an ingrowth block. The candidate
+            # file is the probe's own parameter route; `--bundle` must render the bundle's.
+            bundle_parameters = bundle.render() if bundle is not None else ()
+            block = tuple(bundle_parameters) + tuple(parameters)
+            if ingrowth_keyword_value:
+                block = (*block, ingrowth_keyword_value)
             base_keywords = list(keywords_for(interval))
             if cycles > 1:
                 base_keywords = [

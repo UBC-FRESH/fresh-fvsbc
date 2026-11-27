@@ -1,4 +1,40 @@
-# fresh-fvsbc 0.38.0
+# fresh-fvsbc 0.39.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.38.0
+
+- **CDF's dense stands stop losing stems.** A held-out CDFmm stand at 112 m²/ha gained 41 m²/ha over
+  16 years and lost 1% of its stems; the model lost 42% and gained nothing. Separating the two, the
+  mortality was the larger defect at that density, so `cdf-v3` gains **`MORTMULT 0.5` for FD and AC**
+  on top of `BAIMULT 8`.
+- **Held-out result.** CDF fold: BA bias **−5.12 → −3.12 m²/ha** (MAE 5.32 → 3.46), TPH bias
+  **−34.7 → −8.8** (MAE 85.9 → 66.8). Both improve on the held-out sites; the train intervals move
+  slightly the other way.
+- **The dense stand itself** moves from 271 TPH / 109 BA to **370 TPH / 117 BA**.
+- **The probe applies a bundle's parameters.** `run_calibration_probe.py --bundle` rendered only the
+  ingrowth block; it now renders the parameters too, so a shipped bundle can be tested exactly as it
+  ships.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.9`** (W5–W17). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.39.0"
+```
+
+## Gaps that remain
+
+- The dense CDF stand is still 33 m²/ha short on BA: its growth is an extreme the zone's `BAIMULT`
+  cannot reach without breaking the rest of the fold. `notes/reference/cdf-dense-stand.md`.
+- `SBSmc2` over-predicts at high basal area (+20 m²/ha across ten intervals).
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- MS, ESSF, and PP have no bundle.
+- Disturbance calibration is not done.
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+
+## fresh-fvsbc 0.38.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
