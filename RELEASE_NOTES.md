@@ -1,4 +1,36 @@
-# fresh-fvsbc 0.41.7
+# fresh-fvsbc 0.41.8
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.7
+
+- **First MS bundle.** `ms-v3` carries **`BAIMULT 1.6`** for all species plus the recruitment v1
+  block. MS had no bundle and both folds under-predicted BA and TPH.
+- **All four MAE figures improve.** Held-out BA MAE 3.80 → **3.75**, TPH 258.3 → **250.5**; train
+  BA 5.92 → **5.78**, TPH 751.6 → **729.3**. The held-out TPH bias moves from −46 to +66; the
+  train TPH bias improves from −200 to −8.
+- **Why growth + recruitment, not a per-bin mortality shape.** Per-BA-bin mortality/ingrowth
+  responses had opposite signs on train and held out; no bin improved both. Recruitment alone
+  fixed TPH with BA unchanged; a partial growth correction supplied the BA improvement.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.14`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.8"
+```
+
+## Gaps that remain
+
+- PP still has no bundle; its held-out fold is 5 intervals on 2 sites.
+- SBSmc2 is +2.2 m²/ha / −323 TPH on the matched fold.
+- The CDF dense stand is still 33 m²/ha short.
+- CW large-tree height is still the donor.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.7
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

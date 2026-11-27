@@ -132,9 +132,9 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "MS",
         SupportTier.PROVISIONAL,
-        "V3 fitted large-tree DG for AT/BL/FD/LW/PL/PY/SE and height for BL/FD/LW/PL/SE; "
+        "V3 fitted rows with the ms-v3 bundle (BAIMULT 1.6 + recruitment v1); "
         "tabular mortality; unsigned",
-        "w15-ms-v3",
+        "w15-ms-v3, ms-v3",
     ),
     (
         "PP",
