@@ -56,6 +56,7 @@ outside the repository because they carry site identifiers.
 | `w18-sbs-bl-dg.patch.gz` | SBS BL large-tree DG refit, weighted to 10-20 cm, applied after W17 |
 | `w21-cwh-small-joint.patch.gz` | CWH small-tree density response in diameter and mortality, applied after W18 |
 | `w22-sbs-bl-density.patch.gz` | SBS BL stand-density term, applied after W21 |
+| `w28-sbsmc2-stem-shape.patch.gz` | SBSmc2 stem-shape mortality (save <10 cm, thin >=20 cm), applied after W22 |
 | `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
 | `sbsmc2-v3-bundle.json` | SBSmc2 subzone bundle (`BAIMULT 0.3` + recruitment v1) |

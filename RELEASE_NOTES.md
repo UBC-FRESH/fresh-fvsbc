@@ -1,4 +1,36 @@
-# fresh-fvsbc 0.41.5
+# fresh-fvsbc 0.41.6
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.5
+
+- **SBSmc2 gets a stem-shape mortality term.** The full subzone still had too few stems and too
+  much basal area (+9.1 m²/ha / −908 TPH). W28 saves small stems and thins large ones:
+  `X *= 0.5` for DBH < 10 cm and `X *= 2.5` for DBH ≥ 20 cm (SBSmc2 only).
+- **Both errors improve on both folds.** Held-out BA MAE 12.52 → **11.61**, TPH 1212 → **1081**;
+  train BA 7.66 → **7.13**, TPH 566 → **545**. Biases improve to +6.9 / −729 (test) and +0.4 /
+  −183 (train).
+- **The shape matters.** Saving small stems alone raised BA; thinning large stems alone lost TPH.
+  The two-sided term is what moves both.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.14`** (W2–W22 + W28). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.6"
+```
+
+## Gaps that remain
+
+- SBSmc2 still +6.9 m²/ha / −729 TPH; the remaining deficit is ingrowth/ingress.
+- The CDF dense stand is still 33 m²/ha short; it needs high-BA (>100) training data.
+- CW large-tree height is still the donor.
+- MS and PP have no validated bundle.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.5
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
