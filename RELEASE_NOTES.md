@@ -1,4 +1,37 @@
-# fresh-fvsbc 0.36.0
+# fresh-fvsbc 0.37.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.36.0
+
+- **The command line takes a shipped bundle by name.** `fresh-fvsbc ... --calibration cwh-v3`
+  resolves `bwbs-v3`, `cdf-v3`, `cwh-v3`, `mh-v3`, `sbps-v3`, `sbs-v3`, or `recruitment-bc-v1`; a path
+  still works.
+- **Recruitment runs from the command line.** With a recruitment bundle and two or more cycles the
+  command writes the `ESTAB` block itself, so a shell user does not have to assemble it.
+- **A block keyword is refused where it would break.** `--keyword DATABASE=...` wrote a block's
+  options on one line, which FVS reads as one field and then misparses; it now points at `--block`.
+- **A clear error when there is nowhere to insert.** A calibration without `PROCESS`/`STOP` used to
+  raise a bare `ValueError`; it is now `KeywordPlacementError`, reported by the command with the fix.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.9`** (W5–W17). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.37.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- MS, ESSF, and PP have no bundle; their held-out folds are in the record.
+- `SBSmc2` over-predicts at high basal area; CDF dense stands sit at −5 m²/ha.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- Disturbance calibration is not done.
+- The dataset has no whole-province run or DOI yet.
+
+## fresh-fvsbc 0.36.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

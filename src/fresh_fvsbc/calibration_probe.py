@@ -18,6 +18,7 @@ import pandas as pd
 from fresh_fvsbc.keywords import Keyword
 
 __all__ = [
+    "KeywordPlacementError",
     "eligible_intervals",
     "ingrowth_keyword",
     "insert_parameters",
@@ -198,6 +199,10 @@ def parameter_keywords(
     return tuple(keywords)
 
 
+class KeywordPlacementError(ValueError):
+    """A keyword set with nowhere to insert the calibration records."""
+
+
 def insert_parameters(
     keywords: Sequence[Keyword], parameters: Sequence[Keyword]
 ) -> tuple[Keyword, ...]:
@@ -225,7 +230,10 @@ def insert_parameters(
         None,
     )
     if at is None:
-        raise ValueError("the keyword set has no PROCESS or STOP to insert before")
+        raise KeywordPlacementError(
+            "the keyword set has no PROCESS or STOP to insert calibration records before; "
+            "pass PROCESS and STOP (the CLI takes them as --keyword PROCESS --keyword STOP)"
+        )
     return (*keywords[:at], *parameters, *keywords[at:])
 
 

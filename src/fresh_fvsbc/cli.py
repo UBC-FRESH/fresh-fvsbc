@@ -28,7 +28,13 @@ from functools import partial
 from pathlib import Path
 
 from fresh_fvsbc.bec import BecCodeError
-from fresh_fvsbc.bundle import BundleError, load_bundle
+from fresh_fvsbc.bundle import (
+    DEFAULT_BUNDLES,
+    BundleError,
+    CalibrationBundle,
+    load_bundle,
+    load_default_bundle,
+)
 from fresh_fvsbc.keywords import (
     KEYWORD_BLOCK_KEYWORDS,
     LINES_KEYWORDS,
@@ -177,9 +183,13 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--calibration",
-        type=Path,
-        metavar="FILE",
-        help="calibration bundle to render and apply to this run",
+        type=str,
+        metavar="NAME_OR_FILE",
+        help=(
+            "calibration bundle to render and apply to this run: a shipped name ("
+            + ", ".join(DEFAULT_BUNDLES)
+            + ") or a path"
+        ),
     )
     parser.add_argument(
         "--tsa",
@@ -261,6 +271,34 @@ def _parse_keyword(text: str) -> Keyword:
     if not separator:
         return Keyword(name, supplemental=supplemental)
     return Keyword(name, tuple(fields.split(",")), supplemental=supplemental)
+
+
+def _parse_keyword_argument(text: str) -> Keyword:
+    """Parse one ``--keyword`` argument and refuse a keyword that needs ``--block``.
+
+    Parameters
+    ----------
+    text : str
+        The argument, as ``NAME`` or ``NAME=FIELD,...``.
+
+    Returns
+    -------
+    Keyword
+        The keyword and its fields.
+
+    Raises
+    ------
+    CommandInputError
+        If the keyword takes a block; its options would be written on one line and FVS reads each
+        option from its own line.
+    """
+    keyword = _parse_keyword(text)
+    if keyword.name.upper() in (LINES_KEYWORDS | KEYWORD_BLOCK_KEYWORDS):
+        raise CommandInputError(
+            f"{keyword.name.upper()} takes a block, so it needs --block: --block "
+            f'"{keyword.name.upper()}|first option|second option"'
+        )
+    return keyword
 
 
 def _parse_block(text: str) -> Keyword:
@@ -383,6 +421,35 @@ def _web_main(argv: Sequence[str]) -> int:
     return web_main(argv)
 
 
+def _load_calibration(value: str) -> CalibrationBundle:
+    """Load a bundle from a shipped name or a path.
+
+    Parameters
+    ----------
+    value : str
+        One of :data:`fresh_fvsbc.bundle.DEFAULT_BUNDLES`, or a bundle file.
+
+    Returns
+    -------
+    CalibrationBundle
+        The loaded bundle.
+
+    Raises
+    ------
+    BundleError
+        If the value is neither a shipped name nor an existing file.
+    """
+    if value in DEFAULT_BUNDLES:
+        return load_default_bundle(value)
+    path = Path(value).expanduser()
+    if not path.is_file():
+        raise BundleError(
+            f"{value!r} is neither a file nor a shipped bundle; choose from "
+            + ", ".join(DEFAULT_BUNDLES)
+        )
+    return load_bundle(path)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run one case from the command line.
 
@@ -408,7 +475,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(arguments)
     try:
         keywords = tuple(
-            _parse_block(text) if kind == "block" else _parse_keyword(text)
+            _parse_block(text) if kind == "block" else _parse_keyword_argument(text)
             for kind, text in (args.entries or ())
         )
         # The validator's warnings are about the set as a whole — an order FVS silently punishes,
@@ -417,7 +484,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         for warning in validate_keywords(keywords):
             print(f"fresh-fvsbc: warning: {warning}", file=sys.stderr)
         population = _read_population(args.population)
-        calibration = load_bundle(args.calibration) if args.calibration is not None else None
+        calibration = _load_calibration(args.calibration) if args.calibration is not None else None
         result = run_population(
             population,
             directory=args.directory,
