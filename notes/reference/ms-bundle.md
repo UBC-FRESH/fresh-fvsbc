@@ -1,6 +1,6 @@
 # `ms-v3`: MS growth plus recruitment
 
-Status: **shipped in 0.41.8.** Engine unchanged at 0.4.14. Tier stays C (unsigned).
+Status: **shipped in 0.41.8; verified from PyPI.** Engine unchanged at 0.4.14. Tier stays C (unsigned).
 
 ## 1. Starting point
 
