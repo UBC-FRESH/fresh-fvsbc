@@ -12,10 +12,17 @@ tests in the same change set, and the gates configured in ``pyproject.toml`` cov
 
 from __future__ import annotations
 
-__version__ = "0.34.0"
+__version__ = "0.35.0"
 
 from fresh_fvsbc.bec import BecCode, BecCodeError
-from fresh_fvsbc.bundle import BundleError, CalibrationBundle, load_bundle
+from fresh_fvsbc.bundle import (
+    DEFAULT_BUNDLES,
+    BundleError,
+    CalibrationBundle,
+    default_bundle_path,
+    load_bundle,
+    load_default_bundle,
+)
 from fresh_fvsbc.keywords import (
     Keyword,
     KeywordSet,
@@ -63,6 +70,7 @@ from fresh_fvsbc.treelist import (
 )
 
 __all__ = [
+    "DEFAULT_BUNDLES",
     "AmbiguousSpeciesError",
     "BecCode",
     "BecCodeError",
@@ -88,9 +96,11 @@ __all__ = [
     "__version__",
     "built_variants",
     "check_run",
+    "default_bundle_path",
     "from_cases",
     "keyword_set_hash",
     "load_bundle",
+    "load_default_bundle",
     "read_cases",
     "read_errors",
     "read_table",

@@ -66,7 +66,7 @@ The third patch adds the 19 W2.3 subzones and their provisional defaults. Withou
 builds, but those codes fall back to ``ICHmw2/01``; ``run_case`` refuses that fallback rather than
 returning a plausible run. The fourth fixes the ``KAM`` + ``MS`` boundary collision that made
 ``MSxk1`` resolve as ``MSmm``. The final twelve patches add the five-zone prototype, fix the SBPS small-tree height branch, add the BWBS V3 growth and mortality tables, restore SBS large-tree growth, put CWH, MH, and CDF on the V3 path with fitted large-tree diameter growth, fit CWH height growth for six species, give SBS a per-subzone maximum basal area, make PP resolve as PP with its measured caps, put MS, ESSF, and PP on the V3 path. The
-patched wheel is versioned ``0.4.9`` and is the ``fvs`` extra for ``fresh-fvsbc 0.34.0``. The wrapper
+patched wheel is versioned ``0.4.9`` and is the ``fvs`` extra for ``fresh-fvsbc 0.35.0``. The wrapper
 now accepts the five prototype zones; the binary carries their provisional parser and defaults. That
 is deployment plumbing, not calibration: IDFdk and SBS have passed holdouts; CWH has an
 unsigned growth pilot and BWBS carries the unsigned V3 calibration in ``w5-bwbs-v3``; none is certified. CDF and MH carry V3 candidates; CMA is out of scope by decision.
@@ -85,3 +85,29 @@ What you get
 If `list_variants()` reports anything but `OK` for `BC`, the build did not produce the variant and no
 run will work. That is the first thing to check, and `notes/reference/fvsbc-smoke-run.md` is a worked
 example.
+
+Bundles that ship with the package
+----------------------------------
+
+The banked calibration bundles are installed with the wrapper, so a run does not need the repository:
+
+.. code-block:: python
+
+   >>> from fresh_fvsbc import DEFAULT_BUNDLES, load_default_bundle
+   >>> DEFAULT_BUNDLES
+   ('bwbs-v3', 'cdf-v3', 'cwh-v3', 'mh-v3', 'sbps-v3', 'sbs-v3', 'recruitment-bc-v1')
+   >>> bundle = load_default_bundle("cwh-v3")
+   >>> [keyword.name for keyword in bundle.render()][:2]
+   ['BAIMULT', 'BAIMULT']
+
+``recruitment-bc-v1`` carries no keywords; it carries the ``ESTAB`` model:
+
+.. code-block:: python
+
+   >>> recruitment = load_default_bundle("recruitment-bc-v1")
+   >>> recruitment.ingrowth.scale
+   0.4
+   >>> block = recruitment.ingrowth_keyword(bec="CWHvm1/01", years=10, ba=45.0, cycles=2)
+
+Insert that block before ``PROCESS``. The model establishes trees from cycle 2 onward; a single-cycle
+run does not use it.

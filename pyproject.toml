@@ -3,7 +3,7 @@
 
 [project]
 name = "fresh-fvsbc"
-version = "0.34.0"
+version = "0.35.0"
 description = "A Python wrapper for the BC variant of the Forest Vegetation Simulator."
 readme = "README.md"
 license = "MIT"
@@ -41,6 +41,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "fresh_fvsbc.web" = ["skins/*.json", "static/*", "static/vendor/three/*"]
+"fresh_fvsbc" = ["data/*.json"]
 
 [tool.ruff]
 line-length = 100
