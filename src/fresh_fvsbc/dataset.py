@@ -286,7 +286,14 @@ def build_dataset(manifest_path: str | Path, out_dir: str | Path) -> dict[str, P
         summary.insert(0, "stand_id", stand_id)
         summary.insert(0, "run_id", run_id)
         stands.append(summary)
-        tree_table = read_table(result.database, "FVS_TreeList_Metric").copy()
+        try:
+            tree_table = read_table(result.database, "FVS_TreeList_Metric").copy()
+        except UnknownTableError as error:
+            raise DatasetError(
+                f"stand {stand_id}: the run wrote no tree list, so the dataset has no tree scale; "
+                "add 'TREELIDB' to the manifest stand's DATABASE lines and a {'name': 'TREELIST'} "
+                "keyword before PROCESS"
+            ) from error
         if not tree_table.empty:
             tree_table.insert(0, "bec", bec)
             tree_table.insert(0, "stand_id", stand_id)
