@@ -1,6 +1,6 @@
 # W22: the SBSmc2 dense small-tree cell
 
-Status: **shipped in 0.41.3 on engine 0.4.13.** Tier stays C (unsigned).
+Status: **shipped in 0.41.3 on engine 0.4.13; verified from PyPI.** Tier stays C (unsigned).
 
 ## 1. The cell
 
