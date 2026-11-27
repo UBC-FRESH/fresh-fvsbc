@@ -1,4 +1,36 @@
-# fresh-fvsbc 0.41.6
+# fresh-fvsbc 0.41.7
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.6
+
+- **SBSmc2 ingress is fitted with a variance-aware shape, not a global scale.** The matched
+  BA-stratified fold showed the model at +2.2 m²/ha / −386 TPH. Raising recruitment globally
+  fixes the mean but adds variance; only the **20–30 m²/ha BA bin** improves train TPH MAE, so
+  that bin's recruitment rate is **doubled** in `sbsmc2-v3`.
+- **Held-out and train both improve or hold.** Held-out BA MAE 7.89 → **7.84** and TPH MAE
+  828 → **794**; train TPH MAE 610 → **609**, train BA 8.09 → 8.10 (flat).
+- **The stratified fold is the representative estimate.** Matching the held-out and train
+  stand-density distributions moves SBSmc2 from the random split's +6.9/−729 to **+2.2/−386**.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.14`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.7"
+```
+
+## Gaps that remain
+
+- SBSmc2 still +2.2 m²/ha / −386 TPH; the remaining deficit is ingress in other BA bins.
+- The CDF dense stand is still 33 m²/ha short.
+- CW large-tree height is still the donor.
+- MS and PP have no validated bundle.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.6
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

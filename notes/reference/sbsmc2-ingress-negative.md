@@ -82,4 +82,4 @@ The random split's +6.9/−729 was partly a distribution artifact; the matched e
 7.82/822 (both slightly better) but train 8.08/627 (TPH worse); train TPH is minimized at the
 shipped 0.4. No scale improves both MAE.
 
-The stratified estimates are the ones to quote for SBSmc2; the bundle stays at scale 0.4.
+The stratified estimates are the ones to quote for SBSmc2. Follow-up: the variance-aware BA 20-30 shape ships in 0.41.7 (`sbsmc2-variance-aware-ingress.md`).
