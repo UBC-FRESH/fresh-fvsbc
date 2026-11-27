@@ -59,3 +59,27 @@ Neither is available locally. The bundle and W28 stay as shipped; the residual i
 - Scale grid: `~/workspace/bwbs-work/probe_sbsmc2_sc{60,80,100,120,160}/`.
 - BA≤50 shape: `probe_sbsmc2_lb{2,4,8}/`.
 - BA 20–30 shape: `probe_sbsmc2_ba2030_{2,3,4}/`.
+
+## 5. Re-stratified split: the random split overstated the defect
+
+The random 20% split left the held-out stands more under-stocked than train. Re-splitting the 126
+sites by mean BA0 (five quantile bins, 20% of sites in each) makes the folds match:
+
+| Fold | BA mean | BA median | BA q10 | BA q90 | QMD mean |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| test (25 sites) | 39.3 | 41.0 | 22.3 | 52.9 | 14.8 |
+| train (101 sites) | 40.7 | 41.5 | 22.6 | 54.0 | 14.7 |
+
+On the matched fold the shipped 0.41.6 configuration is far better calibrated:
+
+| Fold | BA bias | BA MAE | TPH bias | TPH MAE |
+| --- | ---: | ---: | ---: | ---: |
+| test | +2.2 | 7.89 | −386 | 828 |
+| train | +1.6 | 8.09 | −272 | 610 |
+
+The random split's +6.9/−729 was partly a distribution artifact; the matched estimate is
+**+2.2/−386**. The ingress scale grid still fails on the matched fold: scale 0.8 gives test
+7.82/822 (both slightly better) but train 8.08/627 (TPH worse); train TPH is minimized at the
+shipped 0.4. No scale improves both MAE.
+
+The stratified estimates are the ones to quote for SBSmc2; the bundle stays at scale 0.4.
