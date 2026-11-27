@@ -50,3 +50,23 @@ row refit, and it is the realistic next target for these zones.
 - Train-only annual fits: the local ESSF pair extraction (`tree_survival.csv`, train sites from
   `essf_test_sites.txt`).
 - Fold: `~/workspace/bwbs-work/probe_essf_held_post/` (42 test / 260 train).
+
+## 4. MS: the rows are stable, the mortality shape is the gap
+
+Train-only annual refits of the MS dominant rows reproduce the shipped W15 rows:
+
+| Species | Train pairs | Train-only CON | Shipped CON | Train-only LD | Shipped LD |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| PL | 14,778 | −1.923 | −1.940 | 0.0658 | 0.0557 |
+| BL | 2,328 | −1.833 | −1.939 | 0.0600 | 0.0572 |
+| FD | 3,616 | −1.851 | −1.915 | 0.0650 | 0.0628 |
+
+A row refit is a no-op. MS mortality, however, has a real density slope: 0.82%/yr below CCF
+100 rising to 1.3–1.5%/yr at CCF 200–400 (`ln(rate)` slope **0.87** per 100 CCF, 1,030
+intervals). The fold is under-predicted on both BA and TPH, so the structural target is the
+mortality **shape** — a density-dependent term, not another uniform multiplier.
+
+The uniform mortality grid already showed the risk: held-out improves but train TPH MAE rises
+(751.6 → 753–785). A shaped term would have to fix the high-density intervals without adding
+variance elsewhere, and the train/held-out disagreement remains the validation hurdle. That is
+a larger `morts.f` change than the row refit; it is not shipped here.

@@ -54,3 +54,24 @@ Until then the SBS bundle is unchanged.
 
 - `~/workspace/bwbs-work/probe_bl_{60,70,80,90}_{90,100,110}/` (144 rows each).
 - Bundles `bundle_bl_<g>_<m>.json` (local).
+
+## 5. Clean `morts.f` mortality term (W25)
+
+The generic `FIXMORT` keyword was replaced by a direct `morts.f` term for SBS BL 10–20 cm:
+
+```
+IF (SBS .AND. ISPC=BL .AND. 10 <= DBH < 20) X = X * 0.85
+```
+
+coupled with `FIXDG BL <g> 10 20`. The side effect disappeared, but the frontier did not move:
+
+| g (m = 0.85) | Test BA MAE | Test TPH MAE | Train BA MAE | Train TPH MAE | Cell BA / TPH |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| shipped | **5.91** | **644.3** | **4.94** | **396.9** | +1.5 / −81 |
+| 1.0 | 5.91 | 644.4 | 5.01 | 398.2 | +2.1 / −52 |
+| 1.1 | 5.88 | 643.4 | 5.05 | 396.6 | +2.2 / −59 |
+| 1.2 | 5.88 | 643.0 | 5.04 | 395.8 | +2.2 / −67 |
+
+At g = 1.2 the held-out fold improves (5.91 → 5.88, 644.3 → 643.0), but train BA MAE worsens
+(4.94 → 5.04) and the cell BA rises to +2.2. Selecting on train rejects it; the clean term does
+not create a both-fold point. The engine was reverted to 0.4.13.
