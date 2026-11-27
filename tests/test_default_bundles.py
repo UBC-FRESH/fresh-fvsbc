@@ -68,6 +68,15 @@ def test_the_essf_bundle_carries_the_coupled_rows() -> None:
     assert len(mort) == 12
 
 
+def test_the_ms_bundle_carries_the_growth_and_recruitment_rows() -> None:
+    """MS carries the growth correction and the recruitment block."""
+    bundle = load_default_bundle("ms-v3")
+    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    assert set(bai.values()) == {"1.6000"}
+    assert len(bai) == 12
+    assert bundle.ingrowth is not None
+
+
 def test_the_sbsmc2_bundle_carries_the_full_subzone_rows() -> None:
     """SBSmc2 needs the growth correction and the recruitment block."""
     bundle = load_default_bundle("sbsmc2-v3")

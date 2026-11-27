@@ -77,7 +77,8 @@ def test_ms_is_v3_after_w15() -> None:
     """MS carries its own fitted rows and the engine runs it on V3."""
     record = classify("MSdm1", "PL")
     assert record.path == "V3"
-    assert record.evidence == "w15-ms-v3"
+    assert "w15-ms-v3" in record.evidence
+    assert "ms-v3" in record.evidence
     assert "V3 fitted" in record.reason
 
 
