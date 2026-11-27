@@ -17,7 +17,7 @@ decimal places.
 | BWBS | V3 | 94 | train | +2.31 | 6.71 | none |
 | SBPS | V3 | 27 | 6 held out | +2.18 | 2.64 | `MORTMULT 2` |
 | MH | V3 | 18 | 3 held out | +1.47 | 1.71 | `BAIMULT 8` |
-| CDF | V3 | 30 | 16 held out | −5.12 | 5.32 | `BAIMULT 8` |
+| CDF | V3 | 30 | 16 held out | −3.12 | 3.46 | `BAIMULT 8` + `MORTMULT 0.5` FD/AC |
 | MS | V3 | 134 | 19 held out | −2.99 | 3.80 | none |
 | ESSF | V3 | 302 | 42 held out | −3.07 | 5.49 | none |
 | PP | V3 | 25 | 5 held out | −2.53 | 2.53 | none |
