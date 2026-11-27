@@ -530,6 +530,7 @@ DEFAULT_BUNDLES: tuple[str, ...] = (
     "essf-v3",
     "mh-v3",
     "ms-v3",
+    "pp-v3",
     "sbps-v3",
     "sbs-v3",
     "sbsmc2-v3",

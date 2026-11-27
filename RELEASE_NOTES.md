@@ -1,4 +1,35 @@
-# fresh-fvsbc 0.41.8
+# fresh-fvsbc 0.41.9
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.8
+
+- **First PP bundle.** `pp-v3` carries **`BAIMULT 3.0`** and **`MORTMULT 0.8`**. PP had no bundle
+  and its old held-out fold was only 5 intervals on 2 of 10 sites.
+- **Validated leave-one-site-out across all 10 PP sites.** BA MAE 2.58 → **1.76**, TPH MAE
+  66.05 → **65.30**. BA improves on all 8 sites that carry intervals; TPH improves on 5 and
+  worsens on 3 (largest +5 on a 2-interval site).
+- **Why LOSO.** With 10 sites, leave-one-site-out uses every site as held-out once instead of
+  relying on a 2-site split.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.14`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.9"
+```
+
+## Gaps that remain
+
+- SBSmc2 is +2.2 m²/ha / −323 TPH on the matched fold.
+- The CDF dense stand is still 33 m²/ha short.
+- CW large-tree height is still the donor.
+- Disturbance calibration is not done.
+- No A/B support cells.
+- All zones remain unsigned **C** pilots.
+
+## fresh-fvsbc 0.41.8
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
