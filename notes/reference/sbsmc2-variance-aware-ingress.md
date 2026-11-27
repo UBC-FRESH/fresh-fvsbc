@@ -1,6 +1,6 @@
 # SBSmc2 variance-aware ingress shape
 
-Status: **shipped in 0.41.7.** Engine unchanged at 0.4.14. Tier stays C (unsigned).
+Status: **shipped in 0.41.7; verified from PyPI.** Engine unchanged at 0.4.14. Tier stays C (unsigned).
 
 ## 1. The matched fold
 
