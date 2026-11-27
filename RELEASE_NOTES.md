@@ -1,4 +1,35 @@
-# fresh-fvsbc 0.34.0
+# fresh-fvsbc 0.35.0
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.34.0
+
+- **The calibration bundles ship in the wheel.** `DEFAULT_BUNDLES` and `load_default_bundle(name)`
+  load `bwbs-v3`, `cdf-v3`, `cwh-v3`, `mh-v3`, `sbps-v3`, `sbs-v3`, and `recruitment-bc-v1` from the
+  installed package, validated against the build's pins. A run no longer needs the repository.
+- **`sbs-v3` joins the set.** The SBS bundle was untracked under its D7 name; it now carries a
+  `sbs-v3` id with its joint BA/TPH claim.
+- **A shipped-copy guard.** A test asserts the installed copies are byte-identical to the banked
+  calibration artifacts, so the wheel cannot drift from the record.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.9`** (W5–W17). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.35.0"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- MS, ESSF, and PP have no bundle; their held-out folds are in the record.
+- `SBSmc2` over-predicts at high basal area; CDF dense stands sit at −5 m²/ha.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- Disturbance calibration is not done.
+- The dataset has no whole-province run or DOI yet.
+
+## fresh-fvsbc 0.34.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

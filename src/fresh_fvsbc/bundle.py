@@ -56,6 +56,7 @@ from fresh_fvsbc.provenance import FVS_SOURCE_COMMIT, PYFVS_COMMIT
 
 __all__ = [
     "CALIBRATION_KEYWORDS",
+    "DEFAULT_BUNDLES",
     "MANAGEMENT_REGIMES",
     "BundleBoundsError",
     "BundleDomain",
@@ -63,7 +64,9 @@ __all__ = [
     "BundleError",
     "BundleParameter",
     "CalibrationBundle",
+    "default_bundle_path",
     "load_bundle",
+    "load_default_bundle",
 ]
 
 #: The keywords a bundle may render. They are the calibration levers the pinned
@@ -512,6 +515,69 @@ class CalibrationBundle:
             warnings=tuple(warnings),
             ingrowth=ingrowth,
         )
+
+
+#: The bundles that ship inside the package, by the name a caller uses.
+#:
+#: Every one is a banked calibration artifact from ``notes/reference/calibration``: the zone bundles
+#: carry the stand-level parameters a zone's fold selected, and ``recruitment-bc-v1`` carries the
+#: ``ESTAB`` model. Shipping them means an installed wheel can reproduce a documented run without
+#: the repository.
+DEFAULT_BUNDLES: tuple[str, ...] = (
+    "bwbs-v3",
+    "cdf-v3",
+    "cwh-v3",
+    "mh-v3",
+    "sbps-v3",
+    "sbs-v3",
+    "recruitment-bc-v1",
+)
+
+
+def default_bundle_path(name: str) -> Path:
+    """Return the path of a bundle that ships with the package.
+
+    Parameters
+    ----------
+    name : str
+        One of :data:`DEFAULT_BUNDLES`.
+
+    Returns
+    -------
+    Path
+        The bundle file inside the installed package.
+
+    Raises
+    ------
+    BundleError
+        If ``name`` is not a shipped bundle.
+    """
+    if name not in DEFAULT_BUNDLES:
+        raise BundleError(
+            f"{name!r} is not a shipped bundle; choose from {', '.join(DEFAULT_BUNDLES)}"
+        )
+    return Path(__file__).with_name("data") / f"{name}-bundle.json"
+
+
+def load_default_bundle(name: str) -> CalibrationBundle:
+    """Load one of the bundles that ships with the package.
+
+    Parameters
+    ----------
+    name : str
+        One of :data:`DEFAULT_BUNDLES`.
+
+    Returns
+    -------
+    CalibrationBundle
+        The loaded bundle, validated against this build's pins.
+
+    Raises
+    ------
+    BundleError
+        If ``name`` is not shipped, or the bundle does not load.
+    """
+    return load_bundle(default_bundle_path(name))
 
 
 def load_bundle(path: str | Path) -> CalibrationBundle:
