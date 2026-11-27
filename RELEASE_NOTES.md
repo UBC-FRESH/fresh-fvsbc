@@ -1,4 +1,38 @@
-# fresh-fvsbc 0.41.2
+# fresh-fvsbc 0.41.3
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.2
+
+- **The SBSmc2 dense small-tree cell is largely fixed.** The cell moves from **+2.8 to +1.5 m²/ha**
+  and from **−200 to −81 TPH**.
+- **SBS BL now has a stand-density term.** The BL row's CCF coefficient is **−0.35**, so growth
+  falls at high density; the bundle's `MORTMULT` for FD/PL/SE/HW moves from **2.0 to 1.85**.
+  The pair data show a milder slope than the engine's existing response, so the term is a
+  targeted cell correction, not a direct pair fit; it was selected on the train fold and
+  validated held out.
+- **Both fold errors improve.** Held-out BA MAE 6.09 → **5.91**, TPH 658.9 → **644.3**; train
+  BA 5.22 → **4.94**, TPH 398.3 → **396.9**. The held-out TPH bias moves from −22 to +20 on a
+  mean of about 650; the cell TPH bias improves by 119.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.13`** (W2–W18 + W21 + W22). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.3"
+```
+
+## Gaps that remain
+
+- The SBSmc2 cell is still +1.5 m²/ha / −81 TPH.
+- The CDF dense stand is still 33 m²/ha short; it needs high-BA (>100) training data.
+- CW large-tree height is still the donor; CWH small-tree density is now fitted.
+- MS, ESSF, and PP have no bundle; held-out and train folds diverge.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.2
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
