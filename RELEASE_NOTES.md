@@ -1,4 +1,47 @@
-# fresh-fvsbc 0.41.0
+# fresh-fvsbc 0.41.1
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+**0.41.0 and engine 0.4.10 are superseded.** Their SBS BL row was parameterised on annual
+growth, but FVS applies a **10-year** diameter increment, so those builds grew SBS BL about
+ten times too slowly. Upgrade to 0.41.1 / engine 0.4.11.
+
+## What changed since 0.41.0
+
+- **The SBS BL row is parameterised correctly.** `ZNKONST(31)` predicts a 10-year increment
+  in cm; the refit response is `10 * growth_cm` from 11,005 SBS BL pairs, with the 10–20 cm
+  class weighted three times and a ×1.2176 smearing correction for the log fit.
+- **The crown term that inflated dense stands is gone.** The legacy `3.1925 * crown` added
+  1.44 to ln(growth) on the SBSmc2 cell (crown ratio 0.45) — a factor of 4.2. The refit uses
+  the density terms V3 actually applies and no crown term, because the pairs carry no crown
+  ratio.
+- **The dense stand now grows at the measured rate.** 79 TPH, QMD 15.5 cm: measured 0.21
+  cm/yr, legacy + crutch **0.50**, W18 **0.28**.
+- **Held-out result.** Test TPH MAE 686.7 → **658.9**; train BA MAE 5.83 → **5.22**, TPH MAE
+  435.5 → **398.3**. Test BA MAE is 6.00 → 6.09 (0.09, against a multiplier that was selected
+  on this fold); against the same row with no multiplier, BA MAE improves 6.38 → 6.09.
+- **SBSmc2 is essentially fixed.** The cell moves from **+9.2 to +2.8 m²/ha** and from
+  **−635 to −200 TPH**.
+- **`sbs-v3` has no `BAIMULT` for BL.** It keeps `MORTMULT 2` for FD/PL/SE/HW.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.11`** (W5–W18). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.1"
+```
+
+## Gaps that remain
+
+- The BL row has no crown term; mapping `CR_CL` classes to midpoints is the next step.
+- The CDF dense stand is still 33 m²/ha short on BA.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- MS, ESSF, and PP have no bundle.
+- Disturbance calibration is not done.
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+
+## fresh-fvsbc 0.41.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
