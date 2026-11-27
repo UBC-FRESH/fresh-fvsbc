@@ -46,6 +46,17 @@ def test_the_zone_bundles_carry_parameters_and_recruitment_carries_rates() -> No
             assert bundle.render(), name
 
 
+def test_the_cdf_bundle_carries_the_dense_stand_mortality() -> None:
+    """FD and AC keep MORTMULT 0.5; no other species does."""
+    bundle = load_default_bundle("cdf-v3")
+    morts = {
+        parameter.fields[1]: parameter.fields[2]
+        for parameter in bundle.parameters
+        if parameter.keyword == "MORTMULT"
+    }
+    assert morts == {"FD": "0.5000", "AC": "0.5000"}
+
+
 def test_an_unknown_name_is_refused() -> None:
     """A caller cannot ask for a bundle that is not shipped."""
     with pytest.raises(BundleError, match="not a shipped bundle"):

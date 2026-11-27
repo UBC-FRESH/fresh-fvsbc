@@ -91,7 +91,7 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "CDF",
         SupportTier.PROVISIONAL,
-        "V3 own FD/AT large-tree rows, coastal donor for the rest; BAIMULT 8",
+        "V3 own FD/AT rows; BAIMULT 8 with MORTMULT 0.5 for FD/AC from the dense-stand check",
         "w10-mh-cdf-own-dg",
     ),
     (
