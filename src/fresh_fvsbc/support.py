@@ -91,8 +91,8 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "CDF",
         SupportTier.PROVISIONAL,
-        "V3 own FD/AT rows; BAIMULT 8 with MORTMULT 0.5 for FD/AC from the dense-stand check",
-        "w10-mh-cdf-own-dg",
+        "V3 own FD/AT rows; BAIMULT 8, MORTMULT 0.5 FD/AC, W30 high-BA mortality",
+        "w10-mh-cdf-own-dg, w30-cdf-high-ba-mort",
     ),
     (
         "CMA",
