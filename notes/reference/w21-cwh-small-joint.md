@@ -1,6 +1,6 @@
 # W21: CWH small-tree density in both diameter and mortality
 
-Status: **shipped in 0.41.2 on engine 0.4.12.** Tier stays C (unsigned).
+Status: **shipped in 0.41.2 on engine 0.4.12; verified from PyPI.** Tier stays C (unsigned).
 
 ## 1. Why
 
