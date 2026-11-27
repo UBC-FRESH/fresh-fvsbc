@@ -1,6 +1,6 @@
 # `sbsmc2-v3`: the full-subzone growth correction
 
-Status: **shipped in 0.41.5.** Engine unchanged at 0.4.13. Tier stays C (unsigned).
+Status: **shipped in 0.41.5; verified from PyPI.** Engine unchanged at 0.4.13. Tier stays C (unsigned).
 
 ## 1. The sample problem
 
