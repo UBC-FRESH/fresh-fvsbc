@@ -288,3 +288,41 @@ def test_keyword_supports_a_nested_block() -> None:
     keyword = _keyword({"name": "FMIN", "nested": [{"name": "MORTREPT", "fields": ["1"]}]})
     assert keyword.name == "FMIN"
     assert keyword.nested[0].name == "MORTREPT"
+
+
+def test_a_manifest_without_a_tree_list_is_refused_clearly(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The builder needs the tree scale; a manifest that does not ask for it says so."""
+    import fresh_fvsbc.dataset as dataset
+    from fresh_fvsbc.outputs import UnknownTableError
+
+    class _Prov:
+        def as_record(self) -> dict[str, object]:
+            return {
+                "variant": "bc",
+                "keyword_set_hash": "k",
+                "treelist_hash": "t",
+                "case_id": "case",
+                "calibration_id": "",
+                "support": [],
+            }
+
+    class _Result:
+        database = tmp_path / "stub.db"
+        provenance = _Prov()
+
+    def fake_run(*_args: object, **_kwargs: object) -> _Result:
+        return _Result()
+
+    def fake_read(_db: object, table: str) -> pd.DataFrame:
+        if table == "FVS_Summary_Metric":
+            return pd.DataFrame(
+                [{"Year": 1990, "BA": 20.0, "Tph": 500.0, "QMD": 18.0, "TCuM": 100.0}]
+            )
+        raise UnknownTableError(table)
+
+    monkeypatch.setattr(dataset, "run_case", fake_run)
+    monkeypatch.setattr(dataset, "read_table", fake_read)
+    with pytest.raises(DatasetError, match="add 'TREELIDB'"):
+        build_dataset(_manifest(tmp_path), tmp_path / "out")

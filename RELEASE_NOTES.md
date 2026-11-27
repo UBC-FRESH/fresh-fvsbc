@@ -1,4 +1,31 @@
-# fresh-fvsbc 0.37.0
+# fresh-fvsbc 0.37.1
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.37.0
+
+- **The dataset builder says what a manifest is missing.** A manifest whose `DATABASE` lines omit
+  `TREELIDB` produced `UnknownTableError: 'FVS_TreeList_Metric'` from deep inside a run. It now raises
+  `DatasetError` naming the stand and telling the caller to add `TREELIDB` and a `TREELIST` keyword.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.9`** (W5–W17). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.37.1"
+```
+
+## Gaps that remain
+
+- No A/B support cells; every forested zone is an unsigned **C** pilot.
+- MS, ESSF, and PP have no bundle; their held-out folds are in the record.
+- `SBSmc2` over-predicts at high basal area; CDF dense stands sit at −5 m²/ha.
+- CWH small-tree growth and mortality are still donors; the CW height row is still a donor.
+- Disturbance calibration is not done.
+- The dataset has no whole-province run or DOI yet.
+
+## fresh-fvsbc 0.37.0
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
