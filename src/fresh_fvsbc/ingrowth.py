@@ -99,7 +99,10 @@ class IngrowthRate:
         bool
             True when the BEC and both ranges match.
         """
-        if bec.strip().upper() != self.bec:
+        # A caller may pass the label as the run sees it: "CWHvm1/01", "CAR CWHvm1/01", or the
+        # zone-and-subzone token the rates are keyed by.
+        label = bec.strip().upper().split()[-1].split("/")[0]
+        if label != self.bec:
             return False
         if ba is not None and not (self.ba_min <= ba <= self.ba_max):
             return False

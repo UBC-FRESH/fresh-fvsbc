@@ -388,3 +388,13 @@ def test_fit_rates_accepts_a_species_list() -> None:
     table = recruitment_table(intervals, pd.concat([trees, extra], ignore_index=True))
     model = fit_rates(table, species=("AT",))
     assert model.selected("IDFdk3", 20.0, 10.0) == {"AT": 3.0}
+
+
+def test_a_site_series_label_selects_the_zone_rate() -> None:
+    """The wrapper's keyword carries "CWHvm1/01"; the rates are keyed by "CWHVM1"."""
+    from fresh_fvsbc.ingrowth import IngrowthRate
+
+    rate = IngrowthRate(bec="CWHVM1", species="HW", rate=12.0)
+    assert rate.applies("CWHvm1/01", None, None)
+    assert rate.applies("CAR CWHvm1/01", None, None)
+    assert not rate.applies("CWHvm2/01", None, None)
