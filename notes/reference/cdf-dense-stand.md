@@ -66,7 +66,12 @@ The gain is small and the train fold pays for it, so the cap stays at the measur
 
 ## 6. What remains
 
-The dense stand is still 33 m²/ha short of its measured BA with the cap and mortality fixed: its
-growth is an extreme (BA +41 at BA 112), and the zone's `BAIMULT` cannot reach it without breaking
-the rest of the fold. That is either a site-specific growth anomaly or a genuine high-BA growth
-term the current DG form does not carry. It is recorded here rather than tuned away.
+The dense stand is still 33 m²/ha short of its measured BA with the cap and mortality fixed.
+`cdf-high-ba-density-negative.md` tests the high-BA growth-term hypothesis: the FD row's
+density residual is flat (interval-level), so there is no density signal to fit; the row is
+uniformly ~8× low because W10 fitted annual growth while V3 applies a 10-year increment, and
+`BAIMULT 8` partly masks it. Correcting the period basis and retuning FD's growth/mortality
+moves along a growth–mortality frontier — more BA costs TPH — and no setting improves both
+held-out errors. The dense stand (112–153 BA) is outside the training range (max 80.8) and is
+a single interval, so the interaction is not identifiable. Recorded as out-of-domain rather
+than tuned away.
