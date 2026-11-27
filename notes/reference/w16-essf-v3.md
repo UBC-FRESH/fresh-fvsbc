@@ -54,6 +54,10 @@ PL's free height fit landed on its bounds with a power term that predicted 7.5 m
 recorded coefficients are the donor's `DG/DG2/DBH1/DBH2/HT2` with `CNSI = 0.30548`.
 
 ## 4. Evidence
+> **In-sample.** The table below uses the intervals the rows were fitted from. The
+> held-out check (`heldout-ms-essf-pp.md`) splits 20% of the sites and reproduces the
+> direction and most of the size; quote that note for the defensible number.
+
 
 ESSF fold, 302 intervals, one cycle each, no bundle:
 

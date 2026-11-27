@@ -54,6 +54,10 @@ Height growth, dominant and codominant pairs, ten-year increments:
 | BL | 1,782 | 0.404 | 1.708 | 1.666 |
 
 ## 4. Evidence
+> **In-sample.** The table below uses the intervals the rows were fitted from. The
+> held-out check (`heldout-ms-essf-pp.md`) splits 20% of the sites and reproduces the
+> direction and most of the size; quote that note for the defensible number.
+
 
 MS fold, 134 intervals, one cycle each, no bundle:
 
