@@ -20,8 +20,10 @@ def test_w18_patch_refits_the_bl_row() -> None:
     """The patch replaces the BL row's coefficients and drops the crown term."""
     text = gzip.decompress(_PATCH.read_bytes()).decode("utf-8")
     assert "11005" in text
-    assert "-2.344304" in text
-    assert "-0.025885" in text
+    assert "0.378733" in text
+    assert "-0.109179" in text
+    assert "-1.030391" in text
+    assert "0.427045" in text
     assert "3.1925" in text, "the patch shows the old crown coefficient being removed"
     assert "+     >  0.0000,               ! crown" in text
 
