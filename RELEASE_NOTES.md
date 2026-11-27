@@ -1,4 +1,40 @@
-# fresh-fvsbc 0.41.4
+# fresh-fvsbc 0.41.5
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.4
+
+- **The SBSmc2 validation sample was wrong, and this fixes the calibration on the real subzone.**
+  The SBS fold sampled only 10 SBSmc2 intervals; the data has **249 intervals on 126 sites**. On a
+  dedicated 20% site split the full subzone was **+11.6 m²/ha BA and −1,064 TPH** — far worse than
+  the sampled +1.5/−81.
+- **New `sbsmc2-v3` bundle.** `BAIMULT 0.3` for all species plus the recruitment v1 ingrowth block.
+  It improves both errors on both folds: held-out BA MAE 14.04 → **12.52** and TPH 1,298 → **1,212**;
+  train BA MAE 8.37 → **7.66** and TPH 574 → **566**. Biases also improve (held-out BA +11.6 → +9.1,
+  TPH −1,064 → −908).
+- **Why growth, not small-stem mortality.** Lighter <10 cm mortality cut TPH error but raised BA;
+  the small-stem path trades one error for the other. Reducing growth lowers BA and raises TPH
+  together, which is what the over-BA/under-TPH subzone needs.
+
+This is a **partial** correction: SBSmc2 is still +9.1 m²/ha / −908 TPH. The engine stays
+**`fresh-fvsbc-pyfvs 0.4.13`**.
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.5"
+```
+
+## Gaps that remain
+
+- SBSmc2 still +9.1 m²/ha / −908 TPH on the full subzone.
+- The CDF dense stand is still 33 m²/ha short; it needs high-BA (>100) training data.
+- CW large-tree height is still the donor.
+- MS and PP have no validated bundle.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.4
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

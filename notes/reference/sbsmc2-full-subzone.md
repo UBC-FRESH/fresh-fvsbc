@@ -52,8 +52,7 @@ size-specific 10–20 cm term cannot fix a full-subzone TPH deficit of this size
 - A proper SBS recalibration needs a full-subzone fold (which now exists) and a mortality /
   ingrowth shape change, and it should replace the sample-selected bundle.
 
-No change ships from this step. The finding is recorded so the next SBS release starts from the
-representative fold.
+Follow-up: `sbsmc2-bundle.md` ships a partial correction (`BAIMULT 0.3` + recruitment) on this fold in 0.41.5.
 
 ## Reproduce
 
