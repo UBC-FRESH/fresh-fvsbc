@@ -50,6 +50,10 @@ level is defensible. It was still preferred to the ICH donor on the fold; if a f
 otherwise, the switch is one row. This is recorded rather than hidden.
 
 ## 4. Evidence
+> **In-sample.** The table below uses the intervals the rows were fitted from. The
+> held-out check (`heldout-ms-essf-pp.md`) splits 20% of the sites and reproduces the
+> direction and most of the size; quote that note for the defensible number.
+
 
 PP fold, 25 intervals, one cycle each, no bundle:
 
