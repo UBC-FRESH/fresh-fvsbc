@@ -1,6 +1,6 @@
 # The DBH-limit break: why the SBS subzone folds over-predicted TPH
 
-Status: **root cause found and fixed in the tooling; the affected bundles are refit in 0.41.17; verified from PyPI.**
+Status: **verified from PyPI in 0.41.17/0.41.18.** The SBS subzones and the zone bundles are refit or withdrawn on stable folds.
 
 ## 1. The defect
 
