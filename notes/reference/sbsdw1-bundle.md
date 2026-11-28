@@ -1,6 +1,6 @@
 # `sbsdw1-v3`: the SBSdw1 coupled calibration
 
-Status: **shipped in 0.41.16.** Engine unchanged at 0.4.16. Tier stays C (unsigned).
+Status: **shipped in 0.41.16; verified from PyPI.** Engine unchanged at 0.4.16. Tier stays C (unsigned).
 
 ## 1. The gap
 
