@@ -1,6 +1,6 @@
 # CDF high-BA ingress/mortality: negative on the held-out fold
 
-Status: **negative result / identifiability block.** `cdf-v3` stays; no shipped parameter changes.
+Status: **negative result / identifiability block; verified from PyPI in 0.41.20.** `cdf-v3` stays; no shipped parameter changes.
 
 ## 1. The task
 
