@@ -10,7 +10,8 @@ the province data gives SBSmk1 (118 repeat sites, 56 held-out intervals):
 | Build | BA bias / MAE | TPH bias / MAE |
 | --- | ---: | ---: |
 | base | −5.18 / 7.00 | −637 / 881 |
-| **sbsmk1-v3** | **−1.97 / 6.37** | **−669 / 873** |
+| growth/mortality only | −1.97 / 6.37 | −669 / 873 |
+| **`sbsmk1-v3` (with recruitment)** | **−2.01 / 6.33** | **−409 / 810** |
 
 ## 2. The fit
 
@@ -23,8 +24,9 @@ Both folds under-predicted BA and TPH. A train-only coupled grid (all species):
 | **2.0 / 0.85** | **6.37** | **873** | **6.12** | **767** |
 | 2.5 / 0.85 | 6.19 | 885 | 6.23 | 759 |
 
-`BAIMULT 2.0` + `MORTMULT 0.85` improves all four MAE figures. The TPH bias moves slightly more
-negative (−637 → −669) while its MAE improves.
+`BAIMULT 2.0` + `MORTMULT 0.85` improved BA but left TPH under (−669). Adding recruitment v1 at
+scale 0.4 supplies the TPH: held-out TPH MAE 873 → 810, train 767 → 743, BA also improves. The
+TPH bias moves from −669 to −409 (test) and −409 to −144 (train).
 
 ## 3. W22 is not the cause
 
@@ -33,9 +35,7 @@ SBSmw by 0.02 MAE. The SBS-wide density term is not driving the subzone gaps.
 
 ## 4. What remains
 
-SBSmk1 is still −2.0 m²/ha / −669 TPH biased. The next subzones by repeat-site count are SBSmw
-(110) and SBSmc (35); SBSmw is already well calibrated on BA (+0.16 / 5.18) but under-predicts TPH
-(−282 / 421).
+SBSmk1 is still −409 TPH biased. SBSmw now has its own bundle (0.41.13); SBSmc remains to check.
 
 ## Reproduce
 
