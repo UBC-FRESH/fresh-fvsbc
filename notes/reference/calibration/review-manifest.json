@@ -137,7 +137,7 @@
     "fvs_source_commit": "ef5fa847",
     "pyfvs_commit": "e95172b",
     "variant": "bc",
-    "wrapper_version": "0.41.11"
+    "wrapper_version": "0.41.12"
   },
   "scope": {
     "excluded": [

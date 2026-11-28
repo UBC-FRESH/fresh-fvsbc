@@ -61,6 +61,7 @@ outside the repository because they carry site identifiers.
 | `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
 | `sbsmc2-v3-bundle.json` | SBSmc2 subzone bundle (`BAIMULT 0.3` + recruitment v1) |
+| `sbsmk1-v3-bundle.json` | SBSmk1 subzone bundle (`BAIMULT 2.0`, `MORTMULT 0.85`) |
 | `essf-v3-bundle.json` | The ESSF V3 bundle (`BAIMULT 2.5`, `MORTMULT 0.9`) |
 | `ms-v3-bundle.json` | The MS V3 bundle (`BAIMULT 1.6` + recruitment v1) |
 | `pp-v3-bundle.json` | The PP V3 bundle (`BAIMULT 3.0`, `MORTMULT 0.8`) |
