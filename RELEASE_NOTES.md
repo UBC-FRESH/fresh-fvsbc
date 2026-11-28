@@ -1,4 +1,34 @@
-# fresh-fvsbc 0.41.10
+# fresh-fvsbc 0.41.11
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.10
+
+- **The CDF high-BA mortality term is stronger (×0.1, was ×0.25).** The dense site's raw visit
+  history shows one permanent 0.405 ha plot with the same design and DBH limit at 2008 and 2024,
+  so its 153 m²/ha end is real. The model's QMD is close; its TPH is low, i.e. mortality is still
+  too high above BA 90.
+- **Held-out CDF improves again.** BA MAE 3.07 → **3.01**, TPH MAE 51.4 → **50.6**; the train
+  fold is unchanged (BA ≤ 90, term inert).
+- **Dense interval:** 123 BA/447 TPH → **125 BA/462 TPH** against 153/518.
+
+The engine moves to **`fresh-fvsbc-pyfvs 0.4.16`** (W2–W22 + W28 + W30 ×0.1). Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.11"
+```
+
+## Gaps that remain
+
+- The CDF dense stand is still ~28 m²/ha / ~56 TPH short.
+- SBSmc2 is +2.2 m²/ha / −323 TPH on the matched fold.
+- CW large-tree height is still the donor.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.10
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
