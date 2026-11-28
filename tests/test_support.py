@@ -28,7 +28,6 @@ def test_sbs_cites_the_w6_large_tree_row() -> None:
     assert "W22 BL density" in record.reason
     assert "sbsmc2-v3" in record.evidence
     assert "w28-sbsmc2-stem-shape" in record.evidence
-    assert "sbsmk1-v3" in record.evidence
     assert "sbsmw-v3" in record.evidence
     assert "sbswk2-v3" in record.evidence
     assert "sbsdw1-v3" in record.evidence

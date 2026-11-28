@@ -1,6 +1,8 @@
 # `sbsmk1-v3`: the SBSmk1 subzone gap
 
-Status: **shipped in 0.41.14; verified from PyPI.** Engine unchanged at 0.4.16. Tier stays C (unsigned).
+**Withdrawn in 0.41.17.** The 0.41.12/0.41.14 bundle was fit on a fold that read a 9.1 → 2 cm tally-limit change as growth. On the stable-DBH-limit fold it makes both folds worse (test 5.143/381.4 → 5.550/426.6; train 4.810/430.2 → 5.360/500.4), and no clean candidate improves BA and TPH in both folds. SBSmk1 ships no bundle; see `dbh-limit-break.md`.
+
+Status: **withdrawn in 0.41.17.** SBSmk1 ships no subzone bundle.
 
 ## 1. The gap
 
