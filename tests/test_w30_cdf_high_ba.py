@@ -13,6 +13,6 @@ _PATCH = (
 
 def test_w30_patch_carries_the_high_ba_term() -> None:
     text = gzip.decompress(_PATCH.read_bytes()).decode("utf-8")
-    assert "0.2500" in text
+    assert "0.1000" in text
     assert "90.0" in text
     assert "CDF" in text

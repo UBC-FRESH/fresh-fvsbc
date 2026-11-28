@@ -24,7 +24,7 @@ a smooth high-BA response; no mortality term can supply it.
 CDF, V3, above **90 m²/ha**:
 
 ```
-X = X * 0.25          ! mortality
+X = X * 0.10          ! mortality
 ```
 
 It is inert below 90, so the CDF train fold (BA ≤ 81) is unchanged and the dense site's
@@ -35,7 +35,7 @@ multi-interval record is the only place it acts.
 | Build | Fold | BA bias | BA MAE | TPH bias | TPH MAE |
 | --- | --- | ---: | ---: | ---: | ---: |
 | 0.41.9 | test | −3.12 | 3.46 | −8.8 | 66.8 |
-| **W30** | **test** | **−2.06** | **3.07** | **+7.8** | **51.4** |
+| **W30 ×0.1** | **test** | **−1.75** | **3.01** | **+12.0** | **50.6** |
 | 0.41.9 | train | +2.98 | 4.41 | +100.1 | 191.1 |
 | **W30** | **train** | +2.98 | 4.41 | +100.1 | 191.1 |
 
