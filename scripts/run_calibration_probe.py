@@ -61,6 +61,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--psp-dir", required=True, type=Path, metavar="DIR")
     parser.add_argument("--out-dir", required=True, type=Path, metavar="DIR")
     parser.add_argument("--domain", required=True, help="BEC prefix, such as SBPS or CWH")
+    parser.add_argument(
+        "--exact-bec",
+        action="store_true",
+        help="match --domain exactly; use it to keep SBSmc apart from SBSmc2/SBSmc3",
+    )
     parser.add_argument("--per-bec", type=int, default=5, metavar="N")
     parser.add_argument("--min-ba0", type=float, default=15.0, metavar="M2HA")
     parser.add_argument("--max-mortality-fraction", type=float, default=0.4, metavar="FRACTION")
@@ -151,7 +156,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     except (OSError, ValueError, json.JSONDecodeError, KeyError) as error:
         print(f"run_calibration_probe: {error}")
         return EXIT_BAD_INPUT
-    domain = intervals[intervals["BEC"].astype(str).str.startswith(args.domain)].copy()
+    bec = intervals["BEC"].astype(str)
+    if args.exact_bec:
+        domain = intervals[bec == args.domain].copy()
+    else:
+        domain = intervals[bec.str.startswith(args.domain)].copy()
     if domain.empty:
         print(f"run_calibration_probe: no intervals for {args.domain}")
         return EXIT_BAD_INPUT
