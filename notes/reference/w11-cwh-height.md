@@ -63,6 +63,13 @@ height and its level, so the row cost stand volume. CW keeps the donor until a f
 tall end exists. This is the same rule the project applies everywhere else: a donor that is close
 (CW's donor is 4% low on dominants) is better than a fit that is wrong where it matters.
 
+## 3b. A new-form CW equation was tested later and also rejected
+
+The 0.41.21 test fitted the new form to CW pairs: pair RMSE 1.49 → 1.06 and tall-end bias
+−0.64 → −0.32, but the held-out CWH TPH MAE moved 171.41 → 171.51 and the stand A/B worsened
+(BA −4.737 → −4.782, top height −5.55 → −5.66, volume −106.98 → −109.74). The donor stays. See
+`w11-cw-height-new-equation-negative.md`.
+
 ## 4. Stand-level A/B
 
 246 CWH intervals (12 per BEC) grown untreated for their measured length, W10 engine against W11,
