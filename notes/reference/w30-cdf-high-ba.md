@@ -43,6 +43,14 @@ The held-out fold improves on both measures; the train fold is untouched. The de
 moves 117/370 → **123/447** (measured 153/518); the pre-2008 intervals also move toward the
 observed TPH.
 
+## 3b. The BA gap was one tree's keying error
+
+The 2008–2024 observed BA (153.1) includes tree 84 at 401.7 cm; its 2008 DBH was 98.3 cm and its
+height grows normally. Corrected to 101.7 cm, observed BA is 123.8 against the model's 125. The
+28 m²/ha "defect" is therefore not a growth response. See `cdf-tree84-screen.md`; the probe gains
+`--max-dbh-growth-rate` and the CDF held-out BA MAE falls from 3.01 to 1.34 with the interval
+screened. The remaining TPH gap (~56 on the interval) is separate.
+
 ## 4. What remains
 
 The dense site is still ~30 m²/ha and ~71 TPH short, and its final BA jump is unexplained by a

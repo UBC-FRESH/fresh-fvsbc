@@ -1,4 +1,37 @@
-# fresh-fvsbc 0.41.18
+# fresh-fvsbc 0.41.19
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.18
+
+- **The CDF dense-stand BA gap was a keying error.** The 2008–2024 interval's observed 153.1 m²/ha
+  contains tree 84 at **401.7 cm**; its 2008 DBH was 98.3 cm and its height grew normally. Corrected
+  to 101.7 cm, observed BA is 123.8 against the model's 125. The reported ~28 m²/ha defect is not a
+  growth response.
+- **New calibration screen: `--max-dbh-growth-rate`.** The probe matches live trees at both visits
+  and drops intervals with an impossible DBH jump. At 5 cm/yr it flags exactly the `4002349|1|2008|2024`
+  interval and writes `screened_intervals.csv`.
+- **Held-out CDF fold:** BA MAE **3.01 → 1.34**, TPH MAE 50.6 → 50.2 with the interval screened.
+  Correcting the observation instead of dropping the interval gives BA 1.33, so the two agree.
+- **No shipped parameter changed.** The remaining CDF TPH gap (~56 on the interval, ~50 MAE on the
+  fold) is a real high-BA ingress/mortality gap, not a discontinuity.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.16`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.19"
+```
+
+## Gaps that remain
+
+- CDF dense stand: TPH still ~56 low; the fold applies no recruitment.
+- CW large-tree height is still the donor.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.18
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

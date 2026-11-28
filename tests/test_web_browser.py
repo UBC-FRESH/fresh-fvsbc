@@ -40,7 +40,7 @@ def _make_run(root: Path) -> None:
     (run / "provenance.json").write_text(
         json.dumps(
             {
-                "fresh_fvsbc_version": "0.41.18",
+                "fresh_fvsbc_version": "0.41.19",
                 "pyfvs_commit": "e95172b",
                 "fvs_source_commit": "ef5fa847",
                 "variant": "bc",

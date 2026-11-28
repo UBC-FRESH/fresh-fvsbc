@@ -71,6 +71,13 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="drop intervals whose two visits tally different DBH limits",
     )
+    parser.add_argument(
+        "--max-dbh-growth-rate",
+        type=float,
+        default=None,
+        metavar="CM_PER_YEAR",
+        help="drop intervals with a matched live tree growing faster than this",
+    )
     parser.add_argument("--per-bec", type=int, default=5, metavar="N")
     parser.add_argument("--min-ba0", type=float, default=15.0, metavar="M2HA")
     parser.add_argument("--max-mortality-fraction", type=float, default=0.4, metavar="FRACTION")
@@ -156,6 +163,70 @@ def _stable_dbh_limit(intervals: pd.DataFrame, psp_dir: Path) -> pd.DataFrame:
     return joined.loc[~changed].drop(columns=["limit0", "limit1"])
 
 
+def _screen_tree_growth(sample: pd.DataFrame, psp_dir: Path, max_rate: float) -> pd.DataFrame:
+    """Return intervals with an implausible matched-tree DBH jump.
+
+    A data-entry slip (98.3 cm to 401.7 cm in sixteen years) is not growth.
+    The screen compares the same live tree at both visits and flags a rate
+    above ``max_rate`` or an end DBH above 300 cm.
+    """
+    start = _read_trees(psp_dir, sample)
+    visits = pd.read_csv(
+        psp_dir / "faib_sample_byvisit.csv",
+        usecols=["SITE_IDENTIFIER", "VISIT_NUMBER", "CLSTR_ID"],
+        low_memory=False,
+    ).rename(columns={"VISIT_NUMBER": "visit1", "CLSTR_ID": "clstr1"})
+    end_sample = sample.merge(visits, on=["SITE_IDENTIFIER", "visit1"], how="left")
+    end_sample["CLSTR_ID"] = end_sample["clstr1"]
+    end_sample["visit0"] = sample["visit1"]
+    end = _read_trees(psp_dir, end_sample)
+    records: list[dict[str, object]] = []
+    for row in sample.itertuples(index=False):
+        site = row.SITE_IDENTIFIER
+        plot = row.PLOT
+        first = start[
+            (start["SITE_IDENTIFIER"] == site)
+            & (start["PLOT"] == plot)
+            & (start["VISIT_NUMBER"] == row.visit0)
+            & (start["LV_D"] == "L")
+            & (start["PHF_TREE"] > 0)
+        ]
+        second = end[
+            (end["SITE_IDENTIFIER"] == site)
+            & (end["PLOT"] == plot)
+            & (end["VISIT_NUMBER"] == row.visit1)
+            & (end["LV_D"] == "L")
+            & (end["PHF_TREE"] > 0)
+        ]
+        if first.empty or second.empty:
+            continue
+        pairs = (
+            first[["TREE_NO", "DBH"]]
+            .rename(columns={"DBH": "dbh0"})
+            .merge(
+                second[["TREE_NO", "DBH"]].rename(columns={"DBH": "dbh1"}),
+                on="TREE_NO",
+            )
+        )
+        if pairs.empty:
+            continue
+        years = max(float(str(row.years)), 1.0)
+        growth = (pairs["dbh1"] - pairs["dbh0"]) / years
+        worst = float(growth.max())
+        tallest = float(pairs["dbh1"].max())
+        if worst > max_rate or tallest > 300.0:
+            records.append(
+                {
+                    "interval_id": row.interval_id,
+                    "BEC": row.BEC,
+                    "SITE_IDENTIFIER": site,
+                    "max_growth_cm_per_year": round(worst, 3),
+                    "max_end_dbh_cm": round(tallest, 1),
+                }
+            )
+    return pd.DataFrame(records)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the probe and write its interval and aggregate tables.
 
@@ -186,6 +257,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             raise ValueError("cycles must be at least one")
         if args.min_dbh < 0:
             raise ValueError("min_dbh must not be negative")
+        if args.max_dbh_growth_rate is not None and args.max_dbh_growth_rate < 0:
+            raise ValueError("max_dbh_growth_rate must not be negative")
         if args.max_cycle_years is not None and (args.cycles != 1 or args.cycle_years is not None):
             raise ValueError("--max-cycle-years cannot be combined with --cycles or --cycle-years")
     except (OSError, ValueError, json.JSONDecodeError, KeyError) as error:
@@ -210,6 +283,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"run_calibration_probe: {error}")
         return EXIT_BAD_INPUT
     sample = select_intervals(eligible, per_bec=args.per_bec)
+    screened = pd.DataFrame()
+    if args.max_dbh_growth_rate is not None:
+        screened = _screen_tree_growth(sample, args.psp_dir, args.max_dbh_growth_rate)
+        if not screened.empty:
+            sample = sample[~sample["interval_id"].isin(screened["interval_id"])].copy()
     trees = _read_trees(args.psp_dir, sample)
     if args.min_dbh > 0 and "DBH" in trees.columns:
         trees = trees[trees["DBH"] >= args.min_dbh].copy()
@@ -335,6 +413,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return EXIT_BAD_INPUT
     data_checksum = interval_checksum(sample)
     frame.to_csv(args.out_dir / "probe.csv", index=False)
+    if not screened.empty:
+        screened.to_csv(args.out_dir / "screened_intervals.csv", index=False)
     summary = summarise_probe(frame)
     summary.to_csv(args.out_dir / "probe_summary.csv", index=False)
     summarise_probe(frame, by=("candidate", "BEC")).to_csv(
@@ -351,6 +431,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "min_qmd": args.min_qmd,
                 "min_dbh": args.min_dbh,
                 "stable_dbh_limit": args.stable_dbh_limit,
+                "max_dbh_growth_rate": args.max_dbh_growth_rate,
                 "test_sites": sorted(test_sites),
                 "test_year_from": args.test_year_from,
                 "data_checksum": data_checksum,
