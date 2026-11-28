@@ -1,4 +1,47 @@
-# fresh-fvsbc 0.41.17
+# fresh-fvsbc 0.41.18
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.17
+
+- **Zone-level bundles rechecked on stable-DBH-limit folds.**
+  - **Kept:** `cwh-v3`, `mh-v3`, `cdf-v3`, `pp-v3` still improve both held-out BA and TPH.
+  - **Refit:** `sbs-v3` drops from `MORTMULT 1.85` to **1.1** for FD/PL/SE/HW; test
+    7.010/543.1 → **6.760/538.6**, train 4.687/333.7 → **4.617/331.8**.
+  - **Withdrawn:** `sbps-v3`, `ms-v3`, `essf-v3`. On the stable fold each improves BA but leaves
+    TPH flat-to-worse, and no clean candidate improves both. The engine still runs those zones on
+    V3; only the multiplier/recruitment bundles are gone.
+
+  | Zone | Old bundle on stable fold | Action |
+  | --- | --- | --- |
+  | CWH | 5.59/206.7 → **3.38/171.4** test | keep |
+  | MH | 2.71/99.7 → **2.04/85.7** test | keep |
+  | CDF | 5.26/30.8 → **1.06/29.3** test | keep |
+  | PP | 2.01/80.3 → **1.26/79.8** test | keep |
+  | SBS | 543 → 577 TPH at 1.85 | refit to 1.1 |
+  | SBPS | 847 → 1218 TPH | withdraw |
+  | MS | 307 → 311 TPH | withdraw |
+  | ESSF | 394.9 → 396.6 TPH | withdraw |
+
+- **No zone or subzone bundle carries recruitment now.** The standalone `recruitment-bc-v1`
+  bundle remains available.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.16`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.18"
+```
+
+## Gaps that remain
+
+- The CDF dense stand is still ~28 m²/ha / ~56 TPH short.
+- CW large-tree height is still the donor.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.17
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

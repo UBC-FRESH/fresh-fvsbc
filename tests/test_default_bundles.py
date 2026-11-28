@@ -57,17 +57,6 @@ def test_the_cdf_bundle_carries_the_dense_stand_mortality() -> None:
     assert morts == {"FD": "0.5000", "AC": "0.5000"}
 
 
-def test_the_essf_bundle_carries_the_coupled_rows() -> None:
-    """ESSF carries a partial basis correction and lighter mortality."""
-    bundle = load_default_bundle("essf-v3")
-    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
-    mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
-    assert set(bai.values()) == {"2.5000"}
-    assert set(mort.values()) == {"0.9000"}
-    assert len(bai) == 12
-    assert len(mort) == 12
-
-
 def test_the_pp_bundle_carries_the_loso_rows() -> None:
     """PP carries the LOSO-selected growth and mortality multipliers."""
     bundle = load_default_bundle("pp-v3")
@@ -77,15 +66,6 @@ def test_the_pp_bundle_carries_the_loso_rows() -> None:
     assert set(mort.values()) == {"0.8000"}
     assert len(bai) == 12
     assert len(mort) == 12
-
-
-def test_the_ms_bundle_carries_the_growth_and_recruitment_rows() -> None:
-    """MS carries the growth correction and the recruitment block."""
-    bundle = load_default_bundle("ms-v3")
-    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
-    assert set(bai.values()) == {"1.6000"}
-    assert len(bai) == 12
-    assert bundle.ingrowth is not None
 
 
 def test_the_sbsdw1_bundle_carries_only_the_mortality_row() -> None:
@@ -137,7 +117,14 @@ def test_the_sbs_bundle_carries_only_the_mortality_rows() -> None:
     bundle = load_default_bundle("sbs-v3")
     assert not any(p.keyword == "BAIMULT" for p in bundle.parameters)
     mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
-    assert mort == {"FD": "1.8500", "PL": "1.8500", "SE": "1.8500", "HW": "1.8500"}
+    assert mort == {"FD": "1.1000", "PL": "1.1000", "SE": "1.1000", "HW": "1.1000"}
+
+
+def test_withdrawn_zone_bundles_are_not_shipped() -> None:
+    """Bundles that failed the stable-DBH-limit fold are gone from the wheel."""
+    for name in ("sbps-v3", "ms-v3", "essf-v3", "sbsmk1-v3"):
+        with pytest.raises(BundleError, match="not a shipped bundle"):
+            default_bundle_path(name)
 
 
 def test_an_unknown_name_is_refused() -> None:

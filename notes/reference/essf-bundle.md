@@ -1,5 +1,7 @@
 # The first ESSF bundle: a coupled partial basis correction
 
+**Withdrawn in 0.41.18.** The 0.41.4 numbers came from a fold that included intervals with a changed DBH tally limit. On the stable fold the bundle improves BA but leaves TPH flat-to-worse (test 394.9 → 396.6), and no clean candidate improves both; ESSF ships no zone bundle. See `dbh-limit-break.md`.
+
 Status: **shipped in 0.41.4; verified from PyPI.** Engine unchanged at 0.4.13. Tier stays C (unsigned).
 
 ## 1. Why a bundle
