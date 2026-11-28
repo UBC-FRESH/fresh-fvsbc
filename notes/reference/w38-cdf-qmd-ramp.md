@@ -43,3 +43,10 @@ dense stand's QMD is 35–53, where the ramp is mild. The mixed-sign dense histo
 - Expanded fold: `probe_cdf_w38_50_expanded/` against `probe_cdf_base_expanded/`.
 - LOOCV: `probe_cdf_w38_50_loocv_*/`.
 - Patch: `notes/reference/calibration/w38-cdf-qmd-ramp.patch.gz`.
+
+## 5. Dense-stand covariate follow-up
+
+A time-since-fire / QMD / BA interval-level covariate was tested on the 19 high-BA intervals. The
+LOOCV MAE is 118.7–146.0 against a 51.5 baseline; QMD sign accuracy is 47–58%. No available
+structural covariate separates the mixed sign; the dense residual is a within-site history effect.
+See `cdf-stand-history-negative.md`.
