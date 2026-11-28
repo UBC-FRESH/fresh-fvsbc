@@ -159,6 +159,29 @@ def test_probe_parser_carries_the_exact_bec_flag() -> None:
     assert args.exact_bec is True
 
 
+def test_stable_dbh_limit_drops_changed_tally_limits(tmp_path: Path) -> None:
+    """A visit that starts at 9.1 cm and ends at 2 cm is not a growth interval."""
+    psp = tmp_path / "psp"
+    psp.mkdir()
+    pd.DataFrame(
+        [
+            {"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 1, "DBH_LIMIT_TAG": "9.1"},
+            {"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 2, "DBH_LIMIT_TAG": "2.0"},
+            {"SITE_IDENTIFIER": 2, "VISIT_NUMBER": 1, "DBH_LIMIT_TAG": "2.0"},
+            {"SITE_IDENTIFIER": 2, "VISIT_NUMBER": 2, "DBH_LIMIT_TAG": "2.0"},
+        ]
+    ).to_csv(psp / "faib_sample_byvisit.csv", index=False)
+    intervals = pd.DataFrame(
+        [
+            {"SITE_IDENTIFIER": 1, "visit0": 1, "visit1": 2, "BEC": "SBSmk1"},
+            {"SITE_IDENTIFIER": 2, "visit0": 1, "visit1": 2, "BEC": "SBSmk1"},
+        ]
+    )
+    kept = probe._stable_dbh_limit(intervals, psp)
+    assert kept["SITE_IDENTIFIER"].tolist() == [2]
+    assert "limit0" not in kept.columns
+
+
 def test_probe_main_exact_bec_excludes_the_sibling_subzones(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

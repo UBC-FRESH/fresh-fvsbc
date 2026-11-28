@@ -1,4 +1,46 @@
-# fresh-fvsbc 0.41.16
+# fresh-fvsbc 0.41.17
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.16
+
+- **Root cause found: the DBH-limit break.** Early PSP visits tally only trees above 9.1 cm; later
+  visits tally from 2 cm. The calibration fold read those small stems as growth, which is why the
+  SBS subzones looked TPH-deficient. **2,797 of 17,151 intervals (16%)** change `DBH_LIMIT_TAG`
+  between visits. `scripts/run_calibration_probe.py --stable-dbh-limit` drops them.
+- **`sbsmk1-v3` is withdrawn.** On the stable fold it makes both folds worse (test BA/TPH
+  5.14/381 → 5.55/427; train 4.81/430 → 5.36/500), and no clean candidate improves BA and TPH in
+  both folds. SBSmk1 ships no subzone bundle.
+- **Four subzone bundles are refit on clean folds** (all four MAE measures improve):
+
+  | Bundle | Contents | Test (base → clean) | Train (base → clean) |
+  | --- | --- | --- | --- |
+  | `sbsmw-v3` | `BAIMULT 0.95` | 4.88/239 → **4.77/231** | 4.06/139 → **4.00/139** |
+  | `sbswk2-v3` | `BAIMULT 2.0`, `MORTMULT 1.2` | 3.78/245 → **3.77/222** | 4.18/441 → **4.01/373** |
+  | `sbsdw1-v3` | `MORTMULT 1.25` | 6.72/222 → **4.24/211** | 7.81/216 → **6.79/211** |
+  | `sbsmc2-v3` | `BAIMULT 0.3`, `MORTMULT 1.15` | 7.29/677 → **6.25/655** | 7.75/495 → **6.75/468** |
+
+- **Recruitment is no longer carried by any subzone bundle.** Once the limit break is removed it
+  either does nothing or adds variance.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.16`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.17"
+```
+
+## Gaps that remain
+
+- The 16% limit-break share is not SBS-specific; the **zone-level bundles** were calibrated before
+  the flag and need rechecking on stable folds.
+- The CDF dense stand is still ~28 m²/ha / ~56 TPH short.
+- CW large-tree height is still the donor.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.16
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

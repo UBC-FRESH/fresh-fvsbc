@@ -1,5 +1,7 @@
 # SBSmc2 variance-aware ingress shape
 
+**Refit in 0.41.17 on stable-DBH-limit intervals.** The 0.41.7 numbers in this note came from a fold that included 40 intervals with a changed DBH tally limit; see `dbh-limit-break.md` for the clean fold and the current bundle.
+
 Status: **shipped in 0.41.7; verified from PyPI.** Engine unchanged at 0.4.14. Tier stays C (unsigned).
 
 ## 1. The matched fold

@@ -88,55 +88,48 @@ def test_the_ms_bundle_carries_the_growth_and_recruitment_rows() -> None:
     assert bundle.ingrowth is not None
 
 
-def test_the_sbsdw1_bundle_carries_the_coupled_rows_and_ingress() -> None:
-    """SBSdw1 over-predicts BA, so it lowers growth and raises mortality."""
+def test_the_sbsdw1_bundle_carries_only_the_mortality_row() -> None:
+    """SBSdw1 over-predicts BA; higher mortality fixes it on the clean fold."""
     bundle = load_default_bundle("sbsdw1-v3")
-    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    assert not any(p.keyword == "BAIMULT" for p in bundle.parameters)
     mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
-    assert set(bai.values()) == {"0.7000"}
-    assert set(mort.values()) == {"1.3000"}
-    assert bundle.ingrowth is not None
-    assert bundle.ingrowth.scale == pytest.approx(0.4)
+    assert set(mort.values()) == {"1.2500"}
+    assert len(mort) == 12
+    assert bundle.ingrowth is None
 
 
-def test_the_sbswk2_bundle_carries_the_coupled_rows_and_ingress() -> None:
-    """SBSwk2 needs both the growth/mortality pair and recruitment."""
+def test_the_sbswk2_bundle_carries_the_clean_coupled_rows() -> None:
+    """SBSwk2 needs the growth/mortality pair and no recruitment."""
     bundle = load_default_bundle("sbswk2-v3")
     bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
     mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
     assert set(bai.values()) == {"2.0000"}
-    assert set(mort.values()) == {"0.8500"}
-    assert bundle.ingrowth is not None
-    assert bundle.ingrowth.scale == pytest.approx(0.6)
-
-
-def test_the_sbsmw_bundle_carries_the_ingress_scale() -> None:
-    """SBSmw needs only the higher recruitment scale."""
-    bundle = load_default_bundle("sbsmw-v3")
-    assert not bundle.parameters
-    assert bundle.ingrowth is not None
-    assert bundle.ingrowth.scale == pytest.approx(1.2)
-
-
-def test_the_sbsmk1_bundle_carries_the_coupled_rows() -> None:
-    """SBSmk1 carries the growth and mortality correction."""
-    bundle = load_default_bundle("sbsmk1-v3")
-    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
-    mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
-    assert set(bai.values()) == {"2.0000"}
-    assert set(mort.values()) == {"0.8500"}
+    assert set(mort.values()) == {"1.2000"}
     assert len(bai) == 12
     assert len(mort) == 12
-    assert bundle.ingrowth is not None
+    assert bundle.ingrowth is None
 
 
-def test_the_sbsmc2_bundle_carries_the_full_subzone_rows() -> None:
-    """SBSmc2 needs the growth correction and the recruitment block."""
+def test_the_sbsmw_bundle_carries_the_clean_growth_row() -> None:
+    """SBSmw needs a small growth cut and no recruitment."""
+    bundle = load_default_bundle("sbsmw-v3")
+    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    assert set(bai.values()) == {"0.9500"}
+    assert len(bai) == 12
+    assert not any(p.keyword == "MORTMULT" for p in bundle.parameters)
+    assert bundle.ingrowth is None
+
+
+def test_the_sbsmc2_bundle_carries_the_clean_coupled_rows() -> None:
+    """SBSmc2 keeps the growth cut and adds a light mortality increase."""
     bundle = load_default_bundle("sbsmc2-v3")
     bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
     assert set(bai.values()) == {"0.3000"}
+    assert set(mort.values()) == {"1.1500"}
     assert len(bai) == 12
-    assert bundle.ingrowth is not None
+    assert len(mort) == 12
+    assert bundle.ingrowth is None
 
 
 def test_the_sbs_bundle_carries_only_the_mortality_rows() -> None:

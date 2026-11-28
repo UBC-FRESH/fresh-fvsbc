@@ -1,6 +1,8 @@
 # `sbswk2-v3`: the SBSwk2 coupled calibration
 
-Status: **shipped in 0.41.15; verified from PyPI.** Engine unchanged at 0.4.16. Tier stays C (unsigned).
+**Refit in 0.41.17 on stable-DBH-limit intervals.** The 0.41.15 numbers in this note came from a fold that mixed 9.1 cm and 2 cm visits; see `dbh-limit-break.md` for the clean fold and the current bundle.
+
+Status: **refit and shipped in 0.41.17** (`BAIMULT 2.0`, `MORTMULT 1.2`, no recruitment). Engine unchanged at 0.4.16. Tier stays C (unsigned).
 
 ## 1. The gap
 

@@ -66,6 +66,11 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="match --domain exactly; use it to keep SBSmc apart from SBSmc2/SBSmc3",
     )
+    parser.add_argument(
+        "--stable-dbh-limit",
+        action="store_true",
+        help="drop intervals whose two visits tally different DBH limits",
+    )
     parser.add_argument("--per-bec", type=int, default=5, metavar="N")
     parser.add_argument("--min-ba0", type=float, default=15.0, metavar="M2HA")
     parser.add_argument("--max-mortality-fraction", type=float, default=0.4, metavar="FRACTION")
@@ -123,6 +128,34 @@ def _candidates(path: Path) -> list[dict[str, object]]:
     return records
 
 
+def _stable_dbh_limit(intervals: pd.DataFrame, psp_dir: Path) -> pd.DataFrame:
+    """Drop intervals whose visits tally different minimum DBHs.
+
+    An early PSP visit may tally only trees above 9.1 cm while the remeasurement
+    starts at 2 cm.  The extra small stems are then read as growth, which no
+    growth or ingress term can reproduce.
+    """
+    visits = pd.read_csv(
+        psp_dir / "faib_sample_byvisit.csv",
+        usecols=["SITE_IDENTIFIER", "VISIT_NUMBER", "DBH_LIMIT_TAG"],
+        low_memory=False,
+    )
+    visits["DBH_LIMIT_TAG"] = pd.to_numeric(visits["DBH_LIMIT_TAG"], errors="coerce")
+    start = visits.rename(columns={"VISIT_NUMBER": "visit0", "DBH_LIMIT_TAG": "limit0"})[
+        ["SITE_IDENTIFIER", "visit0", "limit0"]
+    ]
+    end = visits.rename(columns={"VISIT_NUMBER": "visit1", "DBH_LIMIT_TAG": "limit1"})[
+        ["SITE_IDENTIFIER", "visit1", "limit1"]
+    ]
+    joined = intervals.merge(start, on=["SITE_IDENTIFIER", "visit0"], how="left").merge(
+        end, on=["SITE_IDENTIFIER", "visit1"], how="left"
+    )
+    changed = (
+        joined["limit0"].notna() & joined["limit1"].notna() & (joined["limit0"] != joined["limit1"])
+    )
+    return joined.loc[~changed].drop(columns=["limit0", "limit1"])
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the probe and write its interval and aggregate tables.
 
@@ -139,6 +172,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         intervals = pd.read_csv(args.data_dir / "intervals.csv")
+        if args.stable_dbh_limit:
+            intervals = _stable_dbh_limit(intervals, args.psp_dir)
         visits = pd.read_csv(args.data_dir / "visits.csv")
         candidates = _candidates(args.candidates)
         ingrowth = (
@@ -315,6 +350,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "max_mortality_fraction": args.max_mortality_fraction,
                 "min_qmd": args.min_qmd,
                 "min_dbh": args.min_dbh,
+                "stable_dbh_limit": args.stable_dbh_limit,
                 "test_sites": sorted(test_sites),
                 "test_year_from": args.test_year_from,
                 "data_checksum": data_checksum,

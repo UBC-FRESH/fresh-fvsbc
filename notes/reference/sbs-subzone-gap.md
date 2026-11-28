@@ -65,3 +65,8 @@ fold has only 11 intervals.
 
 SBSwk2 (90 sites) under-predicts both BA and TPH in both folds and is fixed by `sbswk2-v3`; see
 `notes/reference/sbswk2-bundle.md`.
+
+## 7. Superseded by the DBH-limit finding
+
+The SBSmk1 TPH gap documented here was a 9.1 → 2 cm tally-limit change, not a model defect. See
+`notes/reference/dbh-limit-break.md`; `sbsmk1-v3` is withdrawn in 0.41.17.
