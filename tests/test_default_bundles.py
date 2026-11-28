@@ -105,6 +105,7 @@ def test_the_sbsmk1_bundle_carries_the_coupled_rows() -> None:
     assert set(mort.values()) == {"0.8500"}
     assert len(bai) == 12
     assert len(mort) == 12
+    assert bundle.ingrowth is not None
 
 
 def test_the_sbsmc2_bundle_carries_the_full_subzone_rows() -> None:
