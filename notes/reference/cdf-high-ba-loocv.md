@@ -1,6 +1,6 @@
 # CDF high-BA TPH: leave-one-site-out from the existing 20 intervals
 
-Status: **negative for shipping; positive signal on the 60–90 m²/ha sites.** `cdf-v3` stays.
+Status: **negative for shipping; positive signal on the 60–90 m²/ha sites; verified from PyPI in 0.41.22.** `cdf-v3` stays.
 
 ## 1. The validation built from existing data
 
