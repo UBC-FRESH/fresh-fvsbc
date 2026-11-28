@@ -1,6 +1,6 @@
 # `sbswk2-v3`: the SBSwk2 coupled calibration
 
-Status: **shipped in 0.41.15.** Engine unchanged at 0.4.16. Tier stays C (unsigned).
+Status: **shipped in 0.41.15; verified from PyPI.** Engine unchanged at 0.4.16. Tier stays C (unsigned).
 
 ## 1. The gap
 
