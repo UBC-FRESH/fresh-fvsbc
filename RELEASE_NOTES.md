@@ -1,4 +1,42 @@
-# fresh-fvsbc 0.41.21
+# fresh-fvsbc 0.41.22
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.21
+
+- **Public disturbance observations materialized.** The BC Data Catalogue fire-severity, fire-
+  perimeter and consolidated-cutblock layers were resolved through OpenMaps WFS. A South Coast AOI
+  returned 150 severity polygons, 692 fire perimeters and 7,840 cutblocks; joining to PSP header
+  points gave **24 events at 20 sites** (20 fire, 4 harvest). Two harvest events fall inside
+  calibration intervals. No severity polygon covered a PSP point, so fire events carry a
+  perimeter-default severity until a severity-rated overlap exists.
+- **Harness reports interval matches.** `interval_coverage()` and the CLI now count events whose
+  year lies between an interval's two visits, not just site coverage.
+- **CDF high-BA leave-one-site-out tested.** The existing 20 intervals at BA ≥60 (five sites) were
+  held out one site at a time. All-species MORTMULT 0.25 and 60+ ingress ×2 + MORTMULT 0.5 improve
+  both mean BA and mean TPH (TPH MAE 47.2 → 41.9 / 40.4). But a BA-scoped 60–90 term (W34 ×0.5)
+  fails the full clean fold (BA 1.318 → 1.377, TPH 36.10 → 36.96). **No CDF parameter ships.**
+- **W33 donor-preserving CW tall term tested.** It halves the pair tall-end bias (−0.64 → −0.30) and
+  moves top height −5.55 → −5.53 and volume −106.98 → −106.57, but BA and held-out TPH are
+  unchanged. **No CW change ships.**
+
+No bundle or engine parameter changed. The engine stays **`fresh-fvsbc-pyfvs 0.4.16`**.
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.22"
+```
+
+## Gaps that remain
+
+- CDF dense stand: TPH mixed-sign; the BA-scoped term trades the 60–81 sites against the dense
+  early intervals.
+- CW large-tree height: donor; the tall term is too small to move BA/TPH.
+- Disturbance: public observations now cover 24 events; only 2 fall inside calibration intervals.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.21
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

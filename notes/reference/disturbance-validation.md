@@ -67,3 +67,30 @@ $ python scripts/validate_disturbance.py \
 reports bias and MAE by type and severity. No BC fire/severity or
 harvested-block observations are in the repository, so the template currently
 reports zero events.
+
+## Public observations materialized (0.41.22)
+
+The BC Data Catalogue layers are public and resolvable through OpenMaps WFS:
+
+| Layer | WFS typename |
+| --- | --- |
+| Fire Burn Severity - Historical | `pub:WHSE_FOREST_VEGETATION.VEG_BURN_SEVERITY_SP` |
+| BC Wildfire Fire Perimeters - Historical | `pub:WHSE_LAND_AND_NATURAL_RESOURCE.PROT_HISTORICAL_FIRE_POLYS_SP` |
+| Harvested Areas of BC (Consolidated Cutblocks) | `pub:WHSE_FOREST_VEGETATION.VEG_CONSOLIDATED_CUT_BLOCKS_SP` |
+
+A South Coast AOI (CDF/CWH/MH sites) returned 150 burn-severity polygons, 692 fire perimeters and
+7,840 cutblocks. Joining them to the PSP header points produced **24 events at 20 sites**: 20 fire
+perimeters and 4 cutblocks. No burn-severity polygon covered a PSP point, so the fire events carry
+`SEVERITY_SOURCE = perimeter-default` (1.0) until a severity-rated overlap exists. Two harvest
+events fall inside calibration intervals.
+
+`interval_coverage()` now reports events whose year lies between an interval's two visits, so the
+harness reports both site coverage and usable calibration intervals. The observations CSV contains
+PSP site ids and stays outside the repository; the tracked template remains header-only.
+
+## Harness output on the public observations
+
+```
+"observations": 24, "matched_sites": 20, "by_type": {"fire": 20, "harvest": 4}
+"events": 2, "intervals": 2, "sites": 2, "by_type": {"harvest": 2}
+```
