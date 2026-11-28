@@ -59,3 +59,9 @@ equation at the inventory year rather than a growth increment.
 - Fit: `~/workspace/bwbs-work/fit_cw_new.py` form f4.
 - Fold: `probe_CWH_w36/` against `probe_CWH_zone_stable_bundle/`.
 - A/B: `cwh-height-w36-summary.csv` against `cwh-height-w11revert-summary.csv`.
+
+## 6. Engine-DGM follow-up
+
+Fitting against the engine's predicted DGM (W37) gives the best stand-level CW result: top height
+−5.55 → −5.376 and volume −106.98 → −104.18, with BA flat and TPH marginally worse. It still fails
+the all-three-improve rule. See `w37-cw-engine-dgm.md`.
