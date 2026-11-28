@@ -88,6 +88,17 @@ def test_the_ms_bundle_carries_the_growth_and_recruitment_rows() -> None:
     assert bundle.ingrowth is not None
 
 
+def test_the_sbsdw1_bundle_carries_the_coupled_rows_and_ingress() -> None:
+    """SBSdw1 over-predicts BA, so it lowers growth and raises mortality."""
+    bundle = load_default_bundle("sbsdw1-v3")
+    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
+    assert set(bai.values()) == {"0.7000"}
+    assert set(mort.values()) == {"1.3000"}
+    assert bundle.ingrowth is not None
+    assert bundle.ingrowth.scale == pytest.approx(0.4)
+
+
 def test_the_sbswk2_bundle_carries_the_coupled_rows_and_ingress() -> None:
     """SBSwk2 needs both the growth/mortality pair and recruitment."""
     bundle = load_default_bundle("sbswk2-v3")

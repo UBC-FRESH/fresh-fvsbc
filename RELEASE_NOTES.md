@@ -1,4 +1,32 @@
-# fresh-fvsbc 0.41.15
+# fresh-fvsbc 0.41.16
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.15
+
+- **First SBSdw1 bundle.** SBSdw1's 43 repeat sites over-predicted BA (+5.8) and its TPH error
+  changed sign. `sbsdw1-v3` pairs `BAIMULT 0.7` + `MORTMULT 1.3` with recruitment v1 at scale 0.4.
+- **All four MAE figures improve.** Held-out BA 6.38 → **4.00**, TPH 268.6 → **263.7**; train BA
+  7.29 → **6.32**, TPH 245.8 → **237.6**. BA improves strongly in both folds; the held-out TPH
+  gain is small because the fold has only 11 intervals, so it is provisional.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.16`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.16"
+```
+
+## Gaps that remain
+
+- SBSmk1 −409 TPH; SBSmc2 +2.2 / −323; SBSdw1 provisional TPH.
+- The CDF dense stand is still ~28 m²/ha / ~56 TPH short.
+- CW large-tree height is still the donor.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.15
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

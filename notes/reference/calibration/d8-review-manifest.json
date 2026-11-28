@@ -25,13 +25,13 @@
     {
       "domain": "CWH-4cm",
       "path": "notes/reference/calibration/d7-cwh-4cm-bundle.json",
-      "sha256": "sha256:a7a59000c5cbeca171802c965355fd0f1716186db8406bcf52d32d6d2d330c5c",
+      "sha256": "sha256:ca8e837007b9e7f29716f35cec507d59df7c3a6752638a27efdd1aaadfeeb8a9",
       "bytes": 6452
     },
     {
       "domain": "ICHmw2-Arrow-Cascadia",
       "path": "notes/reference/calibration/d9-ichmw2-candidate-bundle.json",
-      "sha256": "sha256:d76e50e4ebd789d7d9e3f2f456ad4be19c4490d8c171e280246c409dc563ad77",
+      "sha256": "sha256:d1c0ca2c769eccd09e1cb2cc95c466d8782a5eb70dce6adecec408ff46ec7d9b",
       "bytes": 4123
     }
   ],

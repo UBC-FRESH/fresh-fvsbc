@@ -52,12 +52,14 @@ calibrated:
 `scripts/run_calibration_probe.py` now has `--exact-bec` so a subzone fold cannot absorb its
 siblings. SBSmc needs no bundle.
 
-## 5. SBSdw1 has a fold divergence
+## 5. SBSdw1 ships after adding recruitment
 
-SBSdw1 (43 sites, 11 held-out / 61 train intervals) over-predicts BA in both folds but its TPH
-error changes sign: **+28 test / −66 train**. Lowering growth and raising mortality improves BA MAE
-in every candidate but worsens train TPH MAE (base 245.8; best 248.1). No candidate improves all
-four, so no bundle ships.
+SBSdw1 (43 sites, 11 held-out / 61 train intervals) over-predicts BA in both folds, but its TPH
+error changes sign: **+28 test / −66 train**. A growth/mortality grid alone improves BA and
+worsens train TPH. Adding recruitment lets the coupled fit lower BA while holding TPH: `0.7 / 1.3`
+with recruitment 0.4 gives held-out BA 6.38 → 4.00 and TPH 268.6 → 263.7, train BA 7.29 → 6.32 and
+TPH 245.8 → 237.6. Shipped as `sbsdw1-v3` (0.41.16); the held-out TPH gain is small because the
+fold has only 11 intervals.
 
 ## 6. SBSwk2 ships
 
