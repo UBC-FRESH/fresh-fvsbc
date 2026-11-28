@@ -48,3 +48,10 @@ alone, and must still pass the full held-out fold.
 - High-BA subset: `~/workspace/bwbs-work/calib-cdf-highba/` (20 intervals, 5 sites).
 - LOOCV runs: `probe_cdf_loocv_*`.
 - Full clean fold: `probe_cdf_w34x05/` against `probe_cdf_clean_cdf/`.
+
+## 5. QMD-conditioned follow-up
+
+A QMD 29–33 cm, BA >60 term (W35) improves the LOOCV mean (TPH 47.16 → 38.52, BA 2.34 → 1.85) and
+the expanded clean fold (test 2.489/201.406 → 2.457/200.826; train 2.032/164.062 →
+1.979/163.253). But it changes only four intervals, the held-out gain is one interval, and the
+14-interval fold is inert. It does not ship. See `cdf-high-ba-qmd-negative.md`.
