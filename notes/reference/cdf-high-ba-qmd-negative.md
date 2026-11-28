@@ -57,3 +57,11 @@ sample currently caps at 30 intervals per BEC) or to fit QMD structurally before
 - LOOCV: `probe_cdf_w35_<site>/` against `probe_cdf_loocv_<site>_cdf/`.
 - Expanded fold: `probe_cdf_w35_expanded/` against `probe_cdf_base_expanded/`.
 - 14-interval fold: `probe_cdf_clean_cdf/` (unchanged).
+
+## 5. Sample expansion does not add intervals
+
+The CDF inventory has 26 header sites, 21 with two or more visits, all already in the calibration
+dataset (94 intervals). The BA ≥60 / QMD 29–33 band has **four intervals at three sites** even with
+`--per-bec 200`. CWH has 609 intervals in the band, but the same term worsens CWH (test
+3.381/171.4 → 3.467/173.4; train 4.270/269.1 → 4.415/271.8). See
+`cdf-sample-expansion-negative.md`.
