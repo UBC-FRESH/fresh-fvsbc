@@ -1,4 +1,36 @@
-# fresh-fvsbc 0.41.20
+# fresh-fvsbc 0.41.21
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.20
+
+- **New-form CW height equation: tested and rejected.** On the CWH remeasurement pairs the new form
+  improves RMSE 1.49 → **1.06 m/decade** and halves the tall-end bias (−0.64 → −0.32). But on the
+  held-out CWH fold the TPH MAE moves 171.41 → 171.51 and the stand A/B worsens
+  (BA −4.737 → −4.782, top height −5.55 → −5.66, volume −106.98 → −109.74). The CW donor stays;
+  no engine change ships.
+- **Disturbance validation harness prepared.** `fresh_fvsbc.disturbance` and
+  `scripts/validate_disturbance.py` load a documented observed-event CSV, check coverage against
+  the PSP intervals, and score BA/TPH bias and MAE by type and severity once predictions exist.
+  A header-only template and the input contract are in `notes/reference/disturbance-validation.md`.
+  No BC fire/severity or harvested-block observations are in the repository yet.
+
+No bundle or engine parameter changed. The engine stays **`fresh-fvsbc-pyfvs 0.4.16`**.
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.21"
+```
+
+## Gaps that remain
+
+- CDF dense stand: TPH mixed-sign; needs an independent BA >90 remeasurement site.
+- CW large-tree height: donor; the new form failed the stand test.
+- Disturbance: harness ready, observations missing (BC fire/severity and harvested blocks).
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.20
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

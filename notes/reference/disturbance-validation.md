@@ -40,3 +40,30 @@ runs on, and the tables carry the engine's behaviour, not a calibrated claim.
 
 `scripts/` has no zone-specific disturbance case yet; the smoke case is the one above, and
 `tests/test_disturbance_bwbs.py` encodes it behind `FVSBC_W5=1`.
+
+## Validation input contract (prepared 0.41.21)
+
+The observed side is a CSV with these columns:
+
+| Column | Meaning |
+| --- | --- |
+| `SITE_IDENTIFIER` | PSP site id, matching `intervals.csv` |
+| `DISTURBANCE_YEAR` | Year of the event |
+| `DISTURBANCE_TYPE` | `fire`, `harvest`, `mpb`, or `windthrow` |
+| `SEVERITY` | 0–1 fraction (0 = none, 1 = complete) |
+| `EVENT_ID` | optional source identifier |
+
+Header-only template: `notes/reference/calibration/disturbance-observations-template.csv`.
+Check coverage (and later score BA/TPH) with:
+
+```console
+$ python scripts/validate_disturbance.py \
+    --observations notes/reference/calibration/disturbance-observations-template.csv \
+    --intervals <calibration-dir>
+```
+
+`--predictions` accepts one row per event with `DISTURBANCE_TYPE`, `SEVERITY`,
+`observed_ba1`, `predicted_ba1`, `observed_tph1`, `predicted_tph1`; the harness
+reports bias and MAE by type and severity. No BC fire/severity or
+harvested-block observations are in the repository, so the template currently
+reports zero events.
