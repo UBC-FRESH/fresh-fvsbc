@@ -562,3 +562,4 @@ Newest entries last. Each milestone gets a dated entry that matches the roadmap 
   `1-0.5*max(0,min(1,(50-QMD)/25))`. Expanded clean fold: test BA 2.489 -> 2.460, TPH 201.406 ->
   201.342; train BA 2.032 -> 2.015, TPH 164.062 -> 164.099 (flat). High-BA LOOCV mean BA 2.34 ->
   2.05, TPH 47.16 -> 43.28. Wrapper 0.41.23, engine 0.4.17. `notes/reference/w38-cdf-qmd-ramp.md`.
+- **0.41.23 is live.** Tag `v0.41.23`; engine 0.4.17 published from `w38-cdf-qmd-ramp.patch.gz`, wrapper 0.41.23. Installed wheel reproduces the expanded fold exactly: test BA 2.460 / TPH 201.342, train BA 2.015 / TPH 164.099. High-BA LOOCV mean BA 2.05 / TPH 43.28.
