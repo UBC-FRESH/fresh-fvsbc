@@ -55,3 +55,10 @@ A QMD 29–33 cm, BA >60 term (W35) improves the LOOCV mean (TPH 47.16 → 38.52
 the expanded clean fold (test 2.489/201.406 → 2.457/200.826; train 2.032/164.062 →
 1.979/163.253). But it changes only four intervals, the held-out gain is one interval, and the
 14-interval fold is inert. It does not ship. See `cdf-high-ba-qmd-negative.md`.
+
+## 6. Ingress follow-up
+
+A CDF 60+ ingress term was fitted from the observed new stems and tested with and without a QMD
+29–33 scope. BA is unchanged (ingress stays below the BA-carrying sizes) and TPH worsens on the
+expanded clean fold (201.406 → 207.6–210.2 test; 164.062 → 171.5–171.7 train). The LOOCV subset
+improvement does not transfer. No ingress term ships; see `cdf-high-ba-ingress-negative.md`.
