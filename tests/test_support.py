@@ -16,8 +16,8 @@ def test_sbps_is_not_matched_as_sbs() -> None:
     """The longer token wins; SBPS has its own pending fold."""
     record = classify("SBPSmc/01", "PL")
     assert record.tier is SupportTier.PROVISIONAL
-    assert record.evidence == "w7-sbps-large-tree"
-    assert "MORTMULT 2" in record.reason
+    assert record.evidence == "w7-sbps-large-tree, dbh-limit-clean-fold"
+    assert "withdrawn" in record.reason
 
 
 def test_sbs_cites_the_w6_large_tree_row() -> None:
@@ -73,8 +73,8 @@ def test_essf_is_v3_after_w16() -> None:
     assert record.tier is SupportTier.PROVISIONAL
     assert record.path == "V3"
     assert "w16-essf-v3" in record.evidence
-    assert "essf-v3" in record.evidence
-    assert "BAIMULT 2.5" in record.reason
+    assert "essf-v3" not in record.evidence.split(", ")
+    assert "withdrawn" in record.reason
 
 
 def test_ms_is_v3_after_w15() -> None:
@@ -82,8 +82,8 @@ def test_ms_is_v3_after_w15() -> None:
     record = classify("MSdm1", "PL")
     assert record.path == "V3"
     assert "w15-ms-v3" in record.evidence
-    assert "ms-v3" in record.evidence
-    assert "V3 fitted" in record.reason
+    assert "ms-v3" not in record.evidence.split(", ")
+    assert "withdrawn" in record.reason
 
 
 def test_pp_is_v3_after_w17() -> None:

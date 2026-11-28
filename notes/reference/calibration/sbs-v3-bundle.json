@@ -1,5 +1,5 @@
 {
-  "bundle_id": "sbs-v3-bl-ccf-mm185-2026-11-27",
+  "bundle_id": "sbs-v3-mm110-2026-11-28",
   "version": "0.1.0",
   "pins": {
     "pyfvs_commit": "e95172b",
@@ -12,6 +12,7 @@
       "KAM",
       "NEL"
     ],
+    "tsas": [],
     "becs": [
       "SBS"
     ],
@@ -27,14 +28,14 @@
       "fields": [
         "1",
         "FD",
-        "1.8500",
+        "1.1000",
         "0",
         "999"
       ],
       "units": "multiplier",
       "value_index": 2,
       "bounds": {
-        "min": 0.25,
+        "min": 0.1,
         "max": 4.0
       }
     },
@@ -43,14 +44,14 @@
       "fields": [
         "1",
         "PL",
-        "1.8500",
+        "1.1000",
         "0",
         "999"
       ],
       "units": "multiplier",
       "value_index": 2,
       "bounds": {
-        "min": 0.25,
+        "min": 0.1,
         "max": 4.0
       }
     },
@@ -59,14 +60,14 @@
       "fields": [
         "1",
         "SE",
-        "1.8500",
+        "1.1000",
         "0",
         "999"
       ],
       "units": "multiplier",
       "value_index": 2,
       "bounds": {
-        "min": 0.25,
+        "min": 0.1,
         "max": 4.0
       }
     },
@@ -75,31 +76,31 @@
       "fields": [
         "1",
         "HW",
-        "1.8500",
+        "1.1000",
         "0",
         "999"
       ],
       "units": "multiplier",
       "value_index": 2,
       "bounds": {
-        "min": 0.25,
+        "min": 0.1,
         "max": 4.0
       }
     }
   ],
   "training": {
     "data_checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-    "split": "SBS 38 held-out / 106 train intervals; SBSmc2 high-BA cell inspected",
-    "objective": "held-out BA and TPH error; dense small-tree SBSmc2",
+    "split": "SBS stable-DBH-limit zone fold: 40 held-out / 104 train intervals (per-BEC 10)",
+    "objective": "held-out and train BA and TPH MAE on intervals with an unchanged DBH tally limit",
     "convergence": {
-      "iterations": 1,
-      "method": "fixed candidate"
+      "iterations": 0,
+      "method": "train-only mortality grid; selected MORTMULT 1.1 for FD/PL/SE/HW"
     }
   },
   "review": {
-    "reviewer": "SBSmc2 density check, not signed off",
-    "date": "2026-11-27",
+    "reviewer": "SBS clean-fold refit, not signed off",
+    "date": "2026-11-28",
     "signed_off": false
   },
-  "claim": "SBS V3: MORTMULT 1.85 for FD/PL/SE/HW plus the W22 BL density term (CCFA -0.35); BA and TPH MAE improve on held-out and train, and the SBSmc2 cell improves from +2.8/-200 to +1.5/-81; unsigned pilot."
+  "claim": "SBS V3: MORTMULT 1.1 for FD/PL/SE/HW, replacing the 1.85 fit on a contaminated fold. All four MAE measures improve on train and held out. Unsigned pilot."
 }

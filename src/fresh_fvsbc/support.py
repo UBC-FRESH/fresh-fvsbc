@@ -110,15 +110,16 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "SBPS",
         SupportTier.PROVISIONAL,
-        "V3 pilot; W7 fitted large-tree DG with the SBPS MORTMULT 2 bundle; BL/EP/OH still zero",
-        "w7-sbps-large-tree",
+        "V3 pilot; W7 fitted large-tree DG; BL/EP/OH still zero; "
+        "zone bundle withdrawn on stable folds",
+        "w7-sbps-large-tree, dbh-limit-clean-fold",
     ),
     (
         "SBS",
         SupportTier.PROVISIONAL,
         "V3 W6 large-tree row with the W18 BL refit; W22 BL density term; "
-        "MORTMULT 1.85 for FD/PL/SE/HW",
-        "w6-sbs-large-tree, w18-sbs-bl-refit, w22-sbs-bl-density, "
+        "MORTMULT 1.1 for FD/PL/SE/HW",
+        "w6-sbs-large-tree, w18-sbs-bl-refit, w22-sbs-bl-density, sbs-v3, "
         "sbsmc2-v3, sbsmw-v3, sbswk2-v3, sbsdw1-v3, "
         "w28-sbsmc2-stem-shape",
     ),
@@ -127,16 +128,15 @@ _ZONE_TIERS: tuple[tuple[str, SupportTier, str, str], ...] = (
     (
         "ESSF",
         SupportTier.PROVISIONAL,
-        "V3 fitted rows with the essf-v3 bundle (BAIMULT 2.5, MORTMULT 0.9); "
-        "partial ten-year-basis growth correction; unsigned",
-        "w16-essf-v3, essf-v3",
+        "V3 fitted rows; partial ten-year-basis growth correction; zone bundle "
+        "withdrawn on stable folds; unsigned",
+        "w16-essf-v3, dbh-limit-clean-fold",
     ),
     (
         "MS",
         SupportTier.PROVISIONAL,
-        "V3 fitted rows with the ms-v3 bundle (BAIMULT 1.6 + recruitment v1); "
-        "tabular mortality; unsigned",
-        "w15-ms-v3, ms-v3",
+        "V3 fitted rows; tabular mortality; zone bundle withdrawn on stable folds; unsigned",
+        "w15-ms-v3, dbh-limit-clean-fold",
     ),
     (
         "PP",

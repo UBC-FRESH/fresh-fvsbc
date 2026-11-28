@@ -75,12 +75,25 @@ is removed, it either does nothing or adds variance. `SBSmk1` has no clean candi
 BA and TPH in both folds (the best growth/mortality pairs trade 0.01–0.02 m²/ha of BA MAE for a
 TPH gain), so it ships no bundle.
 
-## 5. What else this touches
+## 5. Zone-level recheck
 
 The break is not SBS-specific: 2,797 intervals span CWH, ICH, MS, IDF and every other zone. The
-zone-level bundles (`cwh-v3`, `mh-v3`, `ms-v3`, `sbs-v3`, …) were calibrated before the flag
-existed and need rechecking on stable folds. That recheck is the next step; it is not assumed safe
-by this change.
+zone bundles were rechecked on stable folds (`--per-bec 10`, the zone-quality split):
+
+| Zone bundle | Held-out and train result on the stable fold | Action |
+| --- | --- | --- |
+| `cwh-v3` | test 5.59/206.7 → 3.38/171.4; train 6.15/331.5 → 4.27/269.1 | keep |
+| `mh-v3` | test 2.71/99.7 → 2.04/85.7; train 4.77/444.5 → 3.44/395.8 | keep |
+| `cdf-v3` | test 5.26/30.8 → 1.06/29.3 | keep |
+| `pp-v3` | test 2.01/80.3 → 1.26/79.8; train 2.51/40.5 → 1.84/38.8 | keep |
+| `sbs-v3` | old 1.85: test TPH 543 → 577, train 4.69/334 → 4.85/348 | refit to 1.1 |
+| `sbps-v3` | test TPH 847 → 1218; train 490 → 703 | withdraw |
+| `ms-v3` | test TPH 307 → 311; train 584 → 646 | withdraw |
+| `essf-v3` | test TPH 394.9 → 396.6; train 534.6 → 530.5 | withdraw |
+
+The `sbs-v3` refit (`MORTMULT 1.1`) gives test 6.760/538.6 and train 4.617/331.8, improving all
+four against base. SBPS, MS and ESSF have no clean candidate that improves BA and TPH in both
+folds, so their bundles are withdrawn rather than shipped with a known trade.
 
 ## Reproduce
 

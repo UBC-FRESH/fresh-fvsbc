@@ -1,5 +1,7 @@
 # `ms-v3`: MS growth plus recruitment
 
+**Withdrawn in 0.41.18.** The 0.41.8 numbers came from a fold that included intervals with a changed DBH tally limit. On the stable fold no candidate improves BA and TPH in both folds (best test TPH 306.8 against 307.1 base); MS ships no zone bundle. See `dbh-limit-break.md`.
+
 Status: **shipped in 0.41.8; verified from PyPI.** Engine unchanged at 0.4.14. Tier stays C (unsigned).
 
 ## 1. Starting point

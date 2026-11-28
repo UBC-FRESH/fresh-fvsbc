@@ -13,14 +13,25 @@ decimal places.
 | IDF | V3 | 167 | train | −0.63 | 3.69 | none |
 | ICH | V3 | 213 | train | −1.26 | 5.53 | none |
 | CWH | V3 | 398 | 108 held out | −0.71 | 3.78 | `BAIMULT 8` + W21 small-tree density |
-| SBS | V3 | 144 | 38 held out | −0.53 | 5.91 | `MORTMULT 1.85` + W22 BL density |
+| SBS | V3 | 144 | 38 held out | −0.53 | 5.91 | `MORTMULT 1.1` + W22 BL density (refit 0.41.18) |
 | BWBS | V3 | 94 | train | +2.31 | 6.71 | none |
-| SBPS | V3 | 27 | 6 held out | +2.18 | 2.64 | `MORTMULT 2` |
+| SBPS | V3 | 27 | 6 held out | +2.18 | 2.64 | none (withdrawn 0.41.18) |
 | MH | V3 | 18 | 3 held out | +1.47 | 1.71 | `BAIMULT 8` |
 | CDF | V3 | 30 | 16 held out | −1.75 | 3.01 | `BAIMULT 8` + `MORTMULT 0.5` FD/AC + W30 high-BA |
-| MS | V3 | 134 | 19 held out | −2.83 | 3.75 | `BAIMULT 1.6` + recruitment |
-| ESSF | V3 | 302 | 42 held out | −2.21 | 5.15 | `BAIMULT 2.5` + `MORTMULT 0.9` |
+| MS | V3 | 134 | 19 held out | −2.83 | 3.75 | none (withdrawn 0.41.18) |
+| ESSF | V3 | 302 | 42 held out | −2.21 | 5.15 | none (withdrawn 0.41.18) |
 | PP | V3 | 27 | LOSO (10 sites) | −1.70 | 1.76 | `BAIMULT 3.0` + `MORTMULT 0.8` |
+
+
+## Stable-DBH-limit note (0.41.18)
+
+The numbers above were measured before `--stable-dbh-limit` existed and include intervals whose two
+visits tally different DBH limits (16% of the calibration set). On stable folds:
+
+- **CWH**, **MH**, **CDF** and **PP** keep their bundles; each still improves both held-out BA and TPH.
+- **SBS** is refit to `MORTMULT 1.1` (test 7.010/543.1 → 6.760/538.6; train 4.687/333.7 → 4.617/331.8).
+- **SBPS**, **MS** and **ESSF** lose their bundles: on the stable fold no candidate improves BA and
+  TPH in both folds. See `dbh-limit-break.md`.
 
 ## What the table says
 

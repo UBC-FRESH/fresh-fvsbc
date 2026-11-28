@@ -60,16 +60,17 @@ outside the repository because they carry site identifiers.
 | `w30-cdf-high-ba-mort.patch.gz` | CDF mortality x0.25 above BA 90 m2/ha, applied after W28 |
 | `mh-v3-bundle.json`, `cdf-v3-bundle.json` | The MH and CDF V3 bundles (`BAIMULT 8`); supersede the V2 bundles |
 | `cwh-v3-bundle.json` | The CWH V3 bundle (`BAIMULT 8`); supersedes `cwh-v2-bundle.json` |
+| `sbs-v3-bundle.json` | The SBS zone bundle (`MORTMULT 1.1` for FD/PL/SE/HW) |
 | `sbsmc2-v3-bundle.json` | SBSmc2 subzone bundle (`BAIMULT 0.3`, `MORTMULT 1.15`) |
 | `sbsmk1-v3-bundle.json` | Withdrawn 0.41.17; SBSmk1 ships no bundle |
 | `sbsmw-v3-bundle.json` | SBSmw subzone bundle (`BAIMULT 0.95`) |
 | `sbswk2-v3-bundle.json` | SBSwk2 subzone bundle (`BAIMULT 2.0`, `MORTMULT 1.2`) |
 | `sbsdw1-v3-bundle.json` | SBSdw1 subzone bundle (`MORTMULT 1.25`) |
-| `essf-v3-bundle.json` | The ESSF V3 bundle (`BAIMULT 2.5`, `MORTMULT 0.9`) |
-| `ms-v3-bundle.json` | The MS V3 bundle (`BAIMULT 1.6` + recruitment v1) |
+| `essf-v3-bundle.json` | Withdrawn 0.41.18; no clean candidate improves BA and TPH |
+| `ms-v3-bundle.json` | Withdrawn 0.41.18; no clean candidate improves BA and TPH |
 | `pp-v3-bundle.json` | The PP V3 bundle (`BAIMULT 3.0`, `MORTMULT 0.8`) |
 | `recruitment-bc-v1-bundle.json` | The BC recruitment v1 bundle (BEC × species × BA bin, scale 0.4) |
-| `sbps-v3-bundle.json` | The SBPS V3 base bundle (`MORTMULT 2`) |
+| `sbps-v3-bundle.json` | Withdrawn 0.41.18; no clean candidate improves BA and TPH |
 | `cwh-v2-bundle.json` | The CWH V2 stand-level bundle (`BAIMULT 10`) |
 | `mh-v2-bundle.json` | The MH V2 bundle (`BAIMULT 10`); **superseded by W9** |
 | `cdf-v2-bundle.json` | The CDF V2 bundle (`BAIMULT 10`); **superseded by W9** |
