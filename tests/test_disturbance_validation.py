@@ -131,6 +131,44 @@ def test_coverage_accepts_an_empty_template() -> None:
     assert result["severity_min"] is None
 
 
+def test_interval_coverage_counts_events_between_visits() -> None:
+    """An event after the first visit and before the second is inside."""
+    observations = pd.DataFrame(
+        [
+            {"SITE_IDENTIFIER": 1, "DISTURBANCE_YEAR": 2005, "DISTURBANCE_TYPE": "fire"},
+            {"SITE_IDENTIFIER": 1, "DISTURBANCE_YEAR": 1995, "DISTURBANCE_TYPE": "harvest"},
+        ]
+    )
+    intervals = pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 1,
+                "year0": 2000,
+                "year1": 2010,
+                "interval_id": "1|1|2000|2010",
+            }
+        ]
+    )
+    result = disturbance.interval_coverage(observations, intervals)
+    assert result["events"] == 1
+    assert result["intervals"] == 1
+    assert result["sites"] == 1
+    assert result["by_type"] == {"fire": 1}
+
+
+def test_interval_coverage_handles_empty_and_missing_columns() -> None:
+    """An empty table is zero; a bad interval table names the missing column."""
+    empty = pd.DataFrame(columns=disturbance.REQUIRED_COLUMNS)
+    assert disturbance.interval_coverage(empty, pd.DataFrame())["events"] == 0
+    with pytest.raises(DisturbanceError, match="missing interval columns"):
+        disturbance.interval_coverage(
+            pd.DataFrame(
+                [{"SITE_IDENTIFIER": 1, "DISTURBANCE_YEAR": 2000, "DISTURBANCE_TYPE": "fire"}]
+            ),
+            pd.DataFrame({"SITE_IDENTIFIER": [1]}),
+        )
+
+
 def test_summarise_scores_by_type_and_severity() -> None:
     """Bias and MAE are computed against the observed post-event stand."""
     predictions = pd.DataFrame(
@@ -179,7 +217,14 @@ def test_cli_reports_coverage_and_scores_predictions(
 
     data = tmp_path / "calib"
     data.mkdir()
-    pd.DataFrame({"SITE_IDENTIFIER": [1, 2]}).to_csv(data / "intervals.csv", index=False)
+    pd.DataFrame(
+        {
+            "SITE_IDENTIFIER": [1, 2],
+            "year0": [2000, 2000],
+            "year1": [2010, 2010],
+            "interval_id": ["1|1|2000|2010", "2|1|2000|2010"],
+        }
+    ).to_csv(data / "intervals.csv", index=False)
     events = _observations(tmp_path / "events.csv")
     status = validate_disturbance.main(["--observations", str(events), "--intervals", str(data)])
     assert status == 0

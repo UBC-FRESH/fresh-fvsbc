@@ -115,6 +115,50 @@ def coverage(observations: pd.DataFrame, intervals: pd.DataFrame) -> dict[str, o
     }
 
 
+def interval_coverage(observations: pd.DataFrame, intervals: pd.DataFrame) -> dict[str, object]:
+    """Count observed events that fall inside a calibration interval.
+
+    Parameters
+    ----------
+    observations : pandas.DataFrame
+        A table returned by :func:`load_observations`.
+    intervals : pandas.DataFrame
+        The calibration interval table, with ``SITE_IDENTIFIER``, ``year0``,
+        ``year1`` and ``interval_id``.
+
+    Returns
+    -------
+    dict
+        Event, interval and site counts for events whose year lies between
+        the interval's two visits, plus counts by disturbance type.
+    """
+    if observations.empty:
+        return {"events": 0, "intervals": 0, "sites": 0, "by_type": {}}
+    missing = [
+        name
+        for name in ("SITE_IDENTIFIER", "year0", "year1", "interval_id")
+        if name not in intervals.columns
+    ]
+    if missing:
+        raise DisturbanceError(f"missing interval columns: {', '.join(missing)}")
+    joined = observations.merge(
+        intervals[["SITE_IDENTIFIER", "year0", "year1", "interval_id"]],
+        on="SITE_IDENTIFIER",
+        how="inner",
+    )
+    inside = joined[
+        (joined["DISTURBANCE_YEAR"] >= joined["year0"])
+        & (joined["DISTURBANCE_YEAR"] <= joined["year1"])
+    ]
+    by_type = inside["DISTURBANCE_TYPE"].value_counts().to_dict()
+    return {
+        "events": len(inside),
+        "intervals": int(inside["interval_id"].nunique()),
+        "sites": int(inside["SITE_IDENTIFIER"].nunique()),
+        "by_type": {str(key): int(value) for key, value in by_type.items()},
+    }
+
+
 def summarise(predictions: pd.DataFrame) -> pd.DataFrame:
     """Return BA/TPH bias and MAE by disturbance type and severity class.
 

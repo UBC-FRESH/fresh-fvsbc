@@ -20,6 +20,7 @@ from fresh_fvsbc.disturbance import (
     EXIT_OK,
     DisturbanceError,
     coverage,
+    interval_coverage,
     load_observations,
     summarise,
 )
@@ -62,7 +63,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     except (OSError, DisturbanceError) as error:
         print(f"validate_disturbance: {error}")
         return EXIT_BAD_INPUT
-    print(json.dumps(coverage(observations, intervals), indent=2, sort_keys=True))
+    try:
+        print(json.dumps(coverage(observations, intervals), indent=2, sort_keys=True))
+        print(json.dumps(interval_coverage(observations, intervals), indent=2, sort_keys=True))
+    except DisturbanceError as error:
+        print(f"validate_disturbance: {error}")
+        return EXIT_BAD_INPUT
     if args.predictions is None:
         print("validate_disturbance: no predictions supplied; coverage only")
         return EXIT_OK
