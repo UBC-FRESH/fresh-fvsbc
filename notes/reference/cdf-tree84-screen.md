@@ -1,6 +1,6 @@
 # CDF dense stand: the 2008–2024 BA jump is one keying error
 
-Status: **diagnosed and screened; no shipped parameter changes.** Tool: `--max-dbh-growth-rate`.
+Status: **diagnosed and screened; no shipped parameter changes; verified from PyPI in 0.41.19.** Tool: `--max-dbh-growth-rate`.
 
 ## 1. The record
 
