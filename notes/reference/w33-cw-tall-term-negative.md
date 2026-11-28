@@ -53,3 +53,10 @@ under the current rule; a future CW formulation needs a stronger, structurally d
 - Fit: `~/workspace/bwbs-work/fit_cw_new.py` tall-term grid (H0=25, exp=1).
 - A/B: `cwh-height-w33-summary.csv` against `cwh-height-w11revert-summary.csv`.
 - Fold: `probe_CWH_w33/` against `probe_CWH_zone_stable_bundle/`.
+
+## 6. A height-diameter follow-up also fails
+
+A direct height-growth form with a `max(0, H−30)` tall term fits the pairs best (RMSE 1.089, tall
+bias −0.051) but worsens the stand A/B (top −5.55 → −5.64, volume −106.98 → −109.50, BA
+−4.737 → −4.761) and leaves the 65-interval fold flat-to-worse. See
+`w36-cw-height-diameter-negative.md`.
