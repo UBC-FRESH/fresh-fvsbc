@@ -81,3 +81,11 @@ separate tree-output change, not a height-equation fit.
 
 **Consequence:** W37 remains the best stand-level evidence for CW height. A height-balanced refit
 cannot be made reliable within the current tree-output interface.
+
+## 7. Keyed refit (W39)
+
+The tree key was recovered by matching the initial output list by species and nearest DBH. On 1,491
+tall trees from 29 intervals the fit is reliable (RMSE 1.085, tall bias +0.026), but the CWH fold
+TPH is 171.414 → 171.506 and the A/B BA is −4.737 → −4.770; only top height (−5.55 → −5.493) and
+volume (−106.98 → −106.77) improve. W39 is weaker than W37 on top/volume. See
+`w39-cw-keyed-refit.md`.
