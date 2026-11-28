@@ -1,6 +1,6 @@
 # W38: CDF BA>60 mortality ramp on QMD
 
-Status: **shipped in wrapper 0.41.23 / engine 0.4.17.**
+Status: **shipped in wrapper 0.41.23 / engine 0.4.17; verified from PyPI.**
 
 ## 1. The term
 
