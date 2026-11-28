@@ -1,6 +1,6 @@
 # `sbsmk1-v3`: the SBSmk1 subzone gap
 
-Status: **shipped in 0.41.12; verified from PyPI.** Engine unchanged at 0.4.16. Tier stays C (unsigned).
+Status: **shipped in 0.41.14; verified from PyPI.** Engine unchanged at 0.4.16. Tier stays C (unsigned).
 
 ## 1. The gap
 
