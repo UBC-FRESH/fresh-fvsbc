@@ -53,3 +53,11 @@ documented limit.
 - Site/interval counts: `faib_header.csv`, `faib_sample_byvisit.csv`, `calib/intervals.csv`.
 - W35 expanded fold: `probe_cdf_w35_expanded/` vs `probe_cdf_base_expanded/`.
 - CWH transfer: `probe_CWH_w35/` vs `probe_CWH_zone_stable_bundle/`.
+
+## 5. Tree-level survival was tried and has no signal
+
+The four target intervals have two dead trees; widening to BA ≥50, QMD 27–35 gives 31 dead trees at
+four sites. A logistic survival model has pooled leave-one-site-out AUC **0.356** (worse than
+random) and Brier 0.0366 against an intercept baseline of 0.0373. On the expanded fold the
+high-BA/QMD subset is again AUC 0.356. No survival term ships; see
+`cdf-tree-survival-negative.md`.
