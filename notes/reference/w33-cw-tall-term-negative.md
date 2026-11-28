@@ -1,7 +1,7 @@
 # W33: a donor-preserving tall-tree CW term
 
-Status: **negative for shipping.** It improves top height and volume marginally but leaves BA and
-TPH unchanged; the donor stays.
+Status: **negative for shipping; verified from PyPI in 0.41.22.** It improves top height and volume
+marginally but leaves BA and TPH unchanged; the donor stays.
 
 ## 1. The term
 
