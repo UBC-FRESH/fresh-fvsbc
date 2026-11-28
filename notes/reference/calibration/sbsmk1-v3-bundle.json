@@ -1,0 +1,402 @@
+{
+  "bundle_id": "sbsmk1-v3-ba20-mm085-2026-11-28",
+  "version": "0.1.0",
+  "pins": {
+    "pyfvs_commit": "e95172b",
+    "fvs_source_commit": "ef5fa847",
+    "variant": "bc"
+  },
+  "domain": {
+    "regions": [
+      "CAR",
+      "KAM",
+      "NEL"
+    ],
+    "tsas": [],
+    "becs": [
+      "SBSmk1"
+    ],
+    "species_groups": [],
+    "dbh_classes": [],
+    "management": [
+      "untreated"
+    ]
+  },
+  "parameters": [
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PL",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "SE",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "AT",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "BL",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "AC",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "EP",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "FD",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PY",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "CW",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "BG",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "HW",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "BAIMULT",
+      "fields": [
+        "1",
+        "PW",
+        "2.0000"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.25,
+        "max": 15.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "PL",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "SE",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "AT",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "BL",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "AC",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "EP",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "FD",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "PY",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "CW",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "BG",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "HW",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    },
+    {
+      "keyword": "MORTMULT",
+      "fields": [
+        "1",
+        "PW",
+        "0.8500",
+        "0",
+        "999"
+      ],
+      "units": "multiplier",
+      "value_index": 2,
+      "bounds": {
+        "min": 0.1,
+        "max": 4.0
+      }
+    }
+  ],
+  "training": {
+    "data_checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "split": "SBSmk1 20% site split: 56 held-out / 218 train intervals (BA-stratified)",
+    "objective": "held-out and train BA and TPH MAE; coupled growth/mortality",
+    "convergence": {
+      "iterations": 0,
+      "method": "train-only grid; selected BAIMULT 2.0, MORTMULT 0.85"
+    }
+  },
+  "review": {
+    "reviewer": "SBSmk1 coupled check, not signed off",
+    "date": "2026-11-28",
+    "signed_off": false
+  },
+  "claim": "SBSmk1 V3: BAIMULT 2.0 and MORTMULT 0.85. Both folds under-predicted BA and TPH; both MAE measures improve on train and held out. Unsigned pilot."
+}

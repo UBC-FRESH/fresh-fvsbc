@@ -88,6 +88,17 @@ def test_the_ms_bundle_carries_the_growth_and_recruitment_rows() -> None:
     assert bundle.ingrowth is not None
 
 
+def test_the_sbsmk1_bundle_carries_the_coupled_rows() -> None:
+    """SBSmk1 carries the growth and mortality correction."""
+    bundle = load_default_bundle("sbsmk1-v3")
+    bai = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "BAIMULT"}
+    mort = {p.fields[1]: p.fields[2] for p in bundle.parameters if p.keyword == "MORTMULT"}
+    assert set(bai.values()) == {"2.0000"}
+    assert set(mort.values()) == {"0.8500"}
+    assert len(bai) == 12
+    assert len(mort) == 12
+
+
 def test_the_sbsmc2_bundle_carries_the_full_subzone_rows() -> None:
     """SBSmc2 needs the growth correction and the recruitment block."""
     bundle = load_default_bundle("sbsmc2-v3")

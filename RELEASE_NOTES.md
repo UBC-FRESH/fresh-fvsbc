@@ -1,4 +1,35 @@
-# fresh-fvsbc 0.41.11
+# fresh-fvsbc 0.41.12
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.11
+
+- **First SBSmk1 bundle.** The province data showed SBSmk1 far worse than the SBS zone average:
+  **−5.18 BA / −637 TPH** on a 56-interval held-out fold. `sbsmk1-v3` carries **`BAIMULT 2.0`**
+  and **`MORTMULT 0.85`**.
+- **All four MAE figures improve.** Held-out BA 7.00 → **6.37**, TPH 881 → **873**; train BA
+  6.54 → **6.12**, TPH 780 → **767**. Held-out BA bias improves from −5.18 to −1.97.
+- **W22 was not the cause.** Scoping the SBS-wide BL density term to SBSmc2 changed SBSmk1 and
+  SBSmc by zero; the gap is subzone calibration, not a W22 regression.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.16`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.12"
+```
+
+## Gaps that remain
+
+- SBSmk1 still −2.0 m²/ha / −669 TPH biased (MAE improved).
+- SBSmc2 +2.2 m²/ha / −323 TPH on the matched fold.
+- The CDF dense stand is still ~28 m²/ha / ~56 TPH short.
+- CW large-tree height is still the donor.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.11
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
