@@ -94,3 +94,15 @@ PSP site ids and stays outside the repository; the tracked template remains head
 "observations": 24, "matched_sites": 20, "by_type": {"fire": 20, "harvest": 4}
 "events": 2, "intervals": 2, "sites": 2, "by_type": {"harvest": 2}
 ```
+
+## Full-extent severity fetch (0.41.22 follow-up)
+
+The burn-severity layer was fetched for the full PSP bounding box and joined to all calibration
+site points. Result: **1,161 site–fire pairs at 1,030 sites, 305 fires**, with severity overlap on
+**96 site–fire pairs at 95 sites** (30 fires: 13 high, 38 medium, 20 low, 25 unburned). Including
+the South Coast cutblocks gives **100 observations at 99 sites**; the harness finds **6 events
+inside calibration intervals** (4 fire, 2 harvest).
+
+Only two of the four in-interval fires have a usable post-fire BA/TPH change; one is unburned and
+one has the fire at the second visit. A fire-response fit on two events is not identifiable. See
+`disturbance-fire-response.md`.
