@@ -10,6 +10,7 @@ import pandas as pd
 import pytest
 
 import run_calibration_probe as probe
+from fresh_fvsbc.bundle import default_bundle_path
 from fresh_fvsbc.calibration_probe import (
     eligible_intervals,
     ingrowth_keyword,
@@ -248,7 +249,33 @@ def test_screen_tree_growth_flags_an_impossible_dbh_jump(tmp_path: Path) -> None
             },
         ]
     )
-    screened = probe._screen_tree_growth(sample, psp, max_rate=2.0)
+    extra = pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 3,
+                "CLSTR_ID": "3-PSP",
+                "PLOT": 1,
+                "visit0": 1,
+                "visit1": 2,
+                "years": 10.0,
+                "BEC": "CDFmm",
+                "interval_id": "3|1|1990|2000",
+            },
+            {
+                "SITE_IDENTIFIER": 4,
+                "CLSTR_ID": "4-PSP",
+                "PLOT": 1,
+                "visit0": 1,
+                "visit1": 2,
+                "years": 10.0,
+                "BEC": "CDFmm",
+                "interval_id": "4|1|1990|2000",
+            },
+        ]
+    )
+    screened = probe._screen_tree_growth(
+        pd.concat([sample, extra], ignore_index=True), psp, max_rate=2.0
+    )
     assert screened["interval_id"].tolist() == ["1|1|2008|2024"]
     assert screened.loc[0, "max_growth_cm_per_year"] == pytest.approx(18.96, abs=0.01)
     assert screened.loc[0, "max_end_dbh_cm"] == 401.7
@@ -582,6 +609,156 @@ def test_probe_main_writes_screened_intervals(
     assert screened.loc[0, "max_end_dbh_cm"] == 401.7
     rows_out = pd.read_csv(tmp_path / "out" / "probe.csv")
     assert rows_out["interval_id"].tolist() == ["2|1|1990|2000"]
+
+
+def _probe_data(tmp_path: Path) -> tuple[Path, Path]:
+    """A one-interval dataset and candidate file for argument tests."""
+    data = tmp_path / "data"
+    data.mkdir()
+    pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 1,
+                "CLSTR_ID": "1-PSP",
+                "visit0": 1,
+                "visit1": 2,
+                "PLOT": 1,
+                "ba0": 30.0,
+                "next_ba": 32.0,
+                "tph0": 900.0,
+                "next_tph": 850.0,
+                "dead_tph": 50.0,
+                "dead_ba": 2.0,
+                "qmd": 12.0,
+                "BEC": "CDFmm",
+                "TSA_DESC": "Quesnel TSA",
+                "years": 16.0,
+                "year0": 2008,
+                "year1": 2024,
+                "interval_id": "1|1|2008|2024",
+            }
+        ]
+    ).to_csv(data / "intervals.csv", index=False)
+    pd.DataFrame(
+        [{"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 2, "PLOT": 1, "ba": 32.0, "tph": 850.0}]
+    ).to_csv(data / "visits.csv", index=False)
+    candidates = tmp_path / "candidates.json"
+    candidates.write_text(json.dumps([{"label": "base", "bamax": 50.0}]), encoding="utf-8")
+    return data, candidates
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        ("--cycles", "0"),
+        ("--min-dbh", "-1"),
+        ("--max-dbh-growth-rate", "-1"),
+        ("--max-unaccounted-removal", "-1"),
+        ("--max-cycle-years", "5"),
+        ("--min-qmd", "-1"),
+    ],
+)
+def test_probe_main_rejects_bad_arguments(tmp_path: Path, extra: tuple[str, ...]) -> None:
+    """Invalid values exit with the bad-input code before any extension run."""
+    data, candidates = _probe_data(tmp_path)
+    args = [
+        "--data-dir",
+        str(data),
+        "--psp-dir",
+        str(tmp_path / "psp"),
+        "--out-dir",
+        str(tmp_path / "out"),
+        "--domain",
+        "CDF",
+        "--candidates",
+        str(candidates),
+        *extra,
+    ]
+    if extra == ("--max-cycle-years", "5"):
+        args += ["--cycles", "2"]
+    assert probe.main(args) == 2
+
+
+def test_probe_main_reports_an_empty_domain(tmp_path: Path) -> None:
+    """A domain that matches no interval is a bad input, not an empty run."""
+    data, candidates = _probe_data(tmp_path)
+    status = probe.main(
+        [
+            "--data-dir",
+            str(data),
+            "--psp-dir",
+            str(tmp_path / "psp"),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--domain",
+            "NOPE",
+            "--exact-bec",
+            "--candidates",
+            str(candidates),
+        ]
+    )
+    assert status == 2
+
+
+def test_probe_main_renders_bundle_ingrowth_and_cycles(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A bundle's ingrowth block and a multi-cycle interval are both rendered."""
+    data, candidates = _probe_data(tmp_path)
+    psp = tmp_path / "psp"
+    psp.mkdir()
+    pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 1,
+                "CLSTR_ID": "1-PSP",
+                "VISIT_NUMBER": visit,
+                "PLOT": 1,
+                "TREE_NO": 1,
+                "SPECIES": "FD",
+                "DBH": dbh,
+                "HEIGHT": 30.0,
+                "LV_D": "L",
+                "PHF_TREE": 2.47,
+                "CR_CL": "C",
+            }
+            for visit, dbh in ((1, 20.0), (2, 22.0))
+        ]
+    ).to_csv(psp / "faib_tree_detail.csv", index=False)
+    pd.DataFrame(
+        [
+            {"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 1, "CLSTR_ID": "1-PSP"},
+            {"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 2, "CLSTR_ID": "1-PSP"},
+        ]
+    ).to_csv(psp / "faib_sample_byvisit.csv", index=False)
+    monkeypatch.setattr(probe, "psp_tree_records", lambda *_a, **_k: ([{"species": "FD"}], 0))
+    monkeypatch.setattr(
+        probe, "run_case", lambda *_a, **_k: SimpleNamespace(database=tmp_path / "FVSOut.db")
+    )
+    monkeypatch.setattr(probe, "summary_for_year", lambda *_a, **_k: {"ba": 31.0, "tph": 950.0})
+    status = probe.main(
+        [
+            "--data-dir",
+            str(data),
+            "--psp-dir",
+            str(psp),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--domain",
+            "CDF",
+            "--candidates",
+            str(candidates),
+            "--bundle",
+            str(default_bundle_path("recruitment-bc-v1")),
+            "--max-cycle-years",
+            "5",
+            "--min-dbh",
+            "1",
+        ]
+    )
+    assert status == 0
+    rows = pd.read_csv(tmp_path / "out" / "probe.csv")
+    assert rows["cycles"].iloc[0] > 1
 
 
 def test_candidates_refuses_empty_and_unlabelled_lists(tmp_path: Path) -> None:
