@@ -139,6 +139,55 @@ def test_probe_parser_carries_the_common_minimum_dbh() -> None:
     assert args.min_dbh == 4.0
 
 
+def test_drop_unaccounted_removals_keeps_recorded_mortality() -> None:
+    """A harvest loses trees without a death record; natural mortality does not."""
+    intervals = pd.DataFrame(
+        [
+            {
+                "interval_id": "natural",
+                "tph0": 1000.0,
+                "next_tph": 900.0,
+                "dead_tph": 100.0,
+                "ba0": 40.0,
+                "next_ba": 36.0,
+                "dead_ba": 4.0,
+            },
+            {
+                "interval_id": "harvest",
+                "tph0": 1000.0,
+                "next_tph": 500.0,
+                "dead_tph": 100.0,
+                "ba0": 40.0,
+                "next_ba": 20.0,
+                "dead_ba": 4.0,
+            },
+        ]
+    )
+    kept = probe._drop_unaccounted_removals(intervals, max_fraction=0.1)
+    assert kept["interval_id"].tolist() == ["natural"]
+
+
+def test_probe_parser_carries_the_removal_screen_option() -> None:
+    """The unaccounted-removal screen is explicit on the command line."""
+    args = probe._parser().parse_args(
+        [
+            "--data-dir",
+            "data",
+            "--psp-dir",
+            "psp",
+            "--out-dir",
+            "out",
+            "--domain",
+            "CDF",
+            "--candidates",
+            "candidates.json",
+            "--max-unaccounted-removal",
+            "0.1",
+        ]
+    )
+    assert args.max_unaccounted_removal == 0.1
+
+
 def test_screen_tree_growth_flags_an_impossible_dbh_jump(tmp_path: Path) -> None:
     """A 98.3 -> 401.7 cm tree in sixteen years is a keying error, not growth."""
     psp = tmp_path / "psp"
@@ -422,6 +471,10 @@ def test_probe_main_writes_screened_intervals(
         "visit1": 2,
         "PLOT": 1,
         "ba0": 30.0,
+        "next_ba": 32.0,
+        "tph0": 900.0,
+        "next_tph": 850.0,
+        "dead_tph": 50.0,
         "dead_ba": 2.0,
         "qmd": 12.0,
         "BEC": "CDFmm",
@@ -445,18 +498,33 @@ def test_probe_main_writes_screened_intervals(
                 "year1": 2000,
                 "interval_id": "2|1|1990|2000",
             },
+            {
+                **common,
+                "SITE_IDENTIFIER": 3,
+                "CLSTR_ID": "3-PSP",
+                "year0": 1990,
+                "year1": 2000,
+                "next_ba": 15.0,
+                "next_tph": 400.0,
+                "interval_id": "3|1|1990|2000",
+            },
         ]
     ).to_csv(data / "intervals.csv", index=False)
     pd.DataFrame(
         [
             {"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 2, "PLOT": 1, "ba": 32.0, "tph": 900.0},
             {"SITE_IDENTIFIER": 2, "VISIT_NUMBER": 2, "PLOT": 1, "ba": 32.0, "tph": 900.0},
+            {"SITE_IDENTIFIER": 3, "VISIT_NUMBER": 2, "PLOT": 1, "ba": 15.0, "tph": 400.0},
         ]
     ).to_csv(data / "visits.csv", index=False)
     psp = tmp_path / "psp"
     psp.mkdir()
     rows = []
-    for site, cluster, dbhs in ((1, "1-PSP", (98.3, 401.7)), (2, "2-PSP", (20.0, 22.0))):
+    for site, cluster, dbhs in (
+        (1, "1-PSP", (98.3, 401.7)),
+        (2, "2-PSP", (20.0, 22.0)),
+        (3, "3-PSP", (20.0, 22.0)),
+    ):
         for visit, dbh in zip((1, 2), dbhs, strict=True):
             rows.append(
                 {
@@ -477,7 +545,7 @@ def test_probe_main_writes_screened_intervals(
     pd.DataFrame(
         [
             {"SITE_IDENTIFIER": site, "VISIT_NUMBER": visit, "CLSTR_ID": cluster}
-            for site, cluster in ((1, "1-PSP"), (2, "2-PSP"))
+            for site, cluster in ((1, "1-PSP"), (2, "2-PSP"), (3, "3-PSP"))
             for visit in (1, 2)
         ]
     ).to_csv(psp / "faib_sample_byvisit.csv", index=False)
@@ -504,6 +572,8 @@ def test_probe_main_writes_screened_intervals(
             str(candidates),
             "--max-dbh-growth-rate",
             "5",
+            "--max-unaccounted-removal",
+            "0.1",
         ]
     )
     assert status == 0
@@ -511,7 +581,7 @@ def test_probe_main_writes_screened_intervals(
     assert screened["interval_id"].tolist() == ["1|1|2008|2024"]
     assert screened.loc[0, "max_end_dbh_cm"] == 401.7
     rows_out = pd.read_csv(tmp_path / "out" / "probe.csv")
-    assert "1|1|2008|2024" not in rows_out["interval_id"].tolist()
+    assert rows_out["interval_id"].tolist() == ["2|1|1990|2000"]
 
 
 def test_candidates_refuses_empty_and_unlabelled_lists(tmp_path: Path) -> None:

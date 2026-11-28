@@ -78,6 +78,13 @@ def _parser() -> argparse.ArgumentParser:
         metavar="CM_PER_YEAR",
         help="drop intervals with a matched live tree growing faster than this",
     )
+    parser.add_argument(
+        "--max-unaccounted-removal",
+        type=float,
+        default=None,
+        metavar="FRACTION",
+        help="drop intervals losing more TPH/BA than recorded dead trees explain",
+    )
     parser.add_argument("--per-bec", type=int, default=5, metavar="N")
     parser.add_argument("--min-ba0", type=float, default=15.0, metavar="M2HA")
     parser.add_argument("--max-mortality-fraction", type=float, default=0.4, metavar="FRACTION")
@@ -227,6 +234,25 @@ def _screen_tree_growth(sample: pd.DataFrame, psp_dir: Path, max_rate: float) ->
     return pd.DataFrame(records)
 
 
+def _drop_unaccounted_removals(intervals: pd.DataFrame, max_fraction: float) -> pd.DataFrame:
+    """Drop intervals whose TPH or BA loss is not explained by recorded dead trees.
+
+    An untreated calibration interval records its dead trees.  A harvest or a
+    plot change removes trees without a death record, which shows up as a
+    positive unaccounted loss.
+    """
+    unaccounted_tph = (intervals["tph0"] - intervals["next_tph"] - intervals["dead_tph"]).clip(
+        lower=0.0
+    )
+    unaccounted_ba = (intervals["ba0"] - intervals["next_ba"] - intervals["dead_ba"]).clip(
+        lower=0.0
+    )
+    tph_fraction = unaccounted_tph / intervals["tph0"].clip(lower=1.0)
+    ba_fraction = unaccounted_ba / intervals["ba0"].clip(lower=1.0)
+    keep = (tph_fraction <= max_fraction) & (ba_fraction <= max_fraction)
+    return intervals.loc[keep]
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the probe and write its interval and aggregate tables.
 
@@ -259,6 +285,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             raise ValueError("min_dbh must not be negative")
         if args.max_dbh_growth_rate is not None and args.max_dbh_growth_rate < 0:
             raise ValueError("max_dbh_growth_rate must not be negative")
+        if args.max_unaccounted_removal is not None and args.max_unaccounted_removal < 0:
+            raise ValueError("max_unaccounted_removal must not be negative")
         if args.max_cycle_years is not None and (args.cycles != 1 or args.cycle_years is not None):
             raise ValueError("--max-cycle-years cannot be combined with --cycles or --cycle-years")
     except (OSError, ValueError, json.JSONDecodeError, KeyError) as error:
@@ -283,6 +311,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"run_calibration_probe: {error}")
         return EXIT_BAD_INPUT
     sample = select_intervals(eligible, per_bec=args.per_bec)
+    if args.max_unaccounted_removal is not None:
+        sample = _drop_unaccounted_removals(sample, args.max_unaccounted_removal).copy()
     screened = pd.DataFrame()
     if args.max_dbh_growth_rate is not None:
         screened = _screen_tree_growth(sample, args.psp_dir, args.max_dbh_growth_rate)
@@ -432,6 +462,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "min_dbh": args.min_dbh,
                 "stable_dbh_limit": args.stable_dbh_limit,
                 "max_dbh_growth_rate": args.max_dbh_growth_rate,
+                "max_unaccounted_removal": args.max_unaccounted_removal,
                 "test_sites": sorted(test_sites),
                 "test_year_from": args.test_year_from,
                 "data_checksum": data_checksum,
