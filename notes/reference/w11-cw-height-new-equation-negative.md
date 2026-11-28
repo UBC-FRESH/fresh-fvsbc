@@ -1,6 +1,6 @@
 # CW height: a new-form equation fits the pairs but not the stand
 
-Status: **negative result.** The donor row stays; no engine or parameter change ships.
+Status: **negative result; verified from PyPI in 0.41.21.** The donor row stays; no engine or parameter change ships.
 
 ## 1. The equation
 
