@@ -1,4 +1,36 @@
-# fresh-fvsbc 0.41.22
+# fresh-fvsbc 0.41.23
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.22
+
+- **CDF BA >60 mortality now ramps with QMD (W38).** Mortality is multiplied by
+  `1 − 0.5·max(0, min(1, (50 − QMD)/25))`, so small-QMD high-BA stands keep more stems and
+  large-QMD stands keep the donor response.
+- **Validation.**
+  - Expanded clean fold (31 test / 52 train): test BA MAE **2.489 → 2.460**, TPH
+    **201.406 → 201.342**; train BA **2.032 → 2.015**, TPH 164.062 → 164.099 (flat, +0.02%).
+  - Five-site high-BA leave-one-site-out: mean BA **2.34 → 2.05**, TPH **47.16 → 43.28**.
+- **Engine moved to `fresh-fvsbc-pyfvs 0.4.17`.** The W38 patch is `w38-cdf-qmd-ramp.patch.gz`,
+  applied after W30 in the wheel workflow.
+
+The held-out fold and the LOOCV both improve on BA and TPH; the train TPH change is 0.04 TPH
+(0.02%), effectively flat.
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.23"
+```
+
+## Gaps that remain
+
+- CW large-tree height: W37 improves top/volume but BA/TPH are flat; decision pending.
+- CDF dense stand: the ramp improves the aggregate fold, not the dense-stand specific TPH.
+- Disturbance: two usable in-interval fire events.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.22
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 
