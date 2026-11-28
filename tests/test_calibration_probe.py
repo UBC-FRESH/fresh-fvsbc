@@ -139,6 +139,93 @@ def test_probe_parser_carries_the_common_minimum_dbh() -> None:
     assert args.min_dbh == 4.0
 
 
+def test_screen_tree_growth_flags_an_impossible_dbh_jump(tmp_path: Path) -> None:
+    """A 98.3 -> 401.7 cm tree in sixteen years is a keying error, not growth."""
+    psp = tmp_path / "psp"
+    psp.mkdir()
+    rows = []
+    for site, cluster, tree, dbh in (
+        (1, "1-PSP", 84, 98.3),
+        (1, "1-PSP", 84, 401.7),
+        (2, "2-PSP", 1, 20.0),
+        (2, "2-PSP", 1, 22.0),
+    ):
+        visit = 1 if (site == 1 and dbh < 400) or (site == 2 and dbh == 20.0) else 2
+        rows.append(
+            {
+                "SITE_IDENTIFIER": site,
+                "CLSTR_ID": cluster,
+                "VISIT_NUMBER": visit,
+                "PLOT": 1,
+                "TREE_NO": tree,
+                "SPECIES": "FD",
+                "DBH": dbh,
+                "HEIGHT": 50.0,
+                "LV_D": "L",
+                "PHF_TREE": 2.47,
+                "CR_CL": "C",
+            }
+        )
+    pd.DataFrame(rows).to_csv(psp / "faib_tree_detail.csv", index=False)
+    pd.DataFrame(
+        [
+            {"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 1, "CLSTR_ID": "1-PSP"},
+            {"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 2, "CLSTR_ID": "1-PSP"},
+            {"SITE_IDENTIFIER": 2, "VISIT_NUMBER": 1, "CLSTR_ID": "2-PSP"},
+            {"SITE_IDENTIFIER": 2, "VISIT_NUMBER": 2, "CLSTR_ID": "2-PSP"},
+        ]
+    ).to_csv(psp / "faib_sample_byvisit.csv", index=False)
+    sample = pd.DataFrame(
+        [
+            {
+                "SITE_IDENTIFIER": 1,
+                "CLSTR_ID": "1-PSP",
+                "PLOT": 1,
+                "visit0": 1,
+                "visit1": 2,
+                "years": 16.0,
+                "BEC": "CDFmm",
+                "interval_id": "1|1|2008|2024",
+            },
+            {
+                "SITE_IDENTIFIER": 2,
+                "CLSTR_ID": "2-PSP",
+                "PLOT": 1,
+                "visit0": 1,
+                "visit1": 2,
+                "years": 10.0,
+                "BEC": "CDFmm",
+                "interval_id": "2|1|1990|2000",
+            },
+        ]
+    )
+    screened = probe._screen_tree_growth(sample, psp, max_rate=2.0)
+    assert screened["interval_id"].tolist() == ["1|1|2008|2024"]
+    assert screened.loc[0, "max_growth_cm_per_year"] == pytest.approx(18.96, abs=0.01)
+    assert screened.loc[0, "max_end_dbh_cm"] == 401.7
+
+
+def test_probe_parser_carries_the_growth_screen_option() -> None:
+    """The tree-growth screen is explicit on the command line."""
+    args = probe._parser().parse_args(
+        [
+            "--data-dir",
+            "data",
+            "--psp-dir",
+            "psp",
+            "--out-dir",
+            "out",
+            "--domain",
+            "CDF",
+            "--candidates",
+            "candidates.json",
+            "--max-dbh-growth-rate",
+            "2.0",
+        ]
+    )
+    assert args.max_dbh_growth_rate == 2.0
+
+
 def test_probe_parser_carries_the_exact_bec_flag() -> None:
     """An exact subzone match is explicit, so SBSmc does not absorb SBSmc2."""
     args = probe._parser().parse_args(
@@ -321,6 +408,110 @@ def test_probe_main_writes_a_summary_with_a_mocked_extension(
     metadata = json.loads((tmp_path / "out" / "probe.json").read_text())
     assert metadata["test_year_from"] == 1995
     assert metadata["data_checksum"].startswith("sha256:")
+
+
+def test_probe_main_writes_screened_intervals(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The CLI drops a typo interval and records it for the calibration log."""
+    data = tmp_path / "data"
+    data.mkdir()
+    common = {
+        "CLSTR_ID": "1-PSP",
+        "visit0": 1,
+        "visit1": 2,
+        "PLOT": 1,
+        "ba0": 30.0,
+        "dead_ba": 2.0,
+        "qmd": 12.0,
+        "BEC": "CDFmm",
+        "TSA_DESC": "Quesnel TSA",
+        "years": 16.0,
+    }
+    pd.DataFrame(
+        [
+            {
+                **common,
+                "SITE_IDENTIFIER": 1,
+                "year0": 2008,
+                "year1": 2024,
+                "interval_id": "1|1|2008|2024",
+            },
+            {
+                **common,
+                "SITE_IDENTIFIER": 2,
+                "CLSTR_ID": "2-PSP",
+                "year0": 1990,
+                "year1": 2000,
+                "interval_id": "2|1|1990|2000",
+            },
+        ]
+    ).to_csv(data / "intervals.csv", index=False)
+    pd.DataFrame(
+        [
+            {"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 2, "PLOT": 1, "ba": 32.0, "tph": 900.0},
+            {"SITE_IDENTIFIER": 2, "VISIT_NUMBER": 2, "PLOT": 1, "ba": 32.0, "tph": 900.0},
+        ]
+    ).to_csv(data / "visits.csv", index=False)
+    psp = tmp_path / "psp"
+    psp.mkdir()
+    rows = []
+    for site, cluster, dbhs in ((1, "1-PSP", (98.3, 401.7)), (2, "2-PSP", (20.0, 22.0))):
+        for visit, dbh in zip((1, 2), dbhs, strict=True):
+            rows.append(
+                {
+                    "SITE_IDENTIFIER": site,
+                    "CLSTR_ID": cluster,
+                    "VISIT_NUMBER": visit,
+                    "PLOT": 1,
+                    "TREE_NO": 1,
+                    "SPECIES": "FD",
+                    "DBH": dbh,
+                    "HEIGHT": 40.0,
+                    "LV_D": "L",
+                    "PHF_TREE": 2.47,
+                    "CR_CL": "C",
+                }
+            )
+    pd.DataFrame(rows).to_csv(psp / "faib_tree_detail.csv", index=False)
+    pd.DataFrame(
+        [
+            {"SITE_IDENTIFIER": site, "VISIT_NUMBER": visit, "CLSTR_ID": cluster}
+            for site, cluster in ((1, "1-PSP"), (2, "2-PSP"))
+            for visit in (1, 2)
+        ]
+    ).to_csv(psp / "faib_sample_byvisit.csv", index=False)
+    candidates = tmp_path / "candidates.json"
+    candidates.write_text(json.dumps([{"label": "base", "bamax": 50.0}]), encoding="utf-8")
+    monkeypatch.setattr(probe, "psp_tree_records", lambda *_a, **_k: ([{"species": "FD"}], 0))
+    monkeypatch.setattr(
+        probe,
+        "run_case",
+        lambda *_a, **_k: SimpleNamespace(database=tmp_path / "FVSOut.db"),
+    )
+    monkeypatch.setattr(probe, "summary_for_year", lambda *_a, **_k: {"ba": 31.0, "tph": 950.0})
+    status = probe.main(
+        [
+            "--data-dir",
+            str(data),
+            "--psp-dir",
+            str(psp),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--domain",
+            "CDF",
+            "--candidates",
+            str(candidates),
+            "--max-dbh-growth-rate",
+            "5",
+        ]
+    )
+    assert status == 0
+    screened = pd.read_csv(tmp_path / "out" / "screened_intervals.csv")
+    assert screened["interval_id"].tolist() == ["1|1|2008|2024"]
+    assert screened.loc[0, "max_end_dbh_cm"] == 401.7
+    rows_out = pd.read_csv(tmp_path / "out" / "probe.csv")
+    assert "1|1|2008|2024" not in rows_out["interval_id"].tolist()
 
 
 def test_candidates_refuses_empty_and_unlabelled_lists(tmp_path: Path) -> None:
