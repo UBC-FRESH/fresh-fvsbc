@@ -88,6 +88,14 @@ def test_the_ms_bundle_carries_the_growth_and_recruitment_rows() -> None:
     assert bundle.ingrowth is not None
 
 
+def test_the_sbsmw_bundle_carries_the_ingress_scale() -> None:
+    """SBSmw needs only the higher recruitment scale."""
+    bundle = load_default_bundle("sbsmw-v3")
+    assert not bundle.parameters
+    assert bundle.ingrowth is not None
+    assert bundle.ingrowth.scale == pytest.approx(1.2)
+
+
 def test_the_sbsmk1_bundle_carries_the_coupled_rows() -> None:
     """SBSmk1 carries the growth and mortality correction."""
     bundle = load_default_bundle("sbsmk1-v3")

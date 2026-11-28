@@ -29,6 +29,7 @@ def test_sbs_cites_the_w6_large_tree_row() -> None:
     assert "sbsmc2-v3" in record.evidence
     assert "w28-sbsmc2-stem-shape" in record.evidence
     assert "sbsmk1-v3" in record.evidence
+    assert "sbsmw-v3" in record.evidence
 
 
 def test_cma_is_out_of_scope_not_a_gap() -> None:
