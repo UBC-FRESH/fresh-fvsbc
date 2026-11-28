@@ -61,3 +61,23 @@ small trees), which is a sampling change on the existing CWH pairs, not new data
 - Collection: `~/workspace/bwbs-work/collect_engine_dgm.py`, `engine_dgm_pairs.csv`.
 - Fold: `probe_CWH_w37/` against `probe_CWH_zone_stable_bundle/`.
 - A/B: `cwh-height-w37-summary.csv` against `cwh-height-w11revert-summary.csv`.
+
+## 6. Height-balanced engine-DGM refit: blocked by tree-identity mapping
+
+A second, height-balanced sample (30 tall CWH intervals, 272 matched trees) was collected to refit
+W37 on the tall end. The FVS tree output does **not** preserve the observed tree numbers:
+
+- observed `TREE_NO` in a representative interval: 1–15;
+- FVS `FVS_TreeList_Metric.TreeId` for the same interval: 12, 13, 15, 18, 19, … .
+
+`TreeIndex` is also renumbered. Matching predicted DG to the observed height pairs therefore relies
+on DBH/species matching or a tree-list mapping that is not currently written. The first 1,107-tree
+sample matched only where the renumbering happened to coincide; it is not a reliable engine-DGM
+fit.
+
+A clean refit would require carrying the observed `TREE_NO` through `write_tree_file`/`TREEID` and
+reading it back from the output, or matching on a unique (plot, species, DBH) key. That is a
+separate tree-output change, not a height-equation fit.
+
+**Consequence:** W37 remains the best stand-level evidence for CW height. A height-balanced refit
+cannot be made reliable within the current tree-output interface.
