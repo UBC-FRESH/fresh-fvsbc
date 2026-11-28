@@ -1,4 +1,39 @@
-# fresh-fvsbc 0.41.19
+# fresh-fvsbc 0.41.20
+
+A Python wrapper for the BC variant of the Forest Vegetation Simulator.
+
+Pre-1.0, and the public API can change.
+
+## What changed since 0.41.19
+
+- **CDF high-BA ingress/mortality was tested and rejected.** On the cleaned held-out fold the
+  shipped `cdf-v3` has the lowest TPH MAE (**36.1**). Recruitment (scale 0.4–1.5), 60+ bin boosts
+  (×2–×4), 40–60 and 30–40 boosts, and all-species mortality (0.25–0.5) all raise it (38.6–54.5);
+  none improves both BA and TPH.
+- **The train fold cannot identify a >90 m²/ha term.** Its BA range is 29–56; the only BA >90
+  intervals in the calibration set belong to the held-out dense site itself. The expanded train
+  adds only 63–81 m²/ha intervals. A >90 fit would be validated on the same site it was fitted on.
+- **New data screen: `--max-unaccounted-removal`.** It drops intervals whose TPH/BA loss is not
+  explained by recorded dead trees (harvest/plot changes). On the CDF fold it removes
+  `4002933|1|2008|2022`, `4002809|1|2002|2022` and `4002975|1|1944|1947`; with the tree-84 screen
+  the held-out TPH MAE falls from 50.6 to **36.1**.
+
+**No shipped parameter changed**; `cdf-v3` and the engine stay as in 0.41.19.
+
+The engine stays **`fresh-fvsbc-pyfvs 0.4.16`**. Install:
+
+```
+pip install "fresh-fvsbc[fvs]==0.41.20"
+```
+
+## Gaps that remain
+
+- CDF dense stand: TPH still mixed-sign; needs an independent BA >90 remeasurement site.
+- CW large-tree height is still the donor.
+- Disturbance calibration is not done.
+- No A/B support cells.
+
+## fresh-fvsbc 0.41.19
 
 A Python wrapper for the BC variant of the Forest Vegetation Simulator.
 

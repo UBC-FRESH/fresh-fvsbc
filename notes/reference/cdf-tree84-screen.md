@@ -52,6 +52,12 @@ The two treatments agree: the BA error on the interval falls from −28.1 to +1.
 fold is unchanged (the affected interval is held out). **No shipped parameter changes**; the model's
 BA prediction of 125 m²/ha is correct against the corrected observation of 123.8.
 
+## 3b. High-BA ingress/mortality was tested and rejected
+
+After the screens, `cdf-v3` is the TPH optimum on the held-out fold (MAE 36.1); every high-BA
+ingress or mortality variant raises it. The train fold has no BA > 90 intervals, and the only such
+site is the held-out dense stand. See `cdf-high-ba-ingress-negative.md`.
+
 ## 4. What remains
 
 TPH is still low on the dense interval: model 462 vs observed 518 (−56), and the fold's TPH MAE is
