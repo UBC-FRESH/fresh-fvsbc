@@ -41,3 +41,17 @@ SBSmk1 is still −409 TPH biased. SBSmw now has its own bundle (0.41.13); SBSmc
 
 - Fold: `~/workspace/bwbs-work/probe_sbsmk1_bundle/` (274 rows).
 - Grid: `probe_sbsmk1_grid/`.
+
+## 6. Stem-shape refinement fails
+
+The remaining TPH bias (−409) was tested with a SBSmk1-scoped stem-shape term:
+
+| Shape | Test BA MAE | Test TPH MAE | Train BA MAE | Train TPH MAE |
+| --- | ---: | ---: | ---: | ---: |
+| shipped (rec 0.4) | **6.334** | **810.4** | **6.088** | **743.0** |
+| save <10 cm ×0.5 | 6.316 | 848.8 | 6.194 | 793.6 |
+| save <10 ×0.5, thin ≥20 ×1.5 | 6.201 | 847.1 | 6.148 | 790.5 |
+
+Saving small stems improves the TPH **bias** (−409 → −341) but worsens its **MAE**; the coupled
+thinning-large half lowers BA a little and still leaves TPH MAE worse. The recruitment scale 0.4
+is the optimum; a further stem-shape term only trades bias for variance. Reverted; no ship.

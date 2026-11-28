@@ -139,6 +139,89 @@ def test_probe_parser_carries_the_common_minimum_dbh() -> None:
     assert args.min_dbh == 4.0
 
 
+def test_probe_parser_carries_the_exact_bec_flag() -> None:
+    """An exact subzone match is explicit, so SBSmc does not absorb SBSmc2."""
+    args = probe._parser().parse_args(
+        [
+            "--data-dir",
+            "data",
+            "--psp-dir",
+            "psp",
+            "--out-dir",
+            "out",
+            "--domain",
+            "SBSmc",
+            "--candidates",
+            "candidates.json",
+            "--exact-bec",
+        ]
+    )
+    assert args.exact_bec is True
+
+
+def test_probe_main_exact_bec_excludes_the_sibling_subzones(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A prefix match would mix SBSmc2 into the SBSmc fold; the flag prevents it."""
+    data = tmp_path / "data"
+    data.mkdir()
+    row = {
+        "SITE_IDENTIFIER": 1,
+        "CLSTR_ID": "1-PSP",
+        "visit0": 1,
+        "visit1": 2,
+        "PLOT": 1,
+        "ba0": 30.0,
+        "dead_ba": 2.0,
+        "qmd": 12.0,
+        "TSA_DESC": "Quesnel TSA",
+        "year0": 2000,
+        "year1": 2010,
+        "years": 10,
+        "interval_id": "1|1|2000|2010",
+    }
+    pd.DataFrame([{**row, "BEC": "SBSmc1"}, {**row, "BEC": "SBSmc2"}]).to_csv(
+        data / "intervals.csv", index=False
+    )
+    pd.DataFrame(
+        [{"SITE_IDENTIFIER": 1, "VISIT_NUMBER": 2, "PLOT": 1, "ba": 32.0, "tph": 900.0}]
+    ).to_csv(data / "visits.csv", index=False)
+    candidates = tmp_path / "candidates.json"
+    candidates.write_text(json.dumps([{"label": "base", "bamax": 50.0}]), encoding="utf-8")
+    monkeypatch.setattr(probe, "_read_trees", lambda *_args, **_kwargs: pd.DataFrame({"x": [1]}))
+    monkeypatch.setattr(
+        probe, "psp_tree_records", lambda *_args, **_kwargs: ([{"species": "PL"}], 0)
+    )
+    monkeypatch.setattr(
+        probe,
+        "run_case",
+        lambda *_args, **_kwargs: SimpleNamespace(database=tmp_path / "FVSOut.db"),
+    )
+    monkeypatch.setattr(
+        probe, "summary_for_year", lambda *_args, **_kwargs: {"ba": 31.0, "tph": 950.0}
+    )
+    status = probe.main(
+        [
+            "--data-dir",
+            str(data),
+            "--psp-dir",
+            str(tmp_path / "psp"),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--domain",
+            "SBSmc1",
+            "--exact-bec",
+            "--candidates",
+            str(candidates),
+            "--test-year-from",
+            "1995",
+        ]
+    )
+    assert status == 0
+    rows = pd.read_csv(tmp_path / "out" / "probe.csv")
+    assert rows["BEC"].tolist() == ["SBSmc1"]
+
+
 def test_probe_main_writes_a_summary_with_a_mocked_extension(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

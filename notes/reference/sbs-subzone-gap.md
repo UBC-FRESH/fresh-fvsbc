@@ -34,3 +34,32 @@ EP 5%, so a species-specific growth/mortality calibration has room to work.
 
 - Splits: `~/workspace/bwbs-work/{SBSmk1,SBSmw,SBSmc}_test_sites.txt`.
 - Current engine: `probe_{SBSmk1,SBSmw,SBSmc}_w22/`.
+
+## 4. The SBSmc "imbalance" was a prefix bug
+
+The earlier SBSmc fold used `--domain SBSmc`, which matches **SBSmc1, SBSmc2 and SBSmc3** by prefix,
+while the test-site list held only the 7 SBSmc sites. The train row was therefore mostly SBSmc2, so
+its +2.19 BA / −404 TPH was the SBSmc2 residual, not SBSmc.
+
+An exact-BEC fold (`--exact-bec`, 24 held-out / 95 train intervals) shows SBSmc is already well
+calibrated:
+
+| Fold | BA bias / MAE | TPH bias / MAE |
+| --- | ---: | ---: |
+| test | −0.80 / 1.93 | −22 / 71 |
+| train | +0.82 / 2.54 | +21 / 69 |
+
+`scripts/run_calibration_probe.py` now has `--exact-bec` so a subzone fold cannot absorb its
+siblings. SBSmc needs no bundle.
+
+## 5. SBSdw1 has a fold divergence
+
+SBSdw1 (43 sites, 11 held-out / 61 train intervals) over-predicts BA in both folds but its TPH
+error changes sign: **+28 test / −66 train**. Lowering growth and raising mortality improves BA MAE
+in every candidate but worsens train TPH MAE (base 245.8; best 248.1). No candidate improves all
+four, so no bundle ships.
+
+## 6. SBSwk2 ships
+
+SBSwk2 (90 sites) under-predicts both BA and TPH in both folds and is fixed by `sbswk2-v3`; see
+`notes/reference/sbswk2-bundle.md`.
